@@ -1,4 +1,3 @@
-using namespace std;
 #include "mpi.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,31 +8,7 @@ using namespace std;
 #include <mkl.h>
 #include "fullci.h"
 
-int main()
-{
-
-   int argc;
-   char argv;
-   int rank, size;
-
-   MPI::Init();
-//    cudaThreadSynchronize();
-//    cublasInit();
-   size = MPI::COMM_WORLD.Get_size();
-   rank = MPI::COMM_WORLD.Get_rank();
-
-//   cout << size << rank << "\n";
-    init(size, rank);
-    hamiltonian(rank);
-
-   if(rank == 0){
-    qr();
-   }
-//    lanzos();
-//    cublasShutdown();
-    MPI::Finalize();
-
-}
+using namespace std;
 
 void init (int size , int rank)
 {
