@@ -1,6 +1,6 @@
 
 
-namespace ithaca { 
+namespace iquads { 
 
 template < typename T >
 class matrix : public tensor

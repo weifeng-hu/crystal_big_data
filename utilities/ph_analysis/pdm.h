@@ -57,6 +57,7 @@ public:
     std::cout << " error: number of elements exceeds limit 1e8 " << std::endl;
     abort();
    }
+   this->store.fill(0.0e0);
   }
   ~twopdm(){};
 
@@ -74,13 +75,28 @@ public:
 
   const double get_element( const int ind_i, const int ind_j, const int ind_k, const int ind_l ) const 
     { return store.at( ind_i * norb * norb * norb + ind_j * norb * norb + ind_k * norb + ind_l ); }
-  const double set_element( const int ind_i, const int ind_j, const int ind_k, const int ind_l )
+  double& set_element( const int ind_i, const int ind_j, const int ind_k, const int ind_l )
     { return store.at( ind_i * norb * norb * norb + ind_j * norb * norb + ind_k * norb + ind_l ); }
 
   double& operator() ( const int ind_i, const int ind_j, const int ind_k, const int ind_l )
     { return store.at( ind_i * norb * norb * norb + ind_j * norb * norb + ind_k * norb + ind_l); }
   const double operator() ( const int ind_i, const int ind_j, const int ind_k, const int ind_l ) const 
     { return store.at( ind_i * norb * norb * norb + ind_j * norb * norb + ind_k * norb + ind_l ); }
+
+  twopdm& operator+ ( const twopdm& to_be_added ){
+   const int norb_a = to_be_added.get_norb();
+   if( norb_a != this->norb ){ cout << " error: two pdms with different norbs cannot be added"; abort(); }
+   for( int i = 0; i < norb; i++ ){
+    for( int j = 0; j < norb; j++ ){
+     for( int k = 0; k < norb; k++ ){
+      for( int l = 0; l < norb; l++ ){
+       this->set_element( i, j, k, l ) = this->get_element( i, j, k, l ) + to_be_added( i, j, k, l );
+      }
+     }
+    }
+   }
+   return *this;
+  }
 
 private:
   std::array< double, NACT_THRESH * NACT_THRESH * NACT_THRESH * NACT_THRESH > store;

@@ -2,6 +2,7 @@
 #define PH_ANALYSIS_H
 
 #include <map>
+#include <array>
 
 #include "pdm.h"
 #include "overlap_matrix.h"
@@ -16,7 +17,17 @@ onepdm transform_element_1( const mo_coefficients& mo, const double element, con
 
 twopdm transform_element_2( const mo_coefficients& mo, const double element, const int ind_i, const int ind_j, const int ind_k, const int ind_l );
 
+onepdm transform_element_2( const mo_coefficients& mo, const double element, const int ind_i, const int ind_j );
+
+//int print_projected_element_double_spin_excitation( const twopdm& mat_a, const twopdm& mat_b );
+
+multimap< double, array<int, 4> > get_pphh_list( const twopdm& gamma2, const double thresh );
+
+int print_projected_element_double_spin_excitation( const twopdm& mat_a, const mo_coefficients& u_mat );
+
 int print_projected_element_1( const onepdm& mat, const double value, const int ind_i, const int ind_j);
+
+int print_projected_element_2( const twopdm& mat, const double value, const int ind_i, const int ind_j);
 
 int transform_ph_main( multimap<double, pair<int, int> >& ph_pair, const mo_coefficients& c_mo, const double thresh );
 

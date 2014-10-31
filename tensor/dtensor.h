@@ -1,7 +1,6 @@
 
 
-namespace iqs {
+namespace iquads {
 
-namespace 
 
 }

@@ -1,7 +1,7 @@
 #include <vector>
 #include "tensor/tensor_class.h"
 
-namespace iqs { 
+namespace iquads { 
 
 // Constructors
 export

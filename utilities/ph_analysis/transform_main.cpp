@@ -1,5 +1,6 @@
 #include <utility>
 #include <vector>
+#include <array>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -34,12 +35,22 @@ int transform_pphh_main( multimap< double, pair<int, int> >& pphh_pair, const mo
 {
 
   std::multimap< double, pair<int, int> > :: iterator iter;
+
   for( iter = pphh_pair.begin(); iter != pphh_pair.end(); ++iter ){
-   double value = iter->first;
-   int ind_i = (iter->second).first;
-   int ind_j = (iter->second).second;
-//    mo_coefficients mat2 = transform_element_2( c_mo, value, ind_i, ind_i, ind_j, ind_j );
-//    print_projected_twopdm( mat, value, ind_i, ind_i, ind_j, ind_j );
+   const double value = iter->first;
+   const int ind_i = (iter->second).first;
+   const int ind_j = (iter->second).second;
+   onepdm mat = transform_element_2( c_mo, value, ind_i, ind_j );
+   print_projected_element_1( mat, value, ind_i, ind_j );
+  }
+
+
+  for( iter = pphh_pair.begin(); iter != pphh_pair.end(); ++iter ){
+   const double value = iter->first;
+   const int ind_i = (iter->second).first;
+   const int ind_j = (iter->second).second;
+   twopdm mat = transform_element_2( c_mo, value, ind_i, ind_j, ind_i, ind_j );
+   print_projected_element_2( mat, value, ind_i, ind_j );
   }
 
   return 0;
@@ -70,6 +81,8 @@ multimap< double, pair<int, int> > get_pphh_pairs( const twopdm& gamma2, const d
   multimap< double, pair<int, int> > pphh_pairs;
   const int norb = gamma2.get_norb();
 
+ cout << norb<< endl;
+
   for( int i = 0; i < norb; i++ ){
    for( int j = 0; j < norb; j++ ){
     double value = gamma2( i, i, j, j );
@@ -79,6 +92,34 @@ multimap< double, pair<int, int> > get_pphh_pairs( const twopdm& gamma2, const d
    }
   }
   return pphh_pairs;
+
+}
+
+multimap< double, array<int, 4> > get_pphh_list( const twopdm& gamma2, const double thresh )
+{
+
+  multimap< double, array<int,4> > pphh_list;
+  const int norb = gamma2.get_norb();
+
+  for( int i = 0; i < norb; i++ ){
+   for( int j = 0; j < norb; j++ ){
+    for( int k = 0; k < norb; k++ ){
+     for( int l = 0; l < norb; l++ ){
+      const double value = gamma2( i, j, k, l );
+      array<int, 4> index;
+      index[0] = i;
+      index[1] = j;
+      index[2] = k;
+      index[3] = l;
+//cout << i << " " << j << " " << k << " " << l << " " << value << endl;
+      if( fabs( value ) >= thresh ){
+       pphh_list.insert( pair< double, array<int, 4> >( value, index ) );
+      }
+     }
+    }
+   }
+  }
+  return pphh_list;
 
 }
 
@@ -159,11 +200,13 @@ int transform_main( const transform_info& trans_info )
    }
   }
 
+/*
   {
    const double thresh = trans_info.get_t1_thresh();
    multimap< double, pair<int, int> > ph_pairs = get_ph_pairs( trans_info.get_gamma1(), thresh );
    transform_ph_main( ph_pairs, u_mat );
   }
+*/
 
 /*
   {
@@ -172,6 +215,27 @@ int transform_main( const transform_info& trans_info )
    transform_pphh_main( pphh_pairs, u_mat );
   }
 */
+
+
+  {
+   const double thresh = trans_info.get_t2_thresh();
+   multimap< double, array<int, 4 > > pphh_list = get_pphh_list( trans_info.get_gamma2(), thresh );
+   multimap< double, array<int, 4 > > :: reverse_iterator it_list = pphh_list.rbegin();
+cout << pphh_list.size() << endl;
+   twopdm total( trans_info.get_gamma2().get_norb() );
+   for( ; it_list != pphh_list.rend(); it_list++ ){
+    const double value = it_list->first;
+    const int i = (it_list->second).at(0);
+    const int j = (it_list->second).at(1);
+    const int k = (it_list->second).at(2);
+    const int l = (it_list->second).at(3);
+    cout << i << " " << j << " " << k << " " << l << " " << value << endl;
+    twopdm mat = transform_element_2( u_mat, value, i, j, k, l );
+    total = total + mat;
+//    break;
+   }
+   print_projected_element_double_spin_excitation( total, u_mat );
+  }
 
   return 0;
 

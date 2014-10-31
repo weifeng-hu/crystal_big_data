@@ -1,19 +1,13 @@
-// cmd_options.cpp
-//
-// funtions included:
-//   print_little_help()
-//   print_help()
-//   cmd_options:cmd_options()
 
 #include <iostream>
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../ithaca/cmd_options.h"
+#include "iquads/cmd_options.h"
 
 using namespace std;
 
-namespace ithaca {
+namespace iquads {
 
 // prints a brief help script
 void print_little_help( int iopt )
@@ -291,6 +285,8 @@ cmd_options::cmd_options( int argc, char* argv[] )
 
 
 };  // end of cmd_options::cmd_options
+
+
 
 
 } // end of namespace ithaca

@@ -14,14 +14,134 @@
 //
 // ========================================================
 //
+#include <stdlib.h>
 #include <assert.h>
-#include <vector>
 #include <stdexcept>
 #include <iostream>
+#include <vector>   // for std::vector
+#include <array>    // for std::array
+#include <numeric>  // for std::accumulate
+#include <functional> // for std::multiply
 
 using namespace std;
 
-namespace iqs { 
+namespace iquads { 
+
+#ifndef USE_VECTOR
+template < class T, size_t N >
+class tensor
+{
+public:
+  tensor(){
+   this->dimensions.fill(0);
+   this->len = 0;
+   this->check_size();
+  }
+  tensor( const int d0 ){
+   this->dimensions.fill(0);
+   this->dimensions[0] = d0;
+   this->len = d0;
+   this->check_size();
+  }
+  tensor( const int d0, const int d1 ){
+   this->dimensions.fill(0);
+   this->dimensions[0] = d0; this->dimensions[1] = d1;
+   this->len = d0 * d1;
+   this->check_size();
+  }
+  tensor( const int d0, const int d1, const int d2 ){
+   this->dimensions.fill(0);
+   this->dimensions[0] = d0; this->dimensions[1] = d1; this->dimensions[2] = d2;
+   this->len = d0 * d1 * d2;
+   this->check_size();
+  }
+  tensor( const int d0, const int d1, const int d2, const int d3 ){
+   this->dimensions.fill(0);
+   this->dimensions[0] = d0; this->dimensions[1] = d1; this->dimensions[2] = d2; this->dimensions[3] = d3;
+   this->len = d0 * d1 * d2 * d3;
+   this->check_size();
+  }
+/*
+  tensor( const int d0, const int d1, const int d2, const int d3, const int d4 ){
+   this->dimensions.fill(0);
+   this->dimensions[0] = d0; this->dimensions[1] = d1; this->dimensions[2] = d2; this->dimensions[3] = d3; this->dimensions[4] = d4;
+   this->len = d0 * d1 * d2 * d3 * d4;
+   this->check_size();
+  }
+  tensor( const int d0, const int d1, const int d2, const int d3, const int d4, const int d5 ){
+   this->dimensions.fill(0);
+   this->dimensions[0] = d0; this->dimensions[1] = d1; this->dimensions[2] = d2; this->dimensions[3] = d3; this->dimensions[4] = d4; this->dimensions[5] = d5;
+   this->len = d0 * d1 * d2 * d3 * d4 * d5;
+   this->check_size();
+  }
+  tensor( const int d0, const int d1, const int d2, const int d3, const int d4, const int d5, const int d6 ){
+   this->dimensions.fill(0);
+   this->dimensions[0] = d0; this->dimensions[1] = d1; this->dimensions[2] = d2; this->dimensions[3] = d3; this->dimensions[4] = d4; this->dimensions[5] = d5; this->dimensions[6] = d6;
+   this->len = d0 * d1 * d2 * d3 * d4 * d5 * d6;
+   this->check_size();
+  }
+  tensor( const int d0, const int d1, const int d2, const int d3, const int d4, const int d5, const int d6, const int d7 ){
+   this->dimensions.fill(0);
+   this->dimensions[0] = d0; this->dimensions[1] = d1; this->dimensions[2] = d2; this->dimensions[3] = d3; this->dimensions[4] = d4; this->dimensions[5] = d5; this->dimensions[6] = d6; this->dimensions[7] = d7;
+   this->len = d0 * d1 * d2 * d3 * d4 * d5 * d6 * d7;
+   this->check_size();
+  }
+  tensor( const int d0, const int d1, const int d2, const int d3, const int d4, const int d5, const int d6, const int d7, const int d8 ){
+   this->dimensions.fill(0);
+   this->dimensions[0] = d0; this->dimensions[1] = d1; this->dimensions[2] = d2; this->dimensions[3] = d3; this->dimensions[4] = d4; this->dimensions[5] = d5; this->dimensions[6] = d6; this->dimmensions[7] = d7;
+   this->dimensions[8] = d8;
+   this->len = d0 * d1 * d2 * d3 * d4 * d5 * d6 * d7 * d8;
+   this->check_size();
+  }
+  tensor( const int d0, const int d1, const int d2, const int d3, const int d4, const int d5, const int d6, const int d7, const int d8, const int d9 ){
+   this->dimensions.fill(0);
+   this->dimensions[0] = d0; this->dimensions[1] = d1; this->dimensions[2] = d2; this->dimensions[3] = d3; this->dimensions[4] = d4; this->dimensions[5] = d5; this->dimensions[6] = d6; this->dimensions[7] = d7;
+   this->dimensions[8] = d8; this->dimensions[9] = d9;
+   this->len = d0 * d1 * d2 * d3 * d4 * d5 * d6 * d7 * d8 * d9;
+   this->check_size();
+  }
+*/
+
+public:
+  void check_size(){
+   {
+    const int size = store.size();
+    if( len > size ){
+     cout << " tensor construction error: len > size. " << endl;
+     cout << " requested len: " << len << "\tcompiling-time size:" << size << endl;
+     abort();
+    }
+   }
+   if( len < 0 ){
+    cout << " tensor construction error: len < 0 " << endl;
+    abort();
+   }
+  }
+
+public:
+  const int get_dim( const int ind ) const { return this->dimensions.at(ind); }
+  int get_dim( const int ind ) { return this->dimensions.at(ind); }
+
+  const int get_len() const { return this->len; }
+  int get_len() { return this->len; }
+
+  T& operator() ( const int i0 )
+     { return this->store.at(i0); }
+  T& operator() ( const int i0, const int i1 )
+     { return this->store.at(i1 * dimensions[0] + i0); }
+  T& opeartor() ( const int i0, const int i1, const int i2 )
+     { return this->store.at( i2 * dimensions[1] * dimensions[0] + i1 * dimensions[0] + i0 ); }
+  T& operator() ( const int i0, const int i1, const int i2, const int i3 ) 
+     { return this->store.at( i3 * dimensions[2] * dimensions[1] * dimensions[0] + i2 * dimensions[1] * dimensions[0] + i1 * dimensions[0] + i0 ); }
+
+private:
+  array< T, N > store;
+  array< int, 10 > dimensions;
+  int len;
+
+}
+
+#else
 
 template < typename T >
 class tensor
@@ -249,7 +369,7 @@ inline tensor<T> :: tensor( const int d0, const int d1, const int d2, const int 
   this->data.resize( d0 * d1 * d2 * d3 * d4 * d5 );
   this->size_ = data.size();
 }
-
+#endif
 
 } // end of iqs
 

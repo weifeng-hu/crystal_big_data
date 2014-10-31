@@ -171,6 +171,11 @@ public:
   const double get_element( const int ind ){ return this->store.at(ind); }
   double& operator( const int ind ){ return this->store.at(ind); }
 
+  wavefunction operator* ( const virtual_op op, const wavefunction v){
+   
+
+  }
+
 private:
   array<double, DIM_THRESH> store_d;
   array<int, DIM_THRESH > store_p;

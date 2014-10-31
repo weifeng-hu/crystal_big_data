@@ -179,24 +179,23 @@ int transform_info::read()
     if1pdm.close();
   }
 
-/*
+  this->gamma2.set_norb() = this->nact;
+  this->gamma2.set_n_element() = nact * nact * nact * nact;
+  this->gamma2.set_store().fill(0.0e0);
   {
-    FILE* f_2pdm = fopen( p2_filename.c_str(), "rt" );
-    for( int i = 0; i < norb; i++ ){
-     for( int j = 0; j < norb; j++ ){
-      for( int k = 0; k < norb; k++ ){
-       for( int l = 0; l < norb; l++ ){
-        double value;
-        int ind_i, ind_j, ind_k, ind_l;
-        fscanf( f_2pdm, "%lf %d %d %d %d", &value, &ind_i, &ind_j, &ind_k, &ind_l );
-        gamma2(ind_i, ind_j, ind_k, ind_l) = value;
-       }
-      }
-     }
+    ifstream if2pdm;
+    if2pdm.open( p2_filename.c_str() );
+    if2pdm >> this->nact;
+    while( if2pdm.good() ){
+      double value;
+      int ind_i, ind_j, ind_k, ind_l;
+//      if2pdm >> value >> ind_i >> ind_j >> ind_k >> ind_l;
+      if2pdm >> ind_i >> ind_j >> ind_k >> ind_l >> value;
+      gamma2(ind_i, ind_j, ind_k, ind_l) = value;
     }
-    fclose(f_2pdm);
+    if2pdm.close();
   }
-*/
+
   // compute inverse of C
 
   return 0;

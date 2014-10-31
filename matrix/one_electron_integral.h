@@ -6,19 +6,19 @@
 
 using namespace std;
 
-namespace iqs { namespace matrix {
+namespace iquads { namespace matrix {
 
 class one_electron_integral
 {
 private:
-  iqs::tensor<double> data;
+  iquads::tensor<double> data;
 
 public:
   one_electron_integral( const int dim ) : data( dim, dim ) {} ;
   ~one_electron_integral(){}
 
 public:
-  iqs::tensor<double>& get_data(){ return this->data; }
+  iquads::tensor<double>& get_data(){ return this->data; }
   double& operator() ( const int i, const int j ){ return this->data( i, j ); }
 
 public:

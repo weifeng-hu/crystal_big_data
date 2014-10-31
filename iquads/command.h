@@ -1,21 +1,21 @@
-// cmd_options.h
-// header for cmd_options
-// 
-
 #include <string>
+#include <vector>
 
-namespace ithaca { 
+using namespace std;
+
+namespace iquads {
 
 void print_little_help( int iopt );
 void print_help();
 
-// ithaca::cmd_options is the most primary command option
-// class in the whole program package, it defines the essential 
-// prameters including, the path of executive, the working and 
-// scratch directories and input/output files.
-//
-// it is the parent class for other command option class 
-// in other parts of the program package
+struct instruction
+{
+
+private:
+  string instruct_name;
+
+
+};
 
 class cmd_options {
 
@@ -24,6 +24,11 @@ public:
   ~cmd_options(){};
 
 public:
+  setup_instructions();
+
+private:
+  vector< instruction > instruct;
+  
   std::string path_exec;
   std::string dir_exec;
 
@@ -49,4 +54,4 @@ public:
 
 };
 
-} // end of ithaca::cmd_options
+} // end of iquads::cmd_options

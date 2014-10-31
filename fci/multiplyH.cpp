@@ -9,11 +9,46 @@ namespace fci {
 wavefunction& wavefunction::multiplyQC()
 {
 
-  // one_electron term
+  // wavefunction
+  wavefunction Hv;
 
+  // one_electron term
+  {
+   wavefunction cdv;
+   for( int i = 0; i < nsite; i++ ){
+    wavefunction dv;
+    for( int j = 0; j < nsite; j++ ){
+      double int_v = v1( i, j );
+      dv += int_v * des(j) * v;
+    }
+    cdv += cre(i) * dv;
+   }
+  Hv += cdv;
+  }
 
   // two_electron term
-  
+  {
+   wavefunction ccddv;
+   for( int i = 0; i < nsite; i++ ){
+    wavefunction cddv;
+    for( int j = 0; j < nsite: j++ ){
+     wavefunction ddv;
+     for( int k = 0; k < nsite; k++ ){
+      wavefunction dv;
+      for( int l = 0; l < nsite; l++ ){
+       double int_v = v2(i, j, k, l);
+       dv += des(l) * v;
+      }
+      ddv += des(k) * dv;
+     }
+     cddv += cre(j) * ddv;
+    }
+    ccddv += cre(i) * cddv;
+   }
+  Hv += ccddv;
+  }
+
+  return Hv;
 
 }
 
