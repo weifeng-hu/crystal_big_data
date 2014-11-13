@@ -1,86 +1,57 @@
 #ifndef LAUNCH_SEQUENCE_H
 #define LAUNCH_SEQUENCE_H
 
+#include <memory>
+#include <cstddef>
 #include <string>
 #include <vector>
+#include "iquads/step.h"
+#include "iquads/coordinate.h"
+#include "iquads/platform_info.h"
 
 namespace iquads {
 
-struct platform_info
+struct sequence
 {
 public:
-  platform_info(){}
-  ~platform_info(){}
-
-private:
-  string platform_kind;
-  string cpu_model;
-  string gpu_model;
-  unsigned int launch_mode;
-  bool parallel;
-  unsigned int nprocs;
-  unsigned int nthread_procs;
-
-}
-
-struct step
-{
-public:
-  step(){};
-  ~step(){};
-
-public:
-  void setup( const string keyword ){
-   this->program_name = setup_program_name( keyword );
-   this->input_name   = work_dir + op_code_name + keyword + ".inp";
-   this->output_name  = work_dir + op_code_name + keyword + ".out";
-   this->execution_cmdline = setup_cmdline();
-   write_input( this->input_name );
+  sequence(){};
+  sequence( const iquads::command cmd )
+  {
+    steps.resize(0);
+    this->coords = cmd.get_coordinate();
+    this->op_code_name = cmd.get_op_code_name();
+    this->workdir = cmd.get_workdir();
+    this->instruct_code = cmd.get_instruct_code();
   }
-
-private:
-  string setup_program_name(){
-   return iquads::py_interface::get_program_name( keyword );
-  }
-  void write_input( input_name ){};
-
-private:
-  platform_info platf_info;
-
-  vector< string > opts;
-  vector< string > input_container;
-  string keyword;
-  string op_code_name;
-  string program_name;
-  string work_dir;
-  string input_name;
-  string output_name;
-  string execution_cmdline;
-
-}
-
-struct launch_sequence
-{
-public:
-  launch_sequence(){};
-  ~launch_sequence(){};
+  ~sequence(){};
 
 public:
-  void setup_seqs( iquads :: command cmd ){
-   this->steps.resize(0);
-   const vector<string> keywords = cmd.get_keywords();
-   for( int i = 0; i < keywords.size(); i++ ){
-    for( int j = 0; j < (iquads :: known_seqs).size(); j++ ){
-     const string known_seq = known_seqs.at(j);
-     if( boost::iequals( keywords, known_seq ) ){
-      steps.push_back( load_seq_default( known_eq ) );
-     }
+  void setup_codes()
+   { /* to be defined*/ }
+  void setup_stages()
+   {
+    stage_factory factory = *(createStageFactory( /*condition*/ ));
+    for( size_t i = 0; i < nstages; i++){
+      stages.push_back( factory.get_stage( code.at(i) ) );
     }
-   }
+   } // end of set
+  void launch()
+  {
+    const size_t n_stage = stages.size();
+    for( size_t i = 0; i < n_stage; i++ ){
+     (stage.at(i))->perform();
+    }
   }
 
 private:
-  vector< step > steps;
+  vector< unique_ptr< stage > > stages;
+  vector< unsigned int > codes;
+  coordinate coords;
+  platform_info platform;
+
+  string op_code_name;
+  string workdir;
+  unsigned int instruct_code;
 
 };
 

@@ -13,7 +13,8 @@
 #include <stdlib.h>
 #include <string>
 #include <iostream>
-#include "iquads/cmd_options.h"
+#include <boost/algorithm/string.hpp>
+#include "iquads/command.h"
 
 using namespace std;
 
@@ -21,24 +22,42 @@ int main( int argc, char* argv[] )
 {
 
    string input;
-   if( argc == 1 ){
+   if( argc != 2 ){
      cout << endl;
-     cout << "Command Error:  unknown input file" << endl;
-     cout << "To run this program, a correct input file must always be specified." << endl;
+     cout << "Command line error:  incorrect command line" << endl;
+     cout << endl;
+     cout << " Command line:" << endl;
+     cout << "  <exec_dir>/iquads <input>" << endl;
+     cout << endl;
+     cout << " For detailed usage, type -h or --help. " << endl;
      cout << endl;
      abort();
    }
-   if( argc == 2 ){
+   else
+   {
      input = argv[1];
+     if( boost::iequals( input, "-h" ) || boost::iequals( input, "--help" ) ){
+      iquads::print_help();
+      exit(0);
+     }
+     else{
+      continue;
+     }
    }
 
    iquads::command cmd;
    cmd.read_input( input );
-   cmd.setup_instructions();
+   if( cmd.coordination_is_set() == true && cmd.instruction_key_is_set() == true ){
+     cmd.setup_instructions();
+   }
+   else
+   {
+     cout << "error: either coordination or instruction is not roundly set" << endl;
+     abort();
+   }
 
-   iquads::launch_sequence launch_seq;
-   launch_seq.setup_seq( cmd );
-
-   launch( launch_seq );
+   iquads::sequence seq( cmd );
+   seq.setup_stage();
+   seq.launch();
 
 }
