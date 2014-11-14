@@ -30,7 +30,7 @@ private:
 
 };
 
-typedef solution_eigen< orb_coeff, vector<double> > orbital_solution;
+typedef solution_eigen< orb_coeff, vector<double> > orb_solution;
 typedef solution_eigen< ci_vec, double > ci_solution;
 typedef solution_eigen< mps, double > mps_solution;
 
