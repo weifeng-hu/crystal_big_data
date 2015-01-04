@@ -22,6 +22,18 @@ public:
   ~onepdm(){};
 
 public:
+  void set_type_vo()
+  {
+    cout << "  setting onepdm type to vo " << endl;
+    for( size_t i = 0; i < norb; i++ ){
+     for( size_t j = 0; j < norb; j++ ){
+      if( i < nocc ) this->set_element( i, j ) = 0.0e0;
+      if( j >= nocc ) this->set_element( i, j ) = 0.0e0;
+     }
+    }
+  }
+
+public:
   const int get_norb() const { return this->norb; }
   int& set_norb() { return this->norb; }
 
@@ -41,7 +53,7 @@ public:
 
 private:
   array< double, NACT_THRESH * NACT_THRESH > store;
-  int norb;
+  int norb, nocc;
   int n_element;
 
 };
@@ -60,6 +72,25 @@ public:
    this->store.fill(0.0e0);
   }
   ~twopdm(){};
+
+public:
+  void set_type_vvoo()
+  {
+   cout << "  setting twopdm type to vvoo " << endl;
+   for( size_t i = 0; i < norb; i++ ){
+    for( size_t j = 0; j < norb; j++ ){
+     for( size_t k = 0; k < norb; k++ ){
+      for( size_t l = 0; l < norb; l++ ){
+       if( i < nocc ) this->set_element( i, j, k, l ) = 0.0e0;
+       if( j < nocc ) this->set_element( i, j, k, l ) = 0.0e0;
+       if( k >= nocc ) this->set_element( i, j, k, l ) = 0.0e0;
+       if( l >= nocc ) this->set_element( i, j, k, l ) = 0.0e0;
+      }
+     }
+    }
+   }
+
+  }
 
 public:
   const int get_norb() const { return this->norb; }
@@ -101,6 +132,7 @@ public:
 private:
   std::array< double, NACT_THRESH * NACT_THRESH * NACT_THRESH * NACT_THRESH > store;
   int norb;
+  int nocc;
   int n_element;
 
 };

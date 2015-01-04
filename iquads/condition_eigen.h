@@ -96,6 +96,10 @@ private:
 
 struct condition_scf : public condition_eigen
 {
+public:
+  void set_conditions()
+   { /* to be defined*/ }
+
 private:
   string basis_set_tag_;
   int scftype_;

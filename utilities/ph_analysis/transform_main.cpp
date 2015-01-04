@@ -216,7 +216,14 @@ int transform_main( const transform_info& trans_info )
   }
 */
 
+  {
+   twopdm oovv = trans_info.get_gamma2();
+   oovv.set_type_vvoo();
+   twopdm mat = transform_2( u_mat, oovv );
+   print_projected_bimagon( mat );
+  }
 
+/*
   {
    const double thresh = trans_info.get_t2_thresh();
    multimap< double, array<int, 4 > > pphh_list = get_pphh_list( trans_info.get_gamma2(), thresh );
@@ -236,6 +243,7 @@ cout << pphh_list.size() << endl;
    }
    print_projected_element_double_spin_excitation( total, u_mat );
   }
+*/
 
   return 0;
 

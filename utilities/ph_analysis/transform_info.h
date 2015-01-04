@@ -104,6 +104,7 @@ private:
 
   double t1_thresh, t2_thresh;
   int norb;
+  int nocc;
   int nact;
   int solve_u;
   int compute_s_only;

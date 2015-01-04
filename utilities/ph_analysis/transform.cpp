@@ -12,6 +12,13 @@ using namespace std;
 
 namespace ph_analysis{
 
+onepdm transform_1( mo_coefficients& u_mat, onepdm& mat )
+{
+
+  
+
+}
+
 onepdm transform_element_1( const mo_coefficients &u_mat, const double element, const int ind_i, const int ind_j )
 {
 
@@ -54,6 +61,13 @@ onepdm transform_element_2( const mo_coefficients &u_mat, const double element, 
 
 }
 
+twopdm transform_2( mo_coefficients& u_mat, twopdm& mat )
+{
+
+ 
+
+}
+
 twopdm transform_element_2( const mo_coefficients &u_mat, const double element, const int ind_i, const int ind_j, const int ind_k, const int ind_l )
 {
 
@@ -78,6 +92,16 @@ twopdm transform_element_2( const mo_coefficients &u_mat, const double element, 
    }
 
   return trans_pdm_ao;
+
+}
+
+void print_projected_exciton( onepdm& ao_mat )
+{
+
+}
+
+void print_projected_bimagon( twopdm& ao_mat )
+{
 
 }
 

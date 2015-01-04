@@ -60,37 +60,36 @@ public:
      unsigned int CODE = ( TYPE & PARA & METHOD & SOLUTION );
      switch( code )
      {
-      case SOLVE_HF:
-       unique_ptr< stage > stage_ptr( new solve< scf_solver, orb_solution > );
-       stage_ptr->set_para();
+      case SOLVER_SCF:
+       unique_ptr< stage > stage_ptr( new solve< scf_solver > );
        return stage_ptr;
        break;
-      case SOLVE_HF_ORCA:
-       unique_ptr< stage > stage_ptr( new solve< scf_solver_orca, orb_solution > );
+      case SOLVER_SCF_ORCA:
+       unique_ptr< stage > stage_ptr( new solve< scf_solver_orca > );
        return stage_ptr;
        break;
-      case SOLVE_CPHF:
-       unique_ptr< stage > stage_ptr( new solve< cphf_solver, orblr> );
+      case SOLVER_CPHF:
+       unique_ptr< stage > stage_ptr( new solve< cphf_solver > );
        return stage_ptr;
        break;
-      case SOLVE_CPHF:
-       unique_ptr< stage > stage_ptr( new solve< cphf_solver_orca, orblr > );
+      case SOLVER_CPHF_ORCA:
+       unique_ptr< stage > stage_ptr( new solve< cphf_solver_orca > );
        return stage_ptr;
        break;
-      case SOLVE_DMRG:
-       unique_ptr< stage > stage_ptr( new solve< dmrg_solver, mps_solution > );
+      case SOLVER_DMRG:
+       unique_ptr< stage > stage_ptr( new solve< dmrg_solver > );
        return stage_ptr;
        break;
-      case SOLVE_DMRG_BLOCK:
-       unique_ptr< stage > stage_ptr( new solve< dmrg_solver_block, mps_solution> );
+      case SOLVER_DMRG_BLOCK:
+       unique_ptr< stage > stage_ptr( new solve< dmrg_solver_block > );
        return stage_ptr;
        break;
-      case SOLVE_CPDMRG:
-       unique_ptr< stage > stage_ptr( new solve< cpdmrg_solver, mps_lr> );
+      case SOLVER_CPDMRG:
+       unique_ptr< stage > stage_ptr( new solve< cpdmrg_solver > );
        return stage_ptr;
        break;
-      case SOLVE_CPDMRG_BLOCK:
-       unique_ptr< stage > stage_ptr( new solve< cpdmrg_solver_block, mps_lr > );
+      case SOLVER_CPDMRG_BLOCK:
+       unique_ptr< stage > stage_ptr( new solve< cpdmrg_solver_block > );
        return stage_ptr;
       default:
         cout << " error: unknown stage info: " << endl;

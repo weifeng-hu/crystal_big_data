@@ -19,6 +19,14 @@ twopdm transform_element_2( const mo_coefficients& mo, const double element, con
 
 onepdm transform_element_2( const mo_coefficients& mo, const double element, const int ind_i, const int ind_j );
 
+onepdm transform_1( mo_coefficients& u_mat, onepdm& mat );
+
+twopdm transform_2( mo_coefficients& u_mat, twopdm& mat );
+
+void print_projected_exciton( onepdm& ao_mat );
+
+void print_projected_bimagon( twopdm& ao_mat );
+
 //int print_projected_element_double_spin_excitation( const twopdm& mat_a, const twopdm& mat_b );
 
 multimap< double, array<int, 4> > get_pphh_list( const twopdm& gamma2, const double thresh );
@@ -42,6 +50,8 @@ int transform_main( const transform_info& trans_info);
 mo_coefficients compute_u( const mo_coefficients& c_mo, const mo_coefficients& s_ov, const mo_coefficients& c_lmo );
 
 mo_coefficients compute_ctsh( const mo_coefficients& c_mo, const overlap_matrix& s_ov );
+
+
 
 } // end of namespace ph_analysis
 
