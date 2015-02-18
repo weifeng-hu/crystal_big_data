@@ -2,9 +2,9 @@ DEBUG := YES
 
 CXX	= mpic++ 
 FC	= gfortran -g
-HEADS	= square_matrix.h general_matrix.h functions.h mo_coeff.h one_electron_integral.h two_electron_integral.h\
+HEADS	= square_matrix.h general_matrix.h functions.h mo_coeff.h one_electron_integral.h\
 	  compressed_matrix.h
-CSRCS	= general_matrix.cpp square_matrix.cpp transform.cpp functions.cpp two_electron_integral.cpp read_integral.cpp\
+CSRCS	= general_matrix.cpp square_matrix.cpp transform.cpp functions.cpp \
 	  compressed_matrix.cpp
 FSRCS	= OEI_TRANSFORM.f EIGTQL2.f TEI_TRANSFORM.f
 COBJS	= $(CSRCS:.cpp=.o)
@@ -35,14 +35,17 @@ square_matrix.o:	square_matrix.h	square_matrix.cpp
 functions.o:		general_matrix.h functions.h functions.cpp
 	$(CXX) -c $(CFLAG) $(INCLUDE) functions.cpp
 
-two_electron_integral.o: two_electron_integral.h two_electron_integral.cpp
-	$(CXX) -c $(CFLAG) $(INCLUDE) two_electron_integral.cpp
+#two_electron_integral.o: two_electron_integral.cpp
+#	$(CXX) -c $(CFLAG) $(INCLUDE) two_electron_integral.cpp
 
-read_integral.o:	two_electron_integral.h read_integral.cpp
-	$(CXX) -c $(CFLAG) $(INCLUDE) read_integral.cpp
+#read_integral.o:	two_electron_integral.h read_integral.cpp
+#	$(CXX) -c $(CFLAG) $(INCLUDE) read_integral.cpp
 
 OEI_TRANSFORM.o:	OEI_TRANSFORM.f
 	$(FC) -c OEI_TRANSFORM.f
+
+TEI_TRANSFORM.o:	TEI_TRANSFORM.f
+	$(FC) -c TEI_TRANSFORM.f
 
 EIGTQL2.o:	EIGTQL2.f
 	$(FC) -c EIGTQL2.f

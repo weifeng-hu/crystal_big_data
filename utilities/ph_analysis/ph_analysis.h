@@ -15,17 +15,12 @@ namespace ph_analysis {
 
 onepdm transform_element_1( const mo_coefficients& mo, const double element, const int ind_i, const int ind_j );
 
-twopdm transform_element_2( const mo_coefficients& mo, const double element, const int ind_i, const int ind_j, const int ind_k, const int ind_l );
-
 onepdm transform_element_2( const mo_coefficients& mo, const double element, const int ind_i, const int ind_j );
 
+twopdm transform_element_2( const mo_coefficients& mo, const double element, const int ind_i, const int ind_j, const int ind_k, const int ind_l );
 onepdm transform_1( mo_coefficients& u_mat, onepdm& mat );
 
 twopdm transform_2( mo_coefficients& u_mat, twopdm& mat );
-
-void print_projected_exciton( onepdm& ao_mat );
-
-void print_projected_bimagon( twopdm& ao_mat );
 
 //int print_projected_element_double_spin_excitation( const twopdm& mat_a, const twopdm& mat_b );
 
@@ -37,7 +32,13 @@ int print_projected_element_1( const onepdm& mat, const double value, const int 
 
 int print_projected_element_2( const twopdm& mat, const double value, const int ind_i, const int ind_j);
 
-int transform_ph_main( multimap<double, pair<int, int> >& ph_pair, const mo_coefficients& c_mo, const double thresh );
+//fnt transform_ph_main( multimap<double, pair<int, int> >& ph_pair, const mo_coefficients& c_mo, const double thresh );
+
+int transform_ph_main_element( multimap<double, pair<int, int> >& ph_pair , mo_coefficients &c_mo );
+
+int transform_ph_main( onepdm& pdm_mo, const mo_coefficients& c_mo );
+
+int transform_pphh_main( twopdm& pdm_mo, mo_coefficients &c_mo );
 
 int transform_pphh_main( multimap<double, pair<int, int> >& pphh_pair, const mo_coefficients& c_mo, const double thresh );
 

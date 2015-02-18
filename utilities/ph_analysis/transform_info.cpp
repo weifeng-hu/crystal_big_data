@@ -23,10 +23,16 @@ int transform_info::read()
     if( entry == "nact"     ) ifs >> this->nact;
     if( entry == "t1_thresh") ifs >> this->t1_thresh;
     if( entry == "t2_thresh") ifs >> this->t2_thresh;
+    if( entry == "t1_thresh_in") ifs >> this->t1_thresh_in;
+    if( entry == "t2_thresh_in") ifs >> this->t2_thresh_in;
     if( entry == "p1_filename" ) ifs >> this->p1_filename;
     if( entry == "p2_filename" ) ifs >> this->p2_filename;
     if( entry == "solve_u" ) ifs >> this->solve_u;
     if( entry == "compute_s_only" ) ifs >> this->compute_s_only;
+    if( entry == "trans_onepdm" ) ifs >> this->trans_onepdm;
+    if( entry == "trans_twopdm" ) ifs >> this->trans_twopdm;
+    if( entry == "trans_onepdm_element" ) ifs >> this->trans_onepdm_element;
+    if( entry == "trans_twopdm_element" ) ifs >> this->trans_twopdm_element;
    }
    ifs.close();
 
@@ -50,6 +56,8 @@ int transform_info::read()
    cout << " nact = " << nact << endl;
    cout << " t1_thresh = " << t1_thresh << endl;
    cout << " t2_thresh = " << t2_thresh << endl;
+   cout << " t1_thresh_in = " << t1_thresh_in << endl;
+   cout << " t2_thresh_in = " << t2_thresh_in << endl;
    cout << " s_filename = " << s_filename << endl;
    cout << " c_filename = " << c_filename << endl;
    cout << " cl_filename = " << cl_filename << endl;
@@ -59,6 +67,10 @@ int transform_info::read()
    cout << " act_filename = " << act_filename << endl;
    cout << " solve_u = " << solve_u << endl;
    cout << " compute_s_only = " << compute_s_only << endl;
+   cout << " trans_onepdm   = " << trans_onepdm << endl;
+   cout << " trans_twopdm   = " << trans_twopdm << endl;
+   cout << " trans_onepdm_element  = " << trans_onepdm_element << endl;
+   cout << " trans_twopdm_element  = " << trans_twopdm_element << endl;
   }
 
   {
@@ -165,16 +177,16 @@ int transform_info::read()
   this->gamma1.set_norb() = this->nact;
   this->gamma1.set_n_element() = nact * nact;
   this->gamma1.set_store().fill(0.0e0);
-//  this->gamma1( 5, 4 ) = 1.3338e0;
 
+  if( trans_onepdm == 1 )
   {
     ifstream if1pdm;
     if1pdm.open( p1_filename.c_str() );
     while( if1pdm.good() ){
       double value;
       int ind_i, ind_j;
-      if1pdm >> value >> ind_i >> ind_j;
-      gamma1(ind_i, ind_j) = value;
+      if1pdm >> ind_i >> ind_j >> value;
+      if( fabs(value) >= t1_thresh_in ){ gamma1(ind_i, ind_j) = value; }
     }
     if1pdm.close();
   }
@@ -182,21 +194,18 @@ int transform_info::read()
   this->gamma2.set_norb() = this->nact;
   this->gamma2.set_n_element() = nact * nact * nact * nact;
   this->gamma2.set_store().fill(0.0e0);
+  if( trans_twopdm == 1 )
   {
     ifstream if2pdm;
     if2pdm.open( p2_filename.c_str() );
-    if2pdm >> this->nact;
     while( if2pdm.good() ){
       double value;
       int ind_i, ind_j, ind_k, ind_l;
-//      if2pdm >> value >> ind_i >> ind_j >> ind_k >> ind_l;
       if2pdm >> ind_i >> ind_j >> ind_k >> ind_l >> value;
-      gamma2(ind_i, ind_j, ind_k, ind_l) = value;
+      if( fabs( value ) >= t2_thresh_in ){ gamma2(ind_i, ind_j, ind_k, ind_l) = value; }
     }
     if2pdm.close();
   }
-
-  // compute inverse of C
 
   return 0;
 
@@ -209,6 +218,8 @@ transform_info::transform_info( std::string inputfile )
   this->nact = 0;
   this->t1_thresh = 1.0e-2;
   this->t2_thresh = 1.0e-2;
+  this->t1_thresh_in = 0.0e0;
+  this->t2_thresh_in = 0.0e0;
 
   this->active_space.fill(0);
 
@@ -224,9 +235,12 @@ transform_info::transform_info( std::string inputfile )
   this->act_filename = "not set";
   this->solve_u = -1;
   this->compute_s_only = -1;
+  this->trans_onepdm = -1;
+  this->trans_onepdm_element = -1;
+  this->trans_twopdm = -1;
+  this->trans_twopdm_element = -1;
 
   this->configfile = inputfile;
-
   
   this->read();
 

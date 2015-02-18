@@ -168,9 +168,7 @@ public:
 
  void print_inversehalf( const string prefix, const string basename ){
   string filename = prefix + basename + ".s_inversehalf.txt"; 
-  cout << "ph filename = "<< filename << endl;
   FILE* fov = fopen( filename.c_str() , "wt" );
-  cout << "ph filename = "<< filename << endl;
   for( int i = 0; i < nao; i++ ){
    for( int j = 0; j < nao; j++ ){
     const int ind = i * nao + j;
@@ -187,21 +185,25 @@ public:
   this->compute_inverse();
   this->compute_inversehalf();
 
-  /*
+  
   // tests
   std::array< double, NMO_THRESH * NMO_THRESH > tmp;
 
   // S S-1 = 1
   {
    cout << "  testing S . S^-1 = 1 " << endl;
+   cout << "   print elements != 1 for diagonal and non-zero off-diagonal " << endl;
    tmp.fill(0.0e0);
    mat_x_mat( store.data(), inverse.data(), tmp.data(), 1.0e0, nao, nao, nao, nao, false, false);
    for( int i = 0; i < nao; i++ ){
     for( int j = 0; j < nao; j++ ){
      const int ind = i * nao + j;
      const double val = tmp.at(ind);
-     if( val >1.0e-7 ){
-      printf( "%d %d %20.16f\n", i, j, val );
+     if( i != j ){
+      if( fabs( val ) > 1.0e-8 ){ printf( "%d %d %20.16f\n", i, j, val ); }
+     }
+     else{
+      if( fabs( val - 1.0e0 ) > 1.0e-8 ){ printf( "%d %d %20.16f\n", i, j, val ); }
      }
     }
    }
@@ -211,14 +213,18 @@ public:
   // S-1 S = 1
   {
    cout << "  testing S^-1 . S = 1 " << endl;
+   cout << "   print elements != 1 for diagonal and non-zero off-diagonal " << endl;
    tmp.fill(0.0e0);
    mat_x_mat( inverse.data(), store.data(), tmp.data(), 1.0e0, nao, nao, nao, nao, false, false);
    for( int i = 0; i < nao; i++ ){
     for( int j = 0; j < nao; j++ ){
      const int ind = i * nao + j;
      const double val = tmp.at(ind);
-     if( val >1.0e-7 ){
-      printf( "%d %d %20.16f\n", i, j, val );
+     if( i != j ){
+      if( fabs( val ) > 1.0e-8 ){ printf( "%d %d %20.16f\n", i, j, val ); }
+     }
+     else{
+      if( fabs( val - 1.0e0 ) > 1.0e-8 ){ printf( "%d %d %20.16f\n", i, j, val ); }
      }
     }
    }
@@ -228,14 +234,18 @@ public:
   // S^(-1/2) S S^(-1/2) = 1
   {
    cout << "  testing S^-1/2 . S . S^(-1/2) = 1 " << endl;
+   cout << "   print elements != 1 for diagonal and non-zero off-diagonal " << endl;
    tmp.fill(0.0e0);
    a_x_b_x_at( tmp.data(), this->store.data(), this->inverse_half.data(), nao, nao );
    for( int i = 0; i < nao; i++ ){
     for( int j = 0; j < nao; j++ ){
      const int ind = i * nao + j;
      const double val = tmp.at(ind);
-     if( val >1.0e-7 ){
-      printf( "%d %d %20.16f\n", i, j, val );
+     if( i != j ){
+      if( fabs( val ) > 1.0e-8 ){ printf( "%d %d %20.16f\n", i, j, val ); }
+     }
+     else{
+      if( fabs( val - 1.0e0 ) > 1.0e-8 ){ printf( "%d %d %20.16f\n", i, j, val ); }
      }
     }
    }
@@ -245,14 +255,18 @@ public:
   // S^(1/2) S^(-1) S^(1/2) = 1
   {
    cout << "  testing S^1/2 . S^-1 . S^(1/2) = 1 " << endl;
+   cout << "   print elements != 1 for diagonal and non-zero off-diagonal " << endl;
    tmp.fill(0.0e0);
    a_x_b_x_at( tmp.data(), this->inverse.data(), this->half.data(), nao, nao );
    for( int i = 0; i < nao; i++ ){
     for( int j = 0; j < nao; j++ ){
      const int ind = i * nao + j;
      const double val = tmp.at(ind);
-     if( val >1.0e-7 ){
-      printf( "%d %d %20.16f\n", i, j, val );
+     if( i != j ){
+      if( fabs( val ) > 1.0e-8 ){ printf( "%d %d %20.16f\n", i, j, val ); }
+     }
+     else{
+      if( fabs( val - 1.0e0 ) > 1.0e-8 ){ printf( "%d %d %20.16f\n", i, j, val ); }
      }
     }
    }
@@ -262,21 +276,20 @@ public:
   // S^(1/2) * S(1/2) - S = 0
   {
    cout << "  testing S^1/2 S^(1/2) - S = 0 " << endl;
+   cout << "   print elements != 0 " << endl;
    tmp.fill(0.0e0);
    mat_x_mat( half.data(), half.data(), tmp.data(), 1.0e0, nao, nao, nao, nao, false, false);
    for( int i = 0; i < nao; i++ ){
     for( int j = 0; j < nao; j++ ){
      const int ind = i * nao + j;
      const double val = tmp.at(ind) - store.at(ind);
-     if( fabs( val ) > 1.0e-7 ){
+     if( fabs( val ) > 1.0e-8 ){
       printf( "%d %d %20.16f\n", i, j, val );
      }
     }
    }
 
   }
-
-  */
 
   this->auxiliary_computed = true;
  }

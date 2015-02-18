@@ -147,17 +147,41 @@ public:
 
   void check_unity(){
 
+     cout << "  check unity of the transformation matrix U" << endl;
+     cout << "   print elements != 1 for diagonal and non-zero off-diagonal " << endl;
      mo_coefficients transpose = *this;
      transpose.set_transposed() = true;
 
      {
       mo_coefficients product_uut = (*this) * transpose;
-      product_uut.print_matrix();
+      for( size_t i = 0; i < product_uut.get_nao(); i++ ){
+       for( size_t j = 0; j < product_uut.get_nmo(); j++ ){
+        const double val = product_uut( i, j );
+        if( i != j ){
+         if( fabs( val ) > 1.0e-8 ){ printf( "%d %d %20.16f\n", i, j, val ); }
+        }
+        else{
+         if( fabs( val - 1.0e0 ) > 1.0e-8 ){ printf( "%d %d %20.16f\n", i, j, val ); }
+        }
+       }
+      }
+//      product_uut.print_matrix();
      }
      
      {
       mo_coefficients product_utu = transpose * (*this);
-      product_utu.print_matrix();
+      for( size_t i = 0; i < product_utu.get_nao(); i++ ){
+       for( size_t j = 0; j < product_utu.get_nmo(); j++ ){
+        const double val = product_utu( i, j );
+        if( i != j ){
+         if( fabs( val ) > 1.0e-8 ){ printf( "%d %d %20.16f\n", i, j, val ); }
+        }
+        else{
+         if( fabs( val - 1.0e0 ) > 1.0e-8 ){ printf( "%d %d %20.16f\n", i, j, val ); }
+        }
+       }
+      }
+//      product_utu.print_matrix();
      }
 
   };

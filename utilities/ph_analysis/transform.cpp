@@ -15,7 +15,34 @@ namespace ph_analysis{
 onepdm transform_1( mo_coefficients& u_mat, onepdm& mat )
 {
 
-  
+  const size_t norb = mat.get_norb();
+  onepdm mid( norb );
+  {
+   for( size_t i = 0; i < norb; i++ ){
+    for( size_t j = 0; j < norb; j++ ){
+     double value = 0.0e0;
+     for( size_t k = 0; k < norb; k++ ){
+      value = value + mat( i, k ) * u_mat( k, j );  // mo mo mo ao
+     }
+     mid( i, j ) = value;
+    }
+   }
+  }
+
+  onepdm final( norb );
+  {
+   for( size_t i = 0; i < norb; i++ ){
+    for( size_t j = 0; j < norb; j++ ){
+     double value = 0.0e0;
+     for( size_t k = 0; k < norb; k++ ){
+      value = value + u_mat( k, j ) * mid( k, i ); //mo ao mo ao
+     }
+     final( j, i ) = value;
+    }
+   }
+  }
+
+  return final;
 
 }
 
@@ -64,7 +91,65 @@ onepdm transform_element_2( const mo_coefficients &u_mat, const double element, 
 twopdm transform_2( mo_coefficients& u_mat, twopdm& mat )
 {
 
- 
+  const size_t norb = mat.get_norb();
+  twopdm pdm_ao( mat.get_norb() );
+
+  const size_t n_source = norb;
+  const size_t n_target = norb;
+
+  for( int i = 0; i < n_source; i++ ){
+   for( int j = 0; j < n_source; j++ ){
+    for( int k = 0; k < n_source; k++ ){
+     for( int l = 0; l < n_source; l++ ){
+//      if( i != 10 || j != 10 || k != 9 || l != 9 ) mat(i,j,k,l) = 0.0e0;
+     }
+    }
+   }
+  }
+
+  twopdm mid1( norb );
+  {
+   for( size_t l = 0; l < n_source; l++ ){
+    for( size_t k = 0; k < n_source; k++ ){
+       onepdm midmat1(norb);
+       for( size_t j = 0; j < n_source; j++ ){
+        for( size_t i = 0; i < n_source; i++ ){
+         midmat1( i, j ) = mat( l, k, j, i );
+        }
+       }
+       onepdm midmat2(norb);
+       midmat2 = transform_1( u_mat, midmat1 );
+       for( size_t j = 0; j < n_source; j++ ){
+        for( size_t i = 0; i < n_source; i++ ){
+         mid1( l, k, j, i ) = midmat2( i, j );
+        }
+       }
+    }
+   }
+  }
+  
+  {
+   for( size_t i = 0; i < n_target; i++ ){
+    for( size_t j = 0; j < n_target; j++ ){
+       onepdm midmat1(norb);
+       for( size_t k = 0; k < n_source; k++ ){
+        for( size_t l = 0; l < n_source; l++ ){
+          midmat1( k, l ) = mid1( k, l, i, j );
+        }
+       }
+       onepdm midmat2(norb);
+       midmat2 = transform_1( u_mat, midmat1 );
+
+       for( size_t k = 0; k < n_target; k++ ){
+        for( size_t l = 0; l < n_target; l++ ){
+         pdm_ao( k, l, i, j ) = midmat2(k, l);
+        }
+       }
+    }
+   }
+  }
+
+  return pdm_ao;
 
 }
 
@@ -73,6 +158,8 @@ twopdm transform_element_2( const mo_coefficients &u_mat, const double element, 
 
    int norb = u_mat.get_nmo();
    double value = element;
+
+   cout << value << endl;
 
    twopdm trans_pdm_ao( norb );
    for( int mu = 0; mu < norb; mu++ ){
@@ -95,16 +182,6 @@ twopdm transform_element_2( const mo_coefficients &u_mat, const double element, 
 
 }
 
-void print_projected_exciton( onepdm& ao_mat )
-{
-
-}
-
-void print_projected_bimagon( twopdm& ao_mat )
-{
-
-}
-
 // print double spin excitation in real space
 // this will apply to <2Ag| C+sigma C+ sigma' C sigma' C sigma | 1Ag > , with sigma = - sigma', since two excitations with opposite spins will conserve the spin symmetry
 // recipe:
@@ -122,6 +199,7 @@ int print_projected_element_double_spin_excitation( const twopdm& mat_a, const m
   cout.precision(8);
   // here we consider 
   const int norb = mat_a.get_norb();
+cout << norb << endl;
 //  for( int i = 0; i < norb/2; i = i+2 ){
   for( int i = 0; i < norb; i = i+1 ){
    const int i_prime = norb - 1 - i;
@@ -145,6 +223,7 @@ these are essentially wrong for using pz oribtals, maybe will be correct if usin
 int print_projected_element_2( const twopdm& mat, const double value, const int ind_i, const int ind_j )
 {
 
+  cout.precision(8);
   const int norb = mat.get_norb();
   {
    const int created = ind_i;
@@ -207,25 +286,16 @@ int print_projected_element_1( const onepdm& mat, const double value, const int 
    cout << " < Psi_1 | C+ all | C" << j << " | Psi_0 > = " << total_prob << endl;
   }
 
-}
-
-/*
-int print_project_element_2( const mo_coefficients& mat, const double value, const int ind_i, const int ind_j, const int ind_k, const ind_l )
-{
-
-  int created = 0;
-  int destroyed = 1;
-  double mo_value = 0.0e0;
-
-  cout << " Original canonical transition pdm element: " << endl;
-  cout << "  " << " < Psi_1 | " << " C+ " << created << " C+ " << created << " C " << destroyed << " C " << destroyed << " | Psi_0 > = " << mo_value << endl;
-  cout << endl;
-  cout << " Projected localized transition pdm info: " << endl;
-  for( int i = 0; i < npair; i++ ){
-   cout << "  " << " < Psi_1 | " << " C+ " << created << " C+ " << created << " C " << destroyed << " C "<< destroyed << " | Psi_0 > = " << ao_value<< endl;
+  cout << "  probability of electron excitation from center to edge: " << endl;
+  for( int i = norb/2 - 1; i >= 0; i-- ){
+   int R_minus_r = i;
+   int R_plus_r  = norb - 1 - i;
+   double element1 = mat( R_plus_r,  R_minus_r );
+   double element2 = mat( R_minus_r, R_plus_r  );
+   cout << " R-r/2 = " << R_minus_r << " to  R+r/2 = " << R_plus_r  << " particle-hole separation r = " << R_plus_r - R_minus_r << "\tphi(r) = " << element1 << "\tphi(r)^2 = " << pow( element1, 2 ) << endl;
+//   cout << " R+r/2 = " << R_plus_r  << " to  R-r/2 = " << R_minus_r << " particle-hole separation r = " << R_minus_r - R_plus_r << "\tphi(r) = " << element2 << "\tphi(r)^2 = " << pow( element2, 2 ) << endl;
   }
 
 }
-*/
 
 } // end of ph_analysis

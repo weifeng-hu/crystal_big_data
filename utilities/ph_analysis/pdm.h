@@ -18,6 +18,7 @@ public:
     std::cout << " error: number of elements exceeds limit 1e4 " << std::endl;
     abort();
    }
+   this->store.fill(0.0e0);
   }
   ~onepdm(){};
 

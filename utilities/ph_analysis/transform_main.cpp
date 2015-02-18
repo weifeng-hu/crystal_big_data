@@ -10,12 +10,13 @@
 #include "mo_coefficients.h"
 #include "transform_info.h"
 #include "ph_analysis.h"
+#include "fc_fortran.h"
 
 using namespace std;
 
 namespace ph_analysis{
 
-int transform_ph_main( multimap< double, pair<int, int> >& ph_pair, const mo_coefficients &c_mo )
+int transform_ph_main_element( multimap< double, pair<int, int> >& ph_pair, mo_coefficients &c_mo )
 {
 
   std::multimap< double, pair<int, int> > :: iterator iter;
@@ -26,13 +27,37 @@ int transform_ph_main( multimap< double, pair<int, int> >& ph_pair, const mo_coe
    onepdm mat = transform_element_1( c_mo, value, ind_i, ind_j );
    print_projected_element_1( mat, value, ind_i, ind_j ); 
   }
-
   return 0;
 
 }
 
+int transform_ph_main( onepdm& pdm_mo, mo_coefficients &c_mo )
+{
+  int norb = pdm_mo.get_norb();
+  onepdm pdm_ao( norb );
+  pdm_ao = transform_1( c_mo, pdm_mo );
+  print_projected_element_1( pdm_ao, 0.0e0, 0, 0 );
+//  iqs::matrix::oei_transform_( &norb, &norb, c_mo.set_store().data(), pdm_mo.set_store().data(), pdm_ao.set_store().data() );
+//  print_projected_element_1( pdm_ao, 0.0e0, 0, 0 );
+  return 0;
+}
+
+int transform_pphh_main( twopdm& pdm_mo, mo_coefficients &c_mo )
+{
+   int norb = pdm_mo.get_norb();
+//   twopdm pdm_ao = transform_2( c_mo, pdm_mo );
+
+// Debug
+   twopdm pdm_ao( norb );
+   iqs::matrix::tei_transform_( &norb, &norb, c_mo.set_store().data(), pdm_mo.set_store().data(), pdm_ao.set_store().data() );
+
+   print_projected_element_double_spin_excitation( pdm_ao, c_mo);
+}
+
+
 int transform_pphh_main( multimap< double, pair<int, int> >& pphh_pair, const mo_coefficients &c_mo )
 {
+
 
   std::multimap< double, pair<int, int> > :: iterator iter;
 
@@ -40,17 +65,11 @@ int transform_pphh_main( multimap< double, pair<int, int> >& pphh_pair, const mo
    const double value = iter->first;
    const int ind_i = (iter->second).first;
    const int ind_j = (iter->second).second;
-   onepdm mat = transform_element_2( c_mo, value, ind_i, ind_j );
-   print_projected_element_1( mat, value, ind_i, ind_j );
-  }
-
-
-  for( iter = pphh_pair.begin(); iter != pphh_pair.end(); ++iter ){
-   const double value = iter->first;
-   const int ind_i = (iter->second).first;
-   const int ind_j = (iter->second).second;
-   twopdm mat = transform_element_2( c_mo, value, ind_i, ind_j, ind_i, ind_j );
-   print_projected_element_2( mat, value, ind_i, ind_j );
+//   onepdm mat = transform_element_2( c_mo, value, ind_i, ind_j );
+   twopdm mat = transform_element_2( c_mo, value, ind_i, ind_i, ind_j, ind_j );
+//   print_projected_element_1( mat, value, ind_i, ind_j );
+//   print_projected_element_2( mat, value, ind_i, ind_j );
+   print_projected_element_double_spin_excitation( mat,  c_mo);
   }
 
   return 0;
@@ -111,7 +130,6 @@ multimap< double, array<int, 4> > get_pphh_list( const twopdm& gamma2, const dou
       index[1] = j;
       index[2] = k;
       index[3] = l;
-//cout << i << " " << j << " " << k << " " << l << " " << value << endl;
       if( fabs( value ) >= thresh ){
        pphh_list.insert( pair< double, array<int, 4> >( value, index ) );
       }
@@ -186,8 +204,6 @@ int transform_main( const transform_info& trans_info )
       count = count + 1;
      }
      ifs.close();
-//     cout << count << " " << trans_info.get_nact() << endl;
-//     if( count != trans_info.get_nact() ){ cout << " error: number of pz orbitals != nact " << endl; abort(); }
    }
 
    for( int i = 0; i < u_mat.get_nmo(); i++ ){
@@ -195,32 +211,36 @@ int transform_main( const transform_info& trans_info )
      const int ind_old_i = pz_ind.at(i);
      const int ind_old_j = active_space.at(j);
      const double value = u_mat_tmp( ind_old_j, ind_old_i );
-     u_mat( j , i ) = value;
+     u_mat( j , i ) = value;  // mo, pz
     }
    }
   }
 
-/*
+  if( trans_info.get_trans_onepdm() == 1 )
   {
-   const double thresh = trans_info.get_t1_thresh();
-   multimap< double, pair<int, int> > ph_pairs = get_ph_pairs( trans_info.get_gamma1(), thresh );
-   transform_ph_main( ph_pairs, u_mat );
+   if( trans_info.get_trans_onepdm_element() == -1 ){
+    onepdm pdm_mo = trans_info.get_gamma1();
+    transform_ph_main( pdm_mo, u_mat );
+   }
+   else if( trans_info.get_trans_onepdm_element() == 1 ){
+    const double thresh = trans_info.get_t1_thresh();
+    multimap< double, pair<int, int> > ph_pairs = get_ph_pairs( trans_info.get_gamma1(), thresh );
+    transform_ph_main_element( ph_pairs, u_mat );
+   }
   }
-*/
 
-/*
+  if( trans_info.get_trans_twopdm() == 1 )
   {
-   const double thresh = trans_info.get_t2_thresh();
-   multimap< double, pair<int, int> > pphh_pairs = get_pphh_pairs( trans_info.get_gamma2(), thresh );
-   transform_pphh_main( pphh_pairs, u_mat );
-  }
-*/
-
-  {
-   twopdm oovv = trans_info.get_gamma2();
-   oovv.set_type_vvoo();
-   twopdm mat = transform_2( u_mat, oovv );
-   print_projected_bimagon( mat );
+    if( trans_info.get_trans_twopdm_element() == -1 ){
+     twopdm pdm_mo = trans_info.get_gamma2();
+     transform_pphh_main( pdm_mo, u_mat );
+    }
+    else if( trans_info.get_trans_twopdm_element() == 1 ){
+     const double thresh = trans_info.get_t2_thresh();
+     twopdm pdm_mo = trans_info.get_gamma2();
+     multimap<double, pair<int, int> > pphh_pair = get_pphh_pairs( pdm_mo, thresh );
+     transform_pphh_main( pphh_pair, u_mat );
+    }
   }
 
 /*

@@ -17,9 +17,9 @@ struct coordinate
 
 public;
   coordinate()
-    {  this->init(); }
+    { this->init(); }
   coordinate( const coord_list input_coord )
-    {  this->store_ = input_coord; }
+    { this->store_ = input_coord; }
 
 public:
   void init()
