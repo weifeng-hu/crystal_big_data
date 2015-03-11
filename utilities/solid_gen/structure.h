@@ -3,6 +3,8 @@
 #include <vector>
 #include <stdlib.h>
 
+namespace iquads{
+
 using namespace std;
 
 namespace crystal{
@@ -123,3 +125,5 @@ private:
 };
 
 } // end of crystall
+
+} // end of iquads

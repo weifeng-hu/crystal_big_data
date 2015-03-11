@@ -172,7 +172,7 @@ c         write(*,*) intv, i,j,k,l
         do i = 1,6; do j = 1,6; do k = 1,6; do l=1,6
          u(i,k,l,j)=tempu(i,j,k,l)
         enddo; enddo; enddo; enddo
-        write(*,*)"integral done"
+c        write(*,*)"integral done"
 c	OPEN(FILE='SEINTEGRALS',UNIT=666,FORM='UNFORMATTED',
 c     &		ACCESS='SEQUENTIAL')
 c	DO i=1,5; Do j=1,5

@@ -91,15 +91,16 @@ c          write(*,*)krylovh
           call eigtql2(jj-1,krylovh,eiglanc)
           EngNow=EigLanc(1)
 
-          IF((Dabs(EngNow-Engformer).LT.1.0d-14).OR.(jj.GE.100))THEN
+          IF((Dabs(EngNow-Engformer).LT.1.0d-15).OR.(jj.GE.100))THEN
            if( jj .ge. 8)then
             iroot = 0
-            do ii = 1, 6
+            do ii = 1, 10
              v_x=0.0d0
              do ij = 1, jj-1
               v_i = v_buf(:,:,:,:,:,:, ij+1 )
               call daxpy( 4096, 1.0d0*krylovh(ij, ii), v_i, 1, v_x ,1 )
              enddo
+             call normalise( 4096, v_x )
              call Spin_properties( v_x, num_a, num_b, s_z, s_sq)
              if( (dabs( num_a + num_b - nele ) .le. 1.0e-1 ).and.
      &           (dabs( s_z - n_sz ) .le. 1.0e-1 ) .and. 

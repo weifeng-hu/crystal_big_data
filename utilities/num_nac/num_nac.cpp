@@ -5,13 +5,15 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 
 double R_bohr = 5.291772109217e-1;
 string orca_exe = "/home/wh288/Development/orca_dyn/x86_exe/orca";
-string fci_exe = "/home/wh288/Development/fci_6/Be";
+string fci_exe = "/home/wh288/iquads/fci//fci_6/Be";
 bool execution = true;
+bool verbose = true;
 
 void write_orca_input( string filename, vector<string> atoms, vector< vector<double> > coord, int nel, int norb, int s )
 {
@@ -25,13 +27,13 @@ void write_orca_input( string filename, vector<string> atoms, vector< vector<dou
     ofs << " ctyp xyz" << endl;
     ofs << " units angs" << endl;
     ofs << " coords" << endl;
-    ofs.precision(10);
+    ofs.precision(16);
     for( size_t i = 0; i < natom; i++ ){
      ofs << atoms.at(i) << " " << scientific << coord.at(i).at(0) << " " << coord.at(i).at(1) << " " << coord.at(i).at(2) << endl;
     }
     ofs << " end" << endl;
     ofs << "end" << endl;
-    ofs << "!rhf 6-31g tightscf" << endl;
+    ofs << "!rhf 6-31g extremescf" << endl;
 
     ofs << "$new_job" << endl;
     ofs << "%" << "coords" << endl;
@@ -44,7 +46,7 @@ void write_orca_input( string filename, vector<string> atoms, vector< vector<dou
     }
     ofs << " end" << endl;
     ofs << "end" << endl;
-    ofs << "!casscf 6-31g tightscf" << endl;
+    ofs << "!casscf 6-31g extremescf" << endl;
     ofs << "%" << "casscf nel " << nel << endl;
     ofs << "       norb " << norb << endl;
     ofs << "       mult " << 2*s+1 << endl;
@@ -103,7 +105,7 @@ void write_fci_input( string fci_input, string subdir, string molecule, int nel,
 
 }
 
-void compute_wave( vector<string> atoms, vector<vector<double> > new_coord, string molecule, string target_dir, int nel, int norb, int sz, int guess )
+vector<double> compute_wave( vector<string> atoms, vector<vector<double> > new_coord, string molecule, string target_dir, int nel, int norb, int sz, int guess )
 {
 
    int s = fabs(sz);
@@ -111,7 +113,7 @@ void compute_wave( vector<string> atoms, vector<vector<double> > new_coord, stri
 
    command = "mkdir ";
    command += target_dir;
-   cout << command << endl;
+//   cout << command << endl;
    system( command.c_str() );
 
    // dump integral
@@ -126,11 +128,12 @@ void compute_wave( vector<string> atoms, vector<vector<double> > new_coord, stri
    command += orca_input;
    command += ">";
    command += orca_output;
-   cout << command << endl;
+//   cout << command << endl;
    if( execution == true )system(command.c_str());
 
    if( guess == 2 ){
     // copy ref wv to target_dir
+     cout << " using reference lower energy as guess " << endl;
      string ref_wav = "./ref";
      ref_wav += "/wave.1";
      command = "cp ";
@@ -138,7 +141,7 @@ void compute_wave( vector<string> atoms, vector<vector<double> > new_coord, stri
      command += " ";
      command += target_dir;
      command += "/";
-     cout << command << endl;
+//     cout << command << endl;
      if( execution == true ) system(command.c_str());
    }
 
@@ -151,8 +154,48 @@ void compute_wave( vector<string> atoms, vector<vector<double> > new_coord, stri
    command = fci_exe;
    command += ">";
    command += fci_output;
-   cout << command << endl; 
+//   cout << command << endl; 
    if( execution == true ) system(command.c_str());
+
+   ifstream ifs;
+   ifs.open( fci_output.c_str(), std::ios::in );
+   int iroot = 0;
+   vector< double > energies;
+   energies.resize(2);
+   energies.at(0) = -10.0e0;
+   energies.at(1) = 10.0e0;
+   while( iroot < 2 ){
+    char sbuf[256];
+    ifs.getline( sbuf, 256 );
+    string entry(sbuf);
+    vector<string> fields;
+    boost::algorithm::split( fields, entry, boost::algorithm::is_any_of("=, \t"), boost::algorithm::token_compress_on);
+    double energy, na, nb, sz, s_sq;
+    iroot = iroot + 1;
+    for( size_t i = 0; i < fields.size(); i++ ){
+     if( fields[i] == "energy"){
+      energy = atof( fields[i+1].c_str() );
+      energies.at(iroot-1) = energy;
+     }
+     else if( fields[i] == "Na" ){
+      na = atof( fields[i+1].c_str() );
+     }
+     else if( fields[i] == "Nb" ){
+      nb = atof( fields[i+1].c_str() );
+     }
+     else if( fields[i] == "Sz" ){
+      sz = atof( fields[i+1].c_str() );
+     }
+     else if( fields[i] == "S^2") {
+      s_sq = atof( fields[i+1].c_str() );
+     }
+    }
+    cout.precision(16);
+    cout << "  root[" << iroot << "]: " << " en = " << energy << "  na = " << na << "  nb = " << nb << "  sz = " << sz << "  s_sq = " << s_sq << endl;
+   }
+   ifs.close();
+
+   return energies;
 
 }
 
@@ -231,16 +274,24 @@ int main( int argc, char* argv[] )
   }
 
   cout << " nel = " << nel << " norb = " << norb << " sz = " << sz << "  natom = " << natom << endl;
+  vector<double> eng_ref;
+  vector< vector< vector< vector<double> >  > > eng_disp;
+  eng_disp.resize( natom );
+  for( size_t iatom = 0; iatom < natom; iatom++ ){
+   eng_disp.at(iatom).resize(3);
+  }
 //  goto nac;
 // reference geometry
   {
+   cout << " reference: " << endl;
    string dir = "./ref/";
-   compute_wave( atoms, coord, molecule, dir, nel, norb, sz, 1 );
+   eng_ref = compute_wave( atoms, coord, molecule, dir, nel, norb, sz, 1 );
   }
 
 // displacements
   for( size_t iatom = 0; iatom < natom; iatom++ ){
    for( size_t icop = 0; icop < 3; icop++ ){
+    cout << " displacement " << iatom << "." << icop << ":" << endl;
     vector< vector<double> > new_coord;
     char line[100];
     string dir;
@@ -251,21 +302,33 @@ int main( int argc, char* argv[] )
      new_coord.at(iatom).at(icop) = new_coord.at(iatom).at(icop) + disp;
      sprintf( line, "./%i.%i.p/", iatom, icop );
      dir = line;
-     compute_wave( atoms, new_coord, molecule, dir, nel, norb, sz, 2 );
+     eng_disp.at(iatom).at(icop).push_back( compute_wave( atoms, new_coord, molecule, dir, nel, norb, sz, 1 ) );
      
     // minus
      new_coord = coord;
      new_coord.at(iatom).at(icop) = new_coord.at(iatom).at(icop) - disp;
      sprintf( line, "./%i.%i.m/", iatom, icop );
      dir = line;
-     compute_wave( atoms, new_coord, molecule, dir, nel, norb, sz, 2 );
+     eng_disp.at(iatom).at(icop).push_back( compute_wave( atoms, new_coord, molecule, dir, nel, norb, sz, 1 ) );
    }
   }
 
-nac:
 // numerical nac
+nac:
   for( size_t iatom = 0; iatom < natom; iatom++ ){
    for( size_t icop = 0; icop < 3; icop++ ){
+
+    if( fabs( eng_ref.at(0) - eng_disp.at(iatom).at(icop).at(0).at(0) ) > 1.0e-3 
+      ||fabs( eng_ref.at(0) - eng_disp.at(iatom).at(icop).at(0).at(1) ) > 1.0e-3 ){
+     cout << " displaced energy is wrong; skipping " << endl;
+     continue;
+    }
+    if( fabs( eng_ref.at(1) - eng_disp.at(iatom).at(icop).at(1).at(0) ) > 1.0e-3 
+      ||fabs( eng_ref.at(1) - eng_disp.at(iatom).at(icop).at(1).at(1) ) > 1.0e-3 ){
+     cout << " displaced energy is wrong; skipping "  << endl;
+     continue;
+    }
+
     cout << iatom << "." << icop << ":" << endl;
     const int len = pow(4, norb );
 
@@ -287,6 +350,9 @@ nac:
     vector<double> wave_1   = read_wave( dir_ref, len, 1 );
 
     // some sanity check
+    double ov_r = product( wave_1, wave_2 );
+    double ov_p = product( wave_1_p, wave_2_p );
+    double ov_m = product( wave_1_m, wave_2_m );
     double ov_rp_1 = product( wave_1, wave_1_p );
     double ov_rm_1 = product( wave_1, wave_1_m );
     double ov_pm_1 = product( wave_1_p, wave_1_m );
@@ -304,50 +370,60 @@ nac:
     double ov_p2_m1 = product( wave_2_p, wave_1_m );
     double ov_m2_p1 = product( wave_2_m, wave_1_p );
 
-    cout.precision(8);
-    cout << "  < 1 | 1+ > = " << ov_rp_1 << "\t" << " < 1 | 1- > = " << ov_rm_1 << "\t" << " < 1+ | 1- > = " << ov_pm_1 << endl;
-    cout << "  < 2 | 2+ > = " << ov_rp_2 << "\t" << " < 2 | 2- > = " << ov_rm_2 << "\t" << " < 2+ | 2- > = " << ov_pm_2 << endl;
-    cout << "  < 1 | 2+ > = " << ov_r1_p2 << "\t" << " < 1 | 2- > = " << ov_r1_m2 << "\t" << " < 1+ | 2- > = " << ov_p1_m2 << "\t" << " < 1- | 2+ > = " << ov_m1_p2 << endl;
-    cout << "  < 2 | 1+ > = " << ov_r2_p1 << "\t" << " < 2 | 1- > = " << ov_r2_m1 << "\t" << " < 2+ | 1- > = " << ov_p2_m1 << "\t" << " < 2- | 1+ > = " << ov_m2_p1 << endl;
+    if( verbose == true ){
+     cout.precision(8);
+     cout << "  < 1 | 2 > = " << ov_r << "\t" << " < 1+ | 2+ > = " << ov_m << "\t" << " < 1- | 1- > = " << ov_p << endl;
+     cout << "  < 1 | 1+ > = " << ov_rp_1 << "\t" << " < 1 | 1- > = " << ov_rm_1 << "\t" << " < 1+ | 1- > = " << ov_pm_1 << endl;
+     cout << "  < 2 | 2+ > = " << ov_rp_2 << "\t" << " < 2 | 2- > = " << ov_rm_2 << "\t" << " < 2+ | 2- > = " << ov_pm_2 << endl;
+     cout << "  < 1 | 2+ > = " << ov_r1_p2 << "\t" << " < 1 | 2- > = " << ov_r1_m2 << "\t" << " < 1+ | 2- > = " << ov_p1_m2 << "\t" << " < 1- | 2+ > = " << ov_m1_p2 << endl;
+     cout << "  < 2 | 1+ > = " << ov_r2_p1 << "\t" << " < 2 | 1- > = " << ov_r2_m1 << "\t" << " < 2+ | 1- > = " << ov_p2_m1 << "\t" << " < 2- | 1+ > = " << ov_m2_p1 << endl;
+    }
 
     if( fabs( ov_rp_1 ) < 0.5e0 || fabs( ov_rm_1 ) < 0.5e0 || fabs( ov_pm_1 ) < 0.5e0 ){
      cout << "  detect substantial wavefunction change for this disp; trying to switch roots " << endl;
      if( fabs( ov_r1_p2 ) > 0.5e0 ){
-      cout << "   switching | 1+ > with | 2+ > " << endl;
+      if( verbose == true ) cout << "   switching | 1+ > with | 2+ > " << endl;
       vector<double> wave_tmp = wave_2_p;
       wave_2_p = wave_1_p;
       wave_1_p = wave_tmp;
      }
      if( fabs( ov_r1_m2 ) > 0.5e0 ){
-      cout << "   switching | 1- > with | 2- > " << endl;
+      if( verbose == true ) cout << "   switching | 1- > with | 2- > " << endl;
       vector<double> wave_tmp = wave_2_m;
       wave_2_m = wave_1_m;
       wave_1_m = wave_tmp;
      }
 //     continue;
-    }
-    ov_rp_1 = product( wave_1, wave_1_p );
-    ov_rm_1 = product( wave_1, wave_1_m );
-    ov_pm_1 = product( wave_1_p, wave_1_m );
-    ov_rp_2 = product( wave_2, wave_2_p );
-    ov_rm_2 = product( wave_2, wave_2_m );
-    ov_pm_2 = product( wave_2_p, wave_2_m );
+     if( verbose == true ) cout << "  recheck overlaps " << endl;
+     ov_r = product( wave_1, wave_2 );
+     ov_p = product( wave_1_p, wave_2_p );
+     ov_m = product( wave_1_m, wave_2_m );
+     ov_rp_1 = product( wave_1, wave_1_p );
+     ov_rm_1 = product( wave_1, wave_1_m );
+     ov_pm_1 = product( wave_1_p, wave_1_m );
+     ov_rp_2 = product( wave_2, wave_2_p );
+     ov_rm_2 = product( wave_2, wave_2_m );
+     ov_pm_2 = product( wave_2_p, wave_2_m );
+ 
+     ov_r1_p2 = product( wave_1, wave_2_p );
+     ov_r1_m2 = product( wave_1, wave_2_m );
+     ov_p1_m2 = product( wave_1_p, wave_2_m );
+     ov_m1_p2 = product( wave_1_m, wave_2_p );
+  
+     ov_r2_p1 = product( wave_2, wave_1_p );
+     ov_r2_m1 = product( wave_2, wave_1_m );
+     ov_p2_m1 = product( wave_2_p, wave_1_m );
+     ov_m2_p1 = product( wave_2_m, wave_1_p );
 
-    ov_r1_p2 = product( wave_1, wave_2_p );
-    ov_r1_m2 = product( wave_1, wave_2_m );
-    ov_p1_m2 = product( wave_1_p, wave_2_m );
-    ov_m1_p2 = product( wave_1_m, wave_2_p );
- 
-    ov_r2_p1 = product( wave_2, wave_1_p );
-    ov_r2_m1 = product( wave_2, wave_1_m );
-    ov_p2_m1 = product( wave_2_p, wave_1_m );
-    ov_m2_p1 = product( wave_2_m, wave_1_p );
- 
-    cout.precision(8);
-    cout << "  < 1 | 1+ > = " << ov_rp_1 << "\t" << " < 1 | 1- > = " << ov_rm_1 << "\t" << " < 1+ | 1- > = " << ov_pm_1 << endl;
-    cout << "  < 2 | 2+ > = " << ov_rp_2 << "\t" << " < 2 | 2- > = " << ov_rm_2 << "\t" << " < 2+ | 2- > = " << ov_pm_2 << endl;
-    cout << "  < 1 | 2+ > = " << ov_r1_p2 << "\t" << " < 1 | 2- > = " << ov_r1_m2 << "\t" << " < 1+ | 2- > = " << ov_p1_m2 << "\t" << " < 1- | 2+ > = " << ov_m1_p2 << endl;
-    cout << "  < 2 | 1+ > = " << ov_r2_p1 << "\t" << " < 2 | 1- > = " << ov_r2_m1 << "\t" << " < 2+ | 1- > = " << ov_p2_m1 << "\t" << " < 2- | 1+ > = " << ov_m2_p1 << endl;
+     if( verbose == true ){
+      cout.precision(8);
+      cout << "  < 1 | 2 > = " << ov_r << "\t" << " < 1+ | 2+ > = " << ov_m << "\t" << " < 1- | 1- > = " << ov_p << endl;
+      cout << "  < 1 | 1+ > = " << ov_rp_1 << "\t" << " < 1 | 1- > = " << ov_rm_1 << "\t" << " < 1+ | 1- > = " << ov_pm_1 << endl;
+      cout << "  < 2 | 2+ > = " << ov_rp_2 << "\t" << " < 2 | 2- > = " << ov_rm_2 << "\t" << " < 2+ | 2- > = " << ov_pm_2 << endl;
+      cout << "  < 1 | 2+ > = " << ov_r1_p2 << "\t" << " < 1 | 2- > = " << ov_r1_m2 << "\t" << " < 1+ | 2- > = " << ov_p1_m2 << "\t" << " < 1- | 2+ > = " << ov_m1_p2 << endl;
+      cout << "  < 2 | 1+ > = " << ov_r2_p1 << "\t" << " < 2 | 1- > = " << ov_r2_m1 << "\t" << " < 2+ | 1- > = " << ov_p2_m1 << "\t" << " < 2- | 1+ > = " << ov_m2_p1 << endl;
+     }
+    }
 
     if( fabs( ov_rp_2 ) < 0.5e0 || fabs( ov_rm_2 ) < 0.5e0 || fabs( ov_pm_2 ) < 0.5e0 ){
      cout << "  still detect substantial wavefunction change for this disp; skipping " << endl;
