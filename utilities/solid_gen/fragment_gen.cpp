@@ -3,10 +3,10 @@
 #include "fragment.h"
 #include "eclidean_dis_mat.h"
 
-using namespace std;
-
 int fragment_gen_driver( vector<string> args )
 {
+
+  using namespace std;
 
   const int argc = args.size();
   string input_file = args.at(1);

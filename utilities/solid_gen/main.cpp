@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <string>
 
-using namespace std;
-
 int main( int argc, char* argv[] )
 {
+
+ using namespace std;
 
  vector<string> args;
  args.resize(argc);

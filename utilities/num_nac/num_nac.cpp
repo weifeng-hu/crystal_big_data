@@ -318,6 +318,7 @@ nac:
   for( size_t iatom = 0; iatom < natom; iatom++ ){
    for( size_t icop = 0; icop < 3; icop++ ){
 
+/*
     if( fabs( eng_ref.at(0) - eng_disp.at(iatom).at(icop).at(0).at(0) ) > 1.0e-3 
       ||fabs( eng_ref.at(0) - eng_disp.at(iatom).at(icop).at(0).at(1) ) > 1.0e-3 ){
      cout << " displaced energy is wrong; skipping " << endl;
@@ -328,7 +329,7 @@ nac:
      cout << " displaced energy is wrong; skipping "  << endl;
      continue;
     }
-
+*/
     cout << iatom << "." << icop << ":" << endl;
     const int len = pow(4, norb );
 
