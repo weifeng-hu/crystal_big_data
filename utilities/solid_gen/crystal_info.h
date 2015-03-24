@@ -3,32 +3,37 @@
 
 #include <tuple>
 #include <string>
-#include "structure.h"
+#include "utilities/solid_gen/unit_cell.h"
 
-namespace iquads {
+using namespace std;
 
-namespace crystal {
+namespace iquads{
+
+namespace crystal{
 
 struct crystal_info
 {
-using namespace std;
-public:
-  void read( string input ){};
 
 public:
-  unit_cell get_unit_cell() const { return this->unit_cell; }
-  unit_cell& set_unit_cell() { return this->unit_cell; }
+  void read( string input );
+
+public:
+  unit_cell get_unit_cell() const { return this->primitive; }
+  unit_cell& set_unit_cell() { return this->primitive; }
 
   double get_cutoff() const { return this->cutoff; }
   double& set_cutoff() { return this->cutoff; }
 
-  tuple<int, int, int> get_times() const { return this->times; }
-  tuple<int, int, int>& set_times() { return this->times;}
+  tuple<int, int, int> get_nunits() const { return this->n_units; }
+  tuple<int, int, int>& set_nunits() { return this->n_units;}
+
+  string get_cut_method() { return this->cut_method; }
 
 private:
-  unit_cell primary;
+  unit_cell primitive;
   double cutoff;
-  tuple<int, int, int> times; 
+  string cut_method;
+  tuple<int, int, int> n_units; 
 
 };
 

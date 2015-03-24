@@ -1,7 +1,8 @@
 #include <string>
-#include "cell.h"
-#include "fragment.h"
-#include "eclidean_dis_mat.h"
+#include "utilities/solid_gen/super_cell.h"
+#include "utilities/solid_gen/crystal_info.h"
+#include "utilities/solid_gen/fragment.h"
+#include "utilities/solid_gen/eclidean_dis_mat.h"
 
 int fragment_gen_driver( vector<string> args )
 {
@@ -10,19 +11,18 @@ int fragment_gen_driver( vector<string> args )
 
   const int argc = args.size();
   string input_file = args.at(1);
-  iquads::crystal:crystal_info info; 
+  iquads::crystal::crystal_info info; 
   info.read( input_file );
 
   iquads::crystal::super_cell big_cell;
   {
-   iquads::crystal::unit_cell u_cell( info.get_unit_cell() );
-   big_cell.set_unit_cell() = u_cell;
-   big_cell.generate( info.get_nunit() );
+   big_cell.set_primitive( info.get_unit_cell() );
+   big_cell.generate( info.get_nunits() );
   }
 
-  iquads::crystall:eclidean_dis_mat edm;
+  iquads::crystal::eclidean_dis_mat edm(0);
   { 
-   iquads::crystal::big_fragment big_frag = big_cell.cut( info.get_cut_method() );
+   iquads::crystal::fragment big_frag = big_cell.cut( info.get_cut_method(), info.get_cutoff() );
    edm.compose( big_frag );
    edm.diagonalise();
    edm.print_eigen_pairs();
