@@ -22,6 +22,13 @@ void crystal_info::read( string input )
    ifs >> a >> b >> c;
    this->n_units = make_tuple ( a, b, c );
   }
+  if( entry == "crystal_const" ){
+   double la, lb, lc;
+   ifs >> la >> lb >> lc;
+   this->primitive.set_a() = la;
+   this->primitive.set_b() = lb;
+   this->primitive.set_c() = lc;
+  }
   if( entry == "unit_cell" ){
    int natom;
    ifs >> natom;
@@ -31,17 +38,22 @@ void crystal_info::read( string input )
     double x, y, z;
     int charge;
     ifs >> element >> x >> y >> z >> charge;
-    primitive.get_store().at(i).set_x() = x;
-    primitive.get_store().at(i).set_y() = y;
-    primitive.get_store().at(i).set_z() = z;
-    primitive.get_store().at(i).set_element() = element;
-    primitive.get_store().at(i).set_charge() = charge;
+    primitive.set_store().at(i).set_x() = x;
+    primitive.set_store().at(i).set_y() = y;
+    primitive.set_store().at(i).set_z() = z;
+    primitive.set_store().at(i).set_element() = element;
+    primitive.set_store().at(i).set_charge() = charge;
    }
   }
  }
 
-}
+ cout << " cutoff = " << cutoff << endl;
+ cout << " duplicate by " << endl;
+ cout << "  " << get<0>( n_units ) << " " << get<1>( n_units ) << " " << get<2>( n_units ) << endl;
+ primitive.print();
 
-}
+} // end of crystal_info :: read()
 
-}
+} // end of namespace crystal
+
+} // end of namespace iquads

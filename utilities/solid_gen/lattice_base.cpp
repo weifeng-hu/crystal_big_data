@@ -22,9 +22,9 @@ void super_cell::recentralize()
     double x = cellx.get_atom(iatom).get_x();
     double y = cellx.get_atom(iatom).get_y();
     double z = cellx.get_atom(iatom).get_z();
-    if( x > x_plus ) x_plus = x;
-    if( y > y_plus ) y_plus = y;
-    if( z > z_plus ) z_plus = z;
+    if( (x - x_plus) >= 1.0e-5 ) x_plus = x;
+    if( (y - y_plus) >= 1.0e-5 ) y_plus = y;
+    if( (z - z_plus) >= 1.0e-5 ) z_plus = z;
    }
   }
   for( size_t icell = 0; icell < ncell; icell++ ){
@@ -33,22 +33,29 @@ void super_cell::recentralize()
     double x = cellx.get_atom(iatom).get_x();
     double y = cellx.get_atom(iatom).get_y();
     double z = cellx.get_atom(iatom).get_z();
-    if( x < x_minus ) x_minus = x;
-    if( y < y_minus ) y_minus = y;
-    if( z < z_minus ) z_minus = z;
+    if( (x - x_minus) <= -1.0e-5 ) x_minus = x;
+    if( (y - y_minus) <= -1.0e-5 ) y_minus = y;
+    if( (z - z_minus) <= -1.0e-5 ) z_minus = z;
    }
   }
 
-  double x_center = (x_plus - x_minus)/2.0e0;
-  double y_center = (y_plus - y_minus)/2.0e0;
-  double z_center = (z_plus - z_minus)/2.0e0;
+  cout << " x_plus = " << x_plus << endl;
+  cout << " x_minus = " << x_minus << endl;
+  cout << " y_plus = " << y_plus << endl;
+  cout << " y_minus = " << y_minus << endl;
+  cout << " z_plus = " << z_plus << endl;
+  cout << " z_minus = " << z_minus << endl;
+
+  double x_center = (x_plus + x_minus)/2.0e0;
+  double y_center = (y_plus + y_minus)/2.0e0;
+  double z_center = (z_plus + z_minus)/2.0e0;
 
   for( size_t icell = 0; icell < ncell; icell++ ){
    unit_cell cellx = store_.at(icell);
    for( size_t iatom = 0; iatom < cellx.get_store().size(); iatom++ ){
-    double new_x = cellx.get_atom(iatom).get_x() + x_center;
-    double new_y = cellx.get_atom(iatom).get_y() + y_center;
-    double new_z = cellx.get_atom(iatom).get_z() + z_center;
+    double new_x = cellx.get_atom(iatom).get_x() - x_center;
+    double new_y = cellx.get_atom(iatom).get_y() - y_center;
+    double new_z = cellx.get_atom(iatom).get_z() - z_center;
     cellx.set_atom(iatom).set_x() = new_x;
     cellx.set_atom(iatom).set_y() = new_y;
     cellx.set_atom(iatom).set_z() = new_z;

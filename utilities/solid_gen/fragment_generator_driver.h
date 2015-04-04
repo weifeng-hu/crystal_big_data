@@ -3,4 +3,4 @@
 
 using namespace std;
 
-int fragment_gen_driver( vector<string> args);
+int fragment_generator_driver( vector<string> args);

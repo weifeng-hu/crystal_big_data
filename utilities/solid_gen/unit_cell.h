@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 #include <tuple>
 #include "utilities/solid_gen/atom.h"
 #include "utilities/solid_gen/eclidean_dis_mat.h"
@@ -57,13 +58,29 @@ public:
   }
   return copy;
  }
+ void print()
+ {
+  cout << "==============================" << endl;
+  cout << "        unit cell info" << endl;
+  cout << "atom list:" << endl;
+  for( size_t i = 0; i < store_.size(); i++ ){
+   cout << store_.at(i).get_element()  << " " << store_.at(i).get_x() << " " << store_.at(i).get_y() << " " << store_.at(i).get_z() << endl;
+  }
+  cout << "crystal constants" << endl;
+  cout << lc_a << " " << lc_b << " " << lc_c << endl;
+  cout << "==============================" << endl;
+ }
 
 public:
  void resize( size_t n ) { this->store_.resize(n); }
- vector< atom > get_store() const { return store_; }
- double get_a() const { return lc_a; }
- double get_b() const { return lc_b; }
- double get_c() const { return lc_c; }
+ vector< atom > get_store() const { return this->store_; }
+ vector< atom >& set_store() { return this->store_; }
+ double get_a() const { return this->lc_a; }
+ double get_b() const { return this->lc_b; }
+ double get_c() const { return this->lc_c; }
+ double& set_a() { return this->lc_a; }
+ double& set_b() { return this->lc_b; }
+ double& set_c() { return this->lc_c; }
  atom get_atom( size_t i ) const { return store_.at(i); }
  atom& set_atom( size_t i ) { return store_.at(i); }
 

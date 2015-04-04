@@ -5,9 +5,6 @@
 #include <tuple>
 #include <vector>
 #include <stdlib.h>
-#include "utilities/solid_gen/atom.h"
-#include "utilities/solid_gen/unit_cell.h"
-#include "utilities/solid_gen/fragment.h"
 
 using namespace std;
 
@@ -15,6 +12,7 @@ namespace iquads{
 
 namespace crystal{
 
+template< class unit_cell >
 struct super_cell{
 public:
  super_cell(){
@@ -29,8 +27,6 @@ public:
   this->unit_cell_is_set_ = true;
  }
  bool unit_cell_is_set() { return unit_cell_is_set_; }
- fragment cut_spherical( double cutoff_in );
- fragment cut_cubic();
 
 public:
  void generate_cell( size_t la, size_t lb, size_t lc ){
@@ -57,19 +53,26 @@ public:
  void generate( size_t l ){
   generate_cell( l, l, l );
  }
-
- fragment cut( string cut_method, double cutoff );
+ void print(){
+  cout << "======================================== " << endl;
+  cout << " SUPER CELL INFO " << endl;
+  for( size_t i = 0; i < store_.size(); i++ ){
+   cout << " Unit Cell " << i << endl;
+   store_.at(i).print();
+  }
+  cout << "======================================== " << endl;
+ }
 
 private:
- unit_cell primitive;
  vector< unit_cell > store_;
+ unit_cell primitive;
  double len_a, len_b, len_c;
  int na, nb, nc;
  bool unit_cell_is_set_;
 
 };
 
-} // end of crystall
+} // end of crystal
 
 } // end of iquads
 
