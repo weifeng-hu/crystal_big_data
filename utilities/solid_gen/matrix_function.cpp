@@ -69,7 +69,23 @@ bool is_the_same( DMatrixHeap* eigval_a, DMatrixHeap* eigval_b )
 
 };
 
-vector< tuple<double, int, int> > get_degeneracy_struct( DMatrixHeap* eigval )
+DMatrixHeap compute_boolean_mat( vector<DMatrixHeap>* eigvals )
+{
+
+  size_t n_matrix = eigvals.size();
+  DMatrixHeap retval( n_matrix, n_matrix );
+  for( size_t imatrix = 0; imatrix < n_matrix; imatrix++ ){
+   DMatrixHeap matrix_i = eigvals.at(imatrix);
+   for( size_t jmatrix = 0; jmatrix < n_matrix; jmatrix++ ){
+    DMatrixHeap matrix_j = eigvals.at(jmatrix);
+    retval( imatrix, jmatrix ) = is_the_same( &matrix_i, &matrix_j ) ? 1.0e0 : 0.0e0;
+   }
+  }
+  return retval;
+
+}
+
+vector< tuple< double, int, int> > get_degeneracy_struct( DMatrixHeap* eigval )
 {
 
   vector< tuple<double, int, int> > retval;
@@ -105,6 +121,13 @@ vector< tuple<double, int, int> > get_degeneracy_struct( DMatrixHeap* eigval )
   }
 
   return retval;
+}
+
+vector< vector<int> > get_degeneracy_struct( DMatrixHeap* eigval )
+{
+
+  
+
 }
 
 } // end of namespace matrix

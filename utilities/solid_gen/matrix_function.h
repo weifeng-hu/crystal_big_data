@@ -12,6 +12,7 @@ namespace matrix {
   void symmetrix_diag( DMatrixHeap* a, DMatrixHeap* eigvec, DMatrixHeap* eigval );
   bool is_the_same( DMatrixHeap* eigval_a, DMatrixHeap* eigval_b );
   vector< tuple<double, int, int> > get_degeneracy_struct( DMatrixHeap* eigval )
+  DMatrixHeap compute_boolean_mat( vector<DMatrixHeap>* eigvals );
 
 } // end of namespace matrix
 

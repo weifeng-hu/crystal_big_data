@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <tuple>
+#include <iostream>
 #include "utilities/solid_gen/coordinate.h"
 #include "utilities/solid_gen/atom.h"
 
@@ -51,6 +52,19 @@ public:
     retval.push_back(set);
    }
    return retval;
+  }
+
+  void print_info(){
+   cout << "MOLECULE INFO" << endl;
+   cout << " molecule name: " << this->molecule_name_ << endl;
+   AtomList atomlist_local = this->get_atom_list();
+   const size_t natom = atomlist_local.size();
+   cout << " number of atom: " << natom << endl;
+   cout << " Atom List:" << endl;
+   for( size_t iatom = 0; iatom < natom; iatom++ ){
+    atomlist_local[iatom].print_info();
+   }
+   cout << endl;
   }
 
 private:

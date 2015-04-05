@@ -78,7 +78,7 @@ public:
   }
 
 public:
-  vector<double> get_eigval() const { return this->eigval; }
+  DMatrixHeap get_eigval() const { return this->eigval; }
 
 public:
   double& operator() ( int i, int j ) 

@@ -23,14 +23,16 @@ public:
 
 public:
   void init_from( molecular_lattice* ml ){
-
+   // then?
   }
   void cut( double Radius ){
    this->radius_ = Radius;
+   // then?
   }
 
 public:
   size_t get_nmolecule() const { return this->n_molecule_; }
+  molecule get_molecule( size_t i ) const { return this->bulk.at(i); }
 
 private:
   vector< molecule > bulk;

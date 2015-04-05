@@ -1,7 +1,7 @@
 #ifndef POLYMER_BASE_H
 #define POLYMER_BASE_H
 
-#include <array>
+#include <vector>
 #include <iostream>
 #include "utilities/solid_gen/coordinate.h"
 #include "utilities/solid_gen/threed_space.h"
@@ -20,9 +20,14 @@ template< size_t NUM >
 struct polymer_base{
 public:
   polymer(){
+   this->n_molecule = NUM;
+   this->group.resize( NUM );
    this->natom_ = 0;
   }
   polymer( MoleculeList poly ){
+   this->n_molecule = NUM;
+   this->group.resize( NUM );
+   this->natom_ = 0;
    this->init_from( poly );
   }
 
@@ -84,12 +89,16 @@ public:
   }
   // should think about using std::move() to append vectors
 
+public:
+  MoleculeList get_group() const { return this->group; }
+  size_t get_natom() const { return this->natom_; }
+
 private:
   molecule& set_member( size_t i ){ return group.at(i); }
 
 private:
-  array< molecule, NUM > group;
-  size_t NUM;
+  vector< molecule > group;
+  size_t n_molecule;
   size_t natom_;
 
 };

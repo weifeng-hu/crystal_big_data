@@ -21,21 +21,23 @@ public:
 
 public:
   template< size_t NUM >
-  fragment_info identify_subgroups( double Radius ){
-   polymer_group pg;
-   pg.init<NUM>( bulk_ptr, Radius );
-   pg.compute_subgroups(){
-    vector< DMatrixHeap > eigval_vectors = pg.compute_eigval_vectors();
-    // get the ''eigenvalue boolean matrix''
-    DMatrixHeap eigval_boolean_mat = compute_boolean_mat( eigval_vectors );
-    vector< tuple< double, int, int> > eigval_struct = matrix :: degeneracy_struct( eigval_boolean_mat );
+  vector<fragment_info> identify_subgroups( double Radius )
+  {
+   vector<fragment_info> retval;
+   {
+    polymer_group_base < NUM > polymer_group;
+    share_ptr< molecule_bulk > bulk_ptr_local 
+      = shared_ptr< molecule_bulk > ( &(this->bulk) );
+    polymer_group.init_from_bulk ( bulk_ptr_local, Radius );
+    polymer_group.evaluate_subgroups();
+    retval = polymer_group.get_fraglist_info();
    }
-   return pg.get_subgroup_lists();
+   return retval;
   }
 
 public:
   // add a fragment_info object to the list
-  void add_fragment_info( fragment_info fraginfo ){
+  void add_fragment_type( fragment_info fraginfo ){
    this->fraginfo_list.push_back();
    this->n_fragtype += 1;
   }
@@ -44,7 +46,7 @@ private:
   // a copy of the molecule bulk information
   molecule_bulk bulk;
   // fragment info for all kinds of fragments
-  vector< fragment_info > fraginfo_list;
+  vector< vector< fragment_info > > fraginfo_list;
   // number of fragment types, is size of fraginfo_list
   size_t n_fragtype;
   // a copy of the bulk radius;
