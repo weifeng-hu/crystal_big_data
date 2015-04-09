@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <tuple>
+#include <fstream>
 #include <iostream>
 #include "utilities/solid_gen/coordinate.h"
 #include "utilities/solid_gen/atom.h"
@@ -33,6 +34,71 @@ public:
     (this->atom_list.at(iatom)).print_info();
    }
   }
+
+public:
+  bool within_radius( double Radius ){
+   bool retval = true;
+   size_t n_atom_local = this->atom_list.size();
+   for( size_t iatom = 0; iatom < n_atom_local; iatom++ ){
+    atom atom_local = atom_list.at(iatom);
+    if( atom_local.within_radius( Radius ) == false ){
+     retval = false;
+     break;
+    }
+   }
+   return retval;
+  }
+
+  void operator+= ( array<double, double, double> x ){
+   size_t n_atom_local = this->atom_list.size();
+   for( size_t iatom = 0; iatom < n_atom_local; iatom++ ){
+    atom_list.at(iatom) += x;
+   }
+  }
+
+  void operator>> ( ifstream ifs ){
+   ifs >> this->molecule_name_;
+   ifs >> this->natom_;
+   this->atom_list.resize( this->natom_ );
+   for( size_t iatom = 0; iatom < this->natom_; iatom++ ){
+    atom new_atom;
+    ifs >> new_atom;
+    this->add_atom( new_atom );
+   }
+  }
+
+  array< array<double, double>, 3 > get_edges(){
+   array< array<double, double>, 3 > retval;
+   size_t natom_local = this->atom_list.size();
+   double x_plus = 0.0e0;
+   double x_minus = 0.0e0;
+   double y_plus = 0.0e0;
+   double y_minus = 0.0e0;
+   double z_plus = 0.0e0;
+   double z_minus = 0.0e0;
+   for( size_t iatom = 0; iatom < natom_local; iatom++ ){
+    array< array<double, double>, 3> edge_atom;
+     = this->atom_list.at(iatom).get_edges();
+    if( ( edges_cell.at(0).at(0) - x_plus ) >= 1.0e-5 )
+     { x_plus = edges_cell.at(0).at(0); }
+    if( ( edges_cell.at(1).at(0) - y_plus ) >= 1.0e-5 )
+     { y_plus = edges_cell.at(1).at(0); }
+    if( ( edges_cell.at(2).at(0) - z_plus ) >= 1.0e-5 )
+     { z_plus = edges_cell.at(2).at(0); }
+
+    if( ( edges_cell.at(0).at(1) - x_minus ) <= -1.0e-5 )
+     { x_minus = edges_cell.at(0).at(1); }
+    if( ( edges_cell.at(1).at(1) - y_minus ) <= -1.0e-5 )
+     { y_minus = edges_cell.at(1).at(1); }
+    if( ( edges_cell.at(2).at(1) - z_minus ) <= -1.0e-5 )
+     { z_minus = edges_cell.at(2).at(1); }
+   }
+   retval.at(0) = { x_plus, x_minus };
+   retval.at(1) = { y_plus, y_minus };
+   retval.at(2) = { z_plus, z_minus };
+   return retval;
+  }
+
 
 public:
   AtomList get_atom_list() const { return this->atom_list; }

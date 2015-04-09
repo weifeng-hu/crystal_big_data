@@ -3,10 +3,11 @@
 
 #include <vector>
 #include <string>
-#include <iostream>
 #include <tuple>
+#include <iostream>
 #include "utilities/solid_gen/atom.h"
-#include "utilities/solid_gen/eclidean_dis_mat.h"
+#include "utilities/solid_Gen/molecule.h"
+#include "utilities/solid_gen/unit_cell_base.h"
 
 using namespace std;
 
@@ -14,84 +15,14 @@ namespace iquads{
 
 namespace crystal{
 
-struct unit_cell
-{
-public:
- void add_atom( atom at ){
-  store_.push_back(at);
- }
- bool out_of_range( double cutoff ){
-  size_t natom = this->get_store().size();
-  bool inside = true;
-  for( size_t iatom = 0; iatom < natom; iatom++ ){
-   coord_atom coord = store_.at(iatom).get_coord();
-   coord_atom coord_zero = make_tuple ( 0.0e0, 0.0e0, 0.0e0 );
-   double R = eclidean_dis_mat :: get_distance( coord, coord_zero );
-   if( R > cutoff ){
-    inside = false;
-   }
-  }
-  return ( inside ? false : true );
- }
+  template class unit_cell_base<atom>;
+  template class unit_cell_base<molecule>;
 
- unit_cell duplicate( tuple<int, int, int> direction ){
-  int a = get<0>( direction );
-  int b = get<1>( direction );
-  int c = get<2>( direction );
-  return duplicate( a, b, c );
- }
+  typedef unit_cell_base<atom> atomic_ucell;
+  typedef unit_cell_base<molecule> molecular_ucell;
 
- unit_cell duplicate( int a, int b, int c ){
-  unit_cell copy;
-  size_t natoms = store_.size();
-  for( size_t i = 0; i < natoms; i++ ){
-   const string element = store_.at(i).get_element();
-   const double r_x = lc_a * a;
-   const double r_y = lc_b * b;
-   const double r_z = lc_c * c;
-   const int charge = store_.at(i).get_charge();
-   double R_x_new = store_.at(i).get_x() + r_x;
-   double R_y_new = store_.at(i).get_y() + r_y;
-   double R_z_new = store_.at(i).get_z() + r_z;
-   atom new_atom( element, R_x_new, R_y_new, R_z_new, charge );
-   copy.add_atom( new_atom );
-  }
-  return copy;
- }
- void print()
- {
-  cout << "==============================" << endl;
-  cout << "        unit cell info" << endl;
-  cout << "atom list:" << endl;
-  for( size_t i = 0; i < store_.size(); i++ ){
-   cout << store_.at(i).get_element()  << " " << store_.at(i).get_x() << " " << store_.at(i).get_y() << " " << store_.at(i).get_z() << endl;
-  }
-  cout << "crystal constants" << endl;
-  cout << lc_a << " " << lc_b << " " << lc_c << endl;
-  cout << "==============================" << endl;
- }
+} // end of namespace crystal 
 
-public:
- void resize( size_t n ) { this->store_.resize(n); }
- vector< atom > get_store() const { return this->store_; }
- vector< atom >& set_store() { return this->store_; }
- double get_a() const { return this->lc_a; }
- double get_b() const { return this->lc_b; }
- double get_c() const { return this->lc_c; }
- double& set_a() { return this->lc_a; }
- double& set_b() { return this->lc_b; }
- double& set_c() { return this->lc_c; }
- atom get_atom( size_t i ) const { return store_.at(i); }
- atom& set_atom( size_t i ) { return store_.at(i); }
-
-private:
- vector< atom > store_;
- double lc_a, lc_b, lc_c;
-
-};
-
-}
-
-}
+} // end of namespace iquads
 
 #endif

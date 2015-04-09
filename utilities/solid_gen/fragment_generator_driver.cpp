@@ -9,7 +9,6 @@
 #include "utilities/solid_gen/lattice.h"
 #include "utilities/solid_gen/crystal_info.h"
 #include "utilities/solid_gen/interaction.h"
-#include "utilities/solid_gen/fragment_info.h"
 
 int fragment_generator_driver( vector<string> args )
 {
@@ -56,15 +55,15 @@ int fragment_generator_driver( vector<string> args )
   {
    // short range dimers
    if( info.short_range_requested() == true ){
-    fragment_info short_range_dimer_info 
+    fragment_group_info short_range_dimer_info 
      = interact_picture.identify_subgroups<2>( info.get_short_range_radius() );
-    interact_picture.add_fragment_info( short_range_dimer_info );
+    interact_picture.add_fragment_group( short_range_dimer_info );
    }
    // long range dimers
    if( info.long_range_requested() == true ){
-    fragment_info long_range_dimer_info 
+    fragment_group_info long_range_dimer_info 
      = interact_picture.identify_subgroups<2>( inf.get_long_range_radius() );
-    interact_picture.add_fragment_info( long_range_dimer_info );
+    interact_picture.add_fragment_group( long_range_dimer_info );
    }
   }
 
@@ -72,15 +71,15 @@ int fragment_generator_driver( vector<string> args )
   {
    // short range trimers
    if( info.short_range_requested() == true ){
-    fragment_info short_range_trimer_info 
+    fragment_group_info short_range_trimer_info 
      = interact_picture.identify_subgroups<3>( info.get_short_range_radius() );
-    interact_picture.add_fragment_info( short_range_trimer_info );
+    interact_picture.add_fragment_group( short_range_trimer_info );
    }
    // long range trimers
    if( info.long_range_requested() == true ){
-    fragment_info long_range_trimer_info 
+    fragment_group_info long_range_trimer_info 
      = interact_picture.identify_subgroups<3>( info.get_long_range_radius() );
-    interact_picture.add_fragment_info( long_range_trimer_info );
+    interact_picture.add_fragment_group( long_range_trimer_info );
    }
   }
 
@@ -88,19 +87,19 @@ int fragment_generator_driver( vector<string> args )
   {
    // short range tetramers
    if( info.short_range_requested() == true ){
-    fragment_info short_range_tetramer_info
+    fragment_group_info short_range_tetramer_info
       = interact_picture.identify_subgroups<4>( info.get_short_range_radius() );
-    interact_picture.add_fragment_info( short_range_tetramer_info );
+    interact_picture.add_fragment_group( short_range_tetramer_info );
    }
    // long range tetramers
    if( info.long_range_requested() == true ){
-    fragment_info long_range_tetramer_info 
+    fragment_group_info long_range_tetramer_info 
       = interact_picture.identify_subgroups<4>( info.get_long_range_radius() );
-    interact_picture.add_fragment_info( long_range_tetramer_info );
+    interact_picture.add_fragment_group( long_range_tetramer_info );
    }
   }
 
-  interact_picture.print_fragment_info();   
+  interact_picture.print_fragment_groups();   
   // the generator ends here
   // further functionalties are anticipated
 

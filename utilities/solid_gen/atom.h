@@ -4,7 +4,9 @@
 #include <string>
 #include <tuple>
 #include <iostream>
+#include <fstream>
 #include "utilities/solid_gen/coordinate.h"
+#include "utilities/solid_gen/threed_space_function.h"
 
 using namespace std;
 
@@ -12,7 +14,7 @@ namespace iquads {
 
 namespace basic {
 
-struct atom{
+struct atom {
 public:
   atom(){
    this->element = "not set";
@@ -24,6 +26,30 @@ public:
   }
 
 public:
+  bool within_radius( double Radius ){
+   Coord orig = make_tuple(0.0e0, 0.0e0, 0.0e0);
+   Coord this_coord 
+    = make_tuple( this->coordinate.at(0), this->coordinate.at(1) 
+                  this->coordinate.at(2) );
+   double R = threed_space :: compute_distance( orig, this_coord );
+   return ( R <= Radius ) ? true : false;
+  }
+
+  void operator+= ( array<double, double, double> x ){
+   this->coordinate.at(0) += x.at(0);
+   this->coordinate.at(1) += x.at(1);
+   this->coordiante.at(2) += x.at(2);
+  }
+
+  void operator>> ( ifstream ifs ){
+   ifs >> this->element_;
+   ifs >> this->coordinate.at(0);
+   ifs >> this->coordinate.at(1);
+   ifs >> this->coordiante.at(2);
+   ifs >> this->charge;
+  }
+
+public:
   void set_info( string element, double x, double y, double z, int charge)
   {
    this->element_ = element;
@@ -32,6 +58,15 @@ public:
    this->coordinate.at(2) = z;
    this->charge_ = charge;
   }
+
+  array< array<doube, double>, 3 > get_edges(){
+   array< array<double, double>, 3 > retval;
+   retval.at(0) = { this->coordinate.at(0), this->coordinate.at(0) };
+   retval.at(1) = { this->coordinate.at(1), this->coordinate.at(1) };
+   retval.at(2) = { this->coordinate.at(2), this->coordinate.at(2) };
+   return retval;
+  }
+
   void print_info(){
    char line[100];
    sprintf( line, "(%s)   X(%12.8f)  Y(%12.8f)  Z(%12.8f)  CHARGE(%2i)", 

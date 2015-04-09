@@ -7,6 +7,8 @@
 #include <iostream>
 #include <algorithm>
 #include <memory>
+#include "utilities/solid_gen/molecule.h"
+#include "utilities/solid_gen/molecule_bulk.h"
 
 using namespace std;
 
@@ -17,12 +19,16 @@ namespace crystal {
 struct fragment_info {
 public:
   fragment_info(){
-   this->primitive.resize(0);
-   this->identical_fragment_list.resize(0);
-   this->bulk_ptr.reset();
+   this->reset();
   }
 
 public:
+  void reset(){
+   this->primitive.resize(0);
+   this->identical_fragment_list.resize(0);
+   this->bulk_ptr.reset();
+  } // end of reset()
+
   void print_info(){
    cout << endl;
    cout << "Fragment Info" << endl;
@@ -56,8 +62,11 @@ public:
   } // end of print_info()
 
 public:
+  size_t get_n_mole_per_frag() const { return this->n_molecule_per_fragment_; }
+  size_t& set_n_mole_per_frag() { return this->n_molecule_per_fragment_; }
+
   MoleculeList& set_primitive() { return this->primitive; }
-  vector< vector<int> > & set_fragment_list() { return this->identical_fragment_list; }
+  vector< vector<int> >& set_fragment_list() { return this->identical_fragment_list; }
   shared_ptr<molecule_bulk>& set_bulk_ptr() { return this->bulk_ptr; }
 
 private:
@@ -71,6 +80,8 @@ private:
   //  identical_fragment_list = [ [ 1 5 ] [ 2 6 ] ...  ]
   //  where 1, 5, 2, 6 are individual molecule index in the molecule bulk
   vector< vector<int> > identical_fragment_list;
+
+  size_t n_molecule_per_fragment_;
 
   // stores a printer to the molecule bulk, pointing to the one in 
   // an interaction object

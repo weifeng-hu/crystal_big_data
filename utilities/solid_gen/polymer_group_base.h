@@ -2,10 +2,14 @@
 #define POLYMER_GROUP_BASE
 
 #include <stdlib.h>
+#include <array>
 #include "utilities/solid_gen/math_function.h"
-#include "utilities/solid_gen/molecule.h"
-#include "utilities/solid_gen/polymer_base.h"
 #include "utiltiies/solid_gen/matrix_function.h"
+#include "utilities/solid_gen/molecule.h"
+#include "utilities/solid_gen/molecule_bulk.h"
+#include "utilities/solid_gen/polymer_base.h"
+
+using namespace std;
 
 namespace iquads {
 
@@ -36,16 +40,12 @@ public:
 
    size_t n_comb = polymer_combination.size();
    for( size_t icomb = 0; icomb < n_comb; icomb++ ){
-    array<int, NUM> list_local = this->polymer_combination.at(icomb);
     // get the molecule list to construct a polymer
-    MoleculeList molecule_list;
-    for( size_t imole = 0; imole < n_comb; icomb++ ){
-     const int index_mole = list_local.at(imole);
-     const molecule mole_i = new_bulk->get_molecule(index_mole);
-     molecule_list.push_back(mole_i);
-    } // end of loop imole, a single polymer
-    polymer_base<NUM> polymer_x;
+    array<int, NUM> list_local = this->polymer_combination.at(icomb);
+    vector<int> list_vec( list_local.begin(), list_local.end() );
+    MoleculeList molecule_list = new_bulk->get_molelist_from_list( list_vec );
     // initialize the polymer from molecule_list
+    polymer_base<NUM> polymer_x;
     polymer_x.init_from( molecule_list );
     // if all atoms in the polymer are within a radius of Radius from
     // each other, then to add the polymer to the group storage
@@ -71,35 +71,17 @@ public:
      // compute euclidean distance matrix eigenvalues
      vector< DMatrixHeap > eigval_vectors = this->compute_dist_eigval();
      // get the ''eigenvalue boolean matrix''
-     DMatrixHeap eigval_boolean_mat = compute_boolean_mat( eigval_vectors );
+     DMatrixHeap eigpair_boolean_mat = compute_boolean_mat( eigval_vectors );
      // get the degeneracy structure of the boolean matrix
      group_indices = get_degeneracy_struct( eigval_boolean_mat );
     }
+    this->fill_frag_group( group_indices );
 
-    // fill the fragment info
-    for( size_t igroup = 0; igroup < group_indices.size(); igroup++ ){
-     fragment_info fraginfo_i;
-     fraginfo_i.set_bulk_ptr() = this->bulk_ptr;
-     int primitive_index = group_indices[igroup].at(0);
-     polymer_base< NUM > polymer_x = this->group_storage.at(primitive_index);
-     MoleculeList molecule_list_local = polymer_x.get_group();
-     fraginfo_i.set_primitive() = molecule_list_local;
-     vector<int> subgroup_indices = group_indices.at(igroup);
-     for( size_t isubgroup = 0; isubgroup < subgroup_indices.size(); isubgroup++ ){
-      int index_i = subgroup_indices.at(i);
-      array< int, NUM > molecule_indices = this->polymer_combination.at(index_i);
-      vector<int> temp_vec;
-      temp_vec.resize( NUM );
-      copy_n( molecule_indices.begin(), NUM, temp_vec.begin() );
-      fraginfo_i.set_fragment_list() = temp_vec;
-     }
-     this->fraginfo_list.push_back(fraginfo_i);
-    }
   }
 
 public:
-  vector<fragment_info> get_fragment_info_list() const 
-   { return this->fraginfo_list; }
+ fragment_group_info get_fragment_group_info() const 
+   { return this->frag_group; }
 
 private:
   vector< DMatrixHeap > compute_dist_eigval()
@@ -124,6 +106,47 @@ private:
    return retval;
   }
 
+  MoleculeList get_primitive_for_groupset( vector<int> group_set ){
+   MoleculeList retval;
+   {
+    const size_t prim_index = group_set.at(0);
+    polymer_base<NUM> polymer_x = this->group_storage.at( prim_index );
+    retval = polymer_x.get_group();
+   }
+   return retval;
+  }
+
+  vector< vector<int> > extract_mole_indices_for_groupset( vector<int> group_set ){
+   vector< vector<int> > retval;
+   const size_t n_polymer = group_set.size();
+   for( size_t ipolymer = 0; ipolymer < n_polymer; ipolymer++ ){
+    vector<int> molecule_indices_polymer;
+    molecule_indices_polymer.resize( this->n_molecule_per_unit_ );
+    array<int, NUM> molecule_indices_orig 
+      = this->polymer_combination.at(ipolymer);
+    copy_n( molecule_indices_orig.begin(), 
+            this->n_molecule_per_unit_, 
+            molecule_indices_polymer.begin() );
+    retval.push_back( molecule_indices_polymer );
+   }
+   return retval;
+  }
+
+  void fill_frag_group( vector< vector<int> > group_indices ){
+   size_t n_group = group_indices.size();
+   for( size_t igroup = 0; igroup < n_group; igroup++ ){
+    fragment_info fraginfo_local;
+    fraginfo_local.set_n_mole_per_frag() = this->n_molecule_per_unit_;
+    fraginfo_local.set_bulk_ptr() = this->bulk_ptr;
+    fraginfo_local.set_primitive() 
+      = this->get_primitive_for_groupset( group_indices.at(igroup) );
+    fraginfo_local.set_fragment_list()
+      = this->extract_mole_indices_for_groupset( group_indices.at(igroup) );
+    }
+    this->frag_group.add_fragment_info( fraginfo_local );
+   }
+  }
+
 private:
   // storage of all the molecular groups with the 
   // same number of molecule within each group
@@ -136,10 +159,10 @@ private:
   // to be evaluated by evaluate_subgroup()
   // Each fragment info stores the fragment information
   // for each type of unique fragment
-  vector<fragment_info> fraginfo_list;
+  fragment_group_info frag_group;
 
   // a copy of the number of molecules in each polymer
-  size_t n_molecule_per_unit;
+  size_t n_molecule_per_unit_;
 
   // pointer to the molecule bulk, which is stored in
   // an interaction object

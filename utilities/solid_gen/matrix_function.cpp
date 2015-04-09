@@ -17,7 +17,7 @@ namespace iquads {
 
 namespace matrix {
 
-void symmetrix_diag( DMatrixHeap* a, DMatrixHeap* eigvec, DMatrixHeap* eigval )
+void symmetric_diag( DMatrixHeap* a, DMatrixHeap* eigvec, DMatrixHeap* eigval )
 {
 
   // Heap -> Stack
@@ -34,6 +34,15 @@ void symmetrix_diag( DMatrixHeap* a, DMatrixHeap* eigvec, DMatrixHeap* eigval )
   eigval_local.copy_to( eigval );
 
 };
+
+void symmetric_diag_big( DMatrixHeap* a, DMatrixHeap* eigvec, DMatrixHeap* eigval )
+{
+
+  int dimension = a.get_nrow();
+  // blas call
+  diag( a.get_store().data(), eigvec.get_store().data(), eigval.get_store().data(), dimension );
+
+}
 
 bool is_the_same( DMatrixHeap* eigval_a, DMatrixHeap* eigval_b )
 {
@@ -85,7 +94,7 @@ DMatrixHeap compute_boolean_mat( vector<DMatrixHeap>* eigvals )
 
 }
 
-vector< tuple< double, int, int> > get_degeneracy_struct( DMatrixHeap* eigval )
+vector< tuple< double, int, int> > get_degeneracy_groups( DMatrixHeap* eigval )
 {
 
   vector< tuple<double, int, int> > retval;
@@ -123,12 +132,34 @@ vector< tuple< double, int, int> > get_degeneracy_struct( DMatrixHeap* eigval )
   return retval;
 }
 
-vector< vector<int> > get_degeneracy_struct( DMatrixHeap* eigval )
+vector< vector<int> > get_degeneracy_struct( DMatrixHeap* mat )
 {
+  vector< vector<int> > retval;
 
-  
+  int dimension = mat->get_nrow();
+  DMatrixHeap eigvec( dimension, dimension );
+  DMatrixHeap eigval( dimension, 1 );
+  symmetric_diag_big( mat, &eigvec, &eigval, dimension );
 
-}
+  vector< tuple< double, int, int> > degen_groups = get_degeneracy_groups( eigval );
+  const size_t n_groups = degen_groups.size();
+  for( size_t igroup = 0; igroup < n_groups; igroup++ ){
+   vector<int> this_indices;
+   const tuple<double, int, int> degen_group = degen_groups.at(igroup);
+   const int startdim = get<1> ( degen_group );
+   const int enddim   = get<2> ( degen_group );
+   for( size_t i = 0; i < dimension; i++ ){
+    const double value = eigvec( i, startdim );
+    if( fabs( value) > 1.0e-10 ){
+     this_indices.push_back(i);
+    }
+   }
+   retval.push_back( this_indices );
+  }
+
+  return this->retval;
+
+} // end of get_degeneracy_stuct()
 
 } // end of namespace matrix
 
