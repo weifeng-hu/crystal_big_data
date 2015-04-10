@@ -30,9 +30,9 @@ public:
    this->length_b_ = get<1>( edge_lengths );
    this->length_c_ = get<2>( edge_lengths );
 
-   this->angle_alpha_ = get<0>( angles )/pi;
-   this->angle_beta_  = get<1>( angles )/pi;
-   this->angle_gamma_ = get<2>( angles )/pi;
+   this->angle_alpha_ = get<0>( angles ) *pi/180e0;
+   this->angle_beta_  = get<1>( angles ) *pi/180e0;
+   this->angle_gamma_ = get<2>( angles ) *pi/180e0;
   }
 
 public:
@@ -75,11 +75,11 @@ public:
    sprintf(line," length c: %12.8f", this->length_c_);
    cout << line << endl;
 
-   sprintf(line," angle alpha: %12.8f", this->length_c_);
+   sprintf(line," angle alpha: %12.8f", this->angle_alpha_);
    cout << line << endl;
-   sprintf(line," angle beta: %12.8f", this->length_c_);
+   sprintf(line," angle beta: %12.8f", this->angle_beta_);
    cout << line << endl;
-   sprintf(line," angle gamma: %12.8f", this->length_c_);
+   sprintf(line," angle gamma: %12.8f", this->angle_gamma_);
    cout << line << endl;
 
    cout << "Lattice vectors" << endl;

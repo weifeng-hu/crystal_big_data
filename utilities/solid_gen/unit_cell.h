@@ -1,10 +1,6 @@
 #ifndef UNIT_CELL_H
 #define UNIT_CELL_H
 
-#include <vector>
-#include <string>
-#include <tuple>
-#include <iostream>
 #include "utilities/solid_gen/atom.h"
 #include "utilities/solid_Gen/molecule.h"
 #include "utilities/solid_gen/unit_cell_base.h"

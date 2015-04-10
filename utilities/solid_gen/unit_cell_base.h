@@ -63,8 +63,8 @@ public:
    }
   }
 
-  array< array<double, double>, 3 > get_edges(){
-   array< array<double, double>, 3 > retval;
+  array< array<double, 2>, 3 > get_edges(){
+   array< array<double, 2>, 3 > retval;
    size_t n_node_local = this->store.size();
    double x_plus = 0.0e0;
    double x_minus = 0.0e0;
