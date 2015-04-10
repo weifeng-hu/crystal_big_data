@@ -26,13 +26,7 @@ public:
 public:
   void add_atom( atom new_atom ){
    this->atom_list.push_back( new_atom );
-   this->natom += 1;
-  }
-  void print_info(){
-   cout << " MOLECULE(" << this->molecule_name_ << ")" << endl;
-   for( size_t iatom = 0; iatom < natom_; iatom++ ){
-    (this->atom_list.at(iatom)).print_info();
-   }
+   this->natom_ += 1;
   }
 
 public:
@@ -49,53 +43,54 @@ public:
    return retval;
   }
 
-  void operator+= ( array<double, double, double> x ){
+  void operator+= ( array<double, 3> x ){
    size_t n_atom_local = this->atom_list.size();
    for( size_t iatom = 0; iatom < n_atom_local; iatom++ ){
     atom_list.at(iatom) += x;
    }
   }
 
-  void operator>> ( ifstream ifs ){
-   ifs >> this->molecule_name_;
-   ifs >> this->natom_;
-   this->atom_list.resize( this->natom_ );
-   for( size_t iatom = 0; iatom < this->natom_; iatom++ ){
+  friend ifstream& operator>> ( ifstream& ifs, molecule& new_mole ){
+   ifs >> new_mole.set_name();
+   ifs >> new_mole.set_natom();
+   new_mole.set_atom_list().resize( new_mole.get_natom() );
+   for( size_t iatom = 0; iatom < new_mole.get_natom(); iatom++ ){
     atom new_atom;
     ifs >> new_atom;
-    this->add_atom( new_atom );
+    new_mole.add_atom( new_atom );
    }
+   return ifs;
   }
 
-  array< array<double, double>, 3 > get_edges(){
-   array< array<double, double>, 3 > retval;
+  array< array<double, 2>, 3 > get_edges(){
+   array< array<double, 2>, 3 > retval;
    size_t natom_local = this->atom_list.size();
-   double x_plus = 0.0e0;
-   double x_minus = 0.0e0;
-   double y_plus = 0.0e0;
-   double y_minus = 0.0e0;
-   double z_plus = 0.0e0;
-   double z_minus = 0.0e0;
+   double x_plus  = this->atom_list.at(0).get_edges().at(0).at(0);
+   double x_minus = this->atom_list.at(0).get_edges().at(0).at(1);
+   double y_plus  = this->atom_list.at(0).get_edges().at(1).at(0);
+   double y_minus = this->atom_list.at(0).get_edges().at(1).at(1);
+   double z_plus  = this->atom_list.at(0).get_edges().at(2).at(0);
+   double z_minus = this->atom_list.at(0).get_edges().at(2).at(1);
    for( size_t iatom = 0; iatom < natom_local; iatom++ ){
-    array< array<double, double>, 3> edge_atom;
+    array< array<double, 2>, 3> edges_atom
      = this->atom_list.at(iatom).get_edges();
-    if( ( edges_cell.at(0).at(0) - x_plus ) >= 1.0e-5 )
-     { x_plus = edges_cell.at(0).at(0); }
-    if( ( edges_cell.at(1).at(0) - y_plus ) >= 1.0e-5 )
-     { y_plus = edges_cell.at(1).at(0); }
-    if( ( edges_cell.at(2).at(0) - z_plus ) >= 1.0e-5 )
-     { z_plus = edges_cell.at(2).at(0); }
+    if( ( edges_atom.at(0).at(0) - x_plus ) >= 0.0e0 )
+     { x_plus = edges_atom.at(0).at(0); }
+    if( ( edges_atom.at(1).at(0) - y_plus ) >= 0.0e0 )
+     { y_plus = edges_atom.at(1).at(0); }
+    if( ( edges_atom.at(2).at(0) - z_plus ) >= 0.0e0 )
+     { z_plus = edges_atom.at(2).at(0); }
 
-    if( ( edges_cell.at(0).at(1) - x_minus ) <= -1.0e-5 )
-     { x_minus = edges_cell.at(0).at(1); }
-    if( ( edges_cell.at(1).at(1) - y_minus ) <= -1.0e-5 )
-     { y_minus = edges_cell.at(1).at(1); }
-    if( ( edges_cell.at(2).at(1) - z_minus ) <= -1.0e-5 )
-     { z_minus = edges_cell.at(2).at(1); }
+    if( ( edges_atom.at(0).at(1) - x_minus ) < 0.0e0 )
+     { x_minus = edges_atom.at(0).at(1); }
+    if( ( edges_atom.at(1).at(1) - y_minus ) < 0.0e0 )
+     { y_minus = edges_atom.at(1).at(1); }
+    if( ( edges_atom.at(2).at(1) - z_minus ) < 0.0e0 )
+     { z_minus = edges_atom.at(2).at(1); }
    }
-   retval.at(0) = { x_plus, x_minus };
-   retval.at(1) = { y_plus, y_minus };
-   retval.at(2) = { z_plus, z_minus };
+   retval.at(0) = array<double, 2> { x_plus, x_minus };
+   retval.at(1) = array<double, 2> { y_plus, y_minus };
+   retval.at(2) = array<double, 2> { z_plus, z_minus };
    return retval;
   }
 
@@ -104,17 +99,17 @@ public:
   AtomList get_atom_list() const { return this->atom_list; }
   atom get_atom( size_t i ) const { return this->atom_list.at(i); }
   string get_name() const { return this->molecule_name_; }
-  int get_natom() const { return this->natom_; }
+  size_t get_natom() const { return this->natom_; }
 
   AtomList& set_atom_list() { return this->atom_list; }
   atom& set_atom( size_t i ) { return this->atom_list.at(i); }
   string& set_name() { return this->molecule_name_; }
-  int& set_natom() { return this->natom_; }
+  size_t& set_natom() { return this->natom_; }
 
   CoordList get_coordinate_list(){
    CoordList retval;
    for( size_t iatom = 0; iatom < natom_; iatom++ ){
-    const Coord set = this->atom_list.at(iatom).get_coordiante_set();
+    const Coord set = this->atom_list.at(iatom).get_coordinate_set();
     retval.push_back(set);
    }
    return retval;

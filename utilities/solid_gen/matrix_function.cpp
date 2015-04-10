@@ -3,7 +3,7 @@
 #include <vector>
 #include <array>
 #include <tuple>
-#include <utilitiy>
+#include <utility>
 #include <algorithm>
 #include <iostream>
 #include "matrix/blas_interface.h"

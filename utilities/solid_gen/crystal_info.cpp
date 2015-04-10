@@ -1,7 +1,7 @@
 #include <string>
 #include <fstream>
 #include "utilities/solid_gen/molecule.h"
-#include "utilities/solid_gen/molecular_crystal_info.h"
+#include "utilities/solid_gen/crystal_info.h"
 
 using namespace std;
 

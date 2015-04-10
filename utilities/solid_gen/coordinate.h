@@ -1,6 +1,7 @@
-#ifndef COORDINATE_H
-#define COORDINATE_H
+#ifndef IQUADS_COORDINATE_H
+#define IQUADS_COORDINATE_H
 
+#include <vector>
 #include <tuple>
 
 namespace iquads {
@@ -15,7 +16,7 @@ namespace basic {
   // and the significant digits after the decimal point 
   // can only be 8 digits or so
   typedef std::tuple< double, double, double > Coord;
-  typedef vector<Coord> CoordList;
+  typedef std::vector<Coord> CoordList;
 
 } // end of namespace basic
 

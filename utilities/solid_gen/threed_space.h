@@ -1,5 +1,5 @@
-#ifndef THREED_SPACE_H
-#define THREED_SPACE_H
+#ifndef THREED_SPACE_VECTOR_H
+#define THREED_SPACE_VECTOR_H
 
 #include <tuple>
 #include <array>
@@ -10,7 +10,7 @@ namespace iquads {
 
 namespace threed_space {
 
-  const pi = 3.14159265358979324e0;
+  const double pi = 3.14159265358979324e0;
 
   // the x unit vector
   const tuple< double, double, double > e_x 
@@ -24,10 +24,10 @@ namespace threed_space {
   const array< tuple<double, double, double>,3 > e_3d
    = { e_x, e_y, e_z };
 
-  array< double, double, double > 
-  operator* ( array< double, double, double > x, double a ){
-   array< double, double, double> retval
-    = { x.at(0) * a, x.at(1) * a, x.at(2) * a };
+  array< double, 3 >  
+  operator* ( array< double, 3 > vec, double a ){
+   array< double, 3 > retval
+    = { vec.at(0) * a, vec.at(1) * a, vec.at(2) * a };
    return retval;
   }
 

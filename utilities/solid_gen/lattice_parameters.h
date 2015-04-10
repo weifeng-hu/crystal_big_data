@@ -16,11 +16,12 @@ using namespace iquads :: threed_space;
 namespace crystal {
 
 struct lattice_parameters
+{
 public:
   lattice_parameters(){
    this->reset();
   }
-  lattice_constants( tuple<double, double, double> edge_lengths,
+  lattice_parameters( tuple<double, double, double> edge_lengths,
                      tuple<double, double, double> angles )
   {
    this->reset();
@@ -36,18 +37,15 @@ public:
 
 public:
   void reset(){
-   this->const_a_ = 0.0e0;
-   this->const_b_ = 0.0e0;
-   this->const_c_ = 0.0e0;
+   this->length_a_ = 0.0e0;
+   this->length_b_ = 0.0e0;
+   this->length_c_ = 0.0e0;
    this->angle_alpha_ = 0.0e0;
    this->angle_beta_ = 0.0e0;
    this->angle_gamma_ = 0.0e0;
    for( size_t i = 0; i < 3; i++ ){
-    for( size_t j = 0; j < 3; j++ ){
-     this->trans_vectors.at(i).at(j).fill(0.0e0);
-    }
+    this->trans_vectors.at(i).fill(0.0e0);
    }
-   this->alpha_vector.fill(0.0e0);
   }
 
 public:
@@ -64,7 +62,7 @@ public:
    array< double, 3 > a_vec = this->set_a_vec();
    array< double, 3 > b_vec = this->set_b_vec();
    array< double, 3 > c_vec = this->set_c_vec();
-   this->trans_vectors = { a_vec, b_vec, c_vec };
+   this->trans_vectors = array<array<double, 3>, 3> { a_vec, b_vec, c_vec };
   }
 
   void print_info(){
@@ -123,7 +121,7 @@ private:
        this->length_c_ * this->length_b_ * cos( this->angle_gamma_ ) * cos( this->angle_alpha_ ) );
    }
    retval.at(2) 
-    = sqrt( pow( this->length_c_, 2 ) - pow( retval.at(0) ,2) - pow( retval.at(1) ) );
+    = sqrt( pow( this->length_c_, 2 ) - pow( retval.at(0), 2) - pow( retval.at(1), 2 ) );
    return retval;
   };
 
