@@ -27,7 +27,8 @@
 #include <array>
 #include <algorithm>
 #include <utility>
-#include "iquads/iquads_limits.h"
+#include <cassert>
+#include "utilities/solid_gen/iquads_limits.h"
 #include "utilities/solid_gen/vector_matrix_base.h"
 
 using namespace std;
@@ -43,7 +44,6 @@ public:
   array_matrix_base(){
    this->nrow_ = 0;
    this->ncol_ = 0;
-   this->length_ = 0;
   }
   array_matrix_base( vector_matrix_base<T>* obj ){
    this->copy_from( obj );
@@ -59,10 +59,10 @@ public:
     this->nrow_ = obj->get_nrow();
     this->ncol_ = obj->get_ncol();
     vector<T> temp_store = obj->get_store();
-    copy_n( temp_store.begin(), obj_size, this->store_.begin() );
+    copy_n( temp_store.begin(), obj_size, this->store.begin() );
    }
    catch( size_t n){
-    cout << " array load exception: " << obj_size << " >= " << STACK_DOUBLE_LIMIT << endl;
+    cout << " array load exception: " << n << " >= " << STACK_DOUBLE_LIMIT << endl;
     abort();
    }
   }
@@ -71,17 +71,17 @@ public:
    const size_t length = this->nrow_ * this->ncol_;
    vector<T> temp_store;
    temp_store.resize(length);
-   copy_n( this->store_.begin(), length, temp_store.begin() );
+   copy_n( this->store.begin(), length, temp_store.begin() );
    obj->set_store() = move( temp_store );
   }
  
 public:
-  size_t get_nrow() const { return this->nrow_; };
-  size_t get_ncol() const { return this->ncol_; };
+  size_t get_nrow() const { return this->nrow_; }
+  size_t get_ncol() const { return this->ncol_; }
   T& set_element( size_t i, size_t j ) {
    const size_t pos = i * ncol_ + j;
    assert( ( pos < STACK_DOUBLE_LIMIT ) == true );
-   return this->store_.at( pos );
+   return this->store.at( pos );
   }
   T  get_element( size_t i, size_t j ) {
    T retval;
@@ -91,9 +91,11 @@ public:
   T& operator() ( size_t i, size_t j ) {
    return this->set_element(i,j);
   };
+  array<T, STACK_DOUBLE_LIMIT > get_store() const { return this->store; }
+  array<T, STACK_DOUBLE_LIMIT >& set_store() { return this->store; } 
 
 private:
-  array< T, STACK_DOUBLE_LIMIT > store_;
+  array< T, STACK_DOUBLE_LIMIT > store;
   size_t nrow_, ncol_;
 
 };

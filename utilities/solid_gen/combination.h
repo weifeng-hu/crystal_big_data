@@ -14,26 +14,33 @@ template< size_t r >
 struct combinations
 {
 public:
+  combinations(){
+   this->all_combinations.resize(0);
+   this->current.fill(0);
+  }
+
+public:
   void combination_util( vector<int> input_array, size_t start, size_t end, size_t index ){
 
    if( index == r ){
-    this->all_combinations.push_back( current );
+    this->all_combinations.push_back( this->current );
+    return;
    }
 
    for( size_t i = start; ( i <= end && (end - i + 1) >= (r - index) ) ; i++ ){
     this->current[index] = input_array[i];
-    combination_util( input_array, i+1, end, index+1 );
+    this->combination_util( input_array, i+1, end, index+1 );
    }
 
   }
 
-  vector< array<int, k> > get_all_comb() { return this->all_combinations; }
+  vector< array<int, r> > get_all_comb() { return this->all_combinations; }
 
 private:
-  vector< array< int, k > > all_combinations;
-  array<int, k> current;
+  vector< array< int, r > > all_combinations;
+  array<int, r> current;
 
-}
+};
 
 
 /*

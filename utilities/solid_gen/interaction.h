@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <memory>
+#include "utilities/solid_gen/polymer_group_base.h"
+#include "utilities/solid_gen/molecule_bulk.h"
 #include "utilities/solid_gen/fragment_group_info.h"
 
 using namespace std;
@@ -14,8 +16,8 @@ namespace crystal {
 struct interaction {
 public:
   interaction(){
-   this->fraginfo_list.resize(0);
-   this->n_fragtype = 0;
+   this->fragment_group_list.resize(0);
+   this->n_fraggroup = 0;
    this->bulk_radius = 0.0e0;
    this->short_range_radius = 0.0e0;
    this->long_range_radius = 0.0e0;
@@ -28,8 +30,8 @@ public:
    fragment_group_info retval;
    {
     polymer_group_base < NUM > polymer_group;
-    share_ptr< molecule_bulk > bulk_ptr_local 
-      = shared_ptr< molecule_bulk > ( &(this->bulk) );
+    shared_ptr< molecule_bulk > bulk_ptr_local 
+      = make_shared< molecule_bulk > ( (this->bulk) );
     polymer_group.init_from_bulk ( bulk_ptr_local, Radius );
     polymer_group.evaluate_subgroups();
     retval = polymer_group.get_fragment_group_info();
@@ -41,7 +43,7 @@ public:
   // add a fragment_info object to the list
   void add_fragment_group( fragment_group_info fraggroup ){
    this->fragment_group_list.push_back( fraggroup );
-   this->n_fragtype += 1;
+   this->n_fraggroup += 1;
   }
 
 public:
@@ -56,6 +58,11 @@ public:
     frag_group_local.print_info();
    }
   } // end of print_fragment_groups() 
+
+  molecule_bulk& set_bulk() { return this->bulk; }
+
+  double& set_short_range_radius() { return this->short_range_radius; }
+  double& set_long_range_radius() { return this->long_range_radius; }
 
 private:
   // a copy of the molecule bulk information

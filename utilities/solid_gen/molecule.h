@@ -22,6 +22,11 @@ public:
    this->molecule_name_ = "not set";
    this->natom_ = 0;
   }
+  molecule( string molecule_name ){
+   this->atom_list.resize(0);
+   this->molecule_name_ = molecule_name;
+   this->natom_ = 0;
+  }
 
 public:
   void add_atom( atom new_atom ){
@@ -52,9 +57,9 @@ public:
 
   friend ifstream& operator>> ( ifstream& ifs, molecule& new_mole ){
    ifs >> new_mole.set_name();
-   ifs >> new_mole.set_natom();
-   new_mole.set_atom_list().resize( new_mole.get_natom() );
-   for( size_t iatom = 0; iatom < new_mole.get_natom(); iatom++ ){
+   size_t natom;
+   ifs >> natom;
+   for( size_t iatom = 0; iatom < natom; iatom++ ){
     atom new_atom;
     ifs >> new_atom;
     new_mole.add_atom( new_atom );

@@ -15,19 +15,21 @@ namespace crystal{
 struct molecule_bulk
 {
 public:
-  mole_bulk(){
+  molecule_bulk(){
    this->bulk.resize(0);
    this->n_molecule_ = 0;
+   this->radius_ = 0.0e0;
   }
   molecule_bulk( molecular_lattice* ml ){
    this->init_from( ml );
   }
 
 public:
-  void init_from( shared_ptr<molecular_lattice> ml ){
+  void init_from( molecular_lattice* ml ){
+   ml->recenter();
    size_t n_cell_local = ml->get_ncell();
    for( size_t icell = 0; icell < n_cell_local; icell++ ){
-    molecular_cell cell_local = ml->get_cell(icell);
+    molecular_ucell cell_local = ml->get_cell(icell);
     size_t n_node_local = cell_local.get_n_node();
     for( size_t inode = 0; inode < n_node_local; inode++ ){
      this->bulk.push_back( cell_local.get_node(inode) );
@@ -39,7 +41,7 @@ public:
    this->radius_ = Radius;
    vector< molecule > temp_bulk;
    for( size_t imole = 0; imole < this->n_molecule_; imole++ ){
-    molecule mole_local = bulk.at(imole);
+    molecule mole_local = this->bulk.at(imole);
     if( mole_local.within_radius( Radius ) == true ){
      temp_bulk.push_back( mole_local );
     }
@@ -53,7 +55,8 @@ public:
   MoleculeList get_molelist_from_list( vector<int> list ){
    MoleculeList retval;
    for( size_t imole = 0; imole < list.size(); imole++ ){
-    retval.push_back( this->bulk.at(imole) );
+    size_t xmole = list.at(imole);
+    retval.push_back( this->bulk.at(xmole) );
    }
    return retval;
   }

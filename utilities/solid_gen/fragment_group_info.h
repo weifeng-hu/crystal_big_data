@@ -34,15 +34,16 @@ public:
   {
    cout << "Fragment Group Info" << endl;
    cout << " number of fragment types: " << this->group_storage.size() << endl;
-   cout << "all fragment types:" << endl;
+   cout << " all fragment types:" << endl;
    for( size_t itype = 0; itype < group_storage.size(); itype++ ){
-    cout << " Fragment Type " << itype << endl;
+    cout << "  Fragment Type " << itype << endl;
     fragment_info fraginfo_local = group_storage.at(itype);
     fraginfo_local.print_info();
+    cout << endl;
    }
   } // end of print_info()
 
-pubic:
+public:
   size_t get_n_mole_per_frag() const 
     { return this->n_molecule_per_fragment_; }
 
@@ -73,7 +74,7 @@ private:
   size_t n_molecule_per_fragment_;
   shared_ptr<molecule_bulk> bulk_ptr;
 
-} // end of struct fragment_group_info
+}; // end of struct fragment_group_info
 
 } // end of namespace crystal
 

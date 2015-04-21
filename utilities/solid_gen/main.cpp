@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <string>
 #include <vector>
-#include "utilities/solid_gen/fragment_gen.h"
+#include "utilities/solid_gen/fragment_generator_driver.h"
 
 int main( int argc, char* argv[] )
 {
@@ -23,12 +23,12 @@ int main( int argc, char* argv[] )
   // transfer arguments to strings
   vector<string> args;
   args.resize(argc);
-  for( size_t iarg = 0; iarg < argv; iarg++ ){ 
-   args[i] = argv[i]; 
+  for( size_t iarg = 0; iarg < argc; iarg++ ){ 
+   args[iarg] = argv[iarg]; 
   }
 
   // enter the main driver
-  fragment_gen_driver( args );
+  fragment_generator_driver( args );
 
   return 0;
 }

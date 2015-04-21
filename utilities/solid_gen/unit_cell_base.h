@@ -6,10 +6,13 @@
 #include <iostream>
 #include <tuple>
 #include "utilities/solid_gen/threed_space.h"
+#include "utilities/solid_gen/lattice_parameters.h"
 
 using namespace std;
 
 namespace iquads{
+
+using namespace threed_space;
 
 namespace crystal{
 
@@ -31,20 +34,20 @@ public:
      break;
     }
    }
-   return within_radius;
+   return within_radius_local;
   }
  
-  unit_cell_base <class node_type> 
+  unit_cell_base<node_type> 
   translational_duplicate( tuple<int, int, int> direction ){
    double a = get<0>( direction );
    double b = get<1>( direction );
    double c = get<2>( direction );
-   return duplicate( a, b, c );
+   return this->translational_duplicate( a, b, c );
   }
- 
-  unit_cell_base < class node_type > 
+  unit_cell_base<node_type> 
   translational_duplicate( double a, double b, double c ){
    unit_cell_base <node_type> copy;
+   copy.set_constants() = this->get_constants();
    size_t n_node_local = this->store.size();
    for( size_t inode = 0; inode < n_node_local; inode++ ){
     node_type new_node = this->store.at(inode);
@@ -56,24 +59,39 @@ public:
    return copy;
   } 
 
-  void operator+= ( array<double, double, double> disp ){
+  void operator+= ( array<double, 3> disp ){
    size_t n_node_local = this->store.size();
    for( size_t inode = 0; inode < n_node_local; inode++ ){
     this->store.at(inode) += disp;
    }
   }
 
+  friend 
+  ifstream& operator>> ( ifstream& ifs, unit_cell_base<node_type>& cell ){
+   size_t n_node;
+   ifs >> n_node;
+   for( size_t inode = 0; inode < n_node; inode++ ){
+    node_type node_i;
+    ifs >> node_i;
+    cell.add_node( node_i );
+   }
+   lattice_parameters lp;
+   ifs >> lp;
+   cell.set_constants() = lp;
+   return ifs;
+  }
+
   array< array<double, 2>, 3 > get_edges(){
    array< array<double, 2>, 3 > retval;
    size_t n_node_local = this->store.size();
-   double x_plus = 0.0e0;
-   double x_minus = 0.0e0;
-   double y_plus = 0.0e0;
-   double y_minus = 0.0e0;
-   double z_plus = 0.0e0;
-   double z_minus = 0.0e0;
+   double x_plus  = this->store.at(0).get_edges().at(0).at(0); 
+   double x_minus = this->store.at(0).get_edges().at(0).at(1); 
+   double y_plus  = this->store.at(0).get_edges().at(1).at(0); 
+   double y_minus = this->store.at(0).get_edges().at(1).at(1); 
+   double z_plus  = this->store.at(0).get_edges().at(2).at(0); 
+   double z_minus = this->store.at(0).get_edges().at(2).at(1); 
    for( size_t inode = 0; inode < n_node_local; inode++ ){
-    array< array<double, double>, 3 > edges_node
+    array< array<double, 2>, 3 > edges_node
      = this->store.at(inode).get_edges();
     if( ( edges_node.at(0).at(0) - x_plus ) >= 1.0e-5 )
      { x_plus = edges_node.at(0).at(0); }
@@ -89,9 +107,9 @@ public:
     if( ( edges_node.at(2).at(1) - z_minus ) <= -1.0e-5 )
      { z_minus = edges_node.at(2).at(1); }
    }
-   retval.at(0) = { x_plus, x_minus };
-   retval.at(1) = { y_plus, y_minus };
-   retval.at(2) = { z_plus, z_minus };
+   retval.at(0) = array<double, 2> { x_plus, x_minus };
+   retval.at(1) = array<double, 2> { y_plus, y_minus };
+   retval.at(2) = array<double, 2> { z_plus, z_minus };
    return retval;
   }
 
@@ -100,7 +118,7 @@ public:
    cout << "Unit Cell Info" << endl;
    cout << "Node List:" << endl;
    const size_t n_node = this->store.size();
-   for( size_t inode = 0; i < n_node; inode++ ){
+   for( size_t inode = 0; inode < n_node; inode++ ){
     cout << " node " << inode << endl;
     node_type node_local = store.at(inode);
     node_local.print_info();
@@ -109,14 +127,14 @@ public:
    this->constants.print_info();
   } // end of print_info()
 
-  
- 
 public:
   node_type  get_node( size_t i ) const { return store.at(i); }
   node_type& set_node( size_t i ) { return store.at(i); }
-  void resize( size_t n ) { this->store_.resize(n); }
-  vector< node_type >  get_store() const { return this->store_; }
-  vector< node_type >& set_store() { return this->store_; }
+  void resize( size_t n ) { this->store.resize(n); }
+  vector< node_type >  get_store() const { return this->store; }
+  vector< node_type >& set_store() { return this->store; }
+  lattice_parameters& set_constants() { return this->constants; }
+  lattice_parameters  get_constants() const { return this->constants; }
 
   size_t get_n_node() const { return this->store.size(); }
 

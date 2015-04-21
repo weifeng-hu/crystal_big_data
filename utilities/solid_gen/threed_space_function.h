@@ -38,7 +38,7 @@ inline double compute_distance( Coord coord_a, Coord coord_b ){
 
 }
 
-inline array< double, 3 > compute_recenter_vec( array< array<double, 3>, 3> edges )
+inline array< double, 3 > compute_recenter_vec( array< array<double, 2>, 3> edges )
 {
 
   const double x_plus = edges.at(0).at(0);
@@ -47,7 +47,7 @@ inline array< double, 3 > compute_recenter_vec( array< array<double, 3>, 3> edge
   const double y_minus = edges.at(1).at(1);
   const double z_plus = edges.at(2).at(0);
   const double z_minus = edges.at(2).at(1);
-  array<double, 3 > retval = { (x_plus+x_minus)/2, (y_plus+y_minus)/2, (z_plus+z_minus)/2 };
+  array<double, 3 > retval = { -(x_plus+x_minus)/2, -(y_plus+y_minus)/2, -(z_plus+z_minus)/2 };
   return retval;
 
 }

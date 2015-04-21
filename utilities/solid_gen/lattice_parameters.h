@@ -4,6 +4,7 @@
 #include <array>
 #include <tuple>
 #include <iostream>
+#include <fstream>
 #include <math.h>
 #include "utilities/solid_gen/threed_space.h"
 
@@ -46,6 +47,14 @@ public:
    for( size_t i = 0; i < 3; i++ ){
     this->trans_vectors.at(i).fill(0.0e0);
    }
+  }
+
+  friend ifstream& operator>> ( ifstream& ifs, lattice_parameters& lp ){
+   double a,b,c,aa,ab,ay;
+   ifs >> a >> b >> c >> aa >> ab >> ay;
+   cout << a << " " << b << " " << c << endl;
+   lp = lattice_parameters( make_tuple(a,b,c),make_tuple(aa,ab,ay) );
+   lp.compute_translational_vectors();
   }
 
 public:

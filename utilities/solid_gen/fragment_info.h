@@ -27,10 +27,10 @@ public:
    this->primitive.resize(0);
    this->identical_fragment_list.resize(0);
    this->bulk_ptr.reset();
+   this->n_molecule_per_fragment_ = 0;
   } // end of reset()
 
   void print_info(){
-   cout << endl;
    cout << "Fragment Info" << endl;
    cout << " number of identical fragment: " << this->identical_fragment_list.size() << endl;
    cout << "primitive info:" << endl;
@@ -39,19 +39,18 @@ public:
     cout << " Molecule " << imole << endl;
     mole_i.print_info();
    }
-   cout << endl;
 
    cout << " list of fragments in the bulk: " << endl;
    {
     const size_t n_frag_local = identical_fragment_list.size();
     for( size_t ifrag = 0; ifrag < n_frag_local; ifrag++ ){
      array<int, 100> molecule_tuple_local;
-     const size_t n_mole_local = identical_fragment_list.at(ifrag);
+     const size_t n_mole_local = identical_fragment_list.at(ifrag).size();
      // copy the tuple elements to array
      copy_n( identical_fragment_list.at(ifrag).begin(), n_mole_local, molecule_tuple_local.begin() );
      cout << " [";
      for( size_t imole = 0; imole < n_mole_local; imole++ ){
-      cout << " " << molecule_tuple_local.at(imole) << " " << endl;
+      cout << " " << molecule_tuple_local.at(imole) << " " ;
      } // end of loop imole
      cout << "] ";
      cout << "   ";
@@ -59,6 +58,7 @@ public:
      if( ( ifrag % 5 ) == 0 ) cout << endl;
     } // end of loop ifrag
    } // end of local scope of list printing
+   cout << endl;
   } // end of print_info()
 
 public:

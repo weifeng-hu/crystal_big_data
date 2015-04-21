@@ -4,7 +4,7 @@
 /*
 ###################################################
 
-  Euclidean distance matrix class
+    Euclidean distance matrix class
 
 ###################################################
 */
@@ -14,9 +14,11 @@
 #include <string>
 #include <tuple>
 #include <iostream>
-#include "utilities/solid_gen/coordinate.h"
-#include "utilities/solid_gen/atom.h"
 #include "utilities/solid_gen/threed_space.h"
+#include "utilities/solid_gen/atom.h"
+#include "utilities/solid_gen/coordinate.h"
+#include "utilities/solid_gen/matrix.h"
+#include "utilities/solid_gen/matrix_function.h"
 #include "blas/blas_interface.h"
 
 using namespace std;
@@ -25,6 +27,7 @@ namespace iquads {
 
 using namespace matrix;
 using namespace threed_space;
+using namespace basic;
 
 namespace crystal {
 
@@ -68,13 +71,17 @@ public:
   void diagonalise(){
    symmetric_diag( &(this->distance_matrix), &(this->eigvec), &(this->eigval) );
    this->is_diagonalized_ = true;
-  };
+  }
 
   void print_eigen_pairs(){
    if( this->is_diagonalized_ == false ){
    }
   }
-  void print_matrix(){
+  void print_eigval(){
+   for( size_t i = 0; i < this->eigval.get_nrow(); i++ ){
+    cout << this->eigval(i,0) << " ";
+   }
+   cout << endl;
   }
 
 public:
@@ -82,14 +89,14 @@ public:
 
 public:
   double& operator() ( int i, int j ) 
-   { return set_matrix_element( i, j ); }
+   { return this->set_matrix_element( i, j ); }
   string& set_element( int i  ) 
-   { return element.at(i); }
+   { return this->element_list.at(i); }
 
 private:
   // element access
-  double& set_matrix_element( int i, int j ) 
-   { return distance_matrix(i * n_element + j); }
+  double& set_matrix_element( size_t i, size_t j ) 
+   { return this->distance_matrix( i , j ); }
 
 private:
   DMatrixHeap distance_matrix;   // 2-d array to store distance
@@ -99,7 +106,7 @@ private:
   size_t n_element_;        // length of this->element_list
   bool is_diagonalized_;
 
-};
+}; // end of struct euclidean distance matrix
 
 } // end of crystal
 

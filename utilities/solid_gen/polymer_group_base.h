@@ -1,13 +1,15 @@
-#ifndef POLYMER_GROUP_BASE
-#define POLYMER_GROUP_BASE
+#ifndef POLYMER_GROUP_BASE_H
+#define POLYMER_GROUP_BASE_H
 
 #include <stdlib.h>
 #include <array>
 #include "utilities/solid_gen/math_function.h"
-#include "utiltiies/solid_gen/matrix_function.h"
+#include "utilities/solid_gen/matrix_function.h"
 #include "utilities/solid_gen/molecule.h"
 #include "utilities/solid_gen/molecule_bulk.h"
+#include "utilities/solid_gen/euclidean_distance_matrix.h"
 #include "utilities/solid_gen/polymer_base.h"
+#include "utilities/solid_gen/fragment_group_info.h"
 
 using namespace std;
 
@@ -15,6 +17,7 @@ namespace iquads {
 
 using namespace iquads :: math;
 using namespace iquads :: matrix;
+using namespace iquads :: basic;
 
 namespace crystal {
 
@@ -23,8 +26,9 @@ struct polymer_group_base{
 public:
   polymer_group_base(){
    this->group_storage.resize(0);
-   this->fraginfo_list.resize(0);
-   this->n_molecule_per_unit = NUM;
+   this->polymer_combination.resize(0);
+   this->frag_group.reset();
+   this->n_molecule_per_unit_ = NUM;
    this->bulk_ptr.reset();
    this->is_initialized_ = false;
   }
@@ -32,35 +36,44 @@ public:
 public:
   void init_from_bulk( shared_ptr< molecule_bulk > new_bulk, double Radius )
   {
+   cout << "Initializing polymer group" << endl;
+   cout << "Number of monomer per polymer: " << NUM << endl;
    size_t n_mole_local = new_bulk->get_nmolecule();
+   cout << "Number of molecules in the bulk: " << n_mole_local << endl;
    // set the local bulk pointer
    this->bulk_ptr = new_bulk;
    // get a list of combination
    this->polymer_combination = get_combination<NUM>( n_mole_local );
-
    size_t n_comb = polymer_combination.size();
+   cout << "Number of unique polymers of " << NUM << " : " << n_comb << endl;
    for( size_t icomb = 0; icomb < n_comb; icomb++ ){
     // get the molecule list to construct a polymer
     array<int, NUM> list_local = this->polymer_combination.at(icomb);
     vector<int> list_vec( list_local.begin(), list_local.end() );
     MoleculeList molecule_list = new_bulk->get_molelist_from_list( list_vec );
+//    for( size_t imole = 0; imole < molecule_list.size(); imole++ ){
+//     molecule_list.at(imole).print_info();
+//    }
     // initialize the polymer from molecule_list
     polymer_base<NUM> polymer_x;
     polymer_x.init_from( molecule_list );
     // if all atoms in the polymer are within a radius of Radius from
     // each other, then to add the polymer to the group storage
     if( polymer_x.within_radius( Radius ) == true ){
+     cout << " polymer " << icomb << " : " ;
+     for( size_t i = 0; i < NUM; i++ ){ cout << list_vec.at(i) << " "; }
+     cout << " is within Radius " << Radius << endl;
      this->group_storage.push_back( polymer_x );
     }
    } // end of loop icomb, all polymers
 
    this->is_initialized_ = true;
-
   } // end of init_from_bulk()
 
   void evaluate_subgroups()
   {
-    if( this->is_initialize() == false ){
+    cout << "Dividing subgroups among " << this->group_storage.size() << " polymer<" << NUM << ">" << endl;
+    if( this->is_initialized_ == false ){
      cout << " error: polymer_group object is not initialized " << endl;
      abort();
     }
@@ -70,10 +83,11 @@ public:
     {
      // compute euclidean distance matrix eigenvalues
      vector< DMatrixHeap > eigval_vectors = this->compute_dist_eigval();
+     cout << "Number of Eigenvalue vectors for this group: " << eigval_vectors.size() << endl;
      // get the ''eigenvalue boolean matrix''
-     DMatrixHeap eigpair_boolean_mat = compute_boolean_mat( eigval_vectors );
+     DMatrixHeap eigpair_boolean_mat = compute_boolean_mat( &eigval_vectors );
      // get the degeneracy structure of the boolean matrix
-     group_indices = get_degeneracy_struct( eigval_boolean_mat );
+     group_indices = get_degeneracy_group( &eigpair_boolean_mat );
     }
     this->fill_frag_group( group_indices );
 
@@ -96,10 +110,11 @@ private:
      // get the atom list for the polymer
      AtomList atomlist_i = polymer_i.get_atom_list();
      // construct a local euclidean distance matrix for the polymer
-     edm_local.compose_from_atomlist( atom_list_i );
+     edm_local.compose_from_atomlist( atomlist_i );
     }
     // diagonalise and get the eigenvalues
     edm_local.diagonalise();
+//    edm_local.print_eigval();
     // return the eigval vector for this polymer
     retval.push_back( edm_local.get_eigval() );
    } // end of loop ipolymer
@@ -142,10 +157,10 @@ private:
       = this->get_primitive_for_groupset( group_indices.at(igroup) );
     fraginfo_local.set_fragment_list()
       = this->extract_mole_indices_for_groupset( group_indices.at(igroup) );
-    }
     this->frag_group.add_fragment_info( fraginfo_local );
    }
   }
+
 
 private:
   // storage of all the molecular groups with the 

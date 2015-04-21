@@ -2,12 +2,14 @@
 #define UNIT_CELL_H
 
 #include "utilities/solid_gen/atom.h"
-#include "utilities/solid_Gen/molecule.h"
+#include "utilities/solid_gen/molecule.h"
 #include "utilities/solid_gen/unit_cell_base.h"
 
 using namespace std;
 
 namespace iquads{
+
+using namespace basic;
 
 namespace crystal{
 

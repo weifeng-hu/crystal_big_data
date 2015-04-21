@@ -73,10 +73,14 @@ public:
 
   void print_info(){
    char line[100];
-   sprintf( line, "(%s)   X(%12.8f)  Y(%12.8f)  Z(%12.8f)  CHARGE(%d)", 
+//   sprintf( line, "(%s)   X(%12.8f)  Y(%12.8f)  Z(%12.8f)  CHARGE(%d)", 
+//                  this->element_.c_str(), this->coordinate.at(0),
+//                  this->coordinate.at(1), this->coordinate.at(2),
+//                  this->charge_);
+   sprintf( line, "%s   %12.8f  %12.8f  %12.8f  ", 
                   this->element_.c_str(), this->coordinate.at(0),
-                  this->coordinate.at(1), this->coordinate.at(2),
-                  this->charge_);
+                  this->coordinate.at(1), this->coordinate.at(2)
+                  );
    cout << line << endl;
   }
 
@@ -95,7 +99,7 @@ public:
   }
   int get_charge() const { return this->charge_; }
 
-  string& set_element() { return element_; }
+  string& set_element() { return this->element_; }
   double& set_x() { return this->coordinate.at(0); }
   double& set_y() { return this->coordinate.at(1); }
   double& set_z() { return this->coordinate.at(2); }

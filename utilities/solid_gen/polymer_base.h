@@ -3,8 +3,9 @@
 
 #include <vector>
 #include <iostream>
-#include "utilities/solid_gen/coordinate.h"
 #include "utilities/solid_gen/threed_space.h"
+#include "utilities/solid_gen/threed_space_function.h"
+#include "utilities/solid_gen/coordinate.h"
 #include "utilities/solid_gen/atom.h"
 #include "utilities/solid_gen/molecule.h"
 
@@ -12,6 +13,7 @@ using namespace std;
 
 namespace iquads {
 
+using namespace threed_space;
 using namespace basic;
 
 namespace crystal {
@@ -19,13 +21,13 @@ namespace crystal {
 template< size_t NUM >
 struct polymer_base{
 public:
-  polymer(){
-   this->n_molecule = NUM;
+  polymer_base(){
+   this->n_molecule_ = NUM;
    this->group.resize( NUM );
    this->natom_ = 0;
   }
-  polymer( MoleculeList poly ){
-   this->n_molecule = NUM;
+  polymer_base( MoleculeList poly ){
+   this->n_molecule_ = NUM;
    this->group.resize( NUM );
    this->natom_ = 0;
    this->init_from( poly );
@@ -35,16 +37,16 @@ public:
   void init_from( MoleculeList new_molecule_list ){
    try{
     const size_t n_molecule = new_molecule_list.size();
-    if( n_molecule >= this->NUM ) throw n_molecule;
-    for( size_t imolecule = 0; imolecule < n_molecule; imolecule++ ){
-     group.at(imolecule) = new_molecule_list.at(imolecule);
-     const size_t natom_i = new_molecule_list.at(i).get_natom(imolecule);
+    if( n_molecule != this->n_molecule_ ) throw n_molecule;
+    for( size_t imolecule = 0; imolecule < this->n_molecule_; imolecule++ ){
+     this->group.at(imolecule) = new_molecule_list.at(imolecule);
+     const size_t natom_i = new_molecule_list.at(imolecule).get_natom();
      this->natom_ += natom_i;
     }
    }
    catch ( size_t n ){
     cout << " polymer exception: init_from() " << endl;
-    cout << " n_molecule " << n << " >= " << this->NUM << endl;
+    cout << " n_molecule " << n << " != " << this->n_molecule_ << endl;
     abort();
    }
   }
@@ -55,7 +57,7 @@ public:
    CoordList coordlist_local = this->get_coordinate_list();
    const size_t ncoord_local = coordlist_local.size();
    for( size_t icoord = 0; icoord < ncoord_local; icoord++ ){
-    for( size_t jcoord = 0; jcoord < icoord; icoord++ ){
+    for( size_t jcoord = 0; jcoord < icoord; jcoord++ ){
      double dist = compute_distance( coordlist_local.at(icoord), coordlist_local.at(jcoord) );
      if( ( dist - radius ) > 0.0e0 ){
       retval = false;
@@ -69,7 +71,7 @@ end:
 
 public:
   // interface to Euclidean distance matrix
-  CoodList get_coordinate_list(){
+  CoordList get_coordinate_list(){
    CoordList retval;
    for( size_t imolecule = 0; imolecule < NUM; imolecule++ ){
     molecule mole_i = group.at(imolecule);
@@ -98,7 +100,7 @@ private:
 
 private:
   vector< molecule > group;
-  size_t n_molecule;
+  size_t n_molecule_;
   size_t natom_;
 
 };

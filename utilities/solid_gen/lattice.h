@@ -8,13 +8,15 @@
 
 namespace iquads {
 
+using namespace basic;
+
 namespace crystal {
 
-  template class < atomic_cell > lattice_base;
-  template class < molecular_cell > lattice_base;
+  template class lattice_base<atomic_ucell>;
+  template class lattice_base<molecular_ucell>;
 
-  typedef lattice_base<atomic_cell> atomic_lattice;
-  typedef lattice_base<molecular_cell> molecular_lattice;
+  typedef lattice_base<atomic_ucell> atomic_lattice;
+  typedef lattice_base<molecular_ucell> molecular_lattice;
 
 } // end of namespace crystal
 

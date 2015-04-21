@@ -7,10 +7,10 @@ namespace iquads{
 
 namespace matrix{
 
-// explicit template instantiation
-template class array_matrix_base<int>;
-template class array_matrix_base<float>;
-template class array_matrix_base<double>;
+  // explicit template instantiation
+  template class array_matrix_base<int>;
+  template class array_matrix_base<float>;
+  template class array_matrix_base<double>;
 
 } // end of namespace matrix
 

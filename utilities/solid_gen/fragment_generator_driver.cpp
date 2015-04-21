@@ -17,7 +17,7 @@ int fragment_generator_driver( vector<string> args )
   using namespace iquads::crystal;
 
   // get crystal information
-  crystal_info info;
+  molecular_crystal_info info;
   {
    // read the input file
    const int argc = args.size();
@@ -31,17 +31,19 @@ int fragment_generator_driver( vector<string> args )
     = info.get_short_range_radius();
   interact_picture.set_long_range_radius() 
     = info.get_long_range_radius();
-  interact_picture.set_n_fragment_type() = info.;
   {
    // construct the molecule bulk from the molecular lattice
    molecule_bulk mole_bulk;
    {
     // generate the molecule lattice from unit cell
-    molecular_lattice mole_latt( info.get_unit_cell(), info.get_nunits() );
-    // initialise the molecule bulk from the whole lattice
-    mole_bulk.init_from( &mol_latt );
+    molecular_lattice mole_latt;
+    mole_latt.set_primitive( info.get_molecular_cell() );
+    mole_latt.generate( info.get_sizes() );
+    mole_bulk.init_from( &mole_latt );
+    cout << "Number of Molecule in the Bulk before cut is " << mole_bulk.get_nmolecule() << endl;
     // cut the lattice by a radius
-    mole_bulk.cut( info.get_bulk_radius() );
+    mole_bulk.cut( info.get_radius() );
+    cout << "Number of Molecule in the Bulk after cut is " << mole_bulk.get_nmolecule() << endl;
    }
    // the interaction object gains a copy of the molecule bulk
    // the original molecule bulk object will be destructed
@@ -62,7 +64,7 @@ int fragment_generator_driver( vector<string> args )
    // long range dimers
    if( info.long_range_requested() == true ){
     fragment_group_info long_range_dimer_info 
-     = interact_picture.identify_subgroups<2>( inf.get_long_range_radius() );
+     = interact_picture.identify_subgroups<2>( info.get_long_range_radius() );
     interact_picture.add_fragment_group( long_range_dimer_info );
    }
   }

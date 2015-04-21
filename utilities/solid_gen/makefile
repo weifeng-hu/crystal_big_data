@@ -1,17 +1,47 @@
 IQUADS_ROOT	= /home/wh288/iquads/
 CXX	= g++
-COPT	= -g --std=c++11
-CFLAGS	= -I$(IQUADS_ROOT)
+COPT	= -g --std=c++11 -fPIC
+CFLAGS	= -I/home/wh288/Development/boost_1_53_0/ -I$(IQUADS_ROOT)
+CHEADS	= array_matrix_base.h\
+	  array_matrix.h\
+	  atom.h\
+	  combination.h\
+	  coordinate.h\
+	  crystal_info.h\
+	  euclidean_distance_matrix.h\
+	  fragment_generator_driver.h\
+	  fragment_group_info.h\
+	  fragment_info.h\
+	  interaction.h\
+	  iquads_limits.h\
+	  lattice.h\
+	  lattice_base.h\
+	  lattice_parameters.h\
+	  math_function.h\
+	  matrix.h\
+	  matrix_function.h\
+	  molecule.h\
+	  molecule_bulk.h\
+	  polymer.h\
+	  polymer_base.h\
+	  polymer_group_base.h\
+	  threed_space.h\
+	  threed_space_function.h\
+	  unit_cell.h\
+	  unit_cell_base.h\
+	  vector_matrix.h\
+	  vector_matrix_base.h\
+	  crystal_info.h
 CSRCS	= crystal_info.cpp\
-	  fragment_generator_driver.cpp\
 	  matrix_function.cpp\
+	  fragment_generator_driver.cpp\
 	  main.cpp
 COBJS	= $(CSRCS:.cpp=.o)
 LIBS	= -lgfortran $(IQUADS_ROOT)/blas/lib_blas_interface.a -L/home/intel/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lpthread
 PGM	= solid_gen
 
 $(PGM):	$(COBJS)
-	$(CXX) -o $(PGM) $(COBJS) $(LIBS)
+	$(CXX) -o $(PGM) $(CFLAGS) $(COPT) $(COBJS) $(LIBS)
 
 #.cpp.o:
 #	$(CXX) -c $(COPT) $(CFLAGS) $<
@@ -19,14 +49,18 @@ $(PGM):	$(COBJS)
 matrix_function.o:	matrix_function.h	matrix_function.cpp
 	$(CXX) -c $(COPT) $(CFLAGS) matrix_function.cpp
 
-crystal_info.o	:	crystal_info.h	crystal_info.cpp
-	$(CXX) -c $(COPT) $(CFLAGS) matrix_function.cpp
+crystal_info.o	: $(CHEADS)	crystal_info.h	crystal_info.cpp
+	$(CXX) -c $(COPT) $(CFLAGS) crystal_info.cpp
 
-fragment_generator_driver.o:	fragment_generator_driver.cpp
-	$(CXX) -c $(COPT) $(CFLAGS) matrix_function.cpp
+fragment_generator_driver.o: $(CHEADS)	fragment_generator_driver.cpp
+	$(CXX) -c $(COPT) $(CFLAGS) fragment_generator_driver.cpp
 
-main.o:	main.cpp
-	$(CXX) -c $(COPT) $(CFLAGS) matrix_function.cpp
+main.o:	fragment_generator_driver.h main.cpp
+	$(CXX) -c $(COPT) $(CFLAGS) main.cpp
+
+test_combination:
+	$(CXX) -o check/test_combination $(CFLAGS) $(COPT) check/test_combination.cpp
+	check/test_combination
 
 test_coord:
 	$(CXX) -o check/test_coord $(CFLAGS) $(COPT) check/test_coordinate.cpp;
@@ -51,6 +85,50 @@ test_lattice_para:
 test_unit_cell:
 	$(CXX) -o check/test_unit_cell $(CFLAGS) $(COPT) check/test_unit_cell.cpp
 	check/test_unit_cell
+
+test_info:
+	$(CXX) -c $(CFLAGS) $(COPT) crystal_info.cpp
+	$(CXX) -o check/test_info.o -c $(CFLAGS) $(COPT) check/test_info.cpp
+	$(CXX) -o check/test_info $(CFLAGS) $(COPT) ./crystal_info.o check/test_info.o
+	check/test_info
+
+test_lattice:
+	$(CXX) -o check/test_lattice $(CFLAGS) $(COPT) check/test_lattice.cpp
+	check/test_lattice > test_lattice.out
+
+test_matrix:
+	$(CXX) -o check/test_matrix $(CFLAGS) $(COPT) check/test_matrix.cpp
+	check/test_matrix
+
+test_edm:
+	$(CXX) -o matrix_function.o $(CFLAGS) $(COPT) -c matrix_function.cpp
+	$(CXX) -o check/test_euclidean_mat.o $(CFLAGS) $(COPT) -c check/test_euclidean_mat.cpp
+	$(CXX) -o check/test_edm $(CFLAGS) $(COPT) matrix_function.o check/test_euclidean_mat.o ../../blas/lib_blas_interface.a $(LIBS)
+	check/test_edm
+
+test_polymer:
+	$(CXX) -o check/test_polymer $(CFLAGS) $(COPT) check/test_polymer.cpp
+	check/test_polymer
+
+test_bulk:
+	$(CXX) -o check/test_bulk $(CFLAGS) $(COPT) check/test_bulk.cpp
+	check/test_bulk
+
+test_fragment_info:
+	$(CXX) -o check/test_fragment_info $(CFLAGS) $(COPT) check/test_fragment_info.cpp
+	check/test_fragment_info
+
+test_frag_group:
+	$(CXX) -o check/test_frag_group $(CFLAGS) $(COPT) check/test_frag_group.cpp
+	check/test_frag_group
+
+test_polymer_group:
+	$(CXX) -o check/test_polymer_group $(CFLAGS) $(COPT) check/test_polymer_group.cpp
+	check/test_polymer_group
+
+test_interaction:
+	$(CXX) -o check/test_interaction $(CFLAGS) $(COPT) check/test_interaction.cpp
+	check/test_interaction
 
 clean:
 	rm *.o; rm solid_gen

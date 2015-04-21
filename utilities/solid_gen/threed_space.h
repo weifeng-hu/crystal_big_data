@@ -24,7 +24,7 @@ namespace threed_space {
   const array< tuple<double, double, double>,3 > e_3d
    = { e_x, e_y, e_z };
 
-  array< double, 3 >  
+  inline array< double, 3 >  
   operator* ( array< double, 3 > vec, double a ){
    array< double, 3 > retval
     = { vec.at(0) * a, vec.at(1) * a, vec.at(2) * a };
