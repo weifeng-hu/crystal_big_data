@@ -116,16 +116,29 @@ public:
   void print_info()
   {
    cout << "Unit Cell Info" << endl;
+   cout << "{" << endl;
    cout << "Node List:" << endl;
    const size_t n_node = this->store.size();
    for( size_t inode = 0; inode < n_node; inode++ ){
-    cout << " node " << inode << endl;
+    cout << "Node " << inode << endl;
+    cout << "{" << endl;
     node_type node_local = store.at(inode);
     node_local.print_info();
+    cout << "}" << endl;
    }
    cout << "Crystal Constants" << endl;
    this->constants.print_info();
+   cout << "}" << endl;
   } // end of print_info()
+
+  void print_atomlist()
+  {
+   const size_t n_node = this->store.size();
+   for( size_t inode = 0; inode < n_node; inode++ ){
+    node_type node_local = store.at(inode);
+    node_local.print_atomlist();
+   }
+  }
 
 public:
   node_type  get_node( size_t i ) const { return store.at(i); }

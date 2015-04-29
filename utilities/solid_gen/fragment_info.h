@@ -32,15 +32,17 @@ public:
 
   void print_info(){
    cout << "Fragment Info" << endl;
-   cout << " number of identical fragment: " << this->identical_fragment_list.size() << endl;
+   cout << "{" << endl;
+   cout << "number of identical fragment: " << this->identical_fragment_list.size() << endl;
    cout << "primitive info:" << endl;
+   cout << "{" << endl;
    for( size_t imole = 0; imole < primitive.size(); imole++ ){
     molecule mole_i = primitive.at(imole);
-    cout << " Molecule " << imole << endl;
+    cout << "Molecule " << imole << endl;
     mole_i.print_info();
    }
-
-   cout << " list of fragments in the bulk: " << endl;
+   cout << "}" << endl;
+   cout << "list of fragments in the bulk: " << endl;
    {
     const size_t n_frag_local = identical_fragment_list.size();
     for( size_t ifrag = 0; ifrag < n_frag_local; ifrag++ ){
@@ -48,17 +50,17 @@ public:
      const size_t n_mole_local = identical_fragment_list.at(ifrag).size();
      // copy the tuple elements to array
      copy_n( identical_fragment_list.at(ifrag).begin(), n_mole_local, molecule_tuple_local.begin() );
-     cout << " [";
+     cout << "[";
      for( size_t imole = 0; imole < n_mole_local; imole++ ){
       cout << " " << molecule_tuple_local.at(imole) << " " ;
      } // end of loop imole
-     cout << "] ";
+     cout << "]";
      cout << "   ";
      // let's print 5 tupes per line
-     if( ( ifrag % 5 ) == 0 ) cout << endl;
+     if( ( (ifrag+1) % 8 ) == 0 ) cout << endl;
     } // end of loop ifrag
    } // end of local scope of list printing
-   cout << endl;
+   cout << "}" << endl;
   } // end of print_info()
 
 public:

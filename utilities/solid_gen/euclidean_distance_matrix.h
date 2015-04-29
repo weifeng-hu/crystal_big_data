@@ -85,6 +85,7 @@ public:
   }
 
 public:
+  DMatrixHeap get_dist_mat() const { return this->distance_matrix; }
   DMatrixHeap get_eigval() const { return this->eigval; }
 
 public:

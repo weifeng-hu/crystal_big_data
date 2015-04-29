@@ -21,17 +21,20 @@ public:
    this->atom_list.resize(0);
    this->molecule_name_ = "not set";
    this->natom_ = 0;
+   this->mass_ = 0.0e0;
   }
   molecule( string molecule_name ){
    this->atom_list.resize(0);
    this->molecule_name_ = molecule_name;
    this->natom_ = 0;
+   this->mass_ = 0.0e0;
   }
 
 public:
   void add_atom( atom new_atom ){
    this->atom_list.push_back( new_atom );
    this->natom_ += 1;
+   this->mass_ += new_atom.get_mass();
   }
 
 public:
@@ -105,11 +108,13 @@ public:
   atom get_atom( size_t i ) const { return this->atom_list.at(i); }
   string get_name() const { return this->molecule_name_; }
   size_t get_natom() const { return this->natom_; }
+  double get_mass() const { return this->mass_; }
 
   AtomList& set_atom_list() { return this->atom_list; }
   atom& set_atom( size_t i ) { return this->atom_list.at(i); }
   string& set_name() { return this->molecule_name_; }
   size_t& set_natom() { return this->natom_; }
+  double& set_mass() { return this->mass_; }
 
   CoordList get_coordinate_list(){
    CoordList retval;
@@ -122,15 +127,71 @@ public:
 
   void print_info(){
    cout << "MOLECULE INFO" << endl;
-   cout << " molecule name: " << this->molecule_name_ << endl;
+   cout << "{" << endl;
+   cout << "molecule name:\t" << this->molecule_name_ << endl;
    AtomList atomlist_local = this->get_atom_list();
    const size_t natom = atomlist_local.size();
-   cout << " number of atom: " << natom << endl;
-   cout << " Atom List:" << endl;
+   cout << "number of atom:\t" << natom << endl;
+   cout << "Atom List:" << endl;
+   cout << "{" << endl;
    for( size_t iatom = 0; iatom < natom; iatom++ ){
     atomlist_local[iatom].print_info();
    }
-   cout << endl;
+   cout << "}" << endl;
+   cout << "centroid:\t" 
+        << get<0>( this->get_center() ) << " " 
+        << get<1>( this->get_center() ) << " " 
+        << get<2>( this->get_center() ) << endl;
+   cout << "center of mass:\t" 
+        << get<0>( this->get_center_of_mass() ) << " " 
+        << get<1>( this->get_center_of_mass() ) << " " 
+        << get<2>( this->get_center_of_mass() ) << endl;
+   cout << "}" << endl;
+  }
+
+  void print_atomlist(){
+   AtomList atomlist_local = this->get_atom_list();
+   const size_t natom = atomlist_local.size();
+   for( size_t iatom = 0; iatom < natom; iatom++ ){
+    atomlist_local[iatom].print_atomlist();
+   }
+  }
+
+  Coord get_center(){
+   Coord retval;
+   double x_average = 0.0e0;
+   double y_average = 0.0e0;
+   double z_average = 0.0e0;
+   for( size_t iatom = 0; iatom < this->natom_; iatom++ ){
+    x_average += this->atom_list.at(iatom).get_x();
+    y_average += this->atom_list.at(iatom).get_y();
+    z_average += this->atom_list.at(iatom).get_z();
+   }
+   x_average = x_average/this->natom_;
+   y_average = y_average/this->natom_;
+   z_average = z_average/this->natom_;
+   retval = make_tuple( x_average, y_average, z_average );
+
+   return retval;
+  }
+
+  Coord get_center_of_mass(){
+
+   Coord retval;
+   double x_average = 0.0e0;
+   double y_average = 0.0e0;
+   double z_average = 0.0e0;
+   for( size_t iatom = 0; iatom < this->natom_; iatom++ ){
+    x_average += this->atom_list.at(iatom).get_x() * this->atom_list.at(iatom).get_mass();
+    y_average += this->atom_list.at(iatom).get_y() * this->atom_list.at(iatom).get_mass();
+    z_average += this->atom_list.at(iatom).get_z() * this->atom_list.at(iatom).get_mass();
+   }
+   x_average = x_average/this->mass_;
+   y_average = y_average/this->mass_;
+   z_average = z_average/this->mass_;
+   retval = make_tuple( x_average, y_average, z_average );
+
+   return retval;
   }
 
 private:
@@ -139,6 +200,7 @@ private:
   // in the heap
   AtomList atom_list;
   size_t natom_;
+  double mass_;
   string molecule_name_;
 
 };

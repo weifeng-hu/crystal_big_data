@@ -136,6 +136,14 @@ public:
    }
   }
 
+  void print_atomlist(){
+   cout << "Atom List" << endl;
+   for( size_t icell = 0; icell < store.size(); icell++ ){
+    unit_cell unit_cell_local = store.at(icell);
+    unit_cell_local.print_atomlist();
+   }
+  }
+
   unit_cell get_cell( size_t i ) const { return this->store.at(i); }
   size_t get_ncell() const { return this->store.size(); }
 

@@ -23,16 +23,17 @@ public:
    this->element_ = "not set";
    this->coordinate.fill(0.0e0);
    this->charge_ = 0;
+   this->mass_ = 0.0e0;
   }
-  atom( string element, double x, double y, double z, int charge ){
-   this->set_info( element, x, y, z, charge );
+  atom( string element, double x, double y, double z, int charge, double mass ){
+   this->set_info( element, x, y, z, charge, mass );
   }
 
 public:
   bool within_radius( double Radius ){
    Coord orig = make_tuple(0.0e0, 0.0e0, 0.0e0);
    Coord this_coord 
-    = make_tuple( this->coordinate.at(0), this->coordinate.at(1), 
+    = make_tuple( this->coordinate.at(0), this->coordinate.at(1),
                   this->coordinate.at(2) );
    double R = threed_space :: compute_distance( orig, this_coord );
    return ( R <= Radius ) ? true : false;
@@ -50,17 +51,19 @@ public:
    ifs >> new_atom.set_y();
    ifs >> new_atom.set_z();
    ifs >> new_atom.set_charge();
+   ifs >> new_atom.set_mass();
    return ifs;
   }
 
 public:
-  void set_info( string element, double x, double y, double z, int charge)
+  void set_info( string element, double x, double y, double z, int charge, double mass )
   {
    this->element_ = element;
    this->coordinate.at(0) = x;
    this->coordinate.at(1) = y;
    this->coordinate.at(2) = z;
    this->charge_ = charge;
+   this->mass_ = mass;
   }
 
   array< array<double, 2>, 3 > get_edges(){
@@ -84,6 +87,10 @@ public:
    cout << line << endl;
   }
 
+  void print_atomlist(){
+   this->print_info();
+  }
+
 public:
   string get_element() const { return this->element_; }
   double get_x() const { return this->coordinate.at(0); }
@@ -98,6 +105,7 @@ public:
    return set;
   }
   int get_charge() const { return this->charge_; }
+  double get_mass() const { return this->mass_; }
 
   string& set_element() { return this->element_; }
   double& set_x() { return this->coordinate.at(0); }
@@ -112,6 +120,17 @@ public:
    this->coordinate.at(2) = z;
   }
   int& set_charge() { return this->charge_; }
+  double& set_mass() { return this->mass_; }
+
+  Coord get_center() {
+   Coord retval = make_tuple( this->get_x(), this->get_y(), this->get_z() );
+   return retval;
+  }
+
+  Coord get_center_of_mass() {
+   Coord retval = make_tuple( this->get_x(), this->get_y(), this->get_z() );
+   return retval;
+  }
 
 private:
   // we use vector for coordinate 
@@ -119,6 +138,7 @@ private:
   // objects will be stored in the heap and invoked to stack
   array<double, 3> coordinate; 
   int charge_;
+  double mass_;
   string element_;
 
 };

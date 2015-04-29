@@ -48,16 +48,17 @@ void molecular_crystal_info::read( string input )
    }
   }
   
-  cout << " radius: " << this->radius_ << endl;
-  cout << " short range radius: " << this->short_range_radius_ << endl;
-  cout << " long range radius: " << this->long_range_radius_ << endl;
-  cout << " sizes: " << get<0>( this->sizes ) << " " << get<1>( this->sizes) << " " << get<2>( this->sizes ) << endl;
-  cout << " dimer requested? " << this->dimer_requested_ << endl;
-  cout << " trimer requested? " << this->trimer_requested_ << endl;
-  cout << " tetramer requested? " << this->tetramer_requested_ << endl;
-  cout << " short range requested? " << this->short_range_requested_ << endl;
-  cout << " long range requested? " << this->long_range_requested_ << endl;
+  cout << "radius:\t" << this->radius_ << endl;
+  cout << "short range radius:\t" << this->short_range_radius_ << endl;
+  cout << "long range radius:\t" << this->long_range_radius_ << endl;
+  cout << "sizes:\t" << get<0>( this->sizes ) << " " << get<1>( this->sizes) << " " << get<2>( this->sizes ) << endl;
+  cout << "dimer requested?\t" << this->dimer_requested_ << endl;
+  cout << "trimer requested?\t" << this->trimer_requested_ << endl;
+  cout << "tetramer requested?\t" << this->tetramer_requested_ << endl;
+  cout << "short range requested?\t" << this->short_range_requested_ << endl;
+  cout << "long range requested?\t" << this->long_range_requested_ << endl;
   this->primitive_.print_info();
+  cout << endl;
 
 } // end of crystal_info :: read()
 

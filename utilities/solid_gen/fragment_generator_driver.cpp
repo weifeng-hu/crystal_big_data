@@ -39,6 +39,7 @@ int fragment_generator_driver( vector<string> args )
     molecular_lattice mole_latt;
     mole_latt.set_primitive( info.get_molecular_cell() );
     mole_latt.generate( info.get_sizes() );
+//    mole_latt.print_atomlist();
     mole_bulk.init_from( &mole_latt );
     cout << "Number of Molecule in the Bulk before cut is " << mole_bulk.get_nmolecule() << endl;
     // cut the lattice by a radius
@@ -101,6 +102,7 @@ int fragment_generator_driver( vector<string> args )
    }
   }
 
+  cout << endl;
   interact_picture.print_fragment_groups();   
   // the generator ends here
   // further functionalties are anticipated

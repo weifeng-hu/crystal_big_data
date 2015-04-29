@@ -33,14 +33,17 @@ public:
   void print_info()
   {
    cout << "Fragment Group Info" << endl;
-   cout << " number of fragment types: " << this->group_storage.size() << endl;
-   cout << " all fragment types:" << endl;
+   cout << "{" << endl;
+   cout << "number of fragment types: " << this->group_storage.size() << endl;
+   cout << "all fragment types:" << endl;
    for( size_t itype = 0; itype < group_storage.size(); itype++ ){
-    cout << "  Fragment Type " << itype << endl;
+    cout << "Fragment Type " << itype << endl;
+    cout << "{" << endl;
     fragment_info fraginfo_local = group_storage.at(itype);
     fraginfo_local.print_info();
-    cout << endl;
+    cout << "}" << endl;
    }
+   cout << "}" << endl;
   } // end of print_info()
 
 public:

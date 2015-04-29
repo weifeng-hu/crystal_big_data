@@ -52,7 +52,6 @@ public:
   friend ifstream& operator>> ( ifstream& ifs, lattice_parameters& lp ){
    double a,b,c,aa,ab,ay;
    ifs >> a >> b >> c >> aa >> ab >> ay;
-   cout << a << " " << b << " " << c << endl;
    lp = lattice_parameters( make_tuple(a,b,c),make_tuple(aa,ab,ay) );
    lp.compute_translational_vectors();
   }

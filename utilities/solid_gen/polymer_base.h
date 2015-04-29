@@ -25,11 +25,13 @@ public:
    this->n_molecule_ = NUM;
    this->group.resize( NUM );
    this->natom_ = 0;
+   this->mass_ = 0.0e0;
   }
   polymer_base( MoleculeList poly ){
    this->n_molecule_ = NUM;
    this->group.resize( NUM );
    this->natom_ = 0;
+   this->mass_ = 0.0e0;
    this->init_from( poly );
   }
 
@@ -42,6 +44,8 @@ public:
      this->group.at(imolecule) = new_molecule_list.at(imolecule);
      const size_t natom_i = new_molecule_list.at(imolecule).get_natom();
      this->natom_ += natom_i;
+     const double mass_i = new_molecule_list.at(imolecule).get_mass();
+     this->mass_ += mass_i;
     }
    }
    catch ( size_t n ){
@@ -66,6 +70,44 @@ public:
     }
    }
 end:
+   return retval;
+  }
+
+  bool within_mean_radius_by_center_of_mass( double radius ){
+   return ( this->compute_mean_distance_by_center() <= radius ? true : false );
+  }
+
+  bool within_mean_radius_by_center( double radius ){
+   return ( this->compute_mean_distance_by_center_of_mass() <= radius ? true : false );
+  }
+
+  double compute_mean_distance_by_center(){
+   double retval;
+   int count = 0;
+   for( size_t imole = 0; imole < this->n_molecule_; imole++ ){
+    Coord com_i = this->group.at(imole).get_center();
+    for( size_t jmole = imole+1; jmole < this->n_molecule_; jmole++ ){
+     Coord com_j = this->group.at(jmole).get_center();
+     retval += compute_distance( com_i, com_j );
+     count = count + 1;
+    }
+   }
+   retval = retval/count;
+   return retval;
+  }
+
+  double compute_mean_distance_by_center_of_mass(){
+   double retval;
+   int count = 0;
+   for( size_t imole = 0; imole < this->n_molecule_; imole++ ){
+    Coord com_i = this->group.at(imole).get_center_of_mass();
+    for( size_t jmole = imole+1; jmole < this->n_molecule_; jmole++ ){
+     Coord com_j = this->group.at(jmole).get_center_of_mass();
+     retval += compute_distance( com_i, com_j );
+     count = count + 1;
+    }
+   }
+   retval = retval/count;
    return retval;
   }
 
@@ -94,12 +136,14 @@ public:
 public:
   MoleculeList get_group() const { return this->group; }
   size_t get_natom() const { return this->natom_; }
+  double get_mass() const { return this->mass_; }
 
 private:
   molecule& set_member( size_t i ){ return group.at(i); }
 
 private:
   vector< molecule > group;
+  double mass_;
   size_t n_molecule_;
   size_t natom_;
 

@@ -43,27 +43,24 @@ public:
    // set the local bulk pointer
    this->bulk_ptr = new_bulk;
    // get a list of combination
-   this->polymer_combination = get_combination<NUM>( n_mole_local );
-   size_t n_comb = polymer_combination.size();
-   cout << "Number of unique polymers of " << NUM << " : " << n_comb << endl;
+   vector<array<int, NUM> > polymer_combination_orig = get_combination<NUM>( n_mole_local );
+   size_t n_comb = polymer_combination_orig.size();
+   cout << "Number of unique polymers of " << NUM << " before cut: " << n_comb << endl;
    for( size_t icomb = 0; icomb < n_comb; icomb++ ){
     // get the molecule list to construct a polymer
-    array<int, NUM> list_local = this->polymer_combination.at(icomb);
+    array<int, NUM> list_local = polymer_combination_orig.at(icomb);
     vector<int> list_vec( list_local.begin(), list_local.end() );
     MoleculeList molecule_list = new_bulk->get_molelist_from_list( list_vec );
-//    for( size_t imole = 0; imole < molecule_list.size(); imole++ ){
-//     molecule_list.at(imole).print_info();
-//    }
     // initialize the polymer from molecule_list
     polymer_base<NUM> polymer_x;
     polymer_x.init_from( molecule_list );
     // if all atoms in the polymer are within a radius of Radius from
     // each other, then to add the polymer to the group storage
-    if( polymer_x.within_radius( Radius ) == true ){
-     cout << " polymer " << icomb << " : " ;
-     for( size_t i = 0; i < NUM; i++ ){ cout << list_vec.at(i) << " "; }
-     cout << " is within Radius " << Radius << endl;
+//    if( polymer_x.within_radius( Radius ) == true ){
+//    if( polymer_x.within_mean_radius_by_center_of_mass( Radius ) == true ){
+    if( polymer_x.within_mean_radius_by_center( Radius ) == true ){
      this->group_storage.push_back( polymer_x );
+     this->polymer_combination.push_back(list_local);
     }
    } // end of loop icomb, all polymers
 
@@ -82,12 +79,15 @@ public:
     group_indices.resize(0);
     {
      // compute euclidean distance matrix eigenvalues
-     vector< DMatrixHeap > eigval_vectors = this->compute_dist_eigval();
-     cout << "Number of Eigenvalue vectors for this group: " << eigval_vectors.size() << endl;
+//     vector< DMatrixHeap > eigval_vectors = this->compute_dist_eigval();
+//     cout << "Number of Eigenvalue vectors for this group: " << eigval_vectors.size() << endl;
+     vector< DMatrixHeap > edm_all = this->compute_all_edm();
      // get the ''eigenvalue boolean matrix''
-     DMatrixHeap eigpair_boolean_mat = compute_boolean_mat( &eigval_vectors );
+     IMatrixHeap eigpair_boolean_mat = compute_boolean_mat( &edm_all, 50.0 );
+//     IMatrixHeap eigpair_boolean_mat = compute_boolean_mat( &eigval_vectors );
      // get the degeneracy structure of the boolean matrix
-     group_indices = get_degeneracy_group( &eigpair_boolean_mat );
+     group_indices = get_groups( &eigpair_boolean_mat );
+     cout << "Number of subgroups: " << group_indices.size() << endl;
     }
     this->fill_frag_group( group_indices );
 
@@ -98,6 +98,22 @@ public:
    { return this->frag_group; }
 
 private:
+  vector< DMatrixHeap > compute_all_edm()
+  {
+   vector< DMatrixHeap > retval;
+   size_t n_polymer_local = this->group_storage.size();
+   for( size_t ipolymer = 0; ipolymer < n_polymer_local; ipolymer++ ){
+    polymer_base<NUM> polymer_i = group_storage.at(ipolymer);
+    euclidean_distance_matrix edm_local;
+    {
+     AtomList atomlist_i = polymer_i.get_atom_list();
+     edm_local.compose_from_atomlist( atomlist_i );
+    }
+    retval.push_back( edm_local.get_dist_mat() );
+   }
+   return retval;
+  }
+
   vector< DMatrixHeap > compute_dist_eigval()
   {
    vector< DMatrixHeap > retval;
@@ -127,6 +143,15 @@ private:
     const size_t prim_index = group_set.at(0);
     polymer_base<NUM> polymer_x = this->group_storage.at( prim_index );
     retval = polymer_x.get_group();
+    euclidean_distance_matrix edm_local;
+    AtomList atomlist_i = polymer_x.get_atom_list();
+    edm_local.compose_from_atomlist( atomlist_i );
+    edm_local.diagonalise();
+    DMatrixHeap eigval = edm_local.get_eigval();
+    for( size_t i = 0; i < eigval.get_nrow(); i++ ){
+     cout << eigval(i,0) << " ";
+    }
+    cout << endl;
    }
    return retval;
   }
@@ -138,11 +163,15 @@ private:
     vector<int> molecule_indices_polymer;
     molecule_indices_polymer.resize( this->n_molecule_per_unit_ );
     array<int, NUM> molecule_indices_orig 
-      = this->polymer_combination.at(ipolymer);
+      = this->polymer_combination.at(group_set.at(ipolymer));
     copy_n( molecule_indices_orig.begin(), 
             this->n_molecule_per_unit_, 
             molecule_indices_polymer.begin() );
     retval.push_back( molecule_indices_polymer );
+    if( ipolymer==1)
+    for( size_t imole = 0; imole < n_molecule_per_unit_; imole++ ){
+     (bulk_ptr->get_molecule( molecule_indices_polymer.at(imole)) ).print_info();
+    }
    }
    return retval;
   }
@@ -150,6 +179,13 @@ private:
   void fill_frag_group( vector< vector<int> > group_indices ){
    size_t n_group = group_indices.size();
    for( size_t igroup = 0; igroup < n_group; igroup++ ){
+    for( size_t iset = 0; iset < group_indices.at(igroup).size(); iset++ ){
+     const int value = group_indices.at(igroup).at(iset);
+     cout << value << "[";
+     for( size_t jset = 0; jset < NUM; jset++) cout << this->polymer_combination.at(value).at(jset) << " ";
+     cout << "] " ;
+    }
+    cout << endl;
     fragment_info fraginfo_local;
     fraginfo_local.set_n_mole_per_frag() = this->n_molecule_per_unit_;
     fraginfo_local.set_bulk_ptr() = this->bulk_ptr;

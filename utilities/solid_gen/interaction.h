@@ -49,14 +49,15 @@ public:
 public:
   void print_fragment_groups(){
    cout << "Fragment Groups" << endl;
-   cout << " number of fragment groups: " << this->n_fraggroup << endl;
-   cout << endl;
+   cout << "{" << endl;
+   cout << "Number of fragment groups: " << this->n_fraggroup << endl;
    for( size_t igroup = 0; igroup < this->n_fraggroup; igroup++ ){
     cout << "Fragment Group " << igroup << endl;
     fragment_group_info frag_group_local 
       = this->fragment_group_list.at(igroup);
     frag_group_local.print_info();
    }
+   cout << "}" << endl;
   } // end of print_fragment_groups() 
 
   molecule_bulk& set_bulk() { return this->bulk; }
