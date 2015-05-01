@@ -37,10 +37,6 @@ void symmetric_diag( DMatrixHeap* a, DMatrixHeap* eigvec, DMatrixHeap* eigval )
   // Stack -> Heap
   eigvec_local.copy_to( eigvec );
   eigval_local.copy_to( eigval );
-//  cout << eigvec->get_element(0,0) << " " << eigvec->get_element(1,0) << " " << eigvec->get_element(2,0) << endl;
-//  cout << eigvec->get_element(1,0) << " " << eigvec->get_element(1,1) << " " << eigvec->get_element(2,1) << endl;
-//  cout << eigvec->get_element(2,0) << " " << eigvec->get_element(2,1) << " " << eigvec->get_element(2,2) << endl;
-//  cout << eigval->get_element(0,0) << " " << eigval->get_element(1,0) << " " << eigval->get_element(2,0) << endl;
 
 };
 
