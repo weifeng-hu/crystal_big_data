@@ -1,6 +1,6 @@
 IQUADS_ROOT	= /home/wh288/iquads/
 CXX	= g++
-COPT	= -g --std=c++11 -fPIC
+COPT	= -O3 -g --std=c++11
 CFLAGS	= -I/home/wh288/Development/boost_1_53_0/ -I$(IQUADS_ROOT)
 CHEADS	= array_matrix_base.h\
 	  array_matrix.h\

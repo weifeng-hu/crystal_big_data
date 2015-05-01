@@ -2,6 +2,7 @@
 #define INTERACTION_H
 
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include "utilities/solid_gen/polymer_group_base.h"
 #include "utilities/solid_gen/molecule_bulk.h"
@@ -48,17 +49,75 @@ public:
 
 public:
   void print_fragment_groups(){
-   cout << "Fragment Groups" << endl;
-   cout << "{" << endl;
-   cout << "Number of fragment groups: " << this->n_fraggroup << endl;
    for( size_t igroup = 0; igroup < this->n_fraggroup; igroup++ ){
-    cout << "Fragment Group " << igroup << endl;
     fragment_group_info frag_group_local 
       = this->fragment_group_list.at(igroup);
-    frag_group_local.print_info();
+    cout << frag_group_local << endl;
+//    frag_group_local.print_info();
    }
-   cout << "}" << endl;
   } // end of print_fragment_groups() 
+
+  void print_summary(){
+   for( size_t igroup = 0; igroup < this->n_fraggroup; igroup++ ){
+    fragment_group_info frag_group_local 
+      = this->fragment_group_list.at(igroup);
+    frag_group_local.print_summary();
+//    frag_group_local.print_info();
+   }
+  }
+
+  void run_gview(){
+   cout << "Writing Gaussian gjf files ...";
+   vector<string> file_list;
+   for( size_t igroup = 0; igroup < this->n_fraggroup; igroup++ ){
+    fragment_group_info frag_group_local
+     = this->fragment_group_list.at(igroup);
+    for( size_t itype = 0; itype < frag_group_local.set_store().size(); itype++ ){
+      fragment_info frag_local 
+        = frag_group_local.set_store().at(itype);
+      AtomList atom_list_i;
+      for( size_t imole = 0; imole < get<0>(frag_local.set_primitive_info()).size(); imole++){
+       AtomList atom_list_local 
+        = get<0>(frag_local.set_primitive_info()).at(imole).get_atom_list();
+       for( size_t iatom = 0; iatom < atom_list_local.size(); iatom++ ){
+        atom_list_i.push_back( atom_list_local.at(iatom) );
+       } // end of loop iatom
+      } // end of loop imole
+      char file_i[100];
+      sprintf( file_i,"%i.%i.primitive.gjf", igroup, itype);
+      file_list.push_back( string(file_i) );
+      this->write_gview_file( string(file_i), atom_list_i );
+    } // end of loop itype
+   } // end of loop igroup
+   cout << " done" << endl;
+
+   cout << "Starting gview ..."<< endl;
+   {
+    string command = "/home/wh288/Apps/gv-508/gview ";
+    for( size_t ifile = 0; ifile < file_list.size(); ifile++ ){
+     const string file_i = file_list.at(ifile);
+     command += file_i;
+     command += " ";
+    }
+//    cout << command << endl;
+    int res = system( command.c_str() );
+   }
+  }
+
+  void write_gview_file( string filename, AtomList atom_list ){
+   ofstream ofs;
+   ofs.open( filename.c_str(), ios::out );
+   ofs << "#HF/3-21G" << endl;
+   ofs << endl;
+   ofs << "title card" << endl;
+   ofs << endl;
+   ofs << "0  1" << endl;
+   for( size_t iatom = 0; iatom < atom_list.size(); iatom++ ){
+    atom atom_i = atom_list.at(iatom);
+    ofs << atom_i << endl;
+   }
+   ofs.close();
+  }
 
   molecule_bulk& set_bulk() { return this->bulk; }
 

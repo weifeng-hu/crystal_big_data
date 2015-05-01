@@ -133,6 +133,16 @@ public:
   }
   // should think about using std::move() to append vectors
 
+  friend 
+  ostream& operator<< ( ostream& os, polymer_base<NUM> polymer ){
+   const size_t n_member = NUM;
+   for( size_t imember = 0; imember < n_member; imember++ ){
+    molecule mole_i = polymer.set_member(imember);
+    os << mole_i << endl;
+   }
+   return os;
+  }
+
 public:
   MoleculeList get_group() const { return this->group; }
   size_t get_natom() const { return this->natom_; }

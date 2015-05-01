@@ -81,6 +81,16 @@ public:
    return ifs;
   }
 
+  friend
+  ostream& operator<< ( ostream& os, unit_cell_base<node_type>& cell ){
+   const size_t n_node = cell.get_n_node();
+   for( size_t inode = 0; inode < n_node; inode++ ){
+    node_type node_i = cell.get_node( inode );
+    os << node_i << endl;
+   }
+   return os;
+  }
+
   array< array<double, 2>, 3 > get_edges(){
    array< array<double, 2>, 3 > retval;
    size_t n_node_local = this->store.size();

@@ -66,18 +66,19 @@ public:
   }
 
   void recenter(){
-   cout << "Re-centering lattice" << endl;
+   cout << "Re-centering lattice ..." << endl;
    array< array<double,2>, 3 > lattice_edges = this->get_edges();
    {
-    cout << "Original lattice edges: " << endl;
-    cout << " x:  ( " << lattice_edges.at(0).at(0) << " <--> " << lattice_edges.at(0).at(1) << " )" << endl;
-    cout << " y:  ( " << lattice_edges.at(1).at(0) << " <--> " << lattice_edges.at(1).at(1) << " )" << endl;
-    cout << " z:  ( " << lattice_edges.at(2).at(0) << " <--> " << lattice_edges.at(2).at(1) << " )" << endl;
+    cout << "  Original lattice edges: " << endl;
+    cout << "  x:  [ " << lattice_edges.at(0).at(0) << " <--> " << lattice_edges.at(0).at(1) << " ]" << endl;
+    cout << "  y:  [ " << lattice_edges.at(1).at(0) << " <--> " << lattice_edges.at(1).at(1) << " ]" << endl;
+    cout << "  z:  [ " << lattice_edges.at(2).at(0) << " <--> " << lattice_edges.at(2).at(1) << " ]" << endl;
    }
    array< double, 3> recenter_vec
     = compute_recenter_vec( lattice_edges );
    {
-    cout << "Recenter vector is [ ";
+    cout << "  Recenter vector:" << endl;
+    cout << "  [ ";
     cout << recenter_vec.at(0) << " " << recenter_vec.at(1) << " " << recenter_vec.at(2);
     cout << " ]";
     cout << endl;
@@ -88,10 +89,10 @@ public:
    }
    array< array<double,2>, 3> new_lattice_edges = this->get_edges();
    {
-    cout << "Adjusted lattice edges: " << endl;
-    cout << " x:  ( " << new_lattice_edges.at(0).at(0) << " <--> " << new_lattice_edges.at(0).at(1) << " )" << endl;
-    cout << " y:  ( " << new_lattice_edges.at(1).at(0) << " <--> " << new_lattice_edges.at(1).at(1) << " )" << endl;
-    cout << " z:  ( " << new_lattice_edges.at(2).at(0) << " <--> " << new_lattice_edges.at(2).at(1) << " )" << endl;
+    cout << "  Adjusted lattice edges: " << endl;
+    cout << "  x:  [ " << new_lattice_edges.at(0).at(0) << " <--> " << new_lattice_edges.at(0).at(1) << " ]" << endl;
+    cout << "  y:  [ " << new_lattice_edges.at(1).at(0) << " <--> " << new_lattice_edges.at(1).at(1) << " ]" << endl;
+    cout << "  z:  [ " << new_lattice_edges.at(2).at(0) << " <--> " << new_lattice_edges.at(2).at(1) << " ]" << endl;
    }
   } // end of recenter() 
 
@@ -103,8 +104,9 @@ public:
 
 public:
   void generate_cell( size_t la, size_t lb, size_t lc ){
-   cout << "Generating lattice" << endl;
-   cout << "Times: a = " << la << " b = " << lb << " c = " << lc << endl;
+   cout << "Generating lattice from unit cell ... " << endl;
+   cout << "  Times of duplication:" << endl;
+   cout << "  a direction: " << la << "\tb direction: " << lb << "\tc direction: " << lc << endl;
    if( unit_cell_is_set_ == false ){
     cout << "error: unit cell is not defined " << endl;
     abort();
@@ -142,6 +144,16 @@ public:
     unit_cell unit_cell_local = store.at(icell);
     unit_cell_local.print_atomlist();
    }
+  }
+
+  friend 
+  ostream& operator<< ( ostream& os, lattice_base<unit_cell>& lattice ){
+   const size_t n_cell = lattice.get_ncell();
+   for( size_t icell = 0; icell < n_cell; icell++ ){
+    unit_cell cell_i = lattice.get_cell(icell);
+    os << cell_i << endl;
+   }
+   return os;
   }
 
   unit_cell get_cell( size_t i ) const { return this->store.at(i); }

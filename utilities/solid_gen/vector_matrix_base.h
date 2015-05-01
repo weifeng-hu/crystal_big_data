@@ -52,6 +52,19 @@ public:
    fill( this->store_.begin(), this->store_.end(), 0 );
   }
 
+  friend 
+  ostream& operator<< ( ostream& os, vector_matrix_base<T>& mat ){
+   const size_t nrow_local = mat.get_nrow();
+   const size_t ncol_local = mat.get_ncol();
+   for( size_t irow = 0; irow < nrow_local; irow++ ){
+    for( size_t icol = 0; icol < ncol_local; icol++ ){
+     const T element = mat( irow, icol );
+     os << "[" << (irow+1) << "," << (icol+1) << "]:" << element << "  ";
+    }
+   }
+   return os;
+  }
+
 public:
   size_t get_nrow() const { return this->nrow_; };
   size_t get_ncol() const { return this->ncol_; };

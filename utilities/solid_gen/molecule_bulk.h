@@ -26,7 +26,9 @@ public:
 
 public:
   void init_from( molecular_lattice* ml ){
+   cout << "Initialising molecule bulk from lattice ..." << endl;
    ml->recenter();
+   cout << "Transforming to molecule bulk ...";
    size_t n_cell_local = ml->get_ncell();
    for( size_t icell = 0; icell < n_cell_local; icell++ ){
     molecular_ucell cell_local = ml->get_cell(icell);
@@ -35,9 +37,11 @@ public:
      this->bulk.push_back( cell_local.get_node(inode) );
     }
    }
+   cout << " done" << endl;
    this->n_molecule_ = bulk.size();
   }
   void cut( double Radius ){
+   cout << "Performing sphere cut using radius " << Radius << " Angstrom ..." << endl;
    this->radius_ = Radius;
    vector< molecule > temp_bulk;
    for( size_t imole = 0; imole < this->n_molecule_; imole++ ){

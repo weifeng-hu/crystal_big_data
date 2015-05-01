@@ -157,6 +157,17 @@ public:
    }
   }
 
+  friend 
+  ostream& operator<< ( ostream& os, molecule mole ){
+   AtomList atomlist_local = mole.get_atom_list();
+   const size_t natom = atomlist_local.size();
+   for( size_t iatom = 0; iatom < natom; iatom++ ){
+    atom atom_i = atomlist_local.at(iatom);
+    os << atom_i << endl;
+   }
+   return os;
+  }
+
   Coord get_center(){
    Coord retval;
    double x_average = 0.0e0;

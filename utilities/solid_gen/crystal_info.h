@@ -28,6 +28,7 @@ private:
    this->dimer_requested_ = false;
    this->trimer_requested_ = false;
    this->tetramer_requested_ = false;
+   this->visualization_ = false;
    this->n_fragment_type_ = 0;
    this->sizes = make_tuple( 0, 0, 0);
   }
@@ -56,6 +57,8 @@ public:
    { return this->trimer_requested_; }
   bool tetramer_requested() const 
    { return this->tetramer_requested_; }
+  bool visual_requested() const 
+   { return this->visualization_; }
   size_t get_n_fragment_type() const 
    { return this->n_fragment_type_; }
   size_t& get_n_fragment_type()
@@ -73,6 +76,7 @@ private:
   bool dimer_requested_;
   bool trimer_requested_;
   bool tetramer_requested_;
+  bool visualization_;
   size_t n_fragment_type_;
   tuple< size_t, size_t, size_t > sizes;
   array<double, 3> angles;

@@ -7,6 +7,7 @@
 #include <string>
 #include <tuple>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include "utilities/solid_gen/coordinate.h"
 #include "utilities/solid_gen/threed_space_function.h"
@@ -85,6 +86,14 @@ public:
                   this->coordinate.at(1), this->coordinate.at(2)
                   );
    cout << line << endl;
+  }
+
+  friend ostream& operator<< ( ostream& os, atom& atom_ ){
+   os << atom_.get_element().c_str() << "  ";
+   os << fixed << setw(12) << setprecision(8) << atom_.get_x() << "  ";
+   os << fixed << setw(12) << setprecision(8) << atom_.get_y() << "  ";
+   os << fixed << setw(12) << setprecision(8) << atom_.get_z() << "  ";
+   return os;
   }
 
   void print_atomlist(){

@@ -99,24 +99,27 @@ bool is_the_same( DMatrixHeap* eigval_a, DMatrixHeap* eigval_b )
 
   bool retval = true;
   try{
-   const size_t nrow_a = eigval_a->get_nrow();
-   const size_t nrow_b = eigval_b->get_nrow();
+
+   retval = distance_of_two_matrices( eigval_a, eigval_b ) <= 2.0e-2 ? true : false;
+
+//   const size_t nrow_a = eigval_a->get_nrow();
+//   const size_t nrow_b = eigval_b->get_nrow();
 
 //  cout << nrow_a << " " << nrow_b << endl;
-   tuple< size_t, size_t > nrow_pair = make_pair( nrow_a, nrow_b );
-   if( nrow_a != nrow_b ) throw nrow_pair;
+//   tuple< size_t, size_t > nrow_pair = make_pair( nrow_a, nrow_b );
+//   if( nrow_a != nrow_b ) throw nrow_pair;
 
-   DMatrixStack eigval_a_local( eigval_a );
-   DMatrixStack eigval_b_local( eigval_b );
-   for( size_t ival = 0; ival < nrow_a; ival++ ){
-    // no range check
-    const double val_a = eigval_a_local(ival,0);
-    const double val_b = eigval_b_local(ival,0);
-    if( fabs( val_a - val_b ) >= 1.0e0 ){
-     retval = false;
-     break;
-    }
-   }
+//   DMatrixStack eigval_a_local( eigval_a );
+//   DMatrixStack eigval_b_local( eigval_b );
+//   for( size_t ival = 0; ival < nrow_a; ival++ ){
+//    // no range check
+//    const double val_a = eigval_a_local(ival,0);
+//    const double val_b = eigval_b_local(ival,0);
+//    if( fabs( val_a - val_b ) >= 1.0e0 ){
+//     retval = false;
+//     break;
+//    }
+//   }
   }
   catch ( tuple< size_t, size_t > conflict_nrows ){
    cout << " matrix exception: compare_eigval_pair() " << endl;
@@ -152,6 +155,7 @@ IMatrixHeap compute_boolean_mat( vector<DMatrixHeap>* all_matrices, double tol )
 IMatrixHeap compute_boolean_mat( vector<DMatrixHeap>* eigvals )
 {
 
+  cout << "Compute boolean matrix ... " << endl;
 //  vector<int> vertex;
 
   size_t n_matrix = eigvals->size();
@@ -161,6 +165,10 @@ IMatrixHeap compute_boolean_mat( vector<DMatrixHeap>* eigvals )
 //  boost::adjacency_matrix<boost::undirectedS> Matrix(n_matrix);
 //  int n = n_matrix;
 //  boost::adjacency_list< boost::setS, boost::vecS, boost::undirectedS > List(n_matrix);
+
+  size_t num_of_comp = n_matrix * n_matrix;
+  cout  << num_of_comp << " matrix pairs to compare:" << endl;
+  size_t count_interval = num_of_comp/5;
 
   IMatrixHeap retval( n_matrix, n_matrix );
   for( size_t imatrix = 0; imatrix < n_matrix; imatrix++ ){
@@ -172,6 +180,10 @@ IMatrixHeap compute_boolean_mat( vector<DMatrixHeap>* eigvals )
 //     boost::add_edge(imatrix,jmatrix, List);
 //    }
 //    cout << " boolean_mat [ " << imatrix << ", " << jmatrix << " ] = " << retval(imatrix, jmatrix) << endl;;
+    size_t current_count = imatrix * n_matrix + jmatrix;
+    if( (current_count+1) % count_interval == 0 ){
+     cout << (current_count*100/num_of_comp + 1 ) << "%\tcompleted" << endl;
+    }
    }
   }
 //  boost::write_graphviz(cout, List );
@@ -183,6 +195,7 @@ IMatrixHeap compute_boolean_mat( vector<DMatrixHeap>* eigvals )
 
 vector< vector<int> > get_groups( IMatrixHeap* boolean_mat ){
 
+  cout << "Analyzing subgroups from boolean matrix ...";
   vector< map<int,int> > bond_maps;
   size_t nvec = boolean_mat->get_ncol();
   for( size_t ivec = 0; ivec < nvec; ivec++ ){
@@ -247,6 +260,7 @@ vector< vector<int> > get_groups( IMatrixHeap* boolean_mat ){
    }
   }
 
+  cout << " done" << endl;
   return bond_vecs;
 }
 
