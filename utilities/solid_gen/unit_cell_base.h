@@ -1,3 +1,24 @@
+/*
+ *  This source code applies all the terms in 
+ *  GNU GENERAL PUBLIC LICENSE (GPL), Version3, 29 June 2007.
+ *
+ *  Copyright (C) 2013-2015 Weifeng Hu, all rights reserved.
+ *  
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *  
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef UNIT_CELL_BASE_H
 #define UNIT_CELL_BASE_H
 
@@ -39,18 +60,23 @@ public:
  
   unit_cell_base<node_type> 
   translational_duplicate( tuple<int, int, int> direction ){
-   double a = get<0>( direction );
-   double b = get<1>( direction );
-   double c = get<2>( direction );
+   int a = get<0>( direction );
+   int b = get<1>( direction );
+   int c = get<2>( direction );
    return this->translational_duplicate( a, b, c );
   }
   unit_cell_base<node_type> 
-  translational_duplicate( double a, double b, double c ){
+  translational_duplicate( int a_, int b_, int c_ ){
+   double a = a_;
+   double b = b_;
+   double c = c_;
    unit_cell_base <node_type> copy;
+   copy.set_translation_vec() = array<int, 3> { a_, b_, c_ };
    copy.set_constants() = this->get_constants();
    size_t n_node_local = this->store.size();
    for( size_t inode = 0; inode < n_node_local; inode++ ){
     node_type new_node = this->store.at(inode);
+    new_node.set_translation_vec() = array<int, 3> { a_, b_, c_ };
     new_node += this->get_trans_vector_a() * a;
     new_node += this->get_trans_vector_b() * b;
     new_node += this->get_trans_vector_c() * c;
@@ -169,9 +195,13 @@ public:
   array<double, 3> get_trans_vector_c() const
    { return this->constants.get_trans_vector_c(); }
 
+  array<int, 3>& set_translation_vec()
+   { return this->translation_vec; }
+
 private:
   vector< node_type > store;
   lattice_parameters constants;
+  array<int, 3> translation_vec;
 
 }; // end of struct unit_cell_base
 

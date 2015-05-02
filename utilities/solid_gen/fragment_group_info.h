@@ -59,6 +59,8 @@ public:
     if( count !=0 )cout << "-----------------------------------------------" << endl;
     cout << "Fragment " << ++count << endl;
     cout << "Averaged intermolecular distance: " << fixed << setw(4) << setprecision(2) << it->first << endl;
+    cout << "List of fragments linking to the center: " << endl;
+    (it->second).print_fragment_list();
    }
    cout << "===============================================" << endl;
   }

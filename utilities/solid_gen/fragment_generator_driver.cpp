@@ -1,3 +1,24 @@
+/*
+ *  This source code applies all the terms in 
+ *  GNU GENERAL PUBLIC LICENSE (GPL), Version3, 29 June 2007.
+ *
+ *  Copyright (C) 2013-2015 Weifeng Hu, all rights reserved.
+ *  
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *  
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 // ++++++++++++++++++++++++++++++++++++++++++++++
 //
 //         FRAGMENT GENERATOR MAIN DRIVER
@@ -50,6 +71,7 @@ int fragment_generator_driver( vector<string> args )
     mole_latt.generate( info.get_sizes() );
     mole_bulk.init_from( &mole_latt );
     cout << "Found " << mole_bulk.get_nmolecule() << " molecules in the bulk BEFORE cut: " << endl;
+    mole_bulk.recenter_to_central_molecule( mole_bulk.identify_central_molecule() );
     // cut the lattice by a radius
     mole_bulk.cut( info.get_radius() );
     cout << "Found " << mole_bulk.get_nmolecule() << " molecules in the bulk AFTER cut: " << endl;

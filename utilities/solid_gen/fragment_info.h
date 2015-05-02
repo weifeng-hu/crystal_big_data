@@ -1,3 +1,24 @@
+/*
+ *  This source code applies all the terms in 
+ *  GNU GENERAL PUBLIC LICENSE (GPL), Version3, 29 June 2007.
+ *
+ *  Copyright (C) 2013-2015 Weifeng Hu, all rights reserved.
+ *  
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *  
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef FRAGMENT_INFO_H
 #define FRAGMENT_INFO_H
 
@@ -103,6 +124,48 @@ public:
         << get<2>( frag.set_primitive_info() ) << " Angstrom" << endl;
   
    return os;
+  }
+
+  void print_fragment_list(){
+   vector< vector<int> > list;
+   int center_molecule = (this->bulk_ptr)->get_central_molecule();
+   const size_t n_frag = this->identical_fragment_list.size();
+   for( size_t ifrag = 0; ifrag < n_frag; ifrag++ ){
+    tuple< vector<int>, int > frag_local = this->identical_fragment_list.at(ifrag);
+    vector<int> mole_list = get<0>( frag_local );
+    int comb_ind = get<1>( frag_local );
+    for( size_t imole = 0; imole < mole_list.size(); imole++ ){
+     const int ind = mole_list.at(imole);
+     if( ind == center_molecule ){
+      list.push_back( mole_list );
+      break;
+     }
+    }
+   }
+
+   cout << "weight factor: " << list.size() << endl;
+   array<int, 3> origin_vec 
+    = ( (this->bulk_ptr)->get_molecule( center_molecule ) ).set_translation_vec();
+   for( size_t ilist = 0; ilist < list.size(); ilist++ ){
+    vector<int> list_local = list.at(ilist);
+    cout << "[ ";
+    for( size_t imole = 0; imole < list_local.size(); imole++ ){
+     cout << list_local.at(imole) << ": ";
+     {
+      molecule mole_i = (this->bulk_ptr)->get_molecule( list_local.at(imole) );
+      array<int, 3> mole_vec = mole_i.set_translation_vec();
+      array<int, 3> relative_vec 
+       = array<int, 3>{ mole_vec.at(0) - origin_vec.at(0), 
+                        mole_vec.at(1) - origin_vec.at(1),
+                        mole_vec.at(2) - origin_vec.at(2) };
+      string mole_name = mole_i.get_name();
+      cout << mole_name << " < " << relative_vec.at(0) << "a + " << relative_vec.at(1) << "b + " << relative_vec.at(2) << "c >";
+     }
+     cout << "    ";
+    }
+    cout << "]" << endl;
+   }
+   cout << endl;
   }
 
 public:

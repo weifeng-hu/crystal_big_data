@@ -1,3 +1,24 @@
+/*
+ *  This source code applies all the terms in 
+ *  GNU GENERAL PUBLIC LICENSE (GPL), Version3, 29 June 2007.
+ *
+ *  Copyright (C) 2013-2015 Weifeng Hu, all rights reserved.
+ *  
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *  
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *  
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 #ifndef ATOM_H
 #define ATOM_H
 
@@ -141,11 +162,15 @@ public:
    return retval;
   }
 
+  array<int, 3>& set_translation_vec()
+   { return this->translation_vec; }
+
 private:
   // we use vector for coordinate 
   // since for a general storage case, these 
   // objects will be stored in the heap and invoked to stack
-  array<double, 3> coordinate; 
+  array<double, 3> coordinate;
+  array<int, 3> translation_vec;
   int charge_;
   double mass_;
   string element_;
