@@ -115,7 +115,7 @@ bool is_the_same( DMatrixHeap* eigval_a, DMatrixHeap* eigval_b )
   bool retval = true;
   try{
 
-   retval = distance_of_two_matrices( eigval_a, eigval_b ) <= 2.0e-2 ? true : false;
+   retval = distance_of_two_matrices( eigval_a, eigval_b ) <= 1.0e-2 ? true : false;
 
 //   const size_t nrow_a = eigval_a->get_nrow();
 //   const size_t nrow_b = eigval_b->get_nrow();

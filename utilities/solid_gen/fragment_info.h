@@ -107,21 +107,34 @@ public:
 
   friend 
   ostream& operator<< ( ostream& os, fragment_info& frag ){
-   {
+//   {
+     /*
      MoleculeList mole_list_local = get<0>( frag.set_primitive_info() );
      const size_t n_mole_local = mole_list_local.size();
      for( size_t imole = 0; imole < n_mole_local; imole++ ){
       molecule mole_i = mole_list_local.at(imole);
       os << mole_i << endl;
      }
-   }
+     */
 
-   {
-    DMatrixHeap eigval_edm = get<1>( frag.set_primitive_info() );
-    os << eigval_edm << endl;
-   }
-   os << "Averaged intermolecular distance: "
-        << get<2>( frag.set_primitive_info() ) << " Angstrom" << endl;
+     for( size_t iset = 0; iset < frag.set_fragment_list().size(); iset++ ){
+      vector<int> mole_list_local = get<0>( frag.set_fragment_list().at(iset) );
+      int icomb = get<1>( frag.set_fragment_list().at(iset) );
+      os << "  member " << iset << " combination id " << icomb << endl;
+      for( size_t imole = 0; imole < mole_list_local.size(); imole++ ){
+       size_t mole_id = mole_list_local.at(imole);
+       molecule mole_i = (frag.set_bulk_ptr())->get_molecule(mole_id);
+       os << "      molecule " << mole_id << endl << mole_i << endl;
+      }
+     }
+//   }
+
+//   {
+//    DMatrixHeap eigval_edm = get<1>( frag.set_primitive_info() );
+//    os << eigval_edm << endl;
+//   }
+//   os << "Averaged intermolecular distance: "
+//        << get<2>( frag.set_primitive_info() ) << " Angstrom" << endl;
   
    return os;
   }
@@ -143,27 +156,35 @@ public:
     }
    }
 
+   {
+    DMatrixHeap eigval_edm = get<1>( set_primitive_info() );
+    cout << eigval_edm << endl;
+   }
    cout << "weight factor: " << list.size() << endl;
+
    array<int, 3> origin_vec 
     = ( (this->bulk_ptr)->get_molecule( center_molecule ) ).set_translation_vec();
    for( size_t ilist = 0; ilist < list.size(); ilist++ ){
     vector<int> list_local = list.at(ilist);
-    cout << "[ ";
+//    cout << "[ ";
+    cout << " set " << ilist << ": " << endl;
     for( size_t imole = 0; imole < list_local.size(); imole++ ){
-     cout << list_local.at(imole) << ": ";
+     cout << list_local.at(imole) << ": " << endl;;
      {
       molecule mole_i = (this->bulk_ptr)->get_molecule( list_local.at(imole) );
+      cout << mole_i ;
       array<int, 3> mole_vec = mole_i.set_translation_vec();
       array<int, 3> relative_vec 
        = array<int, 3>{ mole_vec.at(0) - origin_vec.at(0), 
                         mole_vec.at(1) - origin_vec.at(1),
                         mole_vec.at(2) - origin_vec.at(2) };
       string mole_name = mole_i.get_name();
-      cout << mole_name << " < " << relative_vec.at(0) << "a + " << relative_vec.at(1) << "b + " << relative_vec.at(2) << "c >";
+//      cout << mole_name << " < " << relative_vec.at(0) << "a + " << relative_vec.at(1) << "b + " << relative_vec.at(2) << "c >";
      }
-     cout << "    ";
+      
+//     cout << "    ";
     }
-    cout << "]" << endl;
+//    cout << "]" << endl;
    }
    cout << endl;
   }

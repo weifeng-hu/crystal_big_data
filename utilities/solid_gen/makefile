@@ -37,7 +37,7 @@ CSRCS	= crystal_info.cpp\
 	  fragment_generator_driver.cpp\
 	  main.cpp
 COBJS	= $(CSRCS:.cpp=.o)
-LIBS	= -lgfortran $(IQUADS_ROOT)/blas/lib_blas_interface.a -L/home/intel/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lpthread
+LIBS	= -lgfortran $(IQUADS_ROOT)/blas/lib_blas_interface.a -L/home/intel/composerxe/mkl/lib/intel64/ -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lpthread
 PGM	= solid_gen
 
 $(PGM):	$(COBJS)

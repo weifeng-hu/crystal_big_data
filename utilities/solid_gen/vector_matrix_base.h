@@ -67,7 +67,7 @@ public:
   }
   void init( size_t new_nrow, size_t new_ncol ){
    this->resize( new_nrow, new_ncol );
-   fill( this->store_.begin(), this->store_.end(), 0 );
+   fill( this->store_.begin(), this->store_.end(), 0.0 );
   }
 
   friend 

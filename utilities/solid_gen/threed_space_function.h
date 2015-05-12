@@ -56,6 +56,34 @@ inline double compute_distance( Coord coord_a, Coord coord_b ){
 
 }
 
+inline double compute_charge_weighted_distance( Coord coord_a, Coord coord_b, int charge_a, int charge_b )
+{ 
+
+  double retval = 0.0e0;
+  {
+   const double x_a = get<0>(coord_a); //* charge_a/10.0e0;
+   const double y_a = get<1>(coord_a); //* charge_a/10.0e0;
+   const double z_a = get<2>(coord_a); //* charge_a/10.0e0;
+ 
+   const double x_b = get<0>(coord_b); //* charge_b/10.0e0;
+   const double y_b = get<1>(coord_b); //* charge_b/10.0e0;
+   const double z_b = get<2>(coord_b); //* charge_b/10.0e0;
+ 
+   const double dx = x_a - x_b;
+   const double dy = y_a - y_b;
+   const double dz = z_a - z_b;
+ 
+   const double dis_sqr = dx * dx + dy * dy + dz * dz;
+   retval = sqrt( dis_sqr ) * charge_a * charge_b;
+  }
+ 
+  return retval;
+
+
+
+
+}
+
 inline array< double, 3 > compute_recenter_vec( array< array<double, 2>, 3> edges )
 {
 

@@ -60,6 +60,7 @@ public:
     cout << "Fragment " << ++count << endl;
     cout << "Averaged intermolecular distance: " << fixed << setw(4) << setprecision(2) << it->first << endl;
     cout << "List of fragments linking to the center: " << endl;
+//    cout << (it->second) << endl;
     (it->second).print_fragment_list();
    }
    cout << "===============================================" << endl;
@@ -70,6 +71,7 @@ public:
    const size_t n_member = frag_group.set_store().size();
    for( size_t itype = 0; itype < n_member; itype++ ){
     fragment_info fraginfo_local = frag_group.set_store().at(itype);
+    os << "Type " << itype << endl;
     os << fraginfo_local << endl;
    }
    return os;

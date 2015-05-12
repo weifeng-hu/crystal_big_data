@@ -10,7 +10,7 @@
 
 using namespace std;
 
-void numerical_nac_driver( vector<string> args )
+void numerical_non_adiabatic_coupling_driver( vector<string> args )
 {
 
   string molecule = args[1];

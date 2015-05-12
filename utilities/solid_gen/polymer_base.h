@@ -74,15 +74,15 @@ end:
   }
 
   bool within_mean_radius_by_center_of_mass( double radius ){
-   return ( this->compute_mean_distance_by_center() <= radius ? true : false );
-  }
-
-  bool within_mean_radius_by_center( double radius ){
    return ( this->compute_mean_distance_by_center_of_mass() <= radius ? true : false );
   }
 
+  bool within_mean_radius_by_center( double radius ){
+   return ( this->compute_mean_distance_by_center() <= radius ? true : false );
+  }
+
   double compute_mean_distance_by_center(){
-   double retval;
+   double retval = 0.0e0;
    int count = 0;
    for( size_t imole = 0; imole < this->n_molecule_; imole++ ){
     Coord com_i = this->group.at(imole).get_center();
@@ -97,7 +97,7 @@ end:
   }
 
   double compute_mean_distance_by_center_of_mass(){
-   double retval;
+   double retval = 0.0e0;
    int count = 0;
    for( size_t imole = 0; imole < this->n_molecule_; imole++ ){
     Coord com_i = this->group.at(imole).get_center_of_mass();

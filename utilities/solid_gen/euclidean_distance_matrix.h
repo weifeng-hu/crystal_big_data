@@ -82,10 +82,14 @@ public:
    }
    for( size_t iatom = 0; iatom < natom; iatom++ ){
     Coord coord_i = new_atom_list[iatom].get_coordinate_set();
+    const int charge_i = new_atom_list[iatom].get_charge();
     for( size_t jatom = 0; jatom < natom; jatom++ ){
      Coord coord_j = new_atom_list[jatom].get_coordinate_set();
+     const int charge_j = new_atom_list[jatom].get_charge();
      this->set_matrix_element( iatom, jatom ) 
         = compute_distance( coord_i, coord_j );
+//     this->set_matrix_element( iatom, jatom ) 
+//        = compute_charge_weighted_distance( coord_i, coord_j, charge_i, charge_j );
     }
    }
   }
