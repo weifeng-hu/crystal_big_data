@@ -1,11 +1,11 @@
 SHELL	= /bin/sh
 CXX	= g++
 FC	= gfortran
-CXXFLAGS= -g
-FCFLAGS = -g
+CXXFLAGS= -O3
+FCFLAGS = -O3
 CSRCS	= blas_interface.cpp
 COBJS	= $(CSRCS:.cpp=.o)
-FSRCS	= mat_x_mat.f symdiag.f
+FSRCS	= mat_x_mat.f symdiag.f ax_b.f
 FOBJS	= $(FSRCS:.f=.o)
 HEAD	= blas_interface.h
 INCLUDE = -I./ -I/home/intel/composerxe/mkl/include

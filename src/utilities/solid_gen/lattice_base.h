@@ -98,6 +98,7 @@ public:
 
   void set_primitive( unit_cell prim ){
    this->primitive = prim;
+   this->lp = prim.get_constants();
    this->unit_cell_is_set_ = true;
   } // end of set_primitive()
   bool unit_cell_is_set() { return unit_cell_is_set_; }
@@ -158,10 +159,12 @@ public:
 
   unit_cell get_cell( size_t i ) const { return this->store.at(i); }
   size_t get_ncell() const { return this->store.size(); }
+  lattice_parameters get_constants() const { return this->lp; }
 
 private:
   vector< unit_cell > store;
   unit_cell primitive;
+  lattice_parameters lp;
   size_t na, nb, nc;
   bool unit_cell_is_set_;
 

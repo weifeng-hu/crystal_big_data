@@ -27,6 +27,7 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
+#include "blas/blas_interface.h"
 #include "utilities/solid_gen/threed_space.h"
 
 using namespace std;
@@ -153,6 +154,29 @@ private:
     = sqrt( pow( this->length_c_, 2 ) - pow( retval.at(0), 2) - pow( retval.at(1), 2 ) );
    return retval;
   };
+
+  array<double, 9> get_trans_mat(){
+   array<double, 9> retval;
+   retval[0] = this->trans_vectors.at(0).at(0);
+   retval[1] = this->trans_vectors.at(0).at(1);
+   retval[2] = this->trans_vectors.at(0).at(2);
+   retval[3] = this->trans_vectors.at(1).at(0);
+   retval[4] = this->trans_vectors.at(1).at(1);
+   retval[5] = this->trans_vectors.at(1).at(2);
+   retval[6] = this->trans_vectors.at(2).at(0);
+   retval[7] = this->trans_vectors.at(2).at(1);
+   retval[8] = this->trans_vectors.at(2).at(2);
+   return retval;
+  }
+
+public:
+  array< double, 3 > compute_coeffs_of_abc( array< double, 3 > xyz ){
+   array< double, 3 > nvec;
+   nvec.fill(0.0e0);
+   array< double, 9 > trans_mat = this->get_trans_mat();
+   ax_b( trans_mat.data(), xyz.data(), nvec.data(), 3 );
+   return nvec;
+  }
 
 private:
   array< array< double, 3 >, 3 > trans_vectors;

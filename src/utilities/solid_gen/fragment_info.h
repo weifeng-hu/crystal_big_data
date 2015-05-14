@@ -140,6 +140,7 @@ public:
   }
 
   void print_fragment_list(){
+
    vector< vector<int> > list;
    int center_molecule = (this->bulk_ptr)->get_central_molecule();
    const size_t n_frag = this->identical_fragment_list.size();
@@ -156,10 +157,10 @@ public:
     }
    }
 
-   {
-    DMatrixHeap eigval_edm = get<1>( set_primitive_info() );
-    cout << eigval_edm << endl;
-   }
+//   {
+//    DMatrixHeap eigval_edm = get<1>( set_primitive_info() );
+//    cout << eigval_edm << endl;
+//   }
    cout << "weight factor: " << list.size() << endl;
 
    array<int, 3> origin_vec 
@@ -179,6 +180,12 @@ public:
                         mole_vec.at(1) - origin_vec.at(1),
                         mole_vec.at(2) - origin_vec.at(2) };
       string mole_name = mole_i.get_name();
+      const Coord center_of_mass = mole_i.get_center_of_mass();
+      array< double, 3 > xyz_local = array<double, 3> { get<0>(center_of_mass),
+                                                 get<1>(center_of_mass),
+                                                 get<2>(center_of_mass) };
+      array< double, 3 > nvec = ((this->bulk_ptr)->get_constants()).compute_coeffs_of_abc( xyz_local );
+      cout << " center of mass " << fixed << setw(4) << setprecision(2) << nvec.at(0) << "a + " << nvec.at(1) << "b + " << nvec.at(2) << "c " << endl;
 //      cout << mole_name << " < " << relative_vec.at(0) << "a + " << relative_vec.at(1) << "b + " << relative_vec.at(2) << "c >";
      }
       

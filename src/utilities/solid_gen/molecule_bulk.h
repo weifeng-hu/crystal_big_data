@@ -29,6 +29,7 @@
 #include "utilities/solid_gen/molecule.h"
 #include "utilities/solid_gen/unit_cell.h"
 #include "utilities/solid_gen/lattice.h"
+#include "utilities/solid_gen/lattice_parameters.h"
 
 namespace iquads{
 
@@ -61,6 +62,7 @@ public:
    }
    cout << " done" << endl;
    this->n_molecule_ = bulk.size();
+   this->lp = ml->get_constants();
   }
   void recenter_to_central_molecule( tuple< array< double, 3 >, int > center_mole_info ){
    cout << "Recentering the origin to the center of mass of the central molecule ... " << endl;
@@ -122,9 +124,11 @@ public:
   size_t get_nmolecule() const { return this->n_molecule_; }
   molecule get_molecule( size_t i ) const { return this->bulk.at(i); }
   int get_central_molecule() const { return this->central_molecule_; }
+  lattice_parameters get_constants() const { return this->lp; }
 
 private:
   vector< molecule > bulk;
+  lattice_parameters lp;
   int central_molecule_;
   double radius_;
   size_t n_molecule_;

@@ -3,6 +3,13 @@
 #include <vector>
 #include "blas_interface.h"
 
+void ax_b( const double* a, const double* b, const double* x, const int dimen )
+{
+
+  ax_b_( a, b, x, &dimen );
+
+}
+
 void mat_x_mat( const double* a, const double* b, double* c, const double coeff, const int nrow_a, const int ncol_a, const int nrow_b, const int ncol_b, const bool transa, const bool transb )
 {
 
