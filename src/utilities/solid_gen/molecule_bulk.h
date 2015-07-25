@@ -120,6 +120,15 @@ public:
    return retval;
   }
 
+  friend
+   ostream& operator<< ( ostream& os, const molecule_bulk& mole_bulk )
+   {
+    for( size_t i = 0 ; i < mole_bulk.get_nmolecule(); i++ ){
+     os << mole_bulk.get_molecule(i);
+    }
+    return os;
+   }
+
 public:
   size_t get_nmolecule() const { return this->n_molecule_; }
   molecule get_molecule( size_t i ) const { return this->bulk.at(i); }

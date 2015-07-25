@@ -41,81 +41,89 @@ template < class node_type >
 struct unit_cell_base
 {
 public:
-  void add_node( node_type new_node ){
-   this->store.push_back(new_node);
-  }
-
-  bool within_radius( double Radius ){
-   size_t n_node_local = this->store.size();
-   bool within_radius_local = true;
-   for( size_t inode = 0; inode < n_node_local; inode++ ){
-    node_type node_local = store.at(inode);
-    if( node_local.within_radius( Radius ) == false ){
-     within_radius_local = false;
-     break;
-    }
+  void add_node( node_type new_node )
+   {
+    this->store.push_back(new_node);
    }
-   return within_radius_local;
-  }
+
+  bool within_radius( double Radius )
+   {
+    size_t n_node_local = this->store.size();
+    bool within_radius_local = true;
+    for( size_t inode = 0; inode < n_node_local; inode++ ){
+     node_type node_local = store.at(inode);
+     if( node_local.within_radius( Radius ) == false ){
+      within_radius_local = false;
+      break;
+     }
+    }
+    return within_radius_local;
+   }
  
   unit_cell_base<node_type> 
-  translational_duplicate( tuple<int, int, int> direction ){
-   int a = get<0>( direction );
-   int b = get<1>( direction );
-   int c = get<2>( direction );
-   return this->translational_duplicate( a, b, c );
-  }
-  unit_cell_base<node_type> 
-  translational_duplicate( int a_, int b_, int c_ ){
-   double a = a_;
-   double b = b_;
-   double c = c_;
-   unit_cell_base <node_type> copy;
-   copy.set_translation_vec() = array<int, 3> { a_, b_, c_ };
-   copy.set_constants() = this->get_constants();
-   size_t n_node_local = this->store.size();
-   for( size_t inode = 0; inode < n_node_local; inode++ ){
-    node_type new_node = this->store.at(inode);
-    new_node.set_translation_vec() = array<int, 3> { a_, b_, c_ };
-    new_node += this->get_trans_vector_a() * a;
-    new_node += this->get_trans_vector_b() * b;
-    new_node += this->get_trans_vector_c() * c;
-    copy.add_node( new_node );
+   translational_duplicate( tuple<int, int, int> direction )
+   {
+    int a = get<0>( direction );
+    int b = get<1>( direction );
+    int c = get<2>( direction );
+    return this->translational_duplicate( a, b, c );
    }
-   return copy;
-  } 
 
-  void operator+= ( array<double, 3> disp ){
-   size_t n_node_local = this->store.size();
-   for( size_t inode = 0; inode < n_node_local; inode++ ){
-    this->store.at(inode) += disp;
+  unit_cell_base<node_type> 
+  translational_duplicate( int a_, int b_, int c_ )
+   {
+    double a = a_;
+    double b = b_;
+    double c = c_;
+    unit_cell_base <node_type> copy;
+    copy.set_translation_vec() = array<int, 3> { a_, b_, c_ };
+    copy.set_constants() = this->get_constants();
+    size_t n_node_local = this->store.size();
+    for( size_t inode = 0; inode < n_node_local; inode++ ){
+     node_type new_node = this->store.at(inode);
+     new_node.set_translation_vec() = array<int, 3> { a_, b_, c_ };
+     new_node += this->get_trans_vector_a() * a;
+     new_node += this->get_trans_vector_b() * b;
+     new_node += this->get_trans_vector_c() * c;
+     copy.add_node( new_node );
+    }
+    return copy;
+   } 
+
+  void operator+= ( array<double, 3> disp )
+   {
+    size_t n_node_local = this->store.size();
+    for( size_t inode = 0; inode < n_node_local; inode++ ){
+     this->store.at(inode) += disp;
+    }
    }
-  }
 
   friend 
-  ifstream& operator>> ( ifstream& ifs, unit_cell_base<node_type>& cell ){
-   size_t n_node;
-   ifs >> n_node;
-   for( size_t inode = 0; inode < n_node; inode++ ){
-    node_type node_i;
-    ifs >> node_i;
-    cell.add_node( node_i );
-   }
-   lattice_parameters lp;
-   ifs >> lp;
-   cell.set_constants() = lp;
-   return ifs;
-  }
+   ifstream& operator>> ( ifstream& ifs, unit_cell_base<node_type>& cell )
+    {
+     size_t n_node;
+     ifs >> n_node;
+     for( size_t inode = 0; inode < n_node; inode++ ){
+      node_type node_i;
+      ifs >> node_i;
+      cell.add_node( node_i );
+     }
+     lattice_parameters lp;
+     ifs >> lp;
+     cell.set_constants() = lp;
+     return ifs;
+    }
 
   friend
-  ostream& operator<< ( ostream& os, unit_cell_base<node_type>& cell ){
-   const size_t n_node = cell.get_n_node();
-   for( size_t inode = 0; inode < n_node; inode++ ){
-    node_type node_i = cell.get_node( inode );
-    os << node_i << endl;
+   ostream& operator<< ( ostream& os, unit_cell_base<node_type>& cell )
+   {
+    const size_t n_node = cell.get_n_node();
+    for( size_t inode = 0; inode < n_node; inode++ ){
+     node_type node_i = cell.get_node( inode );
+     os << node_i << endl;
+    }
+    return os;
    }
-   return os;
-  }
 
   array< array<double, 2>, 3 > get_edges(){
    array< array<double, 2>, 3 > retval;

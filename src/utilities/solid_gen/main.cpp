@@ -31,7 +31,8 @@
 int main( int argc, char* argv[] )
 {
 
-  using namespace std;
+  using std::vector;
+  using std::string;
 
   // transfer arguments to strings
   vector<string> args;
@@ -41,7 +42,7 @@ int main( int argc, char* argv[] )
   }
 
   // enter the main driver
-  fragment_generator_driver( args );
+  int res = fragment_generator_driver( args );
 
   return 0;
 

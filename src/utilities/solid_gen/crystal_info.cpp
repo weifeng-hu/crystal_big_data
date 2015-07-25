@@ -67,6 +67,9 @@ void molecular_crystal_info::read( string input )
    if( entry == "request_visual" ){
     this->visualization_ = true;
    }
+   if( entry == "center_index" ){
+    ifs >> this->center_index_;
+   }
   }
 
 } // end of crystal_info :: read()

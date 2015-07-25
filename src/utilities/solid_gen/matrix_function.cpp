@@ -196,9 +196,9 @@ IMatrixHeap compute_boolean_mat( vector<DMatrixHeap>* eigvals )
 //    }
 //    cout << " boolean_mat [ " << imatrix << ", " << jmatrix << " ] = " << retval(imatrix, jmatrix) << endl;;
     size_t current_count = imatrix * n_matrix + jmatrix;
-    if( (current_count+1) % count_interval == 0 ){
-     cout << (current_count*100/num_of_comp + 1 ) << "%\tcompleted" << endl;
-    }
+//    if( (current_count+1) % count_interval == 0 ){
+//     cout << (current_count*100/num_of_comp + 1 ) << "%\tcompleted" << endl;
+//    }
    }
   }
 //  boost::write_graphviz(cout, List );

@@ -104,30 +104,53 @@ public:
   bool unit_cell_is_set() { return unit_cell_is_set_; }
 
 public:
-  void generate_cell( size_t la, size_t lb, size_t lc ){
-   cout << "Generating lattice from unit cell ... " << endl;
-   cout << "  Times of duplication:" << endl;
-   cout << "  a direction: " << la << "\tb direction: " << lb << "\tc direction: " << lc << endl;
-   if( unit_cell_is_set_ == false ){
-    cout << "error: unit cell is not defined " << endl;
-    abort();
-   }
-   for( size_t i = 0; i < la; i++ ){
-    for( size_t j = 0; j < lb; j++ ){
-     for( size_t k = 0; k < lc; k++ ){
-      tuple< int, int, int > direction = make_tuple( i, j, k );
-      unit_cell copy = primitive.translational_duplicate( direction );
-      store.push_back( copy );
+  void generate_cell( size_t la, size_t lb, size_t lc )
+   {
+    cout << "Generating lattice from unit cell ... " << endl;
+    cout << "  Times of duplication:" << endl;
+    cout << "  a direction: " << la << "\tb direction: " << lb << "\tc direction: " << lc << endl;
+    if( unit_cell_is_set_ == false ){
+     cout << "error: unit cell is not defined " << endl;
+     abort();
+    }
+    for( size_t i = 0; i < la; i++ ){
+     for( size_t j = 0; j < lb; j++ ){
+      for( size_t k = 0; k < lc; k++ ){
+       tuple< int, int, int > direction = make_tuple( i, j, k );
+       unit_cell copy = primitive.translational_duplicate( direction );
+       store.push_back( copy );
+      }
      }
     }
    }
-  }
+
+  void generate_cell_from_center( size_t la, size_t lb, size_t lc )
+   {
+    cout << "Generating lattice from unit cell, spread from center ... " << endl;
+    cout << "  Times of duplication:" << endl;
+    cout << "  a+ direction: " << la << "\tb+ direction: " << lb << "\tc+ direction: " << lc << endl;
+    if( unit_cell_is_set_ == false ){
+     cout << "error: unit cell is not defined " << endl;
+     abort();
+    }
+    for( int i = -la; i <= la; i++ ){
+     for( int j = -lb; j <= lb; j++ ){
+      for( int k = -lc; k <= lc; k++ ){
+       if( i == 0 && j == 0 && k == 0 ) continue;
+       tuple< int, int, int > direction = make_tuple( i, j, k );
+       unit_cell copy = primitive.translational_duplicate( direction );
+       store.push_back( copy );
+      }
+     }
+    }
+   }
 
   void generate( tuple<int, int, int> nunits ){
    size_t a = get<0>( nunits );
    size_t b = get<1>( nunits );
    size_t c = get<2>( nunits );
    generate_cell( a, b, c );
+   //generate_cell_from_center( a, b, c );
   }
 
   void print_info(){

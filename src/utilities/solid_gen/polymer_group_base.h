@@ -154,9 +154,9 @@ private:
     // return the eigval vector for this polymer
     retval.push_back( edm_local.get_eigval() );
 
-    if( (ipolymer+1) % count_interval == 0 ){
-     cout << (ipolymer*100/n_polymer_local + 1) << "%\tcompleted " << endl;
-    }
+//    if( (ipolymer+1) % count_interval == 0 ){
+//     cout << (ipolymer*100/n_polymer_local + 1) << "%\tcompleted " << endl;
+//    }
 
    } // end of loop ipolymer
    return retval;

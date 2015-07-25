@@ -74,7 +74,9 @@ end:
   }
 
   bool within_mean_radius_by_center_of_mass( double radius ){
-   return ( this->compute_mean_distance_by_center_of_mass() <= radius ? true : false );
+//    const double dist = this->compute_mean_distance_by_center_of_mass();
+//    cout << " dist of center of mass "  << dist << "  radius " << radius << "  dist <= radius ? " << (dist <= radius) << endl;
+    return ( this->compute_mean_distance_by_center_of_mass() <= radius ? true : false );
   }
 
   bool within_mean_radius_by_center( double radius ){

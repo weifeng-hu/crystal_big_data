@@ -8,7 +8,7 @@ COBJS	= $(CSRCS:.cpp=.o)
 FSRCS	= mat_x_mat.f symdiag.f ax_b.f
 FOBJS	= $(FSRCS:.f=.o)
 HEAD	= blas_interface.h
-INCLUDE = -I./ -I/home/intel/composerxe/mkl/include
+INCLUDE = -I./ 
 AR	= lib_blas_interface.a
 
 $(AR):	$(COBJS) $(FOBJS)

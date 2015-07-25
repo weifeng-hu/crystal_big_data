@@ -1,17 +1,18 @@
 DEBUG := YES
 
-CXX	= mpic++ 
+CXX	= g++ 
 FC	= gfortran -g
 HEADS	= square_matrix.h general_matrix.h functions.h mo_coeff.h one_electron_integral.h\
 	  compressed_matrix.h
-CSRCS	= general_matrix.cpp square_matrix.cpp transform.cpp functions.cpp \
+CSRCS	= general_matrix.cpp square_matrix.cpp transform.cpp \
 	  compressed_matrix.cpp
 FSRCS	= OEI_TRANSFORM.f EIGTQL2.f TEI_TRANSFORM.f
 COBJS	= $(CSRCS:.cpp=.o)
 FOBJS	= $(FSRCS:.f=.o)
-INCLUDE	= -I../ -I./ -I/home/intel/composerxe/mkl/include
+INCLUDE	= -I../ -I./ 
 AR	= libmatrix.a
-LIBS	= -L/home/intel/composerxe/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core
+#LIBS	= -L/home/intel/composerxe/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core
+#LIBS	= -lapack -lblas
 
 ifeq ($(DEBUG), YES)
   CFLAG =	-g  -DUSE_DBG

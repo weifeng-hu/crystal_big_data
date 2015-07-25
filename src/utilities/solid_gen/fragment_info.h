@@ -168,12 +168,12 @@ public:
    for( size_t ilist = 0; ilist < list.size(); ilist++ ){
     vector<int> list_local = list.at(ilist);
 //    cout << "[ ";
-    cout << " set " << ilist << ": " << endl;
+    cout << " polymer " << ilist << ": " << endl;
     for( size_t imole = 0; imole < list_local.size(); imole++ ){
-     cout << list_local.at(imole) << ": " << endl;;
+     cout << list_local.at(imole) << ": ";
      {
       molecule mole_i = (this->bulk_ptr)->get_molecule( list_local.at(imole) );
-      cout << mole_i ;
+      cout << mole_i << endl;
       array<int, 3> mole_vec = mole_i.set_translation_vec();
       array<int, 3> relative_vec 
        = array<int, 3>{ mole_vec.at(0) - origin_vec.at(0), 
@@ -188,11 +188,23 @@ public:
       cout << " center of mass " << fixed << setw(4) << setprecision(2) << nvec.at(0) << "a + " << nvec.at(1) << "b + " << nvec.at(2) << "c " << endl;
 //      cout << mole_name << " < " << relative_vec.at(0) << "a + " << relative_vec.at(1) << "b + " << relative_vec.at(2) << "c >";
      }
-      
+     cout << endl; 
 //     cout << "    ";
     }
 //    cout << "]" << endl;
+    for( size_t imole = 0; imole < list_local.size(); imole++ ){
+     for( size_t jmole = imole + 1; jmole < list_local.size(); jmole++ ){
+      molecule mole_i = (this->bulk_ptr)->get_molecule( list_local.at(imole) );
+      molecule mole_j = (this->bulk_ptr)->get_molecule( list_local.at(jmole) );
+      const Coord center_of_mass_i = mole_i.get_center_of_mass();
+      const Coord center_of_mass_j = mole_j.get_center_of_mass();
+      double distance = compute_distance( center_of_mass_i, center_of_mass_j );
+      cout << " distance: " << list_local.at(imole) << " <-> " << list_local.at(jmole) << " : " << distance << endl;
+     } 
+    }
+    cout << endl;
    }
+
    cout << endl;
   }
 

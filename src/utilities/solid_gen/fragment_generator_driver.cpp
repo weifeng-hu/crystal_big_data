@@ -27,14 +27,20 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
 #include "utilities/solid_gen/lattice.h"
 #include "utilities/solid_gen/crystal_info.h"
 #include "utilities/solid_gen/interaction.h"
 
+using std::vector;
+using std::string;
+
 int fragment_generator_driver( vector<string> args )
 {
 
-  using namespace std;
+  using std::cout;
+  using std::endl;
+
   using namespace iquads::crystal;
 
   cout << endl;
@@ -75,6 +81,15 @@ int fragment_generator_driver( vector<string> args )
     // cut the lattice by a radius
     mole_bulk.cut( info.get_radius() );
     cout << "Found " << mole_bulk.get_nmolecule() << " molecules in the bulk AFTER cut: " << endl;
+    ofstream os("lattice.gjf", std::ios::out);
+    os << "#HF/3-21G" << endl;
+    os << endl;
+    os << "title card" << endl;
+    os << endl;
+    os << "0  1" << endl;
+    os << mole_bulk << endl;
+    os.close();
+//    exit(0);
    }
    // the interaction object gains a copy of the molecule bulk
    // the original molecule bulk object will be destructed

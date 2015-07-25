@@ -26,7 +26,8 @@
 #include <string>
 #include "utilities/solid_gen/unit_cell.h"
 
-using namespace std;
+using std::tuple;
+using std::string;
 
 namespace iquads {
 
@@ -51,7 +52,7 @@ private:
    this->tetramer_requested_ = false;
    this->visualization_ = false;
    this->n_fragment_type_ = 0;
-   this->sizes = make_tuple( 0, 0, 0);
+   this->sizes = make_tuple( 0, 0, 0 );
   }
 
 public:
@@ -84,6 +85,8 @@ public:
    { return this->n_fragment_type_; }
   size_t& get_n_fragment_type()
    { return this->n_fragment_type_; }
+  int get_center_index() const 
+   { return this->center_index_; }
   tuple< size_t, size_t, size_t > get_sizes() const 
    { return this->sizes; }
 
@@ -99,6 +102,7 @@ private:
   bool tetramer_requested_;
   bool visualization_;
   size_t n_fragment_type_;
+  int center_index_;
   tuple< size_t, size_t, size_t > sizes;
   array<double, 3> angles;
   array<double, 3> lengths;

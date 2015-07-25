@@ -1,9 +1,9 @@
-IQUADS_ROOT	= /home/wh288/iquads/
+IQUADS_ROOT	= /home/chronos/user/Development/iquads/
 IQUADS_SRC	= $(IQUADS_ROOT)/src/
 IQUADS_BIN	= $(IQUADS_ROOT)/bin/
 CXX	= g++
-COPT	= -O3 -g --std=c++11
-CFLAGS	= -I/home/wh288/Development/boost_1_53_0/ -I$(IQUADS_SRC)
+COPT	= -O0 -static --std=c++11
+CFLAGS	= -I/home/chronos/user/Development/boost_1_53_0/ -I$(IQUADS_SRC)
 CHEADS	= array_matrix_base.h\
 	  array_matrix.h\
 	  atom.h\
@@ -39,7 +39,7 @@ CSRCS	= crystal_info.cpp\
 	  fragment_generator_driver.cpp\
 	  main.cpp
 COBJS	= $(CSRCS:.cpp=.o)
-LIBS	= -lgfortran $(IQUADS_SRC)/blas/lib_blas_interface.a -L/home/intel/composerxe/mkl/lib/intel64/ -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lpthread
+LIBS	= $(IQUADS_SRC)/blas/lib_blas_interface.a /home/chronos/user/Development/lapack-3.5.0/liblapack.a /home/chronos/user/Development/BLAS/libblas.a /usr/local/gcc_arm_native/lib/libgfortran.a
 PGM	= solid_gen
 
 $(PGM):	$(COBJS)
