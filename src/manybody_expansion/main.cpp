@@ -38,8 +38,8 @@ int main( int argc, char* argv[] )
   cout << "ManyBody Expansion Lattice Energy Calculation" << endl;
   cout << endl;
 
-  using iquads :: manybody_expansion :: ManyBodyExpansionClient;
-  ManyBodyExpansionClient client;
+  using iquads :: manybody_expansion :: ManyBodyExpansion_Client;
+  ManyBodyExpansion_Client client;
   {
     using iquads :: CommandParser;
     CommandParser command_parser( argc, argv );

@@ -32,16 +32,16 @@
 
 namespace iquads {
 
-namespace manybody_expansion {
+namespace interface_to_third_party {
 
-namespace external_program {
+using std::string;
+typedef string external_program_name_type;
+typedef unsigned int external_program_bitmask_type;
 
-  using std::string;
-  typedef string external_program_name_type;
-  typedef unsigned int external_program_bitmask_type;
-
-  constexpr external_program_bitmask_type molpro = 0x01;
-  constexpr external_program_bitmask_type orca   = 0x02;
+constexpr external_program_bitmask_type iquads = 0x00;
+constexpr external_program_bitmask_type molpro = 0x01 << 0;
+constexpr external_program_bitmask_type orca   = 0x01 << 1;
+constexpr external_program_bitmask_type psi3   = 0x01 << 2;
 
 inline external_program_bitmask_type 
  retrieve_external_program_mask( external_program_name_type external_program_name )
@@ -55,6 +55,10 @@ inline external_program_bitmask_type
            external_program_name == "Orca" ) {
    return orca;
   }
+  else if( external_program_name == "psi3" ||
+           external_program_name == "Psi3" ){
+   return psi3;
+  }
   else{
    using std::cout;
    using std::endl;
@@ -65,9 +69,7 @@ inline external_program_bitmask_type
 
 }; // end of retrieve_external_program_mask()
 
-} // end of namespace external_program
-
-} // end of namespace manybody_expansion
+} // end of namespace interface_to_third_party
 
 } // end of namespace iquads
 

@@ -18,16 +18,24 @@ $(PGM):	$(COBJS)
 	$(CXX) -o $(PGM) $(CFLAGS) $(COPT) $(COBJS) $(LIBS)
 	cp $(PGM) $(IQUADS_BIN)
 
-main.o: ../iquads/command_parser.h ./manybody_expansion_client.h ./manybody_expansion_client.cpp
+main.o: ./../iquads/command_parser.h ./manybody_expansion_client.h ./manybody_expansion_client.cpp
 	$(CXX) -c $(CFLAGS) main.cpp
 
-manybody_expansion_config.o: ./external_program_bitmask.h ./electron_correlation_config.h ./manybody_expansion_config.h
+manybody_expansion_config.o: ./../interface_to_third_party/external_program_bitmask.h\
+		             ./../electron_correlation/electron_correlation_config.h\
+			     ./manybody_expansion_config.h
 	$(CXX) -c $(CFLAGS) manybody_expansion_config.cpp
 
-manybody_expansion_client.o: ../iquads/command_parser.h ./manybody_expansion_command_setting.h ./manybody_expansion_config.h ./manybody_expansion_report.h
+manybody_expansion_client.o: ./../iquads/command_parser.h\
+			     ./manybody_expansion_command_setting.h\
+			     ./manybody_expansion_config.h\
+			     ./manybody_expansion_report.h
 	$(CXX) -c $(CFLAGS) manybody_expansion_client.cpp
 
-manybody_expansion_agent.o: ./manybody_expansion_agent.h ./manybody_expansion_order_bitmask.h
+manybody_expansion_agent.o: ./../interface_to_third_party/external_program_agent_base.h\
+			    ./../interface_to_third_party/external_program_agent.h\
+			    ./manybody_expansion_agent.h\
+			    ./manybody_expansion_order_bitmask.h
 	$(CXX) -c $(CFLAGS) manybody_expansion_agent.cpp
 
 clean:

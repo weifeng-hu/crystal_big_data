@@ -28,14 +28,17 @@
 #define MANYBODY_EXPANSION_TEMPLATE_H
 
 #include <memory>
+#include <interface_to_third_party/external_program_agent_base.h>
+#include <interface_to_third_party/external_program_agent_factory.h>
 #include <manybody_expansion/lattice.h>
 #include <manybody_expansion/expansion_formula_periodic_traits.h>
-#include <manybody_expansion/external_program_agent_base.h>
-#include <manybody_expansion/external_program_agent_factory.h>
 
 namespace iquads {
 
 namespace manybody_expansion {
+
+using interface_to_third_party :: ExternalProgramAgent_Factory;
+using interface_to_third_party :: ExternalProgramAgent_Base;
 
 template < size_t Order >
 class ManyBodyExpansionGeneral 
@@ -58,7 +61,7 @@ public:
   typedef ExpansionFormulaPeriodic< Order > expansion_formula_type;
   typedef ExternalProgramAgent_Factory external_program_factory_type;
   typedef ExternalProgramAgent_Base agent_base_type;
-  typedef ManyBodyExpansionConfig config_type;
+  typedef ManyBodyExpansion_Config config_type;
   typedef shared_ptr<config_type> config_shared_pointer_type;
   typedef agent_base_type* agent_pointer_type;
   typedef double energy_data_type;

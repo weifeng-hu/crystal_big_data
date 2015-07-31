@@ -35,7 +35,7 @@ namespace iquads {
 
 namespace manybody_expansion {
 
-struct ManyBodyExpansionReport {
+struct ManyBodyExpansion_Report {
 public:
   typedef double energy_data_type;
   typedef vector< energy_data_type > energy_data_list_type;
@@ -75,7 +75,7 @@ private:
 
   order_type total_order_;
 
-}; // end of namespace ManyBodyExpansionReport
+}; // end of namespace ManyBodyExpansion_Report
 
 } // end of namespace manybody_expansion
 

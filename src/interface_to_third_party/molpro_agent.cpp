@@ -26,11 +26,11 @@
 
 #include <string>
 #include <fstream>
-#include <manybody_expansion/external_program_agent.h>
+#include <interface_to_third_party/external_program_agent.h>
 
 namespace iquads {
 
-namespace manybody_expansion {
+namespace interface_to_third_party {
 
 MolproAgent :: write_input()
 {
@@ -79,6 +79,6 @@ MolproAgent :: collect_result()
 
 }; // end of collect_result()
 
-} // end of namespace manybody_expansion
+} // end of namespace interface_to_third_party
 
 } // end of namespace iquads

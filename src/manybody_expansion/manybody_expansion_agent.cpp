@@ -33,7 +33,7 @@ namespace iquads {
 
 namespace manybody_expansion {
 
-int ManyBodyExpansionAgent :: execute_periodic()
+int ManyBodyExpansion_Agent :: execute_periodic()
 {
 
   using std::cout;
@@ -75,7 +75,7 @@ int ManyBodyExpansionAgent :: execute_periodic()
 
 }; // end of function execute_periodic()
 
-int ManyBodyExpansionAgent :: execute_general()
+int ManyBodyExpansion_Agent :: execute_general()
 {
 
   using std::cout;
@@ -87,7 +87,7 @@ int ManyBodyExpansionAgent :: execute_general()
 
 }; // end of function execute_general()
 
-int ManyBodyExpansionAgent :: execute()
+int ManyBodyExpansion_Agent :: execute()
 {
 
   using std::cout;

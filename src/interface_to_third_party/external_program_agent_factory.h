@@ -21,29 +21,46 @@
  *
  * @section DESCRIPTION
  *
- *
+  *
  */
 
-#ifndef ELECTRON_CORRELATION_METHOD_BITMASK_H
-#define ELECTRON_CORRELATION_METHOD_BITMASK_H
+#ifndef EXTERNAL_PROGRAM_AGENT_FACTORY_H
+#define EXTERNAL_PROGRAM_AGENT_FACTORY_H
+
+#include <stdlib.h>
+#include <interface_to_third_party/external_program_bitmask.h>
+#include <interface_to_third_party/external_program_agent.h>
 
 namespace iquads {
 
-namespace manybody_expansion {
+namespace interface_to_third_party {
 
-namespace electron_correlation {
-
+class ExternalProgramAgent_Factory
+{
+public:
+  typedef ExternalProgramAgent_Factory this_type;
+  typedef ExternalProgramAgent_Base base_agent_type;
   typedef unsigned int bitmask_type;
+  typedef base_agent_type* base_agent_ptr;
 
-  constexpr bitmask_type RHF   = 0x01;
-  constexpr bitmask_type MP2   = 0x02;
-  constexpr bitmask_type CCSD  = 0x03;
-  constexpr bitmask_type CCSDT = 0x04;
-  constexpr bitmask_type DMRG  = 0x05;
+public:
+  base_agent_ptr get_agent( bitmask_type agent_mask )
+   {
+     switch( agent_mask ){
+      case( molpro ):
+       return new MolproAgent;
+       break;
+      case( orca ):
+       return new OrcaAgent;
+       break;
+      default:
+       exit(1);
+     }
+   } // end of get_agent()
 
-} // end of namespace electron_correlation
+}; // end of class ExternalProgramAgent_Factory
 
-} // end of namespace manybody_expansion
+} // end of namespace interface_to_third_party
 
 } // end of namespace iquads
 

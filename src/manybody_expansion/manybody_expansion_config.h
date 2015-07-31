@@ -29,7 +29,7 @@
 
 #include <string>
 #include <memory>
-#include <manybody_expansion/electron_correlation_config.h>
+#include <electron_correlation/electron_correlation_config.h>
 
 using std::string;
 using std::shared_ptr;
@@ -40,10 +40,10 @@ namespace manybody_expansion {
 
 using electron_correlation :: ElectronCorrelation_Config;
 
-class ManyBodyExpansionConfig
+class ManyBodyExpansion_Config
 {
 public:
-  typedef ManyBodyExpansionConfig this_type;
+  typedef ManyBodyExpansion_Config this_type;
   typedef ElectronCorrelation_Config electron_correlation_config_type;
   typedef electron_correlation_config_type& electron_correlation_config_reference;
   typedef shared_ptr<electron_correlation_config_type> electron_correlation_config_share_ptr;

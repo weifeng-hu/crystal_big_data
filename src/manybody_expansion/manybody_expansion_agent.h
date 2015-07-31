@@ -36,10 +36,10 @@ namespace iquads {
 
 namespace manybody_expansion {
 
-class ManyBodyExpansionAgent
+class ManyBodyExpansion_Agent
 {
 public:
-  typedef ManyBodyExpansionConfig config_type;
+  typedef ManyBodyExpansion_Config config_type;
   typedef shared_ptr<config_type> config_shared_pointer_type;
   typedef unsigned int order_type;
 
@@ -58,7 +58,7 @@ private:
   config_shared_pointer_type config_shared_pointer_;
   order_type order_;
 
-}; // end of class ManyBodyExpansionAgent
+}; // end of class ManyBodyExpansion_Agent
 
 } // end of namespace manybody_expansion
 

@@ -33,7 +33,7 @@ namespace iquads {
 
 namespace manybody_expansion {
 
-typedef ManyBodyExpansionClient client_type;
+typedef ManyBodyExpansion_Client client_type;
 
 client_type :: report_type 
 client_type :: driver( client_type :: command_container_type command_container )
@@ -52,7 +52,7 @@ client_type :: driver( client_type :: command_container_type command_container )
    shared_ptr< client_type :: config_type > config_ptr = make_shared< client_type :: config_type >( config );
    shared_ptr< client_type :: report_type > report_ptr = make_shared< client_type :: report_type >( report );
    {
-    ManyBodyExpansionAgent agent;
+    ManyBodyExpansion_Agent agent;
 //    agent.set_runtime_environment( config_ptr );
 //    agent.execute( report_ptr );
    }
@@ -76,7 +76,7 @@ void client_type :: driver()
     = make_shared< client_type :: config_type > ( this->config_ );
    shared_ptr< client_type :: report_type > report_ptr 
     = make_shared< client_type :: report_type >( this->report_ );
-   ManyBodyExpansionAgent agent;
+   ManyBodyExpansion_Agent agent;
 //   agent.set_runtime_environment( config_ptr );
 //   agent.execute( report_ptr );
   }
@@ -94,7 +94,7 @@ client_type :: command_setting_type
 
   if ( command_container.size() == 1 ){
     cout << "error: no command option input" << endl;
-    client_type :: helper();
+    client_type :: show_help();
     exit(1);
   }
 

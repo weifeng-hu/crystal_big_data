@@ -29,7 +29,7 @@
 
 #include <memory>
 #include <manybody_expansion/lattice.h>
-#include <manybody_expansion/external_program_agent_base.h>
+#include <interface_to_third_party/external_program_agent_base.h>
 
 namespace iquads {
 
@@ -37,7 +37,7 @@ namespace manybody_expansion {
 
 typedef Lattice lattice_type;
 typedef shared_ptr< lattice_type > lattice_shared_pointer_type;
-typedef ExternalProgramAgent_Base agent_base_type;
+typedef interface_to_third_party :: ExternalProgramAgent_Base agent_base_type;
 typedef agent_base_type* agent_pointer_type;
 
 template < size_t Order > 

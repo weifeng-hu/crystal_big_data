@@ -29,33 +29,35 @@
 
 #include <string>
 #include <memory>
-#include <manybody_expansion/electron_correlation_config.h>
-#include <manybody_expansion/electron_correlation_report.h>
+#include <electron_correlation/electron_correlation_config.h>
+#include <electron_correlation/electron_correlation_report.h>
 
 using std::string;
 using std::shared_ptr;
 
 namespace iquads {
 
-namespace manybody_expansion {
+using electron_correlation::ElectronCorrelation_Config;
+using electron_correlation::ElectronCorrelation_Report;
+
+namespace interface_to_third_party {
 
 class ExternalProgramAgent_Base
 {
 public:
-  typedef electron_correlation::ElectronCorrelation_Config config_type;
-  typedef electron_correlation::ElectronCorrelation_Report report_type;
   typedef string program_name_type;
   typedef string program_path_type;
   typedef string working_path_type;
   typedef string file_name_type;
   typedef string command_line_type;
   typedef double energy_data_type;
+  typedef bool condition_type;
 
 public:
   virtual void run_calculation() = 0;
-  virtual void write_input() = 0;
-  virtual void write_script() = 0;
-  virtual void collect_result() = 0;
+  virtual file_name_type write_input() = 0;
+  virtual file_name_type write_script() = 0;
+  virtual file_name_type collect_result() = 0;
 
 public:
   void set_essential_data()
@@ -67,17 +69,12 @@ public:
   virtual void sequence_collect_result_only() = 0;
 
 protected:
-  shared_ptr< config_type > config_ptr_;
-  shared_ptr< report_type > report_ptr_;
-  program_name_type program_name_;
   program_path_type program_path_;
-  working_path_type scratch_;
-  file_name_type input_name_;
-  file_name_type output_name_;
+  program_name_type program_name_;
 
 }; // end of class ExternalProgramAgent_Base
 
-} // end of namespace manybody_expansion
+} // end of namespace interface_to_third_party
 
 } // end of namespace iquads
 

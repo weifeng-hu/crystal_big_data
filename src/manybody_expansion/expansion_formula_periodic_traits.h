@@ -30,11 +30,13 @@
 #include <memory>
 #include <manybody_expansion/lattice.h>
 #include <manybody_expansion/compute_expansion_term_periodic_traits.h>
-#include <manybody_expansion/external_program_agent_base.h>
+#include <interface_to_third_party/external_program_agent_base.h>
 
 namespace iquads {
 
 namespace manybody_expansion {
+
+using interface_to_third_party :: ExternalProgramAgent_Base;
 
 template < size_t Order >
 class ExpansionFormulaPeriodic

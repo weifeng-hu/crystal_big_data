@@ -39,22 +39,22 @@ namespace iquads {
 
 namespace manybody_expansion {
 
-class ManyBodyExpansionClient
+class ManyBodyExpansion_Client
 {
 public:
-  typedef ManyBodyExpansionClient this_type;
+  typedef ManyBodyExpansion_Client this_type;
   typedef typename CommandParser::container_type command_container_type;
   typedef typename CommandParser::argument_type command_argument_type;
-  typedef ManyBodyExpansionCommandSetting command_setting_type;
-  typedef ManyBodyExpansionConfig config_type;
-  typedef ManyBodyExpansionReport report_type;
+  typedef ManyBodyExpansion_CommandSetting command_setting_type;
+  typedef ManyBodyExpansion_Config config_type;
+  typedef ManyBodyExpansion_Report report_type;
   typedef string filename_type;
   typedef string classname_type;
   typedef string function_name_type;
 
 public:
-  ManyBodyExpansionClient(){};
-  ManyBodyExpansionClient( command_container_type command_container )
+  ManyBodyExpansion_Client(){};
+  ManyBodyExpansion_Client( command_container_type command_container )
    {
      this->command_container_ = command_container;
    }
@@ -77,7 +77,7 @@ private:
 
   const string this_class_name = "ManyBodyExpansionClient";
 
-}; // end of class ManyBodyExpansionClient
+}; // end of class ManyBodyExpansion_Client
 
 } // end of namespace manybody_expansion
 
