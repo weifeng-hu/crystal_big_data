@@ -21,20 +21,55 @@
  *
  * @section DESCRIPTION
  *
- *
  */
-
-#ifndef PSI3_CONFIG_H
-#define PSI3_CONFIG_H
 
 namespace iquads { 
 
-namespace interface_to_third_party {
+namespace interface_to_third_party { 
 
-void psi3( ithaca::cmd_options cmd_opt );
+class Block_Config
+{
+public:
+ struct schedule{
+   int iter_index;
+   int M;
+   double david_tol;
+   double noice;
+ }; // end of structure schedule
+
+public:
+  Input( ithaca::interfaces::qcdmrg::cmd_options cmd_opt ) : ithaca::dmrg::Input( cmd_opt ) 
+  ~Input();
+
+
+// Essential parameters for QCDMRG Input files
+public:
+  bool defaulthf;
+  bool bigdavid;
+  bool docd;
+  bool onepdm;
+  bool twopdm;
+
+  int norb;
+  int na,nb;
+  int num_schedule;
+  int nroot;
+  int maxiter
+  int twodot_to_onedot;
+
+  float* weights;
+  double* sweep_tol;
+
+  std::string file_one_int;
+  std::string file_two_int;
+
+  schedule* iter;
+
+public:
+  int write_config();
+
+}; // end of class Block_Config
 
 } // end of namespace interface_to_third_party
 
 } // end of namespace iquads
-
-#endif
