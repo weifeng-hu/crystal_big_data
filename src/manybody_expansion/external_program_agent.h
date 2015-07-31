@@ -25,11 +25,11 @@
  */
 
 
-#ifndef MOLPRO_AGENT_H
-#define MOLPRO_AGENT_H
+#ifndef EXTERNAL_PROGRAM_AGENT_H
+#define EXTERNAL_PROGRAM_AGENT_H
 
-#include <external_program_agent_base.h>
 #include <stdlib.h>
+#include <external_program_agent_base.h>
 
 namespace iquads {
 
@@ -51,8 +51,9 @@ public:
      command_line_type command_line = this->program_path_ + this->input_name_;
      int res = system( command_line.c_str() );
    }
-  void write_input();
-  void collect_result();
+  void write_input(){};
+  void write_script(){};
+  void collect_result(){};
   void sequence_full()
    {
      this->write_input();
@@ -71,10 +72,25 @@ public:
 
 }; // end of class MolproAgent
 
+
 class OrcaAgent 
  : public ExternalProgramAgent_Base
 {
+public:
+  OrcaAgent()
+   {
+     this->program_name_ = "orca";
+     this->program_path_ = "";
+   }
 
+public:
+  void run_calculation(){}
+  void write_input(){}
+  void write_script(){}
+  void collect_result(){}
+  void sequence_full(){}
+  void sequence_export_input_only(){}
+  void sequence_collect_result_only(){}
 
 }; // end of class OrcaAgent
 

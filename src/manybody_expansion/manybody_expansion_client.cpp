@@ -59,7 +59,7 @@ client_type :: driver( client_type :: command_container_type command_container )
   }
   return report;
 
-};
+}; // end of static function driver()
 
 void client_type :: driver()
 {
@@ -76,14 +76,14 @@ void client_type :: driver()
     = make_shared< client_type :: config_type > ( this->config_ );
    shared_ptr< client_type :: report_type > report_ptr 
     = make_shared< client_type :: report_type >( this->report_ );
-//   ManyBodyExpansionAgent agent;
+   ManyBodyExpansionAgent agent;
 //   agent.set_runtime_environment( config_ptr );
 //   agent.execute( report_ptr );
   }
 
 //  this->report_.print( this->config_.print_level() );
 
-};
+}; // end of function driver()
 
 client_type :: command_setting_type 
  client_type :: analyse_command( command_container_type command_container )
@@ -108,9 +108,9 @@ client_type :: command_setting_type
 
   return command_settings;
 
-};
+}; // end of function analyse_command()
 
-void client_type :: helper()
+void client_type :: show_help()
 {
 
   using std::cout;
@@ -121,7 +121,7 @@ void client_type :: helper()
   cout << endl;
   cout << " Options:" << endl;
 
-}
+} // end of function show_help()
 
 } // end of namespace manybody_expansion
 

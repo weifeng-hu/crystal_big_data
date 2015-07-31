@@ -8,7 +8,7 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -24,34 +24,19 @@
  *
  */
 
+#ifndef LATTICE_H
+#define LATTICE_H
+
 namespace iquads {
 
 namespace manybody_expansion {
 
-template < size_t Order >
-class ExpansionFormula
-{
+class Lattice {
 
 };
 
-template <>
-class ExpansionFormula<1>
-{
-  compute()
-  {
-   return compute_expansion_term<1>();
-  };
-}
-
-template <>
-class ExpansionFormula<2>
-{
-  compute()
-   {
-     return compute_expansion_term<1> + compute_expasion_term<2>;
-   }
-}
-
-} // end of manybody_expansion
+} // end of namespace manybody_expansion
 
 } // end of namespace iquads
+
+#endif

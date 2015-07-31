@@ -26,6 +26,7 @@
 
 #include <string>
 #include <fstream>
+#include <manybody_expansion/external_program_bitmask.h>
 #include <manybody_expansion/manybody_expansion_config.h>
 
 using std::string;
@@ -36,7 +37,7 @@ namespace manybody_expansion {
 
 typedef ManyBodyExpansionConfig config_type;
 
-void config_type :: read_config( config_type :: filename_type input_filename )
+void config_type :: read_config( config_type :: file_name_type input_filename )
 {
 
   using std::ifstream;
@@ -72,6 +73,12 @@ void config_type :: read_config( config_type :: filename_type input_filename )
    }
    else if( entry == "dryrun" ){
     this->to_set_up_only_ = true;
+   }
+   else if( entry == "external_program" ){
+    ifs >> this->external_program_name_;
+    using external_program :: retrieve_external_program_mask;
+    this->external_program_mask_ 
+      = retrieve_external_program_mask( this->external_program_name_ );
    }
   }
   ifs.close();

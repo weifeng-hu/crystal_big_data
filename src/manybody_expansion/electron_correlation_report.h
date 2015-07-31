@@ -33,7 +33,7 @@ namespace manybody_expansion {
 
 namespace electron_correlation {
 
-class ElectronCorrelationReport
+class ElectronCorrelation_Report
 {
 public:
   typedef double energy_data_type;

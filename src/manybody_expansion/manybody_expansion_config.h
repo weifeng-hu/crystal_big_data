@@ -28,9 +28,11 @@
 #define MANYBODY_EXPANSION_CONFIG_H
 
 #include <string>
+#include <memory>
 #include <manybody_expansion/electron_correlation_config.h>
 
 using std::string;
+using std::shared_ptr;
 
 namespace iquads {
 
@@ -41,17 +43,26 @@ using electron_correlation :: ElectronCorrelation_Config;
 class ManyBodyExpansionConfig
 {
 public:
-  typedef string filename_type;
+  typedef ManyBodyExpansionConfig this_type;
+  typedef ElectronCorrelation_Config electron_correlation_config_type;
+  typedef electron_correlation_config_type& electron_correlation_config_reference;
+  typedef shared_ptr<electron_correlation_config_type> electron_correlation_config_share_ptr;
+  typedef string file_name_type;
+  typedef file_name_type& file_name_reference;
+  typedef string program_name_type;
+  typedef program_name_type& program_name_reference;
   typedef bool condition_type;
   typedef condition_type& condition_reference;
   typedef unsigned int bitmask_type;
   typedef bitmask_type& bitmask_reference;
-  typedef ElectronCorrelation_Config electron_correlation_config_type;
-  typedef electron_correlation_config_type& electron_correlation_config_reference;
+
+public:
+  void get_run_env()
+   { /* To be defined */ }
 
 public:
   // read config file, define in .cpp
-  void read_config( filename_type filename );
+  void read_config( file_name_type file_name );
 
 public:
   const bitmask_type total_order_mask() const 
@@ -65,6 +76,8 @@ public:
    { return this->to_set_up_only_; }
   condition_reference set_to_set_up_only()
    { return this->to_set_up_only_; }
+  const bitmask_type external_program_mask() const
+   { return this->external_program_mask_; }
 
 private:
   electron_correlation_config_type electron_correlation_config_;
@@ -78,6 +91,8 @@ private:
 
   condition_type is_periodic_;
   condition_type to_set_up_only_;
+  program_name_type external_program_name_;
+  bitmask_type external_program_mask_;
 
 }; // end of class ManyBodyExpansionConfig
 

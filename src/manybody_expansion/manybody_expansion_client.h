@@ -63,17 +63,17 @@ public:
 public:
   static report_type driver( command_container_type command_container );
   static command_setting_type analyse_command( command_container_type command_container );
-  static void helper();
+  static void show_help();
 
   // non-static functions
 public:
   void driver();
 
 private:
-  command_setting_type command_setting_;
-  command_container_type command_container_;
   config_type config_;
   report_type report_;
+  command_setting_type command_setting_;
+  command_container_type command_container_;
 
   const string this_class_name = "ManyBodyExpansionClient";
 

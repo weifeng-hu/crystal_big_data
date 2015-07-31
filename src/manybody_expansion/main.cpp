@@ -41,11 +41,11 @@ int main( int argc, char* argv[] )
   using iquads :: manybody_expansion :: ManyBodyExpansionClient;
   ManyBodyExpansionClient client;
   {
-   using iquads :: CommandParser;
-   CommandParser command_parser( argc, argv );
-   client.driver( command_parser.command_string() );
+    using iquads :: CommandParser;
+    CommandParser command_parser( argc, argv );
+    client.driver( command_parser.command_string() );
   }
 
   return 0;
 
-}
+} // end of main()

@@ -25,8 +25,8 @@
  */
 
 #include <string>
-#include <molpro_agent.h>
 #include <fstream>
+#include <manybody_expansion/external_program_agent.h>
 
 namespace iquads {
 
@@ -55,7 +55,6 @@ MolproAgent :: write_input()
 
 Molpro :: write_script()
 {
-
 
 }; // end of write_script()
 

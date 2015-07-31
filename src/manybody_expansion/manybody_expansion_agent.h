@@ -28,6 +28,9 @@
 #define MANYBODY_EXPANSION_AGENT_H
 
 #include <memory>
+#include <manybody_expansion/manybody_expansion_config.h>
+
+using std::shared_ptr;
 
 namespace iquads {
 
@@ -36,12 +39,23 @@ namespace manybody_expansion {
 class ManyBodyExpansionAgent
 {
 public:
+  typedef ManyBodyExpansionConfig config_type;
+  typedef shared_ptr<config_type> config_shared_pointer_type;
   typedef unsigned int order_type;
 
 public:
-  void execute();
+  int execute();
 
 private:
+  int execute_general();
+  int execute_periodic();
+
+public:
+  const config_shared_pointer_type config_shared_pointer() const
+   { return this->config_shared_pointer_; }
+
+private:
+  config_shared_pointer_type config_shared_pointer_;
   order_type order_;
 
 }; // end of class ManyBodyExpansionAgent

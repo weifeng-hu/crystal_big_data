@@ -64,7 +64,7 @@ public:
   void enable_ccsd()
    {
      this->hf_requested_ = true;
-     this->ccsd_requsted_ = true;
+     this->ccsd_requested_ = true;
    }
   void enable_ccsdt()
    {

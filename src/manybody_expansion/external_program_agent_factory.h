@@ -21,14 +21,15 @@
  *
  * @section DESCRIPTION
  *
- *
+  *
  */
 
 #ifndef EXTERNAL_PROGRAM_AGENT_FACTORY_H
 #define EXTERNAL_PROGRAM_AGENT_FACTORY_H
 
 #include <stdlib.h>
-#include <external_program_agent.h>
+#include <manybody_expansion/external_program_bitmask.h>
+#include <manybody_expansion/external_program_agent.h>
 
 namespace iquads {
 
@@ -38,25 +39,23 @@ class ExternalProgramAgent_Factory
 {
 public:
   typedef unsigned int bitmask_type;
+  typedef ExternalProgramAgent_Base base_agent_type;
+  typedef base_agent_type* base_agent_pointer_type;
 
 public:
-  ExternalProgramAgent_Base* get_agent( bitmask_type agent_mask )
+  base_agent_pointer_type get_agent( bitmask_type agent_mask )
    {
      switch( agent_mask ){
-      case( molpro ):
+      case( external_program::molpro ):
        return new MolproAgent;
        break;
-      case( orca );
+      case( external_program::orca ):
        return new OrcaAgent;
        break;
       default:
-       abort();
+       exit(1);
      }
-   }
-
-private:
-  constexpr bitmask_type molpro = 0x01;
-  constexpr bitmaks_type orca   = 0x02;
+   } // end of get_agent()
 
 }; // end of class ExternalProgramAgent_Factory
 

@@ -24,8 +24,11 @@
  *
  */
 
-#ifndef EXTERNAL_PROGRAM_AGENT_BITMASK_H
-#define EXTERNAL_PROGRAM_AGENT_BITMASK_H
+#ifndef EXTERNAL_PROGRAM_BITMASK_H
+#define EXTERNAL_PROGRAM_BITMASK_H
+
+#include <string>
+#include <iostream>
 
 namespace iquads {
 
@@ -33,10 +36,34 @@ namespace manybody_expansion {
 
 namespace external_program {
 
-  typedef unsigned int bitmask_type;
+  using std::string;
+  typedef string external_program_name_type;
+  typedef unsigned int external_program_bitmask_type;
 
-  constexpr bitmask_type molpro = 0x01;
-  constexpr bitmaks_type orca   = 0x02;
+  constexpr external_program_bitmask_type molpro = 0x01;
+  constexpr external_program_bitmask_type orca   = 0x02;
+
+inline external_program_bitmask_type 
+ retrieve_external_program_mask( external_program_name_type external_program_name )
+{
+
+  if( external_program_name == "molpro" || 
+      external_program_name == "Molpro" ) {
+   return molpro;
+  }
+  else if( external_program_name == "orca" || 
+           external_program_name == "Orca" ) {
+   return orca;
+  }
+  else{
+   using std::cout;
+   using std::endl;
+   cout << "retrieve_external_program_mask():" << endl;
+   cout << "Unknown program name: " << external_program_name << endl;
+   exit(1);
+  }
+
+}; // end of retrieve_external_program_mask()
 
 } // end of namespace external_program
 

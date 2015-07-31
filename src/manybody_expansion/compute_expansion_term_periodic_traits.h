@@ -24,47 +24,64 @@
  *
  */
 
+#ifndef COMPUTE_EXPANSION_TERM_PERIODIC_TRAITS
+#define COMPUTE_EXPANSION_TERM_PERIODIC_TRAITS
+
+#include <memory>
+#include <manybody_expansion/lattice.h>
+#include <manybody_expansion/external_program_agent_base.h>
+
 namespace iquads {
 
 namespace manybody_expansion {
 
+typedef Lattice lattice_type;
+typedef shared_ptr< lattice_type > lattice_shared_pointer_type;
+typedef ExternalProgramAgent_Base agent_base_type;
+typedef agent_base_type* agent_pointer_type;
+
 template < size_t Order > 
-inline double compute_expansion_term()
+inline double compute_expansion_term_periodic( lattice_shared_pointer_type lattice_shared_pointer, agent_pointer_type agent_type )
 {
   return 0.0e0;
 };
 
 template <>
-inline double compute_expansion_term<1>()
+inline double compute_expansion_term_periodic<1>( lattice_shared_pointer_type lattice_shared_pointer, agent_pointer_type agent_type )
 {
   double retval = 0.0e0;
+/*
   for( size_t i = 0; i < n_in_cell_zero; i++ ){
 //  a_monomer = ?;
    retval += compute_interaction_energy<1>( a_monomer );
   }
+*/
 };
 
 template <>
-inline double compute_expansion_term<2>()
+inline double compute_expansion_term_periodic<2>( lattice_shared_pointer_type lattice_shared_pointer, agent_pointer_type agent_type )
 {
 
 // a mess!
   double retval = 0.0e0;
+/*
   for( size_t R = 0; R < n_cell; i++ ){
    for( size_t i_0 = 0; i_0 < n_per_cell; i_0++ ){
 //    a_dimer = ?;
     retval += compute_interaction_energy<2>( a_dimer );
    }
   }
+*/
   return 1.0e0/2.0e0 * retval;
 };
 
 template <>
-inline double compute_expansion_term<3>()
+inline double compute_expansion_term_periodic<3>( lattice_shared_pointer_type lattice_shared_pointer, agent_pointer_type agent_type )
 { 
 
 // a mess!
   double retval = 0.0e0;
+/*
   for( size_t i_0 = 0; i_0 < n_per_cell; i_0++ ){
    for( size_t R_j = 0; R_j < n_cell; R_j++ ){
     for( size_t R_k = 0; R_k < n_cell; R_k++ ){
@@ -77,9 +94,12 @@ inline double compute_expansion_term<3>()
     }
    }
   }
+*/
   return 1.0e0/6.0e0 * retval;
 }
 
 } // end of manybody_expansion
 
 } // end of namespace iquads
+
+#endif

@@ -26,25 +26,27 @@
 
 #include <iostream>
 #include <manybody_expansion/manybody_expansion_agent.h>
-//#include <manybody_expansion/manybody_expansion_template.h>
+#include <manybody_expansion/manybody_expansion_template.h>
 #include <manybody_expansion/manybody_expansion_order_bitmask.h>
 
 namespace iquads {
 
 namespace manybody_expansion {
 
-void ManyBodyExpansionAgent :: execute()
+int ManyBodyExpansionAgent :: execute_periodic()
 {
 
   using std::cout;
   using std::endl;
   using order_bitmask :: bitmask_type;
 
+  cout << " Compute lattice energy using the periodic MBE formula" << endl;
+
   try {
-   switch ( this->order_ ){
+   switch ( this->order_ ) {
     case ( order_bitmask :: FIRST_ORDER ):
-//     ManyBodyExpansionPeriodic<1> manybody_expansion_periodic;
-//     manybody_expansion_periodic.compute_lattice_energy_per_unit_cell();
+     ManyBodyExpansionPeriodic<1> manybody_expansion_periodic;
+//     manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( this->config_shared_pointer(), this->lattice_shared_pointer() );
      break;
     case ( order_bitmask :: SECOND_ORDER ):
 //     ManyBodyExpansionPeriodic<2> manybody_expansion_periodic;
@@ -60,15 +62,47 @@ void ManyBodyExpansionAgent :: execute()
      break;
     default:
      throw( this->order_ );
-     cout << " ManyBody Expansion terms higher than 4th order are not implemented! " << endl;
-     abort();
      break;
    }
   }
   catch ( bitmask_type order ) {
-    cout << " ManyBody Expansion terms of " << this->order_ << " order are not implemented! " << endl;
-    abort();
+    cout << " execute_periodic():" << endl;
+    cout << "  ManyBody Expansion terms of " << this->order_ << " order are not implemented! " << endl;
+    exit(1);
   }
+
+  return 0;
+
+}; // end of function execute_periodic()
+
+int ManyBodyExpansionAgent :: execute_general()
+{
+
+  using std::cout;
+  using std::endl;
+
+  cout << " Compute lattice energy using the general MBE formula " << endl;
+
+  return 0;
+
+}; // end of function execute_general()
+
+int ManyBodyExpansionAgent :: execute()
+{
+
+  using std::cout;
+  using std::endl;
+
+  if( config_shared_pointer() -> is_periodic() == true ){
+    cout << " PERIODIC flag detected; " << endl;
+    this->execute_periodic();
+  }
+  else{
+    cout << " no PERIODIC flag detected; " << endl;
+    this->execute_general();
+  }
+
+  return 0;
 
 };
 

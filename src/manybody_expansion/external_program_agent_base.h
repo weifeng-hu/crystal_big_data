@@ -29,8 +29,8 @@
 
 #include <string>
 #include <memory>
-#include <electron_correlation_config.h>
-#include <electron_correlation_report.h>
+#include <manybody_expansion/electron_correlation_config.h>
+#include <manybody_expansion/electron_correlation_report.h>
 
 using std::string;
 using std::shared_ptr;
@@ -42,10 +42,10 @@ namespace manybody_expansion {
 class ExternalProgramAgent_Base
 {
 public:
-  typedef ElectronCorrelation_Config config_type;
-  typedef ElectronCorrelation_Report report_type;
-  typedef string program_name_identifier_type;
-  typedef string program_path_identifier_type;
+  typedef electron_correlation::ElectronCorrelation_Config config_type;
+  typedef electron_correlation::ElectronCorrelation_Report report_type;
+  typedef string program_name_type;
+  typedef string program_path_type;
   typedef string working_path_type;
   typedef string file_name_type;
   typedef string command_line_type;
@@ -58,15 +58,19 @@ public:
   virtual void collect_result() = 0;
 
 public:
+  void set_essential_data()
+   { /* To be define */ }
+
+public:
   virtual void sequence_full() = 0;
   virtual void sequence_export_input_only() = 0;
   virtual void sequence_collect_result_only() = 0;
 
-private:
+protected:
   shared_ptr< config_type > config_ptr_;
   shared_ptr< report_type > report_ptr_;
-  program_name_identifier_type program_name_;
-  program_path_identifier_type program_path_;
+  program_name_type program_name_;
+  program_path_type program_path_;
   working_path_type scratch_;
   file_name_type input_name_;
   file_name_type output_name_;
