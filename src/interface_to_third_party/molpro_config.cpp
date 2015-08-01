@@ -1,7 +1,7 @@
-#include "../../ithaca/cmd_options.h"
-#include "./cmd_options.h"
 
-namespace ithaca { namespace interface { namespace qcdmrg {
+namespace iquads { 
+
+namespace interface { namespace qcdmrg {
 
 int write_config()
 {

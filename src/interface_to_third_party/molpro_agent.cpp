@@ -32,7 +32,7 @@ namespace iquads {
 
 namespace interface_to_third_party {
 
-MolproAgent :: write_input()
+string MolproAgent :: write_input()
 {
 
   using std::ofstream;
