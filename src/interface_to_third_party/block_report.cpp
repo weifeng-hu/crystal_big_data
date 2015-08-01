@@ -1,38 +1,33 @@
-#include <stdlib.h>
-#include <iostream>
-#include "../../ithaca/cmd_options.h"
-#include "../qcdmrg/cmd_options.h"
+/**
+ * @file
+ * @author Weifeng Hu
+ *
+ * @section LICENSE
+ *
+ * Copyright (C) 2013, 2014, 2015  Weifeng Hu
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @section DESCRIPTION
+ *
+ *
+ */
 
-using namespace ithaca;
-using namespace std;
+namespace iquads { 
 
-namespace ithaca { namespace interface { namespace qcdmrg {
+namespace interface_to_third_party { 
 
-cmd_options::cmd_options( int argc, char* argv[] )
- : ithaca::cmd_options( argc, argv )
-{
-// check whether the parent class is fine 
-  if( this->input_is_set       == false || 
-      this->output_is_set      == false || 
-      this->dir_work_is_set    == false ||
-      this->dir_scratch_is_set == false   )
-  {
-    cout << endl;
-    cout << "Some command options in ithaca::cmd_options are not set. Please check. " << endl;
-    cout << endl;
-    exit(1);
-  }
+} // end of namespace interface_to_third_party
 
-// Initialize the bool members of this class
-  this->dmrg_input_is_set  = false;
-  this->dmrg_output_is_set = false;
-
-  for( int iopt = 0; iopt < argc ; iopt = iopt +2 )
-  {
-
-
-  }
-
-};
-
-} } } // end of ithaca::interface::qcdmrg
+} // end of namespace iquads
