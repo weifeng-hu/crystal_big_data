@@ -27,7 +27,7 @@
 #ifndef PSI3_CONFIG_H
 #define PSI3_CONFIG_H
 
-namespace iquads { 
+namespace iquads {
 
 namespace interface_to_third_party {
 
@@ -36,7 +36,7 @@ struct Psi3_Config
 public:
   void set_defaults();
 
-};
+}; // end of struct Psi3_Config
 
 } // end of namespace interface_to_third_party
 
