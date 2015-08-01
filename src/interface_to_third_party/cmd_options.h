@@ -24,7 +24,6 @@
  *
  */
 
-
 #include <string>
 
 namespace iquads { 
@@ -56,6 +55,6 @@ public:
 
 } 
 
-} // end of names
+} // end of namespace interface_to_third_party
 
-}  // end of ithaca::interface::qcdmrg
+} // end of namespace iquads

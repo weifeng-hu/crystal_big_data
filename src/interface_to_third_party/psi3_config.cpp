@@ -24,22 +24,17 @@
  *
  */
 
-#ifndef PSI3_CONFIG_H
-#define PSI3_CONFIG_H
+#include <interface_to_third_party/psi3_config.h>
 
 namespace iquads { 
 
 namespace interface_to_third_party {
 
-struct Psi3_Config
+void Psi3_Config :: set_defaults()
 {
-public:
-  void set_defaults();
 
-};
+}; // end of set_defaults()
 
 } // end of namespace interface_to_third_party
 
 } // end of namespace iquads
-
-#endif

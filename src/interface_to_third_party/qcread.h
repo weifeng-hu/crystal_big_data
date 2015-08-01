@@ -79,5 +79,4 @@ public:
 
 }; // end of psiread
 
-
 } } // end of cphf::qcread::

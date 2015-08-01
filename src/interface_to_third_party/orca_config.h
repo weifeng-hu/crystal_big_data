@@ -24,22 +24,22 @@
  *
  */
 
-#ifndef PSI3_CONFIG_H
-#define PSI3_CONFIG_H
+#ifndef ORCA_CONFIG_H
+#define ORCA_CONFIG_H
 
 namespace iquads { 
 
 namespace interface_to_third_party {
 
-struct Psi3_Config
-{
+class Orca_Config{
+
 public:
   void set_defaults();
 
-};
+}; // end of class Orca_Config
 
-} // end of namespace interface_to_third_party
+} // end of interface_to_third_party
 
-} // end of namespace iquads
+} // end of iquads
 
 #endif

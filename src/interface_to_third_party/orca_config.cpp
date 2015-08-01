@@ -24,22 +24,18 @@
  *
  */
 
-#ifndef PSI3_CONFIG_H
-#define PSI3_CONFIG_H
+#include <iostream>
+#include <string>
 
 namespace iquads { 
 
 namespace interface_to_third_party {
 
-struct Psi3_Config
+void Orca_Config :: set_defaults()
 {
-public:
-  void set_defaults();
 
-};
+}; // end of function set_defaults()
 
 } // end of namespace interface_to_third_party
 
 } // end of namespace iquads
-
-#endif
