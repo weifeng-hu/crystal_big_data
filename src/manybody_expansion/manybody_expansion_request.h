@@ -24,21 +24,38 @@
  *
  */
 
-#ifndef BLOCK_REPORT_H
-#define BLOCK_REPORT_H
+#ifndef MANYBODY_EXPANSION_REQUEST
+#define MANYBODY_EXPANSION_REQUEST
 
-namespace iquads { 
+#include <string>
+#include <manybody_expansion/lattice.h>
 
-namespace interface_to_third_party { 
+using std::string;
 
-struct Block_Report
-{
+namespace iquads {
+
+namespace manybody_expansion {
+
+struct Request {
 public:
-  typedef double energy_data_type;
+  typedef Lattice lattice_info_type;
+  typedef lattice_info_type& lattice_info_ref;
+  typedef string external_program_name_type;
+  typedef external_program_name_type& external_program_name_ref;
 
-}; // end of struct Block_Report
+public:
+  lattice_info_ref set_lattice_info() 
+   { return this->lattice_info_; }
+  external_program_name_ref set_external_program_name()
+   { return this->external_program_name; }
 
-} // end of namespace interface_to_third_party
+private:
+  lattice_info_type lattice_info_;
+  external_program_name_type external_program_name;
+
+}; // end of struct Request
+
+} // end of namespace manybody_expansion
 
 } // end of namespace iquads
 

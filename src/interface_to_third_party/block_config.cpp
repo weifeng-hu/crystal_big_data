@@ -42,25 +42,25 @@ void config_type :: set_defaults()
 
   this->number_schedule_ = 4;
   this->schedule_.resize( this->number_schedule_ );
-  this->schedule[0].iteration_index_ = 4;
-  this->schedule[1].iteration_index_ = 8;
-  this->schedule[2].iteration_index_ = 12;
-  this->schedule[4].iteration_index_ = 16;
+  this->schedule[0].set_iteration_index() = 4;
+  this->schedule[1].set_iteration_index() = 8;
+  this->schedule[2].set_iteration_index() = 12;
+  this->schedule[4].set_iteration_index() = 16;
 
-  this->schedule[0].M_ = 100;
-  this->schedule[1].M_ = 200;
-  this->schedule[3].M_ = 300;
-  this->schedule[4].M_ = 400;
+  this->schedule[0].set_M() = 100;
+  this->schedule[1].set_M() = 200;
+  this->schedule[3].set_M() = 300;
+  this->schedule[4].set_M() = 400;
 
-  this->schedule[0].david_tol_ = 1.0e-3;
-  this->schedule[1].david_tol_ = 1.0e-4;
-  this->schedule[2].david_tol_ = 1.0e-6;
-  this->schedule[3].david_tol_ = 1.0e-8;
+  this->schedule[0].set_david_tol() = 1.0e-3;
+  this->schedule[1].set_david_tol() = 1.0e-4;
+  this->schedule[2].set_david_tol() = 1.0e-6;
+  this->schedule[3].set_david_tol() = 1.0e-8;
   
-  this->schedule[0].noise_ = 1.0e-4;
-  this->schedule[1].noise_ = 1.0e-6;
-  this->schedule[2].noise_ = 1.0e-9;
-  this->schedule[3].noise_ = 0.0e0;
+  this->schedule[0].set_noise() = 1.0e-4;
+  this->schedule[1].set_noise() = 1.0e-6;
+  this->schedule[2].set_noise() = 1.0e-9;
+  this->schedule[3].set_noise() = 0.0e0;
 
   this->nroots_ = 1;
   this->weights_.resize( this->nroots );

@@ -31,7 +31,7 @@ namespace iquads {
 
 namespace interface_to_third_party {
 
-class Orca_Config{
+struct Orca_Config{
 
 public:
   void set_defaults();

@@ -25,6 +25,8 @@
  */
 
 #include <iostream>
+#include <manybody_expansion/manybody_expansion_request.h>
+#inlucde <manybody_expansion/manybody_expansion_config.h>
 #include <manybody_expansion/manybody_expansion_agent.h>
 #include <manybody_expansion/manybody_expansion_template.h>
 #include <manybody_expansion/manybody_expansion_order_bitmask.h>
@@ -33,7 +35,16 @@ namespace iquads {
 
 namespace manybody_expansion {
 
-int ManyBodyExpansion_Agent :: execute_periodic()
+typedef Agent mbe_agent_type;
+
+mbe_agent_type :: config_type 
+ mbe_agent_type :: setup_config_from_request( request_type request )
+{
+
+} // end of function setup_config_from_request()
+
+mbe_agent_type :: report_type
+ mbe_agent_type :: execute_periodic( config_type config, report_ref report ) 
 {
 
   using std::cout;
@@ -46,19 +57,7 @@ int ManyBodyExpansion_Agent :: execute_periodic()
    switch ( this->order_ ) {
     case ( order_bitmask :: FIRST_ORDER ):
      ManyBodyExpansionPeriodic<1> manybody_expansion_periodic;
-//     manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( this->config_shared_pointer(), this->lattice_shared_pointer() );
-     break;
-    case ( order_bitmask :: SECOND_ORDER ):
-//     ManyBodyExpansionPeriodic<2> manybody_expansion_periodic;
-//     manybody_expansion_periodic.compute_lattice_energy_per_unit_cell();
-     break;
-    case ( order_bitmask :: THIRD_ORDER ):
-//     ManyBodyExpansionPeriodic<3> manybody_expansion_periodic;
-//     manybody_expansion_periodic.compute_lattice_energy_per_unit_cell();
-     break;
-    case ( order_bitmask :: FOURTH_ORDER ):
-//     ManyBodyExpansionPeriodic<4> manybody_expansion_periodic;
-//     manybody_expansion_periodic.compute_lattice_energy_per_unit_cell();
+     manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( config, report );
      break;
     default:
      throw( this->order_ );
@@ -71,40 +70,23 @@ int ManyBodyExpansion_Agent :: execute_periodic()
     exit(1);
   }
 
-  return 0;
-
 }; // end of function execute_periodic()
 
-int ManyBodyExpansion_Agent :: execute_general()
+mbe_agent_type report_type
+ mbe_agent_type :: execute_general( config_type config, report_ref report )
 {
 
   using std::cout;
   using std::endl;
 
   cout << " Compute lattice energy using the general MBE formula " << endl;
+  cout << " general MBE formula algorithm not implemented "  << endl;
+  exit(1);
 
-  return 0;
+  report_type report;
+  return report;
 
 }; // end of function execute_general()
-
-int ManyBodyExpansion_Agent :: execute()
-{
-
-  using std::cout;
-  using std::endl;
-
-  if( config_shared_pointer() -> is_periodic() == true ){
-    cout << " PERIODIC flag detected; " << endl;
-    this->execute_periodic();
-  }
-  else{
-    cout << " no PERIODIC flag detected; " << endl;
-    this->execute_general();
-  }
-
-  return 0;
-
-};
 
 } // end of namespace manybody_expansion
 

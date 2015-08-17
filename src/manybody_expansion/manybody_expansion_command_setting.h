@@ -35,7 +35,7 @@ namespace iquads {
 
 namespace manybody_expansion {
 
-struct ManyBodyExpansion_CommandSetting
+struct CommandSetting
 {
 public:
   typedef string filename_type;
@@ -70,7 +70,7 @@ private:
   filename_type config_filename_;
   filename_type output_filename_;
 
-}; // end of class ManyBodyExpansion_CommandSetting
+}; // end of class CommandSetting
 
 } // end of namespace manybody_expansion
 

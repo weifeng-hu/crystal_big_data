@@ -27,32 +27,25 @@
 #ifndef EXPANSION_FORMULA_PERIODIC_TRAITS_H
 #define EXPANSION_FORMULA_PERIODIC_TRAITS_H
 
-#include <memory>
-#include <manybody_expansion/lattice.h>
 #include <manybody_expansion/compute_expansion_term_periodic_traits.h>
-#include <interface_to_third_party/external_program_agent_base.h>
 
 namespace iquads {
 
 namespace manybody_expansion {
 
-using interface_to_third_party :: ExternalProgramAgent_Base;
+typedef double energy_data_type;
+typedef Config config_type;
+typedef Report report_type;
+typedef report_type& report_ref;
 
 template < size_t Order >
 class ExpansionFormulaPeriodic
 {
 public:
-  typedef double energy_data_type;
-  typedef Lattice lattice_type;
-  typedef shared_ptr< lattice_type > lattice_shared_pointer_type;
-  typedef ExternalProgramAgent_Base agent_base_type;
-  typedef agent_base_type* agent_pointer_type;
-
-public:
-  energy_data_type compute( lattice_shared_pointer_type lattice_shared_pointer, agent_pointer_type agent_pointer )
+  energy_data_type compute()
    {
      using manybody_expansion :: compute_expansion_term_periodic;
-     return compute_expansion_term_periodic<0>( lattice_shared_pointer, agent_pointer );
+     return compute_expansion_term_periodic<0>();
    } // end of compute()
 
 }; // end of class ExpansionFormulaPeriodic< Order >
@@ -61,17 +54,10 @@ template <>
 class ExpansionFormulaPeriodic<1>
 {
 public:
-  typedef double energy_data_type;
-  typedef Lattice lattice_type;
-  typedef shared_ptr< lattice_type > lattice_shared_pointer_type;
-  typedef ExternalProgramAgent_Base agent_base_type;
-  typedef agent_base_type* agent_pointer_type;
-
-public:
-  energy_data_type compute( lattice_shared_pointer_type lattice_shared_pointer, agent_pointer_type agent_pointer )
+  energy_data_type compute()
    {
      using manybody_expansion :: compute_expansion_term_periodic;
-     return compute_expansion_term_periodic<1>( lattice_shared_pointer, agent_pointer );
+     return compute_expansion_term_periodic<1>();
    } // end of compute()
 
 }; // end of class ExpansionFormulaPeriodic<1>
@@ -80,18 +66,11 @@ template <>
 class ExpansionFormulaPeriodic<2>
 {
 public:
-  typedef double energy_data_type;
-  typedef Lattice lattice_type;
-  typedef shared_ptr< lattice_type > lattice_shared_pointer_type;
-  typedef ExternalProgramAgent_Base agent_base_type;
-  typedef agent_base_type* agent_pointer_type;
-
-public:
-  energy_data_type compute( lattice_shared_pointer_type lattice_shared_pointer, agent_pointer_type agent_pointer )
+  energy_data_type compute()
    {
      using manybody_expansion :: compute_expansion_term_periodic;
-     return compute_expansion_term_periodic<1>( lattice_shared_pointer, agent_pointer ) + 
-            compute_expansion_term_periodic<2>( lattice_shared_pointer, agent_pointer );
+     return compute_expansion_term_periodic<1>() + 
+            compute_expansion_term_periodic<2>();
    } // end of compute()
 
 }; // end of class ExpansionFormulaPeriodic<2>
@@ -101,19 +80,12 @@ template <>
 class ExpansionFormulaPeriodic<3>
 {
 public:
-  typedef double energy_data_type;
-  typedef Lattice lattice_type;
-  typedef shared_ptr< lattice_type > lattice_shared_pointer_type;
-  typedef ExternalProgramAgent_Base agent_base_type;
-  typedef agent_base_type* agent_pointer_type;
-
-public:
-  energy_data_type compute( lattice_shared_pointer_type lattice_shared_pointer, agent_pointer_type agent_pointer )
+  energy_data_type compute()
    {
      using manybody_expansion :: compute_expansion_term_periodic;
-     return compute_expansion_term_periodic<1>( lattice_shared_pointer, agent_pointer ) + 
-            compute_expansion_term_periodic<2>( lattice_shared_pointer, agent_pointer ) + 
-            compute_expansion_term_periodic<3>( lattice_shared_pointer, agent_pointer );
+     return compute_expansion_term_periodic<1>() + 
+            compute_expansion_term_periodic<2>() + 
+            compute_expansion_term_periodic<3>();
    } // end of compute()
 
 }; // end of class ExpansionFormulaPeriodic<3>
@@ -123,20 +95,13 @@ template <>
 class ExpansionFormulaPeriodic<4>
 {
 public:
-  typedef double energy_data_type;
-  typedef Lattice lattice_type;
-  typedef shared_ptr< lattice_type > lattice_shared_pointer_type;
-  typedef ExternalProgramAgent_Base agent_base_type;
-  typedef agent_base_type* agent_pointer_type;
-
-public:
-  energy_data_type compute( lattice_shared_pointer_type lattice_shared_pointer, agent_pointer_type agent_pointer )
+  energy_data_type compute()
    {
      using manybody_expansion :: compute_expansion_term_periodic;
-     return compute_expansion_term_periodic<1>( lattice_shared_pointer, agent_pointer ) + 
-            compute_expansion_term_periodic<2>( lattice_shared_pointer, agent_pointer ) +
-            compute_expansion_term_periodic<3>( lattice_shared_pointer, agent_pointer ) +
-            compute_expansion_term_periodic<4>( lattice_shared_pointer, agent_pointer ); 
+     return compute_expansion_term_periodic<1>() + 
+            compute_expansion_term_periodic<2>() +
+            compute_expansion_term_periodic<3>() +
+            compute_expansion_term_periodic<4>(); 
    } // end of compute()
 
 }; // end of class ExpansionFormulaPeriodic<4>

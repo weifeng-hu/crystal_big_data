@@ -26,41 +26,66 @@
 
 #include <string>
 #include <fstream>
-#include <interface_to_third_party/external_program_agent.h>
+#include <interface_to_third_parth/molpro_config.h>
+#include <interface_to_third_party/molpro_agent.h>
 
 namespace iquads {
 
 namespace interface_to_third_party {
 
-string MolproAgent :: write_input()
+typedef MolproAgent agent_type;
+
+agent_type :: file_name_type 
+ agent_type :: write_input() 
 {
 
+  using agent_type::file_name_type;
   using std::ofstream;
   using std::endl;
-  // these are subject to change
-  ofstream ofs.open( this->input_name.c_str() );
-  ofs << "memory, " << this->config_ptr()->memory_size() << ", m" << endl;
-  ofs << "basis=" << this->config_ptr()->basis_set() << endl;
-  ofs << "angstrom" << endl;
-  ofs << "geomtyp=xyz" << endl;
-  ofs << "geomtry={" << endl << this->config_ptr()->molecule() << "}" << endl;
-  if( this->config_ptr()->hf_requested() ) { ofs << "hf" << endl; }
-  else if( this->config_ptr()->mp2_requested() ){ ofs << "hf" << endl << "mp2" << endl; }
-  else if( this->config_ptr()->mp3_requested() ){ ofs << "hf" << endl << "mp3" << endl; }
-  else if( this->config_ptr()->ccsd_requested() ){ ofs << "hf" << endl << "ccsd" << endl; }
-  else if( this->config_ptr()->ccsdt_requested() ){ ofs << "hf" << endl << "ccsd(t)" << endl; }
-  ofs.close();
+
+  this->input_file_name_ 
+    = this->work_path_ + this->molecule_name_ + ".com";
+
+  {
+    ofstream ofs.open( this->input_filename_.c_str() );
+  
+    ofs << "memory, " ;
+    ofs << static_cast<config_pointer_type>( base_config_pointer )->memory_size();
+    ofs << ",";
+    ofs << static_cast<config_pointer_type> ( base_config_pinter ) ->memory_unit() << endl;
+  
+    ofs << "basis=";
+    ofs << static_cast<config_pointer_type> ( base_config_pointer )->basis_set_name() << endl;
+  
+    ofs << base_config_pointer->geometry_unit()<< endl;
+  
+    ofs << "geomtyp = ";
+    ofs << static_cast<config_pointer_type> ( base_config_pointer )-> geometry_type() << endl;
+  
+    ofs << "geomtry={" << endl;
+//  ofs << static_cast<config_pointer_type> ( base_config_pointer )->molecule() << "}" << endl;
+    ofs.close();
+  }
+
+  return input_filename;
 
 }; // end of write_input()
 
-Molpro :: write_script()
+client_type::file_name_type
+ client_type::write_run_script( base_config_ptr base_config_pointer )
 {
+
+  using std::ofstream;
+  ofstream ofs( script_filename.c_str(), ofstream::out | ofstream::app );
+  ofs << this->program_path_ << this->program_name_ << " " << ;
+  ofs.close();
 
 }; // end of write_script()
 
-MolproAgent :: collect_result()
+client_type :: file_name_type
+ client_type :: collect_result()
 {
-
+/*
   using iquads::file::line_searcher;
   using std::string;
   // these are are subject to change
@@ -76,8 +101,19 @@ MolproAgent :: collect_result()
   else if( this->config_ptr()->ccsdt_requested() ){
 //    this->report_ptr()->set_total_energy() = line_searcher< energy_data_type >("", this->output_name );
   }
-
+*/
 }; // end of collect_result()
+
+void agent_type::sequence_local_run()
+{
+
+  config_type config;
+  config->set_defaults();
+  this->write_input( config );
+  this->run_calculation( config );
+  this->collect_result( config );
+
+} // end of sequence_local_run()
 
 } // end of namespace interface_to_third_party
 

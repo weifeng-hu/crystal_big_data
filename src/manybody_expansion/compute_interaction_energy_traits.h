@@ -24,28 +24,32 @@
  *
  */
 
-#include <memory>
-#include <manybody_expansion/manybody_expansion_typedef.h>
-#include <manybody_expansion/>
+#ifndef COMPUTE_INTERACTION_ENERGY_TRAITS_H
+#define COMPUTE_INTERACTION_ENERGY_TRAITS_H
 
 namespace iquads {
 
 namespace manybody_expansion {
 
 template < size_t Order >
-inline energy_data_type compute_interaction_energy( polymer<Order> x,  )
+inline energy_data_type compute_interaction_energy( polymer<Order> x, energy_calc_req_type request )
 {
 
 };
 
 template <>
-inline energy_data_type compute_interaction_energy( polymer<1> x,  )
+inline energy_data_type compute_interaction_energy( polymer<1> x, energy_calc_req_type request )
 {
+
+  ExternalProgramClient<energy_calc_req_type > client_request_energy_calc;
+  client_request_energy_calc.set_request() = request;
+  report_type report = client_request_energy_calc.driver();
+  return report.return_total_energy();
 
 }
 
 template <>
-inline energy_data_type compute_interaction_energy( polymer<3> x, )
+inline energy_data_type compute_interaction_energy( polymer<3> x, energy_calc_req_type request )
 {
 
   energy_data_type energy_monomer_0 = compute_interaction_energy<1> ( x.at(0) );
@@ -69,3 +73,5 @@ inline energy_data_type compute_interaction_energy( polymer<3> x, )
 } // end of namespace manybody_expansion
 
 } // end of namespace iquads
+
+#endif

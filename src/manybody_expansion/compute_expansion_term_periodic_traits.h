@@ -28,26 +28,21 @@
 #define COMPUTE_EXPANSION_TERM_PERIODIC_TRAITS
 
 #include <memory>
-#include <manybody_expansion/lattice.h>
-#include <interface_to_third_party/external_program_agent_base.h>
 
 namespace iquads {
 
 namespace manybody_expansion {
 
-typedef Lattice lattice_type;
-typedef shared_ptr< lattice_type > lattice_shared_pointer_type;
-typedef interface_to_third_party :: ExternalProgramAgent_Base agent_base_type;
-typedef agent_base_type* agent_pointer_type;
+typedef double energy_data_type;
 
 template < size_t Order > 
-inline double compute_expansion_term_periodic( lattice_shared_pointer_type lattice_shared_pointer, agent_pointer_type agent_type )
+inline energy_data_type compute_expansion_term_periodic()
 {
   return 0.0e0;
 };
 
 template <>
-inline double compute_expansion_term_periodic<1>( lattice_shared_pointer_type lattice_shared_pointer, agent_pointer_type agent_type )
+inline energy_data_type compute_expansion_term_periodic<1>()
 {
   double retval = 0.0e0;
 /*
@@ -59,7 +54,7 @@ inline double compute_expansion_term_periodic<1>( lattice_shared_pointer_type la
 };
 
 template <>
-inline double compute_expansion_term_periodic<2>( lattice_shared_pointer_type lattice_shared_pointer, agent_pointer_type agent_type )
+inline energy_data_type compute_expansion_term_periodic<2>()
 {
 
 // a mess!
@@ -76,7 +71,7 @@ inline double compute_expansion_term_periodic<2>( lattice_shared_pointer_type la
 };
 
 template <>
-inline double compute_expansion_term_periodic<3>( lattice_shared_pointer_type lattice_shared_pointer, agent_pointer_type agent_type )
+inline energy_data_type compute_expansion_term_periodic<3>()
 { 
 
 // a mess!

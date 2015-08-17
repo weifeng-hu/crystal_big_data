@@ -40,10 +40,9 @@ namespace manybody_expansion {
 
 using electron_correlation :: ElectronCorrelation_Config;
 
-class ManyBodyExpansion_Config
+class Config
 {
 public:
-  typedef ManyBodyExpansion_Config this_type;
   typedef ElectronCorrelation_Config electron_correlation_config_type;
   typedef electron_correlation_config_type& electron_correlation_config_reference;
   typedef shared_ptr<electron_correlation_config_type> electron_correlation_config_share_ptr;
@@ -62,7 +61,7 @@ public:
 
 public:
   // read config file, define in .cpp
-  void read_config( file_name_type file_name );
+  void read_config_file( file_name_type file_name );
 
 public:
   const bitmask_type total_order_mask() const 
@@ -94,10 +93,10 @@ private:
   program_name_type external_program_name_;
   bitmask_type external_program_mask_;
 
-}; // end of class ManyBodyExpansionConfig
+}; // end of class Config
 
 } // end of namespace manybody_expansion
 
-} // end of manybody_expansion
+} // end of namespace iquads
 
 #endif

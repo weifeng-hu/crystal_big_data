@@ -28,71 +28,49 @@
 #define MANYBODY_EXPANSION_TEMPLATE_H
 
 #include <memory>
-#include <interface_to_third_party/external_program_agent_base.h>
-#include <interface_to_third_party/external_program_agent_factory.h>
-#include <manybody_expansion/lattice.h>
 #include <manybody_expansion/expansion_formula_periodic_traits.h>
+#include <manybody_expansion/manybody_expansion_config.h>
+#include <manybody_expansion/manybody_expansion_report.h>
 
 namespace iquads {
 
 namespace manybody_expansion {
 
-using interface_to_third_party :: ExternalProgramAgent_Factory;
-using interface_to_third_party :: ExternalProgramAgent_Base;
-
 template < size_t Order >
 class ManyBodyExpansionGeneral 
 {
 public:
+  typedef iquads :: manybody_expansion :: Config config_type;
+  typedef iquads :: manybody_expansion :: Report report_type;
+  typedef report_type& report_ref;
   typedef double energy_data_type;
   typedef energy_data_type& energy_data_reference;
   typedef bool condition_type;
 
-private:
-
-}; // end of class manybody_expansion_general
+}; // end of template class manybody_expansion_general
 
 template < size_t Order >
 class ManyBodyExpansionPeriodic
 {
 public:
-  typedef Lattice lattice_type;
-  typedef shared_ptr< Lattice > lattice_shared_pointer_type;
-  typedef ExpansionFormulaPeriodic< Order > expansion_formula_type;
-  typedef ExternalProgramAgent_Factory external_program_factory_type;
-  typedef ExternalProgramAgent_Base agent_base_type;
-  typedef ManyBodyExpansion_Config config_type;
-  typedef shared_ptr<config_type> config_shared_pointer_type;
-  typedef agent_base_type* agent_pointer_type;
+  typedef iquads :: manybody_expansion :: ExpansionFormulaPeriodic< Order > expansion_formula_type;
+  typedef iquads :: manybody_expansion :: Config config_type;
+  typedef iquads :: manybody_expansion :: Report report_type;
+  typedef report_type& report_ref;
   typedef double energy_data_type;
-  typedef energy_data_type& energy_data_reference;
   typedef bool condition_type;
 
 public:
   energy_data_type 
-   compute_lattice_energy_per_unit_cell( config_shared_pointer_type config_shared_pointer, 
-                                         lattice_shared_pointer_type lattice_shared_pointer )
-    // Here the config and lattice shared_ptr as function parameters rather than class members
-    // since they are not necessary elements to make the class ManyBodyExpansionPeriodic valid
-    // The objects they point to are in nature volatile at run-time
+   compute_lattice_energy_per_unit_cell( config_type config, report_ref report )
    {
-     agent_pointer_type agent_pointer 
-      = this->external_program_factory_.get_agent( config_shared_pointer->external_program_mask() );
-     agent_pointer->set_essential_data();
-     this->expansion_formula_.compute( lattice_shared_pointer,  agent_pointer );
+     this->expansion_formula_.compute( config, report );
    } // end of compute_lattice_energy_per_unit_cell()
-
-public:
-  const expansion_formula_type expansion_formula() const 
-   { return this->expansion_formula_; }
-  const external_program_factory_type external_program_factory() const 
-   { return this->external_program_factory_; }
 
 private:
   expansion_formula_type expansion_formula_;
-  external_program_factory_type external_program_factory_;
 
-};// end of class ManyBodyExpansionPeriodic
+};// end of template class ManyBodyExpansionPeriodic
 
 } // end of namespace manybody_expansion
 

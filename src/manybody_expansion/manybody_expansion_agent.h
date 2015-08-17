@@ -27,38 +27,49 @@
 #ifndef MANYBODY_EXPANSION_AGENT_H
 #define MANYBODY_EXPANSION_AGENT_H
 
-#include <memory>
+#include <iostream>
+#include <manybody_expansion/manybody_expansion_request.h>
 #include <manybody_expansion/manybody_expansion_config.h>
-
-using std::shared_ptr;
+#incldue <manybody_expansion/manybddy_expansion_report.h>
 
 namespace iquads {
 
 namespace manybody_expansion {
 
-class ManyBodyExpansion_Agent
+class Agent
 {
 public:
-  typedef ManyBodyExpansion_Config config_type;
-  typedef shared_ptr<config_type> config_shared_pointer_type;
-  typedef unsigned int order_type;
-
-public:
-  int execute();
+  typedef iquads :: manybody_expansion :: Request request_type;
+  typedef iquads :: manybody_expansion :: Config  config_type;
+  typedef iquads :: manybody_expansion :: Report  report_type;
+  typedef report_type& report_ref;
 
 private:
-  int execute_general();
-  int execute_periodic();
+  config_type setup_config_from_request( request_type request );
+  report_type execute_general( config_type config, report_ref report );
+  report_type execute_periodic( config_type config, report_ref report );
 
 public:
-  const config_shared_pointer_type config_shared_pointer() const
-   { return this->config_shared_pointer_; }
+  report_type accept_request_and_process( request_type request );
+   {
+     using std::cout;
+     using std::endl;
 
-private:
-  config_shared_pointer_type config_shared_pointer_;
-  order_type order_;
+     report_type report;
+     config_type config = this->setup_config_from_request( request );
 
-}; // end of class ManyBodyExpansion_Agent
+     if( config.is_periodic() == true ){
+      cout << " PERIODIC flag detected; " << endl;
+      this->execute_periodic( config, report );
+     }
+     else{
+      cout << " no PERIODIC flag detected; " << endl;
+      this->execute_general( config, report );
+     }
+
+   } // end of function accept_request_and_process()
+
+}; // end of class Agent
 
 } // end of namespace manybody_expansion
 
