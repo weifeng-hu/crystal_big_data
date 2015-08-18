@@ -24,28 +24,28 @@
  *
  */
 
-#include <iostream>
-#include <iquads/command_parser.h>
-#include <manybody_expansion/manybody_expansion_client.h>
 
-int main( int argc, char* argv[] )
-{
+#ifndef MANYBODY_EXPANSION_ORDER_BITMASK_H
+#define MANYBODY_EXPANSION_ORDER_BITMASK_H
 
-  using std::cout;
-  using std::endl;
+namespace iquads {
 
-  cout << endl;
-  cout << "ManyBody Expansion Lattice Energy Calculation" << endl;
-  cout << endl;
+namespace manybody_expansion {
 
-  typedef iquads :: manybody_expansion :: Client mbe_client_type;
-  mbe_client_type client;
-  {
-    using iquads :: CommandParser;
-    CommandParser command_parser( argc, argv );
-    client.driver( command_parser.command_string() );
-  }
+namespace order_bitmask {
 
-  return 0;
+  typedef unsigned int bitmask_type;
 
-} // end of main()
+  constexpr bitmask_type AUTO          = 0x01 << 0
+  constexpr bitmask_type FIRST_ORDER   = 0x01 << 1;
+  constexpr bitmask_type SECOND_ORDER  = 0x01 << 2;
+  constexpr bitmask_type THIRD_ORDER   = 0x01 << 3;
+  constexpr bitmask_type FOURTH_ORDER  = 0x01 << 4;
+
+} // end of namespace order_bitmask
+
+} // end of manybody_expansion
+
+} // end of namespace iquads
+
+#endif

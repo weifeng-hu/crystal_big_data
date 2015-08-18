@@ -44,29 +44,14 @@ class Config
 {
 public:
   typedef ElectronCorrelation_Config electron_correlation_config_type;
-  typedef electron_correlation_config_type& electron_correlation_config_reference;
-  typedef shared_ptr<electron_correlation_config_type> electron_correlation_config_share_ptr;
   typedef string file_name_type;
-  typedef file_name_type& file_name_reference;
   typedef string program_name_type;
-  typedef program_name_type& program_name_reference;
   typedef bool condition_type;
-  typedef condition_type& condition_reference;
   typedef unsigned int bitmask_type;
-  typedef bitmask_type& bitmask_reference;
-
-public:
-  void get_run_env()
-   { /* To be defined */ }
-
-public:
-  // read config file, define in .cpp
-  void read_config_file( file_name_type file_name );
 
 public:
   const bitmask_type total_order_mask() const 
    { return this->total_order_mask_; }
-
   const condition_type is_periodic() const 
    { return this->is_periodic_; }
   condition_reference set_is_periodic()

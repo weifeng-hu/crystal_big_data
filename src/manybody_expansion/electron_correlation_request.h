@@ -24,32 +24,19 @@
  *
  */
 
-
-#ifndef MANYBODY_EXPANSION_ORDER_BITMASK_H
-#define MANYBODY_EXPANSION_ORDER_BITMASK_H
+#ifndef ELECTRON_CORRELATION_REQUEST_H
+#define ELECTRON_CORRELATION_REQUEST_H
 
 namespace iquads {
 
-namespace manybody_expansion {
+namespace electron_correlation {
 
-namespace order_bitmask {
+struct Request {
 
-  typedef unsigned int bitmask_type;
 
-  constexpr bitmask_type FIRST_ORDER   = 0x01;
-  constexpr bitmask_type SECOND_ORDER  = 0x02;
-  constexpr bitmask_type THIRD_ORDER   = 0x03;
-  constexpr bitmask_type FOURTH_ORDER  = 0x04;
-  constexpr bitmask_type FIFTY_ORDER   = 0x05;
-  constexpr bitmask_type SIXTH_ORDER   = 0x06;
-  constexpr bitmask_type SEVENTH_ORDER = 0x07;
-  constexpr bitmask_type EIGHTTH_ORDER = 0x08;
-  constexpr bitmask_type NIGHTH_ORDER  = 0x09;
-  constexpr bitmask_type TENTH_ORDER   = 0x10;
+}; // end of struct Request
 
-} // end of namespace expansion_order_bitmask
-
-} // end of manybody_expansion
+} // end of namespace electron_correlation
 
 } // end of namespace iquads
 

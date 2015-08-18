@@ -42,29 +42,39 @@ namespace manybody_expansion {
 class Client
 {
 public:
-  typedef typename CommandParser::container_type command_container_type;
-  typedef typename CommandParser::argument_type command_argument_type;
+  typedef typename CommandParser :: container_type command_container_type;
+  typedef typename CommandParser :: argument_type command_argument_type;
   typedef iquads :: manybody_expansion :: Request request_type;
   typedef iquads :: manybody_expansion :: Report  report_type;
   typedef iquads :: manybody_expansion :: Agent   agent_type;
   typedef iquads :: manybody_expansion :: CommandSetting command_setting_type;
 
+  typedef report_type& report_ref;
+
 public:
   static void show_help();
   static command_setting_type analyse_command( command_container_type command_container );
   void file_request( command_setting_type command_setting );
+
+  void print_report() const 
+   { this->report().print(); }
+   // end of function print_report()
+
   void driver( command_container_type command_container )
    {
-     command_setting_type command_settings
-      = mbe_client_type :: analyse_command( command_container );
+     command_setting_type command_settings = analyse_command( command_container );
+     request_type request = file_request( command_settings );
      agent_type agent;
-     this->report_ 
-      = agent.accept_request_and_process( file_request( command_settings ) );
+     this->set_report()
+       = agent.accept_request_and_process( request );
      this->print_report();
    }  // end of function driver()
 
-  void print_report() const 
-   { this->report_.print(); } // end of function print_report()
+public:
+  const report_type report() const 
+   { return this->report_; }
+  report_ref set_report()
+   { return this->report_; }
 
 private:
   report_type report_;

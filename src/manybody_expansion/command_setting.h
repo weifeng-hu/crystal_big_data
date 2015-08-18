@@ -39,12 +39,13 @@ struct CommandSetting
 {
 public:
   typedef string filename_type;
-  typedef filename_type& filename_reference;
   typedef bool condition_type;
-  typedef condition_type& condition_reference;
+
+  typedef filename_type& filename_ref;
+  typedef condition_type& condition_ref;
 
 public:
-  ManyBodyExpansion_CommandSetting()
+  CommandSetting()
    {
      this->set_default();
    }
@@ -52,22 +53,25 @@ public:
 public:
   void set_default()
    {
-     this->config_filename_ = "not set";
+     this->input_filename_ = "not set";
      this->output_filename_ = "not set";
    }
 
 public:
-  const filename_type config_filename() const 
-   { return this->config_filename_; }
-  filename_reference set_config_filename()
-   { return this->config_filename_; }
+  const filename_type input_filename() const 
+   { return this->input_filename_; }
+
+  filename_ref set_input_filename()
+   { return this->input_filename_; }
+
   const filename_type output_filename() const
    { return this->output_filename_; }
-  filename_type output_filename()
+
+  filename_ref output_filename()
    { return this->output_filename_; }
 
 private:
-  filename_type config_filename_;
+  filename_type input_filename_;
   filename_type output_filename_;
 
 }; // end of class CommandSetting

@@ -30,7 +30,7 @@
 #include <iostream>
 #include <manybody_expansion/manybody_expansion_request.h>
 #include <manybody_expansion/manybody_expansion_config.h>
-#incldue <manybody_expansion/manybddy_expansion_report.h>
+#include <manybody_expansion/manybddy_expansion_report.h>
 
 namespace iquads {
 
@@ -45,7 +45,8 @@ public:
   typedef report_type& report_ref;
 
 private:
-  config_type setup_config_from_request( request_type request );
+  config_type setup_config_from_request( request_type request )
+   { /* to be implemented */ };
   report_type execute_general( config_type config, report_ref report );
   report_type execute_periodic( config_type config, report_ref report );
 

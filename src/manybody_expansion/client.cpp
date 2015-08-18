@@ -40,7 +40,7 @@ mbe_client_type :: request_type
 {
 
   request_type request;
-  request.read_config_file( command_settings.config_filename() );
+  request.read_input_file( command_settings.input_filename() );
   return request;
 
 }; // end of function file_request()

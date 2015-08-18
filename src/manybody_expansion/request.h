@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef MANYBODY_EXPANSION_REQUEST
-#define MANYBODY_EXPANSION_REQUEST
+#ifndef MANYBODY_EXPANSION_REQUEST_H
+#define MANYBODY_EXPANSION_REQUEST_H
 
 #include <string>
 #include <manybody_expansion/lattice.h>
@@ -39,19 +39,30 @@ namespace manybody_expansion {
 struct Request {
 public:
   typedef Lattice lattice_info_type;
-  typedef lattice_info_type& lattice_info_ref;
+  typedef size_t expansion_order_type;
+  typedef string correlation_method_type;
+  typedef string correlation_level_type;
   typedef string external_program_name_type;
-  typedef external_program_name_type& external_program_name_ref;
+  typedef bool condition_type;
+  typedef unsigned int run_mode_type;
+  typedef string file_name_type;
+  typedef string prefix_type;
+  typedef string job_name_head_type;
 
 public:
-  lattice_info_ref set_lattice_info() 
-   { return this->lattice_info_; }
-  external_program_name_ref set_external_program_name()
-   { return this->external_program_name; }
+  void read_input_file( file_name_type input_filename )
+   { /* to be implemented */ };
 
 private:
   lattice_info_type lattice_info_;
-  external_program_name_type external_program_name;
+  expansion_order_type order_;
+  correlation_level_type correlation_level_;
+  correlation_method_type correlation_method_;
+  condition_type use_external_energy_solver_;
+  external_program_name_type external_program_name_;
+  run_mode_type run_mode_;
+  prefix_type prefix_;
+  job_name_type job_name_head_;
 
 }; // end of struct Request
 

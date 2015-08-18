@@ -31,7 +31,7 @@
 
 using std::vector;
 
-namespace iquads { 
+namespace iquads {
 
 namespace manybody_expansion {
 
@@ -44,7 +44,8 @@ public:
   typedef bool condition_type;
 
 public:
-  void print(){}
+  void print()
+   { /* to be implemented */ }
 
 public:
   const energy_data_type total_energy() const 
@@ -75,7 +76,7 @@ private:
 
   order_type total_order_;
 
-}; // end of namespace Report
+}; // end of struct Report
 
 } // end of namespace manybody_expansion
 
