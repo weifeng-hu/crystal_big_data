@@ -27,6 +27,7 @@
 #ifndef COMPUTE_INTERACTION_ENERGY_TRAITS_H
 #define COMPUTE_INTERACTION_ENERGY_TRAITS_H
 
+#include <electron_correlation/settings.h>
 #include <electron_correlation/electron_correlation_client.h>
 
 namespace iquads {
@@ -38,7 +39,7 @@ typedef iquads :: electron_correlation :: Client molecular_energy_client_type;
 typedef iquads :: electron_correlation :: Setting energy_calc_setting_type;
 
 template < size_t Order >
-inline energy_data_type compute_interaction_energy( polymer<Order> x, energy_calc_setting_type guildlines )
+inline energy_data_type compute_interaction_energy( polymer<Order> x, energy_calc_setting_type settings )
 {
 
   return 0.0e0;
@@ -46,23 +47,23 @@ inline energy_data_type compute_interaction_energy( polymer<Order> x, energy_cal
 }; // end of function compute_interaction_energy<Order>
 
 template <>
-inline energy_data_type compute_interaction_energy<1> ( polymer<1> x, energy_calc_setting_type guildlines )
+inline energy_data_type compute_interaction_energy<1> ( polymer<1> x, energy_calc_setting_type settings )
 {
 
   molecular_energy_client_type client;
-  client.driver( Molecule(x), guilelines );
+  client.driver( Molecule(x), settings );
   return client.report().energy();
 
 }; // end of function compute_interaction_energy<1>
 
 template <>
-inline energy_data_type compute_interaction_energy<2>( polymer<2> x )
+inline energy_data_type compute_interaction_energy<2>( polymer<2> x, energy_calc_setting_type settings )
 {
 
   energy_data_type energy_dimer_01;
   {
    molecular_energy_client_type client;
-   client.driver( Molecule(x), guidelines );
+   client.driver( Molecule(x), settings );
    energy_dimer_01 = client.report().energy();
   }
 
@@ -74,13 +75,13 @@ inline energy_data_type compute_interaction_energy<2>( polymer<2> x )
 }; // end of function compute_interaction_energy<2>
 
 template <>
-inline energy_data_type compute_interaction_energy<3>( polymer<3> x )
+inline energy_data_type compute_interaction_energy<3>( polymer<3> x, energy_calc_setting_type settings )
 {
 
   energy_data_type energy_trimer_012;
   {
    molecular_energy_client_type client;
-   client.driver( Molecule(x), guidelines );
+   client.driver( Molecule(x), settings );
    energy_trimer_012 = client.report().energy();
   }
 

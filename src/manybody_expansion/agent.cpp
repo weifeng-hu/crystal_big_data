@@ -25,11 +25,11 @@
  */
 
 #include <iostream>
-#include <manybody_expansion/manybody_expansion_request.h>
-#inlucde <manybody_expansion/manybody_expansion_config.h>
-#include <manybody_expansion/manybody_expansion_agent.h>
+#include <manybody_expansion/order_bitmask.h>
+#include <manybody_expansion/request.h>
+#include <manybody_expansion/config.h>
+#include <manybody_expansion/agent.h>
 #include <manybody_expansion/manybody_expansion_template.h>
-#include <manybody_expansion/manybody_expansion_order_bitmask.h>
 
 namespace iquads {
 

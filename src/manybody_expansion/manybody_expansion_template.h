@@ -29,8 +29,8 @@
 
 #include <memory>
 #include <manybody_expansion/expansion_formula_periodic_traits.h>
-#include <manybody_expansion/manybody_expansion_config.h>
-#include <manybody_expansion/manybody_expansion_report.h>
+#include <manybody_expansion/config.h>
+#include <manybody_expansion/report.h>
 
 namespace iquads {
 
@@ -42,10 +42,11 @@ class ManyBodyExpansionGeneral
 public:
   typedef iquads :: manybody_expansion :: Config config_type;
   typedef iquads :: manybody_expansion :: Report report_type;
-  typedef report_type& report_ref;
   typedef double energy_data_type;
   typedef energy_data_type& energy_data_reference;
   typedef bool condition_type;
+
+  typedef report_type& report_ref;
 
 }; // end of template class manybody_expansion_general
 
@@ -56,9 +57,10 @@ public:
   typedef iquads :: manybody_expansion :: ExpansionFormulaPeriodic< Order > expansion_formula_type;
   typedef iquads :: manybody_expansion :: Config config_type;
   typedef iquads :: manybody_expansion :: Report report_type;
-  typedef report_type& report_ref;
   typedef double energy_data_type;
   typedef bool condition_type;
+
+  typedef report_type& report_ref;
 
 public:
   energy_data_type 

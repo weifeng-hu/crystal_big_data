@@ -24,28 +24,15 @@
  *
  */
 
-#include <iostream>
-#include <iquads/command_parser.h>
-#include <manybody_expansion/client.h>
 
-int main( int argc, char* argv[] )
-{
+namespace iquads {
 
-  using std::cout;
-  using std::endl;
+namespace electron_correlation {
 
-  cout << endl;
-  cout << "ManyBody Expansion Lattice Energy Calculation" << endl;
-  cout << endl;
+struct Setting {
 
-  typedef iquads :: manybody_expansion :: Client mbe_client_type;
-  mbe_client_type client;
-  {
-    using iquads :: CommandParser;
-    CommandParser command_parser( argc, argv );
-    client.driver( command_parser.command_string() );
-  }
+} // end of struct Setting
 
-  return 0;
+} // end of namespace electron_correlation
 
-} // end of main()
+} // end of namespace iquads 

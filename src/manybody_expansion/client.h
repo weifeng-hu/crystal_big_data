@@ -29,9 +29,9 @@
 
 #include <string>
 #include <iquads/command_parser.h>
-#include <manybody_expansion/manybody_expansion_command_setting.h>
-#include <manybody_expansion/manybody_expansion_config.h>
-#include <manybody_expansion/manybody_expansion_report.h>
+#include <manybody_expansion/command_setting.h>
+#include <manybody_expansion/config.h>
+#include <manybody_expansion/report.h>
 
 using std::string;
 

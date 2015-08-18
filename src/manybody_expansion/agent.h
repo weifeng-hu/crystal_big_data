@@ -28,9 +28,9 @@
 #define MANYBODY_EXPANSION_AGENT_H
 
 #include <iostream>
-#include <manybody_expansion/manybody_expansion_request.h>
-#include <manybody_expansion/manybody_expansion_config.h>
-#include <manybody_expansion/manybddy_expansion_report.h>
+#include <manybody_expansion/request.h>
+#include <manybody_expansion/config.h>
+#include <manybody_expansion/report.h>
 
 namespace iquads {
 

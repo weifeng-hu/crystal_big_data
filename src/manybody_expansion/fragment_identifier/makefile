@@ -1,7 +1,7 @@
 IQUADS_ROOT	= /home/chronos/user/Development/iquads/
 IQUADS_SRC	= $(IQUADS_ROOT)/src/
 IQUADS_BIN	= $(IQUADS_ROOT)/bin/
-CXX	= g++
+CXX	= g++ -static
 COPT	= -O0 --std=c++11
 CFLAGS	= -I/home/chronos/user/Development/boost_1_53_0/ -I$(IQUADS_SRC)
 CHEADS	= array_matrix_base.h\

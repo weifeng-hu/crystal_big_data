@@ -26,8 +26,8 @@
 
 #include <iostream>
 #include <memory>
-#include <manybody_expansion/manybody_expansion_agent.h>
-#include <manybody_expansion/manybody_expansion_client.h>
+#include <manybody_expansion/agent.h>
+#include <manybody_expansion/client.h>
 
 namespace iquads {
 
