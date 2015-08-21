@@ -30,10 +30,9 @@
 #include <string>
 #include <memory>
 #include <iquads/run_mode_bitmask.h>
-#include <iquads/report.h>
-#include <electron_correlation/electron_correlation_config.h>
-#include <electron_correlation/electron_correlation_report.h>
+#include <interface_to_third_party/external_program_request.h>
 #include <interface_to_third_party/external_program_config_base.h>
+#include <interface_to_third_party/external_program_report.h>
 
 using std::string;
 
@@ -44,6 +43,8 @@ namespace interface_to_third_party {
 class ExternalProgramAgent_Base
 {
 public:
+  typedef iquads :: interface_to_third_party :: ExternalProgramRequest request_type;
+  typedef iquads :: interface_to_third_party :: ExternalProgramReport report_type;
   typedef ExternalProgramConfig_Base base_config_type;
   typedef base_config_type* base_config_ptr;
   typedef Report report_type;
@@ -86,7 +87,7 @@ public:
       case( COLLECT_LOCAL_OUTPUT ):
         return sequence_collect_local_output();
      }
-   } // end of accept_request_and_process()
+   } // end of function accept_request_and_process()
 
 protected:
   program_path_type program_path_;
