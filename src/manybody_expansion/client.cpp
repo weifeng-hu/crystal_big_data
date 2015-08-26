@@ -40,7 +40,7 @@ mbe_client_type :: request_type
 {
 
   request_type request;
-  request.read_input_file( command_settings.input_filename() );
+  request.read_input_file( command_setting.input_filename() );
   return request;
 
 }; // end of function file_request()
@@ -51,15 +51,15 @@ mbe_client_type :: command_setting_type
 
   if ( command_container.size() == 1 ){
     cout << "error: no command option input" << endl;
-    client_type :: show_help();
+    mbe_client_type :: show_help();
     exit(1);
   }
 
   command_setting_type command_settings;
   for( size_t i = 0; i < command_container.size(); i++ ){
-   client_type :: command_argument_type argument = command_container[i];
+   mbe_client_type :: command_argument_type argument = command_container[i];
    if( argument == "--input" || argument == "-i" ){
-    command_settings.set_config_filename() = command_container.at(i+1);
+    command_settings.set_input_filename() = command_container.at(i+1);
    }
   }
 

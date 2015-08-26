@@ -28,7 +28,7 @@
 #define ELECTRON_CORRELATION_REPORT_H
 
 #include <string>
-#include <molecule.h>
+#include <structure/molecule.h>
 #include <interface_to_third_party/external_program_report.h>
 
 using std::string;
@@ -40,7 +40,7 @@ namespace electron_correlation {
 struct Report
 {
 public:
-  typedef iquads :: geometry :: molecule molecule_type;
+  typedef iquads :: structure :: Molecule molecule_type;
   typedef double energy_data_type;
   typedef string correlation_level_type;
   typedef string correlation_method_type;
@@ -50,11 +50,15 @@ public:
   void collect_data_from_external_report( external_report_type external_report )
    { /* to be implemented */ }
 
+public:
+  const energy_data_type energy() const 
+   { return this->energy_; }
+
 private:
   molecule_type molecule_;
   correlation_level_type correlation_level_;
   correlation_method_type correlation_method_;
-  energy_data_type total_energy_;
+  energy_data_type energy_;
   energy_data_type hf_energy_;
 
 }; // end of struct Report

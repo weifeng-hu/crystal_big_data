@@ -27,6 +27,7 @@
 #ifndef ELECTRON_CORRELATION_CLIENT_H
 #define ELECTRON_CORRELATION_CLIENT_H
 
+#include <structure/molecule.h>
 #include <electron_correlation/report.h>
 #include <electron_correlation/setting.h>
 #include <interface_to_third_party/external_program_request.h>
@@ -48,12 +49,12 @@ public:
   typedef iquads :: interface_to_third_party :: ExternalProgramAgent_Base external_base_agent_type;
   typedef external_base_agent_type* external_base_agent_ptr;
   typedef Setting setting_type;
-  typedef iquads :: geometry :: Molecule molecule_type;
+  typedef iquads :: structure :: Molecule molecule_type;
 
 public:
   report_type internal_solve()
    { /* to be implemented */ }
-  request_type file_external_request()
+  external_request_type file_external_request( setting_type settings )
    { /* to be implemented */ }
   void driver( molecule_type molecule, setting_type settings )
    {
@@ -62,8 +63,8 @@ public:
      }
      else{
       external_request_type external_request = this->file_external_request( settings );
-      external_base_agent_ptr agent_ptr;
-       = this->agent_factory().get_agent( settings.external_agent_mask() );
+      external_base_agent_ptr agent_ptr
+       = this->external_agent_factory().get_agent( settings.external_agent_mask() );
       external_report_type external_report
        = agent_ptr->accept_request_and_process( external_request );
       this->report().collect_data_from_external_report( external_report );
@@ -71,9 +72,9 @@ public:
    } // end of driver()
 
 public:
-  const external_agent_factory_type external_agent_factory() const 
+  external_agent_factory_type& external_agent_factory()
    { return this->external_agent_factory_; }
-  const report_type report() const 
+  report_type& report() 
    { return this->report_; }
 
 private:

@@ -1,5 +1,32 @@
-#ifndef LATTICE_BASE_H
-#define LATTICE_BASE_H
+/**
+ * @file
+ * @author Weifeng Hu
+ *
+ * @section LICENSE
+ *
+ * Copyright (C) 2013, 2014, 2015  Weifeng Hu
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @section DESCRIPTION
+ *
+ *
+ */
+
+
+#ifndef LATTICE_TEMPLATE_H
+#define LATTICE_TEMPLATE_H
 
 #include <stdlib.h>
 #include <string>
@@ -7,22 +34,30 @@
 #include <vector>
 #include <array>
 #include <iostream>
-#include "utilities/solid_gen/threed_space_function.h"
+#include <geometrical_space/threed_space_function.h>>
 
-using namespace std;
+using std::string;
+using std::tuple;
+using std::vector;
+using std::array;
+using std::cout;
+using std::endl;
 
 namespace iquads {
 
-using namespace threed_space;
+using namespace geometrical_space :: threed_space;
 
-namespace crystal {
+namespace structure {
 
-template< class unit_cell >
-struct lattice_base {
+template < class UnitCell_Type >
+struct Lattice {
 public:
-  lattice_base() {
+  Lattice() {
    this->reset();
   }
+
+public:
+  typedef typename UnitCell_Type unit_cell_type;
 
 public:
   void reset(){
@@ -96,7 +131,7 @@ public:
    }
   } // end of recenter() 
 
-  void set_primitive( unit_cell prim ){
+  void set_primitive( unit_cell_type prim ){
    this->primitive = prim;
    this->lp = prim.get_constants();
    this->unit_cell_is_set_ = true;
@@ -117,7 +152,7 @@ public:
      for( size_t j = 0; j < lb; j++ ){
       for( size_t k = 0; k < lc; k++ ){
        tuple< int, int, int > direction = make_tuple( i, j, k );
-       unit_cell copy = primitive.translational_duplicate( direction );
+       unit_cell_type copy = primitive.translational_duplicate( direction );
        store.push_back( copy );
       }
      }
@@ -138,7 +173,7 @@ public:
       for( int k = -lc; k <= lc; k++ ){
        if( i == 0 && j == 0 && k == 0 ) continue;
        tuple< int, int, int > direction = make_tuple( i, j, k );
-       unit_cell copy = primitive.translational_duplicate( direction );
+       unit_cell_type copy = primitive.translational_duplicate( direction );
        store.push_back( copy );
       }
      }
@@ -157,7 +192,7 @@ public:
    cout << "Lattice Info" << endl;
    for( size_t icell = 0; icell < store.size(); icell++ ){
     cout << " Unit Cell " << icell << endl;
-    unit_cell unit_cell_local = store.at(icell);
+    unit_cell_type unit_cell_local = store.at(icell);
     unit_cell_local.print_info();
    }
   }
@@ -165,35 +200,35 @@ public:
   void print_atomlist(){
    cout << "Atom List" << endl;
    for( size_t icell = 0; icell < store.size(); icell++ ){
-    unit_cell unit_cell_local = store.at(icell);
+    unit_cell_type unit_cell_local = store.at(icell);
     unit_cell_local.print_atomlist();
    }
   }
 
   friend 
-  ostream& operator<< ( ostream& os, lattice_base<unit_cell>& lattice ){
+  ostream& operator<< ( ostream& os, lattice_base<unit_cell_type>& lattice ){
    const size_t n_cell = lattice.get_ncell();
    for( size_t icell = 0; icell < n_cell; icell++ ){
-    unit_cell cell_i = lattice.get_cell(icell);
+    unit_cell_type cell_i = lattice.get_cell(icell);
     os << cell_i << endl;
    }
    return os;
   }
 
-  unit_cell get_cell( size_t i ) const { return this->store.at(i); }
+  unit_cell_type get_cell( size_t i ) const { return this->store.at(i); }
   size_t get_ncell() const { return this->store.size(); }
   lattice_parameters get_constants() const { return this->lp; }
 
 private:
-  vector< unit_cell > store;
-  unit_cell primitive;
+  vector< unit_cell_type > store;
+  unit_cell_type primitive;
   lattice_parameters lp;
   size_t na, nb, nc;
   bool unit_cell_is_set_;
 
 }; // end of struct lattice_base
 
-} // end of namespace crystal
+} // end of namespace structure
 
 } // end of namespace iquads
 

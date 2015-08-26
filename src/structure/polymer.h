@@ -19,28 +19,27 @@
  *
  */
 
-#ifndef UNIT_CELL_H
-#define UNIT_CELL_H
 
-#include "utilities/solid_gen/atom.h"
-#include "utilities/solid_gen/molecule.h"
-#include "utilities/solid_gen/unit_cell_base.h"
+#ifndef POLYMER_H
+#define POLYMER_H
 
-using namespace std;
+#include <structure/polymer_base.h>
 
-namespace iquads{
+namespace iquads {
 
-using namespace basic;
+namespace structure {
 
-namespace crystal{
+  // explicit template instantiation
+  template class Polymer<2>;
+  template class Polymer<3>;
+  template class Polymer<4>;
 
-  template class unit_cell_base<atom>;
-  template class unit_cell_base<molecule>;
+  // self defined types
+  typedef Polymer<2> dimer;
+  typedef Polymer<3> trimer;
+  typedef Polymer<4> tetramer;
 
-  typedef unit_cell_base<atom> atomic_ucell;
-  typedef unit_cell_base<molecule> molecular_ucell;
-
-} // end of namespace crystal 
+} // end of namespace structure
 
 } // end of namespace iquads
 

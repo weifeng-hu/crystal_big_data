@@ -1,4 +1,4 @@
-/*
+/**
  *  This source code applies all the terms in 
  *  GNU GENERAL PUBLIC LICENSE (GPL), Version3, 29 June 2007.
  *
@@ -17,7 +17,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- */
+ **/
 
 #ifndef LATTICE_PARAMETERS_H
 #define LATTICE_PARAMETERS_H
@@ -27,24 +27,28 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
-#include "blas/blas_interface.h"
-#include "utilities/solid_gen/threed_space.h"
+#include <blas/blas_interface.h>
+#include <geometrical_space/threed_space.h>
 
-using namespace std;
+using std::array;
+using std::tuple;
+using std::cout;
+using std::endl;
+using std::fstream;
 
 namespace iquads {
 
-using namespace iquads :: threed_space;
+using namespace iquads :: geometrical_space :: threed_space;
 
-namespace crystal {
+namespace structure {
 
-struct lattice_parameters
+struct LatticeParameters 
 {
 public:
-  lattice_parameters(){
+  LatticeParameters(){
    this->reset();
   }
-  lattice_parameters( tuple<double, double, double> edge_lengths,
+  LatticeParameters( tuple<double, double, double> edge_lengths,
                      tuple<double, double, double> angles )
   {
    this->reset();
@@ -71,10 +75,10 @@ public:
    }
   }
 
-  friend ifstream& operator>> ( ifstream& ifs, lattice_parameters& lp ){
+  friend ifstream& operator>> ( ifstream& ifs, LatticeParameters& lp ){
    double a,b,c,aa,ab,ay;
    ifs >> a >> b >> c >> aa >> ab >> ay;
-   lp = lattice_parameters( make_tuple(a,b,c),make_tuple(aa,ab,ay) );
+   lp = LatticeParameters( make_tuple(a,b,c),make_tuple(aa,ab,ay) );
    lp.compute_translational_vectors();
   }
 
@@ -187,9 +191,9 @@ private:
   double angle_beta_;
   double angle_gamma_;
 
-}; // end of struct lattice_constants
+}; // end of struct LatticeParameters
 
-} // end of namespace crystal
+} // end of namespace structure
 
 } // end of namespace iquads
 

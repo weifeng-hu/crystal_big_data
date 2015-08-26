@@ -29,7 +29,7 @@
 
 #include <string>
 #include <memory>
-#include <electron_correlation/electron_correlation_config.h>
+#include <electron_correlation/config.h>
 
 using std::string;
 using std::shared_ptr;
@@ -38,30 +38,33 @@ namespace iquads {
 
 namespace manybody_expansion {
 
-using electron_correlation :: ElectronCorrelation_Config;
-
 class Config
 {
 public:
-  typedef ElectronCorrelation_Config electron_correlation_config_type;
+  typedef iquads :: electron_correlation :: Config electron_correlation_config_type;
   typedef string file_name_type;
   typedef string program_name_type;
   typedef bool condition_type;
   typedef unsigned int bitmask_type;
+  typedef unsigned int order_type;
+
+  typedef condition_type& condition_ref;
 
 public:
   const bitmask_type total_order_mask() const 
    { return this->total_order_mask_; }
   const condition_type is_periodic() const 
    { return this->is_periodic_; }
-  condition_reference set_is_periodic()
+  condition_ref set_is_periodic()
    { return this->is_periodic_; }
   const condition_type to_set_up_only() const
    { return this->to_set_up_only_; }
-  condition_reference set_to_set_up_only()
+  condition_ref set_to_set_up_only()
    { return this->to_set_up_only_; }
   const bitmask_type external_program_mask() const
    { return this->external_program_mask_; }
+  const order_type order() const 
+   { return this->order_; }
 
 private:
   electron_correlation_config_type electron_correlation_config_;
@@ -72,6 +75,7 @@ private:
   condition_type forth_order_requested_;
   condition_type fifth_order_requested_;
   bitmask_type total_order_mask_;
+  order_type order_;
 
   condition_type is_periodic_;
   condition_type to_set_up_only_;

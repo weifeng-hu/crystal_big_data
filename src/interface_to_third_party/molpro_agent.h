@@ -33,6 +33,7 @@
 #include <string>
 #include <cstdlib>
 #include <interface_to_third_party/molpro_config.h>
+#include <interface_to_third_party/external_program_report.h>
 #include <interface_to_third_party/external_program_agent_base.h>
 
 namespace iquads {
@@ -44,7 +45,7 @@ class MolproAgent
 {
 public:
   typedef MolproConfig config_type;
-  typedef config_type& config_reference;
+  typedef ExternalProgramReport report_type;
 
 public:
   MolproAgent()
@@ -66,23 +67,23 @@ public:
    }
 
 public:
-  void run_calculation( file_name_type input_filename, filename_type output_filename )
+  void run_calculation( file_name_type input_filename, file_name_type output_filename )
    {
      command_line_type command_line 
-       = this->program_path_ + " " + work_path + input_filename;
+       = this->program_path_ + " " + input_filename;
      int res = system( command_line.c_str() );
    }
   file_name_type write_input( base_config_ptr base_config_pointer, 
                               work_path_type work_path  ){};
-  file_name_type write_script(){};
+  file_name_type write_run_script( base_config_ptr base_config_pointer ) {};
   file_name_type collect_result( file_name_type output_filename ){};
 
 public:
-  void sequence_local_run();
-  void sequence_write_local_input(){}
-  void sequence_write_pbs_input(){}
-  void sequence_write_sbatch_input(){}
-  void sequence_collect_local_result(){}
+  report_type sequence_local_run();
+  report_type sequence_write_local_input(){}
+  report_type sequence_write_pbs_input(){}
+  report_type sequence_write_sbatch_input(){}
+  report_type sequence_collect_local_output(){}
 
 private:
   config_type config_;

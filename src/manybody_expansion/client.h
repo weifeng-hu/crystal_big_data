@@ -30,6 +30,8 @@
 #include <string>
 #include <iquads/command_parser.h>
 #include <manybody_expansion/command_setting.h>
+#include <manybody_expansion/agent.h>
+#include <manybody_expansion/request.h>
 #include <manybody_expansion/config.h>
 #include <manybody_expansion/report.h>
 
@@ -54,7 +56,7 @@ public:
 public:
   static void show_help();
   static command_setting_type analyse_command( command_container_type command_container );
-  void file_request( command_setting_type command_setting );
+  request_type file_request( command_setting_type command_setting );
 
   void print_report() const 
    { this->report().print(); }

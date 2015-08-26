@@ -33,20 +33,20 @@ main.o: ./../iquads/command_parser.h ./client.h ./client.cpp
 	$(CXX) -c $(CFLAGS) main.cpp
 
 config.o: ./../interface_to_third_party/external_program_bitmask.h\
-		             ./../electron_correlation/electron_correlation_config.h\
-			     ./config.h
+	 ./../electron_correlation/config.h\
+	./config.h
 	$(CXX) -c $(CFLAGS) config.cpp
 
 client.o: ./../iquads/command_parser.h\
-			     ./command_setting.h\
-			     ./config.h\
-			     ./report.h
+	 ./command_setting.h\
+	 ./config.h\
+	 ./report.h
 	$(CXX) -c $(CFLAGS) client.cpp
 
 agent.o: ./../interface_to_third_party/external_program_agent_base.h\
-			    ./../interface_to_third_party/external_program_agent.h\
-			    ./agent.h\
-			    ./order_bitmask.h
+	 ./compute_interaction_energy_traits.h\
+	 ./agent.h\
+	 ./order_mask.h
 	$(CXX) -c $(CFLAGS) agent.cpp
 
 clean:

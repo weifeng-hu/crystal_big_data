@@ -47,7 +47,7 @@ public:
   typedef unsigned int run_mode_type;
   typedef string file_name_type;
   typedef string prefix_type;
-  typedef string job_name_head_type;
+  typedef string job_name_type;
 
 public:
   void read_input_file( file_name_type input_filename )
@@ -62,7 +62,7 @@ private:
   external_program_name_type external_program_name_;
   run_mode_type run_mode_;
   prefix_type prefix_;
-  job_name_type job_name_head_;
+  job_name_type job_name_;
 
 }; // end of struct Request
 

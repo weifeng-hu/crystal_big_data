@@ -44,7 +44,7 @@ public:
   typedef bool condition_type;
 
 public:
-  void print()
+  void print() const
    { /* to be implemented */ }
 
 public:
@@ -74,7 +74,7 @@ private:
 
   size_type n_untcell_;
 
-  order_type total_order_;
+  order_type order_;
 
 }; // end of struct Report
 

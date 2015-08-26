@@ -37,7 +37,7 @@ namespace run_mode {
   constexpr run_mode_type WRITE_LOCAL_INPUT   = 0x01 << 1; 
   constexpr run_mode_type WRITE_PBS_INPUT     = 0x01 << 2;
   constexpr run_mode_type WRITE_SBATCH_INPUT  = 0x01 << 3;
-  constexpr run_mode_type COLLECT_LOCAL_INPUT = 0x01 << 4;
+  constexpr run_mode_type COLLECT_LOCAL_OUTPUT = 0x01 << 4;
 
 } // end of namespace run_mode
 

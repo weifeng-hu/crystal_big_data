@@ -25,7 +25,7 @@
  */
 
 #include <iostream>
-#include <manybody_expansion/order_bitmask.h>
+#include <manybody_expansion/order_mask.h>
 #include <manybody_expansion/request.h>
 #include <manybody_expansion/config.h>
 #include <manybody_expansion/agent.h>
@@ -54,25 +54,25 @@ mbe_agent_type :: report_type
   cout << " Compute lattice energy using the periodic MBE formula" << endl;
 
   try {
-   switch ( this->order_ ) {
+   switch ( config.order() ) {
     case ( order_bitmask :: FIRST_ORDER ):
      ManyBodyExpansionPeriodic<1> manybody_expansion_periodic;
      manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( config, report );
      break;
     default:
-     throw( this->order_ );
+     throw( config.order() );
      break;
    }
   }
   catch ( bitmask_type order ) {
     cout << " execute_periodic():" << endl;
-    cout << "  ManyBody Expansion terms of " << this->order_ << " order are not implemented! " << endl;
+    cout << "  ManyBody Expansion terms of " << order << " order are not implemented! " << endl;
     exit(1);
   }
 
 }; // end of function execute_periodic()
 
-mbe_agent_type report_type
+mbe_agent_type :: report_type 
  mbe_agent_type :: execute_general( config_type config, report_ref report )
 {
 
@@ -83,8 +83,6 @@ mbe_agent_type report_type
   cout << " general MBE formula algorithm not implemented "  << endl;
   exit(1);
 
-  report_type report;
-  return report;
 
 }; // end of function execute_general()
 

@@ -24,14 +24,26 @@
  *
  */
 
+#ifndef EXTERNAL_PROGRAM_REQUEST_H
+#define EXTERNAL_PROGRAM_REQUEST_H
+
 namespace iquads {
 
 namespace interface_to_third_party {
 
 struct ExternalProgramRequest {
 
+public:
+  unsigned int run_mode()
+   { return this->run_mode_; }
+
+private:
+  unsigned int run_mode_;
+
 }; // end of struct ExternalProgramRequest
 
 } // end of namespace interface_to_third_party
 
 } // end of namespace iquads
+
+#endif

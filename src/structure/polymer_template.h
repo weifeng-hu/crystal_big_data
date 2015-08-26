@@ -1,33 +1,62 @@
-#ifndef POLYMER_BASE_H
-#define POLYMER_BASE_H
+/**
+ * @file
+ * @author Weifeng Hu
+ *
+ * @section LICENSE
+ *
+ * Copyright (C) 2013, 2014, 2015  Weifeng Hu
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @section DESCRIPTION
+ *
+ *
+ */
+
+
+#ifndef POLYMER_TEMPLATE_H
+#define POLYMER_TEMPLATE_H
 
 #include <vector>
 #include <iostream>
-#include "utilities/solid_gen/threed_space.h"
-#include "utilities/solid_gen/threed_space_function.h"
-#include "utilities/solid_gen/coordinate.h"
-#include "utilities/solid_gen/atom.h"
-#include "utilities/solid_gen/molecule.h"
+#include <geometrical_space/threed_space.h>
+#include <geometrical_space/threed_space_function.h>
+#include <geometrical_space/coordinate.h>
+#include <particle/atom.h>
+#include <structure/molecule.h>
 
-using namespace std;
+using std::vector;
+using std::cout;
+using std::endl;
 
 namespace iquads {
 
-using namespace threed_space;
-using namespace basic;
+using namespace geometrical_space :: threed_space;
+using namespace particle;
 
-namespace crystal {
+namespace structure {
 
 template< size_t NUM >
-struct polymer_base{
+struct Polymer {
 public:
-  polymer_base(){
+  Polymer(){
    this->n_molecule_ = NUM;
    this->group.resize( NUM );
    this->natom_ = 0;
    this->mass_ = 0.0e0;
   }
-  polymer_base( MoleculeList poly ){
+  Polymer( MoleculeList poly ){
    this->n_molecule_ = NUM;
    this->group.resize( NUM );
    this->natom_ = 0;
@@ -118,7 +147,7 @@ public:
   CoordList get_coordinate_list(){
    CoordList retval;
    for( size_t imolecule = 0; imolecule < NUM; imolecule++ ){
-    molecule mole_i = group.at(imolecule);
+    Molecule mole_i = group.at(imolecule);
     CoordList coordlist_i = mole_i.get_coordinate_list();
     retval.insert( retval.end(), coordlist_i.begin(), coordlist_i.end() );
    }
@@ -127,7 +156,7 @@ public:
   AtomList get_atom_list(){
    AtomList retval;
    for( size_t imolecule = 0; imolecule < NUM; imolecule++ ){
-    molecule mole_i = group.at(imolecule);
+    Molecule mole_i = group.at(imolecule);
     AtomList atomlist_i = mole_i.get_atom_list();
     retval.insert( retval.end(), atomlist_i.begin(), atomlist_i.end() );
    }
@@ -136,10 +165,10 @@ public:
   // should think about using std::move() to append vectors
 
   friend 
-  ostream& operator<< ( ostream& os, polymer_base<NUM> polymer ){
+  ostream& operator<< ( ostream& os, Polymer<NUM> polymer ){
    const size_t n_member = NUM;
    for( size_t imember = 0; imember < n_member; imember++ ){
-    molecule mole_i = polymer.set_member(imember);
+    Molecule mole_i = polymer.set_member(imember);
     os << mole_i << endl;
    }
    return os;
@@ -149,19 +178,33 @@ public:
   MoleculeList get_group() const { return this->group; }
   size_t get_natom() const { return this->natom_; }
   double get_mass() const { return this->mass_; }
+public:
+  Polymer<1> at( size_t i ) 
+   { 
+     MoleculeList mole_list;
+     mole_list.push_back( group.at(i) );
+     Polymer<1> retval(mole_list);
+     return retval;
+   }
 
 private:
-  molecule& set_member( size_t i ){ return group.at(i); }
+  Molecule& set_member( size_t i ){ return group.at(i); }
 
 private:
-  vector< molecule > group;
+  vector< Molecule > group;
   double mass_;
   size_t n_molecule_;
   size_t natom_;
 
-};
+}; // end of template class Polymer
 
-} // end of crystal
+template < size_t NUM_1, size_t NUM_2, size_t NUM_3 = NUM_1 + NUM_2 > Polymer< NUM_3 > 
+ operator+ ( Polymer<NUM_1> poly_a, Polymer<NUM_2> poly_b )
+{
+
+}
+
+} // end of structure
 
 } // end of iquads
 

@@ -27,7 +27,7 @@
 #include <string>
 #include <fstream>
 #include <interface_to_third_party/external_program_bitmask.h>
-#include <manybody_expansion/manybody_expansion_config.h>
+#include <manybody_expansion/config.h>
 
 using std::string;
 
@@ -35,8 +35,9 @@ namespace iquads {
 
 namespace manybody_expansion {
 
-typedef ManyBodyExpansion_Config config_type;
+typedef Config config_type;
 
+/*
 void config_type :: read_config( config_type :: file_name_type input_filename )
 {
 
@@ -84,6 +85,7 @@ void config_type :: read_config( config_type :: file_name_type input_filename )
   ifs.close();
 
 }; // end of read_config()
+*/
 
 } // end of manybody_expansion
 

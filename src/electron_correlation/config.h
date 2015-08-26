@@ -27,7 +27,7 @@
 #ifndef ELECTRON_CORRELATION_CONFIG_H
 #define ELECTRON_CORRELATION_CONFIG_H
 
-#include <electron_correlation/electron_correlation_method_bitmask.h>
+#include <electron_correlation/method_bitmask.h>
 
 namespace iquads {
 
@@ -40,7 +40,7 @@ public:
   typedef condition_type& condition_ref;
 
 public:
-  ElectronCorrelation_Config()
+  Config()
    {
      this->total_correlation_mask_ = 0x00;
    }

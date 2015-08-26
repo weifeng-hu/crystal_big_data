@@ -19,26 +19,30 @@
  *
  */
 
-#ifndef UNIT_CELL_BASE_H
-#define UNIT_CELL_BASE_H
+#ifndef UNIT_CELL_TEMPLATE_H
+#define UNIT_CELL_TEMPLATE_H
 
 #include <vector>
 #include <string>
 #include <iostream>
 #include <tuple>
-#include "utilities/solid_gen/threed_space.h"
-#include "utilities/solid_gen/lattice_parameters.h"
+#include <geometrical_space/threed_space.h>
+#include <structure/lattice_parameters.h>
 
-using namespace std;
+using std::vector;
+using std::string;
+using std::cout;
+using std::endl;
+using std::tuple;
 
 namespace iquads{
 
-using namespace threed_space;
+using namespace geometrical_space :: threed_space;
 
-namespace crystal{
+namespace structure {
 
 template < class node_type >
-struct unit_cell_base
+struct UnitCell
 {
 public:
   void add_node( node_type new_node )
@@ -60,7 +64,7 @@ public:
     return within_radius_local;
    }
  
-  unit_cell_base<node_type> 
+  UnitCell<node_type> 
    translational_duplicate( tuple<int, int, int> direction )
    {
     int a = get<0>( direction );
@@ -69,13 +73,13 @@ public:
     return this->translational_duplicate( a, b, c );
    }
 
-  unit_cell_base<node_type> 
+  UnitCell<node_type> 
   translational_duplicate( int a_, int b_, int c_ )
    {
     double a = a_;
     double b = b_;
     double c = c_;
-    unit_cell_base <node_type> copy;
+    UnitCell <node_type> copy;
     copy.set_translation_vec() = array<int, 3> { a_, b_, c_ };
     copy.set_constants() = this->get_constants();
     size_t n_node_local = this->store.size();
@@ -99,7 +103,7 @@ public:
    }
 
   friend 
-   ifstream& operator>> ( ifstream& ifs, unit_cell_base<node_type>& cell )
+   ifstream& operator>> ( ifstream& ifs, UnitCell<node_type>& cell )
     {
      size_t n_node;
      ifs >> n_node;
@@ -115,7 +119,7 @@ public:
     }
 
   friend
-   ostream& operator<< ( ostream& os, unit_cell_base<node_type>& cell )
+   ostream& operator<< ( ostream& os, UnitCell<node_type>& cell )
    {
     const size_t n_node = cell.get_n_node();
     for( size_t inode = 0; inode < n_node; inode++ ){
@@ -211,9 +215,9 @@ private:
   lattice_parameters constants;
   array<int, 3> translation_vec;
 
-}; // end of struct unit_cell_base
+}; // end of struct UnitCell
 
-} // end of namespace crystal
+} // end of namespace structure
 
 } // end of namespace iquads
 

@@ -27,24 +27,34 @@
 #include <tuple>
 #include <fstream>
 #include <iostream>
-#include "utilities/solid_gen/coordinate.h"
-#include "utilities/solid_gen/atom.h"
+#include <geometrical_space/coordinate.h>
+#include <particle/atom.h>
 
-using namespace std;
+using std::vector;
+using std::string;
+using std::tuple;
+using std::cout;
+using std::endl;
+using std::fstream;
 
 namespace iquads {
 
-namespace basic {
+using geometrical_space :: Coord;
+using geometrical_space :: CoordList;
+using particle::atom;
+using particle::AtomList;
 
-struct molecule{
+namespace structure {
+
+struct Molecule{
 public:
-  molecule(){
+  Molecule(){
    this->atom_list.resize(0);
    this->molecule_name_ = "not set";
    this->natom_ = 0;
    this->mass_ = 0.0e0;
   }
-  molecule( string molecule_name ){
+  Molecule( string molecule_name ){
    this->atom_list.resize(0);
    this->molecule_name_ = molecule_name;
    this->natom_ = 0;
@@ -79,7 +89,7 @@ public:
    }
   }
 
-  friend ifstream& operator>> ( ifstream& ifs, molecule& new_mole ){
+  friend ifstream& operator>> ( ifstream& ifs, Molecule& new_mole ){
    ifs >> new_mole.set_name();
    size_t natom;
    ifs >> natom;
@@ -161,6 +171,7 @@ public:
    for( size_t iatom = 0; iatom < natom; iatom++ ){
     atomlist_local[iatom].print_info();
    }
+   using std::get;
    cout << "}" << endl;
    cout << "centroid:\t" 
         << get<0>( this->get_center() ) << " " 
@@ -182,7 +193,7 @@ public:
   }
 
   friend 
-  ostream& operator<< ( ostream& os, molecule mole ){
+  ostream& operator<< ( ostream& os, Molecule mole ){
    AtomList atomlist_local = mole.get_atom_list();
    const size_t natom = atomlist_local.size();
    for( size_t iatom = 0; iatom < natom; iatom++ ){
@@ -205,6 +216,7 @@ public:
    x_average = x_average/this->natom_;
    y_average = y_average/this->natom_;
    z_average = z_average/this->natom_;
+   using std::make_tuple;
    retval = make_tuple( x_average, y_average, z_average );
 
    return retval;
@@ -224,6 +236,7 @@ public:
    x_average = x_average/this->mass_;
    y_average = y_average/this->mass_;
    z_average = z_average/this->mass_;
+   using std::make_tuple;
    retval = make_tuple( x_average, y_average, z_average );
 
    return retval;
@@ -240,12 +253,12 @@ private:
   string molecule_name_;
 
 
-};
+}; // end of class Molecule
 
-typedef vector<molecule> MoleculeList;
+typedef vector<Molecule> MoleculeList;
 
-} // end of crystal
+} // end of namespace structure
 
-} // end of iquads
+} // end of namespace iquads
 
 #endif

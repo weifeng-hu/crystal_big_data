@@ -26,24 +26,28 @@
 #include <tuple>
 #include <map>
 #include <memory>
-#include "utilities/solid_gen/molecule.h"
-#include "utilities/solid_gen/unit_cell.h"
-#include "utilities/solid_gen/lattice.h"
-#include "utilities/solid_gen/lattice_parameters.h"
+#include <structure/molecule.h>
+#include <structure/unit_cell.h>
+#include <structure/lattice_instant.h>
+#include <structure/lattice_parameters.h>
 
-namespace iquads{
+using std::vector;
+using std::tuple;
+using std::multimap;
 
-namespace crystal{
+namespace iquads {
 
-struct molecule_bulk
+namespace structure {
+
+struct MoleculeBulk
 {
 public:
-  molecule_bulk(){
+  MoleculeBulk(){
    this->bulk.resize(0);
    this->n_molecule_ = 0;
    this->radius_ = 0.0e0;
   }
-  molecule_bulk( molecular_lattice* ml ){
+  Molecule_bulk( molecular_lattice* ml ){
    this->init_from( ml );
   }
 
@@ -121,7 +125,7 @@ public:
   }
 
   friend
-   ostream& operator<< ( ostream& os, const molecule_bulk& mole_bulk )
+   ostream& operator<< ( ostream& os, const MoleculeBulk& mole_bulk )
    {
     for( size_t i = 0 ; i < mole_bulk.get_nmolecule(); i++ ){
      os << mole_bulk.get_molecule(i);
@@ -142,9 +146,9 @@ private:
   double radius_;
   size_t n_molecule_;
 
-};
+}; // end of struct MoleculeBulk 
 
-} // end of crystal
+} // end of structure
 
 } // end of iquads
 

@@ -29,7 +29,9 @@
 
 #include <stdlib.h>
 #include <interface_to_third_party/external_program_bitmask.h>
-#include <interface_to_third_party/external_program_agent.h>
+#include <interface_to_third_party/external_program_agent_base.h>
+#include <interface_to_third_party/molpro_agent.h>
+#include <interface_to_third_party/orca_agent.h>
 
 namespace iquads {
 

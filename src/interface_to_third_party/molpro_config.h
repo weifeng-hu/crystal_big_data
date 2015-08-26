@@ -42,6 +42,7 @@ public:
 
   typedef bool condition_type;
   typedef string file_name_type;
+  typedef string work_path_type;
   typedef string basis_set_name_type;
   typedef string memory_unit_type;
   typedef string geometry_format_type;
@@ -49,16 +50,6 @@ public:
   typedef string molecule_name_type;
   typedef size_t memory_amount_type;
   typedef size_t number_type;
-
-  typedef condition_type& condition_reference;
-  typedef file_name_type& file_name_reference;
-  typedef set_name_type& set_name_reference;
-  typedef memory_unit_type& memory_unit_reference;
-  typedef geometry_format_type& geometry_format_reference;
-  typedef geometry_unit_type& geometry_unit_reference;
-  typedef molecule_name_type& molecule_name_reference;
-  typedef memory_amount_type& memory_amount_reference;
-  typedef number_type& number_reference;
 
 public:
   void set_defaults(){};
@@ -74,7 +65,7 @@ public:
 private:
   file_name_type input_filename_;
   file_name_type output_filename_;
-  wrok_path_type work_path;
+  work_path_type work_path_;
   basis_set_name_type basis_set_name_;
   memory_amount_type memory_amount_;
   memory_unit_type memory_unit_;

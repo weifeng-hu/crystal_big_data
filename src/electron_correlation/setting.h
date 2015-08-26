@@ -24,15 +24,32 @@
  *
  */
 
+#ifndef ELECTRON_CORRELATION_SETTING
+#define ELECTRON_CORRELATION_SETTING
 
 namespace iquads {
 
 namespace electron_correlation {
 
 struct Setting {
+public:
+  typedef unsigned int bitmask_type;
+  typedef bool condition_type;
 
-} // end of struct Setting
+public:
+  const condition_type use_external_solver() const
+   { return this->use_external_solver_; }
+  const bitmask_type external_agent_mask() const 
+   { return this->external_agent_mask_; }
+
+private:
+  condition_type use_external_solver_;
+  bitmask_type external_agent_mask_;
+
+}; // end of struct Setting
 
 } // end of namespace electron_correlation
 
 } // end of namespace iquads 
+
+#endif

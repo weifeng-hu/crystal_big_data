@@ -31,6 +31,7 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+#include <interface_to_third_party/external_program_report.h>
 #include <interface_to_third_party/external_program_agent_base.h>
 
 namespace iquads {
@@ -60,13 +61,17 @@ public:
    }
 
 public:
-  void run_calculation(){}
-  file_name_type write_input(){}
-  file_name_type write_script(){}
-  file_name_type collect_result(){}
-  void sequence_full(){}
-  void sequence_export_input_only(){}
-  void sequence_collect_result_only(){}
+  void run_calculation( file_name_type input_filename, 
+                        file_name_type output_filename ){}
+  file_name_type write_input( base_config_ptr base_config_pointer,
+                              work_path_type work_path ){}
+  file_name_type write_run_script( base_config_ptr base_config_pointer ){}
+  file_name_type collect_result( file_name_type output_filename ){}
+  report_type sequence_local_run(){};
+  report_type sequence_write_local_input(){};
+  report_type sequence_write_pbs_input(){};
+  report_type sequence_write_sbatch_input(){};
+  report_type sequence_collect_local_output(){};
 
 }; // end of class OrcaAgent
 
@@ -97,9 +102,11 @@ public:
   file_name_type write_input(){}
   file_name_type write_script(){}
   file_name_type collect_result(){}
-  void sequence_full(){}
-  void sequence_export_input_only(){}
-  void sequence_collect_result_only(){}
+  report_type sequence_local_run(){};
+  report_type sequence_write_local_input(){};
+  report_type sequence_write_pbs_input(){};
+  report_type sequence_write_sbatch_input(){};
+  report_type sequence_collect_local_output(){};
 
 }; // end of class Psi3Agent
 

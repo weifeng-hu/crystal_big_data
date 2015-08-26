@@ -47,7 +47,6 @@ public:
   typedef iquads :: interface_to_third_party :: ExternalProgramReport report_type;
   typedef ExternalProgramConfig_Base base_config_type;
   typedef base_config_type* base_config_ptr;
-  typedef Report report_type;
   typedef string program_name_type;
   typedef string program_path_type;
   typedef string work_path_type;
@@ -61,23 +60,23 @@ public:
                                 file_name_type output_filename ) = 0;
   virtual file_name_type write_input( base_config_ptr base_config_pointer, 
                                       work_path_type work_path ) = 0;
-  virtual file_name_type write_run_script( base_config_ptr base_config_pointer )
+  virtual file_name_type write_run_script( base_config_ptr base_config_pointer ) = 0;
   virtual file_name_type collect_result( file_name_type output_filename ) = 0;
 
 public:
-  virtual void sequence_local_run() = 0;
-  virtual void sequence_write_local_input() = 0;
-  virtual void sequence_write_pbs_input() = 0;
-  virtual void sequence_write_sbatch_input() = 0;
-  virtual void sequence_collect_local_result() = 0;
+  virtual report_type sequence_local_run() = 0;
+  virtual report_type sequence_write_local_input() = 0;
+  virtual report_type sequence_write_pbs_input() = 0;
+  virtual report_type sequence_write_sbatch_input() = 0;
+  virtual report_type sequence_collect_local_output() = 0;
 
 public:
   report_type accept_request_and_process( request_type request )
    {
-     using namespace iquads :: rum_mode;
+     using namespace iquads :: run_mode;
      switch( request.run_mode() ){
       case( LOCAL_RUN ):
-        return sequence_run( request );
+        return sequence_local_run();
       case( WRITE_LOCAL_INPUT ):
         return sequence_write_local_input();
       case( WRITE_PBS_INPUT ):

@@ -36,7 +36,7 @@ namespace order_bitmask {
 
   typedef unsigned int bitmask_type;
 
-  constexpr bitmask_type AUTO          = 0x01 << 0
+  constexpr bitmask_type AUTO          = 0x01 << 0;
   constexpr bitmask_type FIRST_ORDER   = 0x01 << 1;
   constexpr bitmask_type SECOND_ORDER  = 0x01 << 2;
   constexpr bitmask_type THIRD_ORDER   = 0x01 << 3;

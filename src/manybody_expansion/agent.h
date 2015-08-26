@@ -45,13 +45,12 @@ public:
   typedef report_type& report_ref;
 
 private:
-  config_type setup_config_from_request( request_type request )
-   { /* to be implemented */ };
+  config_type setup_config_from_request( request_type request );
   report_type execute_general( config_type config, report_ref report );
   report_type execute_periodic( config_type config, report_ref report );
 
 public:
-  report_type accept_request_and_process( request_type request );
+  report_type accept_request_and_process( request_type request )
    {
      using std::cout;
      using std::endl;

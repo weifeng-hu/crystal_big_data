@@ -30,14 +30,21 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include "utilities/solid_gen/coordinate.h"
-#include "utilities/solid_gen/threed_space_function.h"
+#include <geometrical_space/coordinate.h>
+#include <geometrical_space/threed_space_function.h>
 
-using namespace std;
+using std::vector;
+using std::array;
+using std::string;
+using std::tuple;
+using std::ostream;
+using std::ifstream;
 
 namespace iquads {
 
-namespace basic {
+namespace particle {
+
+using iquads :: geometrical_space :: Coord;
 
 struct atom {
 public:
@@ -53,11 +60,13 @@ public:
 
 public:
   bool within_radius( double Radius ){
+   using std::make_tuple;
    Coord orig = make_tuple(0.0e0, 0.0e0, 0.0e0);
    Coord this_coord 
     = make_tuple( this->coordinate.at(0), this->coordinate.at(1),
                   this->coordinate.at(2) );
-   double R = threed_space :: compute_distance( orig, this_coord );
+   using iquads :: geometrical_space :: threed_space :: compute_distance;
+   double R = compute_distance( orig, this_coord );
    return ( R <= Radius ) ? true : false;
   }
 
@@ -97,6 +106,8 @@ public:
   }
 
   void print_info(){
+   using std::cout;
+   using std::endl;
    char line[100];
 //   sprintf( line, "(%s)   X(%12.8f)  Y(%12.8f)  Z(%12.8f)  CHARGE(%d)", 
 //                  this->element_.c_str(), this->coordinate.at(0),
@@ -110,6 +121,9 @@ public:
   }
 
   friend ostream& operator<< ( ostream& os, atom& atom_ ){
+   using std::fixed;
+   using std::setw;
+   using std::setprecision;
    os << atom_.get_element().c_str() << "  ";
    os << fixed << setw(12) << setprecision(8) << atom_.get_x() << "  ";
    os << fixed << setw(12) << setprecision(8) << atom_.get_y() << "  ";
@@ -142,6 +156,7 @@ public:
   double& set_y() { return this->coordinate.at(1); }
   double& set_z() { return this->coordinate.at(2); }
   void set_coordinate( Coord new_coord ){
+   using std::get;
    const double x = get<0>( new_coord );
    const double y = get<1>( new_coord );
    const double z = get<2>( new_coord );
@@ -153,11 +168,13 @@ public:
   double& set_mass() { return this->mass_; }
 
   Coord get_center() {
+   using std::make_tuple;
    Coord retval = make_tuple( this->get_x(), this->get_y(), this->get_z() );
    return retval;
   }
 
   Coord get_center_of_mass() {
+   using std::make_tuple;
    Coord retval = make_tuple( this->get_x(), this->get_y(), this->get_z() );
    return retval;
   }
@@ -179,7 +196,7 @@ private:
 
 typedef vector<atom> AtomList;
 
-} // end of namespace basic
+} // end of namespace particle
 
 } // end of namespace iquads
 

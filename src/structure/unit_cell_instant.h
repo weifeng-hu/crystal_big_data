@@ -19,27 +19,26 @@
  *
  */
 
-#ifndef LATTICE_H
-#define LATTICE_H
+#ifndef UNIT_CELL_INSTANT_H
+#define UNIT_CELL_INSTANT_H
 
-#include <string>
-#include <vector>
-#include "utilities/solid_gen/unit_cell.h"
-#include "utilities/solid_gen/lattice_base.h"
+#include <particle/atom.h>
+#include <structure/molecule.h>
+#include <structure/UnitCell.h>
 
-namespace iquads {
+namespace iquads{
 
-using namespace basic;
+using namespace particle;
 
-namespace crystal {
+namespace structure {
 
-  template class lattice_base<atomic_ucell>;
-  template class lattice_base<molecular_ucell>;
+  template class UnitCell<atom>;
+  template class UnitCell<molecule>;
 
-  typedef lattice_base<atomic_ucell> atomic_lattice;
-  typedef lattice_base<molecular_ucell> molecular_lattice;
+  typedef UnitCell<atom> atomic_ucell;
+  typedef UnitCell<molecule> molecular_ucell;
 
-} // end of namespace crystal
+} // end of namespace structure 
 
 } // end of namespace iquads
 

@@ -19,9 +19,26 @@
  *
  */
 
+#ifndef LATTICE_INSTANT_H
+#define LATTICE_INSTANT_H
+
 #include <string>
 #include <vector>
+#include <structure/unit_cell.h>
+#include <structure/lattice_template.h>
 
-using namespace std;
+namespace iquads {
 
-int fragment_generator_driver( vector<string> args);
+namespace structure {
+
+  template class Lattice< atomic_ucell >;
+  template class Lattice< molecular_ucell >;
+
+  typedef Lattice< atomic_ucell > atomic_lattice;
+  typedef Lattice< molecular_ucell > molecular_lattice;
+
+} // end of namespace structure
+
+} // end of namespace iquads
+
+#endif
