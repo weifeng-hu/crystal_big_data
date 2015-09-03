@@ -41,12 +41,18 @@ namespace iquads {
 
 using geometrical_space :: Coord;
 using geometrical_space :: CoordList;
-using particle::atom;
-using particle::AtomList;
+using particle :: Atom;
+using particle :: AtomList;
 
 namespace structure {
 
 struct Molecule{
+public:
+  typedef Atom atom_type; 
+  typedef Coord coordinate_type;
+
+  typedef atom_type& atom_ref;
+
 public:
   Molecule(){
    this->atom_list.resize(0);
@@ -62,7 +68,7 @@ public:
   }
 
 public:
-  void add_atom( atom new_atom ){
+  void add_atom( atom_type new_atom ){
    this->atom_list.push_back( new_atom );
    this->natom_ += 1;
    this->mass_ += new_atom.get_mass();
@@ -73,7 +79,7 @@ public:
    bool retval = true;
    size_t n_atom_local = this->atom_list.size();
    for( size_t iatom = 0; iatom < n_atom_local; iatom++ ){
-    atom atom_local = atom_list.at(iatom);
+    atom_type atom_local = atom_list.at(iatom);
     if( atom_local.within_radius( Radius ) == false ){
      retval = false;
      break;
@@ -94,7 +100,7 @@ public:
    size_t natom;
    ifs >> natom;
    for( size_t iatom = 0; iatom < natom; iatom++ ){
-    atom new_atom;
+    atom_type new_atom;
     ifs >> new_atom;
     new_mole.add_atom( new_atom );
    }
@@ -136,13 +142,13 @@ public:
 
 public:
   AtomList get_atom_list() const { return this->atom_list; }
-  atom get_atom( size_t i ) const { return this->atom_list.at(i); }
+  atom_type get_atom( size_t i ) const { return this->atom_list.at(i); }
   string get_name() const { return this->molecule_name_; }
   size_t get_natom() const { return this->natom_; }
   double get_mass() const { return this->mass_; }
 
   AtomList& set_atom_list() { return this->atom_list; }
-  atom& set_atom( size_t i ) { return this->atom_list.at(i); }
+  atom_ref& set_atom( size_t i ) { return this->atom_list.at(i); }
   string& set_name() { return this->molecule_name_; }
   size_t& set_natom() { return this->natom_; }
   double& set_mass() { return this->mass_; }
@@ -150,7 +156,7 @@ public:
   CoordList get_coordinate_list(){
    CoordList retval;
    for( size_t iatom = 0; iatom < natom_; iatom++ ){
-    const Coord set = this->atom_list.at(iatom).get_coordinate_set();
+    const coordinate_type set = this->atom_list.at(iatom).get_coordinate_set();
     retval.push_back(set);
    }
    return retval;
@@ -197,14 +203,14 @@ public:
    AtomList atomlist_local = mole.get_atom_list();
    const size_t natom = atomlist_local.size();
    for( size_t iatom = 0; iatom < natom; iatom++ ){
-    atom atom_i = atomlist_local.at(iatom);
+    Atom atom_i = atomlist_local.at(iatom);
     os << atom_i << endl;
    }
    return os;
   }
 
-  Coord get_center(){
-   Coord retval;
+  coordinate_type get_center(){
+   coordinate_type retval;
    double x_average = 0.0e0;
    double y_average = 0.0e0;
    double z_average = 0.0e0;
@@ -222,9 +228,8 @@ public:
    return retval;
   }
 
-  Coord get_center_of_mass(){
-
-   Coord retval;
+  coordinate_type get_center_of_mass(){
+   coordinate_type retval;
    double x_average = 0.0e0;
    double y_average = 0.0e0;
    double z_average = 0.0e0;
@@ -238,7 +243,6 @@ public:
    z_average = z_average/this->mass_;
    using std::make_tuple;
    retval = make_tuple( x_average, y_average, z_average );
-
    return retval;
   }
 
@@ -251,7 +255,6 @@ private:
   size_t natom_;
   double mass_;
   string molecule_name_;
-
 
 }; // end of class Molecule
 

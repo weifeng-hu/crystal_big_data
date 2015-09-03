@@ -46,23 +46,41 @@ namespace particle {
 
 using iquads :: geometrical_space :: Coord;
 
-struct atom {
+class Atom {
 public:
-  atom(){
+  typedef Atom this_type;
+  typedef int charge_type;
+  typedef double mass_type;
+  typedef string element_type;
+  typedef double coordinate_value_type;
+  typedef Coord coordinate_type;
+  typedef bool condition_type;
+
+  typedef element_type& element_ref;
+  typedef coordinate_value_type& coordinate_value_ref;
+  typedef charge_type& charge_ref;
+  typedef mass_type& mass_ref;
+
+public:
+  Atom(){
    this->element_ = "not set";
    this->coordinate.fill(0.0e0);
    this->charge_ = 0;
    this->mass_ = 0.0e0;
   }
-  atom( string element, double x, double y, double z, int charge, double mass ){
+  Atom( element_type element, 
+        coordinate_value_type x, 
+        coordinate_value_type y, 
+        coordinate_value_type z, 
+        charge_type charge, mass_type mass ){
    this->set_info( element, x, y, z, charge, mass );
   }
 
 public:
-  bool within_radius( double Radius ){
+  condition_type within_radius( double Radius ){
    using std::make_tuple;
-   Coord orig = make_tuple(0.0e0, 0.0e0, 0.0e0);
-   Coord this_coord 
+   coordinate_type orig = make_tuple(0.0e0, 0.0e0, 0.0e0);
+   coordinate_type this_coord 
     = make_tuple( this->coordinate.at(0), this->coordinate.at(1),
                   this->coordinate.at(2) );
    using iquads :: geometrical_space :: threed_space :: compute_distance;
@@ -70,13 +88,13 @@ public:
    return ( R <= Radius ) ? true : false;
   }
 
-  void operator+= ( array<double, 3> x ){
+  void operator+= ( array<coordinate_value_type, 3> x ){
    this->coordinate.at(0) += x.at(0);
    this->coordinate.at(1) += x.at(1);
    this->coordinate.at(2) += x.at(2);
   }
 
-  friend ifstream& operator>> ( ifstream& ifs, atom& new_atom ){
+  friend ifstream& operator>> ( ifstream& ifs, Atom& new_atom ){
    ifs >> new_atom.set_element();
    ifs >> new_atom.set_x();
    ifs >> new_atom.set_y();
@@ -87,7 +105,10 @@ public:
   }
 
 public:
-  void set_info( string element, double x, double y, double z, int charge, double mass )
+  void set_info( element_type element, 
+                 coordinate_value_type x, 
+                 coordinate_value_type y, 
+                 coordinate_value_type z, charge_type charge, mass_type mass )
   {
    this->element_ = element;
    this->coordinate.at(0) = x;
@@ -120,7 +141,7 @@ public:
    cout << line << endl;
   }
 
-  friend ostream& operator<< ( ostream& os, atom& atom_ ){
+  friend ostream& operator<< ( ostream& os, Atom& atom_ ){
    using std::fixed;
    using std::setw;
    using std::setprecision;
@@ -136,46 +157,46 @@ public:
   }
 
 public:
-  string get_element() const { return this->element_; }
-  double get_x() const { return this->coordinate.at(0); }
-  double get_y() const { return this->coordinate.at(1); }
-  double get_z() const { return this->coordinate.at(2); }
+  element_type get_element() const { return this->element_; }
+  coordinate_value_type get_x() const { return this->coordinate.at(0); }
+  coordinate_value_type get_y() const { return this->coordinate.at(1); }
+  coordinate_value_type get_z() const { return this->coordinate.at(2); }
   // interface from vector to tuple
-  Coord get_coordinate_set(){
-   const double x = this->get_x();
-   const double y = this->get_y();
-   const double z = this->get_z();
+  coordinate_type get_coordinate_set(){
+   const coordinate_value_type x = this->get_x();
+   const coordinate_value_type y = this->get_y();
+   const coordinate_value_type z = this->get_z();
    Coord set = Coord( x, y, z );
    return set;
   }
-  int get_charge() const { return this->charge_; }
-  double get_mass() const { return this->mass_; }
+  charge_type get_charge() const { return this->charge_; }
+  mass_type get_mass() const { return this->mass_; }
 
-  string& set_element() { return this->element_; }
-  double& set_x() { return this->coordinate.at(0); }
-  double& set_y() { return this->coordinate.at(1); }
-  double& set_z() { return this->coordinate.at(2); }
-  void set_coordinate( Coord new_coord ){
+  element_ref set_element() { return this->element_; }
+  coordinate_value_ref set_x() { return this->coordinate.at(0); }
+  coordinate_value_ref set_y() { return this->coordinate.at(1); }
+  coordinate_value_ref set_z() { return this->coordinate.at(2); }
+  void set_coordinate( coordinate_type new_coord ){
    using std::get;
-   const double x = get<0>( new_coord );
-   const double y = get<1>( new_coord );
-   const double z = get<2>( new_coord );
+   const coordinate_value_type x = get<0>( new_coord );
+   const coordinate_value_type y = get<1>( new_coord );
+   const coordinate_value_type z = get<2>( new_coord );
    this->coordinate.at(0) = x;
    this->coordinate.at(1) = y;
    this->coordinate.at(2) = z;
   }
-  int& set_charge() { return this->charge_; }
-  double& set_mass() { return this->mass_; }
+  charge_ref set_charge() { return this->charge_; }
+  mass_ref set_mass() { return this->mass_; }
 
-  Coord get_center() {
+  coordinate_type get_center() {
    using std::make_tuple;
-   Coord retval = make_tuple( this->get_x(), this->get_y(), this->get_z() );
+   coordinate_type retval = make_tuple( this->get_x(), this->get_y(), this->get_z() );
    return retval;
   }
 
-  Coord get_center_of_mass() {
+  coordinate_type get_center_of_mass() {
    using std::make_tuple;
-   Coord retval = make_tuple( this->get_x(), this->get_y(), this->get_z() );
+   coordinate_type retval = make_tuple( this->get_x(), this->get_y(), this->get_z() );
    return retval;
   }
 
@@ -186,15 +207,15 @@ private:
   // we use vector for coordinate 
   // since for a general storage case, these 
   // objects will be stored in the heap and invoked to stack
-  array<double, 3> coordinate;
+  array<coordinate_value_type, 3> coordinate;
   array<int, 3> translation_vec;
-  int charge_;
-  double mass_;
-  string element_;
+  charge_type  charge_;
+  mass_type    mass_;
+  element_type element_;
 
 };
 
-typedef vector<atom> AtomList;
+typedef vector<Atom> AtomList;
 
 } // end of namespace particle
 
