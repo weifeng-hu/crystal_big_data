@@ -27,18 +27,21 @@
 #ifndef EXTERNAL_PROGRAM_REQUEST_H
 #define EXTERNAL_PROGRAM_REQUEST_H
 
+#include <quantity_identifier.h>
+
 namespace iquads {
 
 namespace interface_to_third_party {
 
 struct ExternalProgramRequest {
-
 public:
-  unsigned int run_mode()
-   { return this->run_mode_; }
+  typedef double energy_data_type;
+  typedef unsigned int quantity_identifier_type;
+  tyoedef unsigned int run_mode_type;
 
 private:
-  unsigned int run_mode_;
+  quantity_identifier_type quantity_identifier_;
+  run_mode_type run_mode_;
 
 }; // end of struct ExternalProgramRequest
 

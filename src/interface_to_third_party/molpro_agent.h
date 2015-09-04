@@ -32,6 +32,7 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+#include <fstream>
 #include <interface_to_third_party/molpro_config.h>
 #include <interface_to_third_party/external_program_report.h>
 #include <interface_to_third_party/external_program_agent_base.h>
@@ -77,6 +78,13 @@ public:
                               work_path_type work_path  ){};
   file_name_type write_run_script( base_config_ptr base_config_pointer ) {};
   file_name_type collect_result( file_name_type output_filename ){};
+
+private:
+  energy_data_type run_energy_calculation( request_type request_ )
+   {
+     file_name_type = this->write_input_file( request_type request_ );
+
+   }
 
 public:
   report_type sequence_local_run();

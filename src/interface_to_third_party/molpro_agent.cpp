@@ -36,40 +36,28 @@ namespace interface_to_third_party {
 typedef MolproAgent agent_type;
 
 agent_type :: file_name_type 
- agent_type :: write_input() 
+ agent_type :: write_input_hf_energy( config_type config )
 {
 
-  using agent_type::file_name_type;
   using std::ofstream;
   using std::endl;
-
-  this->input_file_name_ 
-    = this->work_path_ + this->molecule_name_ + ".com";
-
-  {
-    ofstream ofs.open( this->input_filename_.c_str() );
-  
-    ofs << "memory, " ;
-    ofs << static_cast<config_pointer_type>( base_config_pointer )->memory_size();
-    ofs << ",";
-    ofs << static_cast<config_pointer_type> ( base_config_pinter ) ->memory_unit() << endl;
-  
-    ofs << "basis=";
-    ofs << static_cast<config_pointer_type> ( base_config_pointer )->basis_set_name() << endl;
-  
-    ofs << base_config_pointer->geometry_unit()<< endl;
-  
-    ofs << "geomtyp = ";
-    ofs << static_cast<config_pointer_type> ( base_config_pointer )-> geometry_type() << endl;
-  
-    ofs << "geomtry={" << endl;
-//  ofs << static_cast<config_pointer_type> ( base_config_pointer )->molecule() << "}" << endl;
-    ofs.close();
-  }
-
+  file_name_type input_file_name = config.work_path() + config.molecule_name() + config.file_extension();
+  ofstream ofs.open( input_file_name.c_str(), "wt" );
+  ofs << config.memory_config() << endl;
+  ofs << config.basis_set_config() << endl;
+  ofs << config.symmetry_config() << endl;
+  ofs << config.geometry_config() << endl;
+  ofs << config.hf_config() << endl;
+  ofs.close();
   return input_filename;
 
 }; // end of write_input()
+
+agent_type :: file_name_type
+ agent_type :: writ_input_mp2_energy( config_type config )
+{
+  return input_filename;
+}
 
 client_type::file_name_type
  client_type::write_run_script( base_config_ptr base_config_pointer )
