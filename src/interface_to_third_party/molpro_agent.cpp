@@ -36,72 +36,50 @@ namespace interface_to_third_party {
 typedef MolproAgent agent_type;
 
 agent_type :: file_name_type 
- agent_type :: write_input_hf_energy( config_type config )
+ agent_type :: write_input_hf_energy( base_config_ptr base_config_pointer )
 {
 
   using std::ofstream;
   using std::endl;
-  file_name_type input_file_name = config.work_path() + config.molecule_name() + config.file_extension();
+  file_name_type input_file_name = base_config_pointer->work_path() + 
+                                   base_config_pointer->molecule_name() + 
+                                   base_config_pointer->file_extension();
   ofstream ofs.open( input_file_name.c_str(), "wt" );
-  ofs << config.memory_config() << endl;
-  ofs << config.basis_set_config() << endl;
-  ofs << config.symmetry_config() << endl;
-  ofs << config.geometry_config() << endl;
-  ofs << config.hf_config() << endl;
+  ofs << base_config_pointer->memory_config() << endl;
+  ofs << base_config_pointer->basis_set_config() << endl;
+  ofs << base_config_pointer->symmetry_config() << endl;
+  ofs << base_config_pointer->geometry_config() << endl;
+  ofs << base_config_pointer->hf_config() << endl;
   ofs.close();
   return input_filename;
 
-}; // end of write_input()
+}; // end of function write_input_hf_energy()
 
 agent_type :: file_name_type
- agent_type :: writ_input_mp2_energy( config_type config )
-{
-  return input_filename;
-}
-
-client_type::file_name_type
- client_type::write_run_script( base_config_ptr base_config_pointer )
+ agent_type :: write_input_mp2_energy( base_config_ptr base_config_pointer )
 {
 
   using std::ofstream;
-  ofstream ofs( script_filename.c_str(), ofstream::out | ofstream::app );
-  ofs << this->program_path_ << this->program_name_ << " " << ;
-  ofs.close();
+  using std::endl;
+  file_name_type input_file_name = base_config_pointer->work_path() + 
+                                   base_config_pointer->molecule_name() + 
+                                   base_config_pointer->file_extension();
 
-}; // end of write_script()
+  return input_filename;
 
-client_type :: file_name_type
- client_type :: collect_result()
+}; // end of function write_input_mp2_energy()
+
+agent_type :: file_name_type
+ agent_type :: write_input_casscf_energy( base_config_ptr base_config_pointer )
 {
-/*
-  using iquads::file::line_searcher;
-  using std::string;
-  // these are are subject to change
-  if( this->config_ptr()->hf_requested() ){ 
-    this->report_ptr()->set_total_energy() = line_searcher< energy_data_type >(" !RHF STATE 1.1 Energy", this->output_name );
-  }
-  else if( this->config_ptr()->mp2_requested() ){
-    this->report_ptr()->set_total_energy() = line_searcher< energy_data_type >( " !MP2 total energy", this->output_name );
-  }
-  else if( this->config_ptr()->ccsd_requested() ){
-//    this->report_ptr()->set_total_energy() = line_searcher< energy_data_type >(" ", this->output_name );
-  }
-  else if( this->config_ptr()->ccsdt_requested() ){
-//    this->report_ptr()->set_total_energy() = line_searcher< energy_data_type >("", this->output_name );
-  }
-*/
-}; // end of collect_result()
+  using std::ofstream;
+  using std::endl;
+  file_name_type input_file_name = base_config_pointer->work_path() + 
+                                   base_config_pointer->molecule_name() + 
+                                   base_config_pointer->file_extension();
+  return input_filename;
 
-void agent_type::sequence_local_run()
-{
-
-  config_type config;
-  config->set_defaults();
-  this->write_input( config );
-  this->run_calculation( config );
-  this->collect_result( config );
-
-} // end of sequence_local_run()
+}; // end of function write_input_casscf_energy()
 
 } // end of namespace interface_to_third_party
 

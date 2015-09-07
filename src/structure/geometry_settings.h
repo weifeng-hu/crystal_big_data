@@ -24,40 +24,32 @@
  *
  */
 
-#ifndef EXTERNAL_PROGRAM_REPORT_H
-#define EXTERNAL_PROGRAM_REPORT_H
+#ifndef GEOMETRY_SETTINGS_H
+#define GEOMETRY_SETTINGS_H
 
-namespace iquads {
+namespace iqauds {
 
-namespace interface_to_third_party {
+ namespace geometry {
 
-struct ExternalProgramReport {
-public:
-  struct EnergyReport;
-  struct GradientReport;
+  namespace unit {
 
-public:
-  typedef ExternalProgramReport parent_report_type;
-  typedef ExternalProgramReport :: EnergyReport energy_report_t;
-  typedef ExternalProgramReport :: GradientReport gradient_report_t;
+   typedef unsigned int type_mask;
 
-public:
-  void accept_new_step_data( energy_report_t energy_report )
-   {}
-  void accept_new_step_data( gradient_report_t gradient_report )
-   {}
+   constexpr type_mask ANGSTROM = 0x01 << 0;
+   constexpr type_mask BOHR     = 0x01 << 1;
 
-}; // end of struct ExternalProgramReport
+  } // end of namespace unit
 
-struct ExternalProgramReport :: EnergyReport {
+  namespace coordinate_system {
 
-};
+    typedef unsigned int type_mask;
 
-struct ExternalProgramReport :: GradientReport {
+    constexpr type_mask CARTESIAN = 0x01 << 0;
+    constexpr type_mask INTERNAL  = 0x01 << 1;
 
-};
+  } // end of namespace coordinate_type
 
-} // end of namespace interface_to_third_party
+ } // end of namespace geometry
 
 } // end of namespace iquads
 

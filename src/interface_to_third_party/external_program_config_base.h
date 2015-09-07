@@ -28,6 +28,7 @@
 #define EXTERNAL_PROGRAM_CONFIG_BASE_H
 
 #include <string>
+#include <electron_correlation/quantity.h>
 
 using std::string;
 
@@ -37,6 +38,8 @@ namespace interface_to_third_party {
 
 struct ExternalProgramConfig_Base 
 {
+public:
+  typedef iquads :: electron_correlation :: quantity :: quantity_mask_type solution_type;
 public:
   typedef bool condition_type;
   typedef string file_name_type;
@@ -60,6 +63,12 @@ public:
 
 public:
   virtual void set_defaults() = 0;
+
+  solution_type return_solution_quantity_tag()
+   { return this->solution_tag_; }
+
+private:
+  solution_type solution_tag_;
 
 }; // end of struct ExternalProgramConfig_Base
 

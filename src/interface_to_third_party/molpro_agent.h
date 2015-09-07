@@ -45,56 +45,55 @@ class MolproAgent
   : public ExternalProgramAgent_Base
 {
 public:
-  typedef MolproConfig config_type;
+  typedef MolproConfig this_config_type;
+  typedef this_config_type* this_config_ptr;
   typedef ExternalProgramReport report_type;
 
 public:
   MolproAgent()
    {
+    try
      {
       using std::getenv;
       const char* program_path = getenv("MOLPRO_PATH");
       if( program_path == nullptr ){
-        using std::cout;
-        using std::endl;
-        cout << "Environment Variable $MOLPRO_PATH not set" << endl;
-        exit(1);
+       throw 1;
       }
-      else{
-       this->program_path_ = program_path;
-      }
+      this->program_path_ = program_path;
+      this->program_name_ = "molpro";
      }
-     this->program_name_ = "molpro";
-   }
+    catch ( int signal ){
+      using std::cout;
+      using std::endl;
+      cout << "Environment Variable $MOLPRO_PATH not set" << endl;
+      abort();
+    }
+   } // end of default constructor
 
 public:
-  void run_calculation( file_name_type input_filename, file_name_type output_filename )
+  base_config_ptr_list generate_config_list_from_request( request_type request )
+   { /* to be implemented */ }
+  void run_external_program( file_name_type input_filename, file_name_type output_filename )
    {
      command_line_type command_line 
        = this->program_path_ + " " + input_filename;
-     int res = system( command_line.c_str() );
-   }
-  file_name_type write_input( base_config_ptr base_config_pointer, 
-                              work_path_type work_path  ){};
-  file_name_type write_run_script( base_config_ptr base_config_pointer ) {};
-  file_name_type collect_result( file_name_type output_filename ){};
+     try{
+      int res = system( command_line.c_str() );
+      if( res != 0 ){ throw 1; }
+     }
+     catch ( int signal ){
+      using std::cout;
+      using std::endl;
+      cout << "molpro program returns an error" << endl;
+      abort();
+     }
+   };
+  file_name_type write_input_hf_energy( base_config_ptr base_config_pointer );
+  file_name_type write_input_mp2_energy( base_config_ptr base_config_pointer );
+  file_name_type write_input_casscf_energy( base_config_ptr base_config_pointer );
 
-private:
-  energy_data_type run_energy_calculation( request_type request_ )
-   {
-     file_name_type = this->write_input_file( request_type request_ );
-
-   }
-
-public:
-  report_type sequence_local_run();
-  report_type sequence_write_local_input(){}
-  report_type sequence_write_pbs_input(){}
-  report_type sequence_write_sbatch_input(){}
-  report_type sequence_collect_local_output(){}
-
-private:
-  config_type config_;
+  energy_report_type collect_energy_data_from_output( file_name_type output_filename )
+   { }
 
 }; // end of class MolproAgent
 
