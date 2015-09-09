@@ -41,6 +41,7 @@ using interface_to_third_party :: ExternalProgramRequest;
 using interface_to_third_party :: ExternalProgramReport;
 using interface_to_third_party :: ExternalProgramAgent_Factory;
 using interface_to_third_party :: ExternalProgramAgent_Base;
+using structure :: Molecule;
 
 namespace electron_correlation {
 
@@ -49,12 +50,12 @@ public:
   typedef double energy_data_type;
   typedef Report    report_type;
   typedef Setting   setting_type;
+  typedef Molecule  molecule_info_type;
   typedef ExternalProgramRequest           external_request_type;
   typedef ExternalProgramReport            external_report_type;
   typedef ExternalProgramAgent_Factory     external_agent_factory_type;
   typedef ExternalProgramAgent_Base        external_base_agent_type;
   typedef external_base_agent_type*        external_base_agent_ptr;
-  typedef iquads :: structure :: Molecule  molecule_info_type;
 
 public:
   report_type internal_solve()
@@ -67,22 +68,22 @@ public:
      }
      else{
       external_request_type external_request = this->file_external_request( settings );
+      external_agent_factory_type agent_factory;
       external_base_agent_ptr agent_ptr
-       = this->external_agent_factory().get_agent( settings.external_agent_mask() );
+       = agent_factory.get_agent( settings.external_agent_mask() );
       external_report_type external_report
        = agent_ptr->accept_request_and_process( external_request );
-      this->report().collect_data_from_external_report( external_report );
+      this->set_report().collect_data_from_external_report( external_report );
      }
    } // end of driver()
 
 public:
-  external_agent_factory_type& external_agent_factory()
-   { return this->external_agent_factory_; }
-  report_type& report() 
+  const report_type report() const 
+   { return this->report_; }
+  report_type& set_report()
    { return this->report_; }
 
 private:
-  external_agent_factory_type external_agent_factory_;
   report_type report_;
 
 }; // end of class Client

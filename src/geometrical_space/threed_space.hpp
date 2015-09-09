@@ -1,6 +1,4 @@
 /*
- *  This source code applies all the terms in 
- *  GNU GENERAL PUBLIC LICENSE (GPL), Version3, 29 June 2007.
  *
  *  Copyright (C) 2013-2015 Weifeng Hu, all rights reserved.
  *  
@@ -35,7 +33,7 @@ namespace geometrical_space {
 
 namespace threed_space {
 
-  const double pi = 3.14159265358979324e0;
+  constexpr double pi = 3.14159265358979324e0;
 
   using std::make_tuple;
   // the x unit vector

@@ -48,6 +48,12 @@ public:
    { /* to be implemented */ }
 
 public:
+  void add_monomer_data(){}
+  void add_dimer_data(){}
+  void add_trimer_data(){}
+  void add_tetramer_data(){}
+
+public:
   const energy_data_type total_energy() const 
    { return this->total_energy_; }
 

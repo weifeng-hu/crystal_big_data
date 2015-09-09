@@ -35,31 +35,35 @@ using std::string;
 
 namespace iquads {
 
+using structure :: Molecule;
+using interface_to_third_party :: ExternalProgramReport;
+
 namespace electron_correlation {
 
 struct Report
 {
 public:
-  typedef iquads :: structure :: Molecule molecule_type;
+  typedef Molecule molecule_info_type;
+  typedef ExternalProgramReport external_report_type;
   typedef double energy_data_type;
-  typedef string correlation_level_type;
-  typedef string correlation_method_type;
-  typedef iquads :: interface_to_third_party :: ExternalProgramReport external_report_type;
 
 public:
-  void collect_data_from_external_report( external_report_type external_report )
-   { /* to be implemented */ }
+  void collect_data_from_external_report( external_report_type external_report );
 
 public:
+  const molecule_info_type molecule_info() const 
+   { return this->molecule_info_; }
   const energy_data_type energy() const 
    { return this->energy_; }
 
 private:
-  molecule_type molecule_;
-  correlation_level_type correlation_level_;
-  correlation_method_type correlation_method_;
+  molecule_info_type molecule_info_;
   energy_data_type energy_;
-  energy_data_type hf_energy_;
+  /*
+   *
+   * Other data members can be wavefunctions, MO coefficients, etc.
+   *
+   */
 
 }; // end of struct Report
 

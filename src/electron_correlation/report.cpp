@@ -24,35 +24,19 @@
  *
  */
 
-#ifndef ELECTRON_CORRELATION_SETTING_HPP
-#define ELECTRON_CORRELATION_SETTING_HPP
+#include <electron_correlation/report.h>
 
 namespace iquads {
 
 namespace electron_correlation {
 
-struct Setting {
-public:
-  typedef unsigned int bitmask_type;
-  typedef bool condition_type;
+typedef Report :: report_type;
 
-public:
-  void generate_from_config(){}
+void report_type :: collect_data_from_external_report( external_report_type external_report )
+{
 
-public:
-  const condition_type use_external_solver() const
-   { return this->use_external_solver_; }
-  const bitmask_type external_agent_mask() const 
-   { return this->external_agent_mask_; }
-
-private:
-  condition_type use_external_solver_;
-  bitmask_type external_agent_mask_;
-
-}; // end of struct Setting
+}; // end of function collect_data_from_external_report()
 
 } // end of namespace electron_correlation
 
-} // end of namespace iquads 
-
-#endif
+} // end of namespace iquads

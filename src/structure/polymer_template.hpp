@@ -65,6 +65,12 @@ public:
   }
 
 public:
+  friend
+    template < size_t N > 
+     Molecule convert_polymer_to_molecule( Polymer<N> polymer )
+    {
+
+    }
   void init_from( MoleculeList new_molecule_list ){
    try{
     const size_t n_molecule = new_molecule_list.size();
