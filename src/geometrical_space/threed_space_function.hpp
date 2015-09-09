@@ -16,13 +16,13 @@
  *
  */
 
-#ifndef THREED_SPACE_FUNCTION_H
-#define THREED_SPACE_FUNCTION_H
+#ifndef THREED_SPACE_FUNCTION_HPP
+#define THREED_SPACE_FUNCTION_HPP
 
 #include <vector>
 #include <array>
 #include <math.h>
-#include <geometrical_space/coordinate.h>
+#include <geometrical_space/coordinate.hpp>
 
 using std::vector;
 using std::array;

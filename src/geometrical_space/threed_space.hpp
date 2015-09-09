@@ -19,25 +19,45 @@
  *
  */
 
-#ifndef COORDINATE_H
-#define COORDINATE_H
 
-#include <vector>
+#ifndef THREED_SPACE_VECTOR_HPP
+#define THREED_SPACE_VECTOR_HPP
+
 #include <tuple>
+#include <array>
+
+using std::tuple;
+using std::array;
 
 namespace iquads {
 
 namespace geometrical_space {
 
-  // stack storage for coordinates
-  // using tuple of 3 doubles
+namespace threed_space {
 
-  // we enforce using double precision for coordinates
-  // since we may encounter big coordinates like 1e5
-  // and the significant digits after the decimal point 
-  // can only be 8 digits or so
-  typedef std::tuple< double, double, double > Coord;
-  typedef std::vector<Coord> CoordList;
+  const double pi = 3.14159265358979324e0;
+
+  using std::make_tuple;
+  // the x unit vector
+  const tuple< double, double, double > e_x 
+   = make_tuple( 1.0e0, 0.0e0, 0.0e0 );
+  const tuple< double, double, double > e_y 
+   = make_tuple( 0.0e0, 1.0e0, 0.0e0 );
+  const tuple< double, double, double > e_z 
+   = make_tuple( 0.0e0, 0.0e0, 1.0e0 );
+
+  // a tuple of all the unit vectors
+  const array< tuple<double, double, double>,3 > e_3d
+   = { e_x, e_y, e_z };
+
+  inline array< double, 3 >  
+  operator* ( array< double, 3 > vec, double a ){
+   array< double, 3 > retval
+    = { vec.at(0) * a, vec.at(1) * a, vec.at(2) * a };
+   return retval;
+  }
+
+} // end of namespace threed_space
 
 } // end of namespace geometrical_space
 
