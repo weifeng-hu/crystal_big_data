@@ -24,20 +24,37 @@
  *
  */
 
-#include <electron_correlation/client.hpp>
+#ifndef GEOMETRY_SETTINGS_HPP
+#define GEOMETRY_SETTINGS_HPP
 
 namespace iquads {
 
-namespace electron_correlation {
+namespace structure {
 
-typedef Client client_type;
+ namespace geometry {
 
-client_type :: external_request_type
- client_type :: file_external_request( setting_type settings )
-{
+  namespace unit {
 
-}; // end of file_external_request
+   typedef unsigned int unit_type_mask;
 
-} // end of namespace electron_correlation
+   constexpr unit_type_mask ANGSTROM = 0x01 << 0;
+   constexpr unit_type_mask BOHR     = 0x01 << 1;
+
+  } // end of namespace unit
+
+  namespace coordinate_system {
+
+    typedef unsigned int coordinate_type_mask;
+
+    constexpr coordinate_type_mask CARTESIAN = 0x01 << 0;
+    constexpr coordinate_type_mask INTERNAL  = 0x01 << 1;
+
+  } // end of namespace coordinate_type
+
+ } // end of namespace geometry
+
+} // end of namespace structure
 
 } // end of namespace iquads
+
+#endif

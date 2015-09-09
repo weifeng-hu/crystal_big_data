@@ -25,11 +25,11 @@
  */
 
 #include <iostream>
-#include <manybody_expansion/order_mask.h>
-#include <manybody_expansion/request.h>
-#include <manybody_expansion/config.h>
-#include <manybody_expansion/agent.h>
-#include <manybody_expansion/manybody_expansion_template.h>
+#include <manybody_expansion/order_mask.hpp>
+#include <manybody_expansion/request.hpp>
+#include <manybody_expansion/config.hpp>
+#include <manybody_expansion/agent.hpp>
+#include <manybody_expansion/manybody_expansion_template.hpp>
 
 namespace iquads {
 

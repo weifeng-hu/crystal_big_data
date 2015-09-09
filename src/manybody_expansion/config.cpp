@@ -26,8 +26,8 @@
 
 #include <string>
 #include <fstream>
-#include <interface_to_third_party/external_program_bitmask.h>
-#include <manybody_expansion/config.h>
+#include <interface_to_third_party/external_program_bitmask.hpp>
+#include <manybody_expansion/config.hpp>
 
 using std::string;
 

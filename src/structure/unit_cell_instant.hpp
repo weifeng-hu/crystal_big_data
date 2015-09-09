@@ -19,14 +19,27 @@
  *
  */
 
-#ifndef IQUADS_LIMITS_H
-#define IQUADS_LIMITS_H
+#ifndef UNIT_CELL_INSTANT_HPP
+#define UNIT_CELL_INSTANT_HPP
 
-namespace iquads {
+#include <particle/atom.hpp>
+#include <structure/molecule.hpp>
+#include <structure/unit_cell_template.hpp>
 
-  #define STACK_DOUBLE_DIM     512
-  #define STACK_DOUBLE_LIMIT   262144
+namespace iquads{
 
-}
+using namespace particle;
+
+namespace structure {
+
+  template class UnitCell<atom>;
+  template class UnitCell<molecule>;
+
+  typedef UnitCell<atom> atomic_ucell;
+  typedef UnitCell<molecule> molecular_ucell;
+
+} // end of namespace structure 
+
+} // end of namespace iquads
 
 #endif

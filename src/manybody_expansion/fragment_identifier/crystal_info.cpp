@@ -21,9 +21,10 @@
 
 #include <string>
 #include <fstream>
-#include "utilities/solid_gen/crystal_info.h"
+#include <manybody_expansion/fragment_identifier/crystal_info.hpp>
 
-using namespace std;
+using std::string;
+using std::ifstream;
 
 namespace iquads {
 

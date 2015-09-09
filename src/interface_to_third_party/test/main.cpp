@@ -24,20 +24,14 @@
  *
  */
 
-#include <electron_correlation/client.hpp>
+#include <interface_to_third_party/molpro_config.hpp>
+#include <interface_to_third_party/molpro_agent.hpp>
 
-namespace iquads {
-
-namespace electron_correlation {
-
-typedef Client client_type;
-
-client_type :: external_request_type
- client_type :: file_external_request( setting_type settings )
+int main( int argc, char* argv[] )
 {
 
-}; // end of file_external_request
+ iquads :: interface_to_third_party :: MolproConfig config;
+ iquads :: interface_to_third_party :: MolproAgent agent;
 
-} // end of namespace electron_correlation
-
-} // end of namespace iquads
+ return 0;
+}

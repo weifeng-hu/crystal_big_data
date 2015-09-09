@@ -19,14 +19,22 @@
  *
  */
 
-#ifndef IQUADS_LIMITS_H
-#define IQUADS_LIMITS_H
+#ifndef VECTOR_MATRIX_HPP
+#define VECTOR_MATRIX_HPP
 
-namespace iquads {
+#include <manybody_expansion/fragment_identifier/vector_matrix_base.hpp>
 
-  #define STACK_DOUBLE_DIM     512
-  #define STACK_DOUBLE_LIMIT   262144
+namespace iquads{
 
-}
+namespace matrix{
+
+// explicit template instantiation
+template class vector_matrix_base<int>;
+template class vector_matrix_base<float>;
+template class vector_matrix_base<double>;
+
+} // end of namespace matrix
+
+} // end of namespace iquads
 
 #endif

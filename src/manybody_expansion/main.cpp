@@ -25,8 +25,8 @@
  */
 
 #include <iostream>
-#include <iquads/command_parser.h>
-#include <manybody_expansion/client.h>
+#include <iquads/command_parser.hpp>
+#include <manybody_expansion/client.hpp>
 
 int main( int argc, char* argv[] )
 {

@@ -24,20 +24,32 @@
  *
  */
 
-#include <electron_correlation/client.hpp>
+#ifndef ELECTRON_CORRELATION_SETTING_HPP
+#define ELECTRON_CORRELATION_SETTING_HPP
 
 namespace iquads {
 
 namespace electron_correlation {
 
-typedef Client client_type;
+struct Setting {
+public:
+  typedef unsigned int bitmask_type;
+  typedef bool condition_type;
 
-client_type :: external_request_type
- client_type :: file_external_request( setting_type settings )
-{
+public:
+  const condition_type use_external_solver() const
+   { return this->use_external_solver_; }
+  const bitmask_type external_agent_mask() const 
+   { return this->external_agent_mask_; }
 
-}; // end of file_external_request
+private:
+  condition_type use_external_solver_;
+  bitmask_type external_agent_mask_;
+
+}; // end of struct Setting
 
 } // end of namespace electron_correlation
 
-} // end of namespace iquads
+} // end of namespace iquads 
+
+#endif

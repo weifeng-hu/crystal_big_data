@@ -19,14 +19,22 @@
  *
  */
 
-#ifndef IQUADS_LIMITS_H
-#define IQUADS_LIMITS_H
+#ifndef ARRAY_MATRIX_HPP
+#define ARRAY_MATRIX_HPP
 
-namespace iquads {
+#include "utilities/solid_gen/array_matrix_base.hpp"
 
-  #define STACK_DOUBLE_DIM     512
-  #define STACK_DOUBLE_LIMIT   262144
+namespace iquads{
 
-}
+namespace matrix{
+
+  // explicit template instantiation
+  template class array_matrix_base<int>;
+  template class array_matrix_base<float>;
+  template class array_matrix_base<double>;
+
+} // end of namespace matrix
+
+} // end of namespace iquads
 
 #endif

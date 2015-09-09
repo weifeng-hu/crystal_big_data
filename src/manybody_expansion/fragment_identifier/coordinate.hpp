@@ -19,14 +19,31 @@
  *
  */
 
-#ifndef IQUADS_LIMITS_H
-#define IQUADS_LIMITS_H
+#ifndef COORDINATE_HPP
+#define COORDINATE_HPP
+
+#include <vector>
+#include <tuple>
+
+using std::vector;
+using std::tuple;
 
 namespace iquads {
 
-  #define STACK_DOUBLE_DIM     512
-  #define STACK_DOUBLE_LIMIT   262144
+namespace basic {
 
-}
+  // stack storage for coordinates
+  // using tuple of 3 doubles
+
+  // we enforce using double precision for coordinates
+  // since we may encounter big coordinates like 1e5
+  // and the significant digits after the decimal point 
+  // can only be 8 digits or so
+  typedef tuple< double, double, double > Coord;
+  typedef vector<Coord> CoordList;
+
+} // end of namespace basic
+
+} // end of namespace iquads
 
 #endif

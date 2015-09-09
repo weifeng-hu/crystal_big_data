@@ -19,14 +19,26 @@
  *
  */
 
-#ifndef IQUADS_LIMITS_H
-#define IQUADS_LIMITS_H
+#ifndef LATTICE_INSTANT_HPP
+#define LATTICE_INSTANT_HPP
+
+#include <string>
+#include <vector>
+#include <structure/unit_cell.hpp>
+#include <structure/lattice_template.hpp>
 
 namespace iquads {
 
-  #define STACK_DOUBLE_DIM     512
-  #define STACK_DOUBLE_LIMIT   262144
+namespace structure {
 
-}
+  template class Lattice< atomic_ucell >;
+  template class Lattice< molecular_ucell >;
+
+  typedef Lattice< atomic_ucell > atomic_lattice;
+  typedef Lattice< molecular_ucell > molecular_lattice;
+
+} // end of namespace structure
+
+} // end of namespace iquads
 
 #endif

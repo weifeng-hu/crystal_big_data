@@ -26,7 +26,7 @@
 
 #include <string>
 #include <fstream>
-#include <interface_to_third_parth/molpro_config.h>
+#include <interface_to_third_party/molpro_config.h>
 #include <interface_to_third_party/molpro_agent.h>
 
 namespace iquads {
@@ -34,6 +34,19 @@ namespace iquads {
 namespace interface_to_third_party {
 
 typedef MolproAgent agent_type;
+
+agent_type :: base_config_ptr_list
+ agent_type :: generate_config_list_from_request( request_type request )
+{
+
+  base_config_ptr_list config_pointer_list;
+  if( request.calculation() == SINGLE_POINT_ENERGY ){
+   config_pointer_list.resize(1);
+   config_pointer_list[0] = new parent_config_type;
+   /* need to be further implemented */
+  }
+
+}; // end of function generate_config_list_from_request()
 
 agent_type :: file_name_type 
  agent_type :: write_input_hf_energy( base_config_ptr base_config_pointer )
@@ -44,14 +57,13 @@ agent_type :: file_name_type
   file_name_type input_file_name = base_config_pointer->work_path() + 
                                    base_config_pointer->molecule_name() + 
                                    base_config_pointer->file_extension();
-  ofstream ofs.open( input_file_name.c_str(), "wt" );
-  ofs << base_config_pointer->memory_config() << endl;
-  ofs << base_config_pointer->basis_set_config() << endl;
-  ofs << base_config_pointer->symmetry_config() << endl;
-  ofs << base_config_pointer->geometry_config() << endl;
-  ofs << base_config_pointer->hf_config() << endl;
+  ofstream ofs( input_file_name.c_str(), std::ios::out );
+  base_config_pointer->memory_config().print( ofs );
+  base_config_pointer->basis_set_config().print( ofs );
+  base_config_pointer->geometry_config().print( ofs );
+  base_config_pointer->hartree_fock_config().print( ofs );
   ofs.close();
-  return input_filename;
+  return input_file_name;
 
 }; // end of function write_input_hf_energy()
 
@@ -65,7 +77,7 @@ agent_type :: file_name_type
                                    base_config_pointer->molecule_name() + 
                                    base_config_pointer->file_extension();
 
-  return input_filename;
+  return input_file_name;
 
 }; // end of function write_input_mp2_energy()
 
@@ -74,12 +86,18 @@ agent_type :: file_name_type
 {
   using std::ofstream;
   using std::endl;
-  file_name_type input_file_name = base_config_pointer->work_path() + 
+  file_name_type input_filename = base_config_pointer->work_path() + 
                                    base_config_pointer->molecule_name() + 
                                    base_config_pointer->file_extension();
   return input_filename;
 
 }; // end of function write_input_casscf_energy()
+
+agent_type :: energy_report_type 
+ agent_type :: collect_energy_data_from_output( file_name_type output_filename )
+{
+
+}; // end of function collect_energy_data_from_output()
 
 } // end of namespace interface_to_third_party
 

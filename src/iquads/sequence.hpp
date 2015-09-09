@@ -24,20 +24,35 @@
  *
  */
 
-#include <electron_correlation/client.hpp>
+#ifndef SEQUENCE_HPP
+#define SEQUENCE_HPP
 
 namespace iquads {
 
-namespace electron_correlation {
+ namespace sequence {
 
-typedef Client client_type;
+  namespace mode {
 
-client_type :: external_request_type
- client_type :: file_external_request( setting_type settings )
-{
+   typedef unsigned int mode_mask_type;
 
-}; // end of file_external_request
+   constexpr mode_mask_type LOCAL_RUN           = 0x01 << 0;
+   constexpr mode_mask_type WRITE_LOCAL_INPUT   = 0x01 << 1; 
+   constexpr mode_mask_type WRITE_PBS_INPUT     = 0x01 << 2;
+   constexpr mode_mask_type WRITE_SBATCH_INPUT  = 0x01 << 3;
+   constexpr mode_mask_type COLLECT_LOCAL_OUTPUT = 0x01 << 4;
 
-} // end of namespace electron_correlation
+  } // end of namespace mode
+
+  namespace calculation {
+
+   typedef unsigned int calculation_mask_type;
+
+   constexpr calculation_masK_type SINGLE_POINT_ENERGY = 0x01 << 0;
+
+  } // end of namespace 
+
+ } // end of namespace run_mode
 
 } // end of namespace iquads
+
+#endif

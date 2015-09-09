@@ -24,20 +24,28 @@
  *
  */
 
-#include <electron_correlation/client.hpp>
+
+#ifndef MANYBODY_EXPANSION_ORDER_MASK_HPP
+#define MANYBODY_EXPANSION_ORDER_MASK_HPP
 
 namespace iquads {
 
-namespace electron_correlation {
+namespace manybody_expansion {
 
-typedef Client client_type;
+namespace order_bitmask {
 
-client_type :: external_request_type
- client_type :: file_external_request( setting_type settings )
-{
+  typedef unsigned int bitmask_type;
 
-}; // end of file_external_request
+  constexpr bitmask_type AUTO          = 0x01 << 0;
+  constexpr bitmask_type FIRST_ORDER   = 0x01 << 1;
+  constexpr bitmask_type SECOND_ORDER  = 0x01 << 2;
+  constexpr bitmask_type THIRD_ORDER   = 0x01 << 3;
+  constexpr bitmask_type FOURTH_ORDER  = 0x01 << 4;
 
-} // end of namespace electron_correlation
+} // end of namespace order_bitmask
+
+} // end of manybody_expansion
 
 } // end of namespace iquads
+
+#endif

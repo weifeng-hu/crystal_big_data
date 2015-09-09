@@ -8,7 +8,7 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 2 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -24,20 +24,27 @@
  *
  */
 
-#include <electron_correlation/client.hpp>
+#ifndef ELECTRON_CORRELATION_METHOD_HPP
+#define ELECTRON_CORRELATION_METHOD_HPP
 
 namespace iquads {
 
-namespace electron_correlation {
+ namespace electron_correlation {
 
-typedef Client client_type;
+  namespace method {
 
-client_type :: external_request_type
- client_type :: file_external_request( setting_type settings )
-{
+   typedef unsigned int mask_type;
 
-}; // end of file_external_request
+   constexpr mask_type RHF   = 0x01 << 0;
+   constexpr mask_type MP2   = 0x01 << 1;
+   constexpr mask_type CCSD  = 0x01 << 2;
+   constexpr mask_type CCSDT = 0x01 << 3;
+   constexpr mask_type DMRG  = 0x01 << 4;
 
-} // end of namespace electron_correlation
+  } // end of namespace method
+
+ } // end of namespace electron_correlation
 
 } // end of namespace iquads
+
+#endif

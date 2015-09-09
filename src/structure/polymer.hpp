@@ -19,14 +19,28 @@
  *
  */
 
-#ifndef IQUADS_LIMITS_H
-#define IQUADS_LIMITS_H
+
+#ifndef POLYMER_HPP
+#define POLYMER_HPP
+
+#include <structure/polymer_base.hpp>
 
 namespace iquads {
 
-  #define STACK_DOUBLE_DIM     512
-  #define STACK_DOUBLE_LIMIT   262144
+namespace structure {
 
-}
+  // explicit template instantiation
+  template class Polymer<2>;
+  template class Polymer<3>;
+  template class Polymer<4>;
+
+  // self defined types
+  typedef Polymer<2> dimer;
+  typedef Polymer<3> trimer;
+  typedef Polymer<4> tetramer;
+
+} // end of namespace structure
+
+} // end of namespace iquads
 
 #endif
