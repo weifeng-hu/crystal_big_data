@@ -24,12 +24,12 @@
  *
  */
 
-#ifndef COMPUTE_EXPANSION_TERM_PERIODIC_TRAITS_H
-#define COMPUTE_EXPANSION_TERM_PERIODIC_TRAITS_H
+#ifndef COMPUTE_EXPANSION_TERM_PERIODIC_TRAITS_HPP
+#define COMPUTE_EXPANSION_TERM_PERIODIC_TRAITS_HPP
 
-#include <manybody_expansion/config.h>
-#include <manybody_expansion/report.h>
-#include <manybody_expansion/compute_interaction_energy_traits.h>
+#include <manybody_expansion/config.hpp>
+#include <manybody_expansion/report.hpp>
+#include <manybody_expansion/compute_interaction_energy_traits.hpp>
 
 namespace iquads {
 
@@ -77,11 +77,13 @@ template <>
   unit_cell_type cell_zero = config.lattice().get_cell(0);
   for( size_t inode = 0; inode < cell_zero.n_node(); inode++ ){
     polymer_type<1> monomer_i( cell_zero.at(inode) );
+//    symmetry_nonequivalent_dimer_list_type symmetry_noeq_list_for_center_inode = cell_zero.at(inode).identify_symmetry_equivalent_fragments_in_lattice<2>();
 
     for( size_t R = 0; R < config.lattice().n_cell(); i++ ){
       unit_cell_type cell_R = config.lattice().get_cell(R);
       for( size_t R_i = 0; R_i < cell_R.n_node(); R_i++ ){
         polymer_type<1> monomer_j( cell_R.at(R_i) );
+//        if( symmetry_noeq_list_for_center_inode.has( cell_zero.at(inode), cell_R.at(R_i ) )
         {
           polymer_type<2> dimer_ij = monomer_i + monomer_j;
           energy_data_type dimer_interaction_energy = compute_interaction_energy<2>( dimer_ij, settings );
