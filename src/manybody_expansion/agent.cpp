@@ -80,7 +80,7 @@ mbe_agent_type :: report_type
   using std::endl;
 
   cout << " Compute lattice energy using the general MBE formula " << endl;
-  cout << " general MBE formula algorithm not implemented "  << endl;
+  cout << " general non periodic MBE formula algorithm not implemented "  << endl;
   exit(1);
 
 

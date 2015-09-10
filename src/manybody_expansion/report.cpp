@@ -24,28 +24,38 @@
  *
  */
 
-#ifndef COORDINATE_HPP
-#define COORDINATE_HPP
-
-#include <vector>
-#include <tuple>
+#include <manybody_expansion/report.hpp>
 
 namespace iquads {
 
-namespace geometrical_space {
+namespace manybody_expansion {
 
-  // stack storage for a coordinate set
-  // using tuple of 3 doubles
+typedef Report report_type;
 
-  // we enforce using double precision for coordinates
-  // since we may encounter big coordinates like 1e5
-  // and the significant digits after the decimal point 
-  // can only be 8 digits or so
-  typedef std::tuple< double, double, double > Coord;
-  typedef std::vector<Coord> CoordList;
+void report_type :: print() const 
+{
 
-} // end of namespace geometrical_space
+  // * periodic or disordered?
+
+  // * (if periodic) total energy per unit cell
+  // * (if non periodic) total energy 
+
+  // * monomer energy, percentage
+
+  // * dimer interaction energy, percentage
+
+  // * trimer interaction energy, percentage
+
+  // * tetramer interaction energy, percentage
+
+  // * data storage information
+  //   * result data
+  //   * external program inputs
+  //   * external program outputs
+  //   * where did external program run?
+
+}; // end of functiin print
+
+} // end of namespace manybody_expansion
 
 } // end of namespace iquads
-
-#endif

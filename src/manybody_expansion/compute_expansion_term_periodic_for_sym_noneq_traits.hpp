@@ -49,7 +49,7 @@ template < size_t Order >
 }; // end of template function compute_expansion_term_periodic_for_sym_noneq<Order>()
 
 template <>
- inline energy_data_type compute_expansion_term_periodic_for_sym_noneq<1>( config_type config, report_ref report )
+ inline energy_data_type compute_expansion_term_periodic_for_sym_noneq<1> ( config_type config, report_ref report )
 {
 
   energy_data_type retval = 0.0e0;
@@ -57,7 +57,7 @@ template <>
 
   unit_cell_type cell_zero = config.lattice().get_cell(0);
   for( size_t inode = 0; inode < cell_zero.n_node(); inode++ ){
-    sym_noneq_monomer_list_type sym_noneq_list_for_center_inode = cell_zero.at(inode).identify_symmetry_equivalent_fragments_in_lattice<1>();
+    sym_noneq_monomer_list_type sym_noneq_list_for_center_inode = config.lattice().identify_symmetry_equivalent_fragments_for_center<1>( cell_zero.at(inode) );
     if( sym_noneq_list_for_center_inode.has( cell_zero.at(inode)) ){
      double weight_factor = sym_noneq_list_for_center_inode.get_weight_factor( cell_zero.at(inode) );
      polymer_type<1> monomer_i( cell_zero.at(inode) );
@@ -72,7 +72,7 @@ template <>
 }; // end of template function compute_expansion_term_periodic_for_sym_noneq<1>()
 
 template <>
- inline energy_data_type compute_expansion_term_periodic_for_sym_noneq<2>( config_type config, report_ref report )
+ inline energy_data_type compute_expansion_term_periodic_for_sym_noneq<2> ( config_type config, report_ref report )
 {
 
   energy_data_type retval = 0.0e0;
@@ -80,7 +80,7 @@ template <>
 
   unit_cell_type cell_zero = config.lattice().get_cell(0);
   for( size_t inode = 0; inode < cell_zero.n_node(); inode++ ){
-    sym_noneq_dimer_list_type sym_noneq_list_for_center_inode = cell_zero.at(inode).identify_symmetry_equivalent_fragments_in_lattice<2>();
+    sym_noneq_dimer_list_type sym_noneq_list_for_center_inode = config.lattice().identify_symmetry_equivalent_fragments_for_center<2>( cell_zero.at(inode) );
 
     for( size_t R = 0; R < config.lattice().n_cell(); i++ ){
       unit_cell_type cell_R = config.lattice().get_cell(R);
@@ -106,7 +106,7 @@ template <>
 }; // end of template function compute_expansion_term_periodic_for_sym_noneq<2>()
 
 template <>
-inline energy_data_type compute_expansion_term_periodic_for_sym_noneq<3>( config_type config, report_ref report )
+inline energy_data_type compute_expansion_term_periodic_for_sym_noneq<3> ( config_type config, report_ref report )
 { 
 
   energy_data_type retval = 0.0e0;
@@ -114,7 +114,8 @@ inline energy_data_type compute_expansion_term_periodic_for_sym_noneq<3>( config
 
   unit_cell_type cell_zero = config.lattice().get_cell(0);
   for( size_t inode = 0; inode < cell_zero.n_node(); inode++ ){
-    sym_noneq_trimer_list_type sym_noneq_list_for_center_inode = cell_zero.at(inode).identify_symmetry_equivalent_fragments_in_lattice<3>();
+    // something needs to be done in those structure classes so that these functions can be clean coded
+    sym_noneq_trimer_list_type sym_noneq_list_for_center_inode = config.lattice().identify_symmetry_equivalent_fragments_for_center<3>( cell_zero.at(inode).lattice_index() );
     for( size_t R_j = 0; R_j < config.lattice().n_cell(); R_j++ ){
       unit_cell_type cell_R_j = config.lattice().get_cell(R_j);
       for( size_t inode_R_j = 0; inode_R_j < cell_R_j.n_node(); inode_R_j++ ){
@@ -151,7 +152,7 @@ template <>
 
   unit_cell_type cell_zero = config.lattice().get_cell(0);
   for( size_t inode = 0; inode < cell_zero.n_node(); inode++ ){
-    sym_noneq_tetramer_list_type sym_noneq_list_for_center_inode = cell_zero.at(inode).identify_symmetry_equivalent_fragments_in_lattice<4>();
+    sym_noneq_tetramer_list_type sym_noneq_list_for_center_inode = config.lattice().identify_symmetry_equivalent_fragments_for_center<4>( cell_zero.at(inode) );
     for( size_t R_j = 0; R_j < config.lattice().n_cell(); R_j++ ){
       unit_cell_type cell_R_j = config.lattice().get_cell(R_j);
       for( size_t inode_R_j = 0; inode_R_j < cell_R_j.n_node(); inode_R_j++ ){

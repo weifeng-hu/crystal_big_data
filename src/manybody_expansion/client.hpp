@@ -46,10 +46,10 @@ class Client
 public:
   typedef typename CommandParser :: container_type command_container_type;
   typedef typename CommandParser :: argument_type command_argument_type;
-  typedef iquads :: manybody_expansion :: Request request_type;
-  typedef iquads :: manybody_expansion :: Report  report_type;
-  typedef iquads :: manybody_expansion :: Agent   agent_type;
-  typedef iquads :: manybody_expansion :: CommandSetting command_setting_type;
+  typedef Request request_type;
+  typedef Report  report_type;
+  typedef Agent   agent_type;
+  typedef CommandSetting command_setting_type;
 
   typedef report_type& report_ref;
 
@@ -69,6 +69,7 @@ public:
      agent_type agent;
      this->set_report()
        = agent.accept_request_and_process( request );
+     this->report().save();
      this->print_report();
    }  // end of function driver()
 

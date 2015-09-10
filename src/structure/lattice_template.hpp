@@ -35,6 +35,7 @@
 #include <array>
 #include <iostream>
 #include <geometrical_space/threed_space_function.hpp>
+#include <manybody_expansion/fragment_identifier/fragment_info.hpp>
 
 using std::string;
 using std::tuple;
@@ -51,6 +52,12 @@ namespace structure {
 
 template < class UnitCell_Type >
 struct Lattice {
+public:
+  typedef vector< pair< array< int, 1 > , double > > sym_noneq_monomer_list_type;
+  typedef vector< pair< array< int, 2 > , double > > sym_noneq_dimer_list_type;
+  typedef vector< pair< array< int, 3 > , double > > sym_noneq_trimer_list_type;
+  typedef vector< pair< array< int, 4 > , double > > sym_noneq_tetramer_list_type;
+
 public:
   Lattice() {
    this->reset();
@@ -218,6 +225,11 @@ public:
   unit_cell_type get_cell( size_t i ) const { return this->store.at(i); }
   size_t get_ncell() const { return this->store.size(); }
   lattice_parameters get_constants() const { return this->lp; }
+
+public:
+  template < size_t NUM > 
+   vector< pair< array< int, NUM > , double > > 
+    identify_symmetry_equvivalent_fragments_for_center( int center_index ){};
 
 private:
   vector< unit_cell_type > store;

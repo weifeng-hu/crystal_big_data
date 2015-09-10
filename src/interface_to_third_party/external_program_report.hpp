@@ -27,6 +27,7 @@
 #ifndef EXTERNAL_PROGRAM_REPORT_HPP
 #define EXTERNAL_PROGRAM_REPORT_HPP
 
+#include <memory>
 #include <tuple>
 #include <vector>
 #include <electron_correlation/quantity.hpp>
@@ -34,6 +35,7 @@
 
 using std::tuple;
 using std::vector;
+using std::shared_ptr;
 
 namespace iquads {
 
@@ -55,15 +57,15 @@ public:
       typedef EnergyReport this_type;
       typedef double energy_data_type;
       typedef typename quantity :: energy :: energy_mask_type energy_solution_tag_type;
-      typedef typename quantity :: energy :: energy_literal_type energy_solution_type;
+      typedef typename quantity :: energy :: energy_literal_type energy_solution_name_type;
     public:
       cartesian_coord_list_type& set_atom_list()
-       { return this->atom_list; }
+       { return this->atom_list_; }
       energy_data_type& set_energy()
        { return this->energy_; }
       energy_solution_tag_type& set_energy_solution_tag()
        { return this->energy_solution_tag_; }
-      const energy_solution_name return_energy_solution_name() const 
+      const energy_solution_name_type return_energy_solution_name() const 
        { return quantity :: energy :: return_energy_literal( this->energy_solution_tag_ ); }
     private:
       cartesian_coord_list_type atom_list_;
@@ -81,10 +83,9 @@ public:
     public:
 
     private:
-  }
+  };
 
 public:
-  typedef ExternalProgramReport parent_report_type;
   typedef ExternalProgramReport :: EnergyReport energy_report_type;
   typedef ExternalProgramReport :: GradientReport gradient_report_type;
 

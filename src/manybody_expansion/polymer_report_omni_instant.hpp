@@ -24,27 +24,26 @@
  *
  */
 
-#ifndef COORDINATE_HPP
-#define COORDINATE_HPP
+#ifndef MANYBODY_EXPANSION_POLYMER_REPORT_OMNI_INSTANT_HPP
+#define MANYBODY_EXPANSION_POLYMER_REPORT_OMNI_INSTANT_HPP
 
-#include <vector>
-#include <tuple>
+#include <manybody_expansion/polymer_report_omni_template.hpp>
 
 namespace iquads {
 
-namespace geometrical_space {
+namespace manybody_expansion {
 
-  // stack storage for a coordinate set
-  // using tuple of 3 doubles
+  template struct PolymerOmniReportGeneral<1>;
+  template struct PolymerOmniReportGeneral<2>;
+  template struct PolymerOmniReportGeneral<3>;
+  template struct PolymerOmniReportGeneral<4>;
 
-  // we enforce using double precision for coordinates
-  // since we may encounter big coordinates like 1e5
-  // and the significant digits after the decimal point 
-  // can only be 8 digits or so
-  typedef std::tuple< double, double, double > Coord;
-  typedef std::vector<Coord> CoordList;
+  template struct PolymerOmniReportPeriodic<1>;
+  template struct PolymerOmniReportPeriodic<2>;
+  template struct PolymerOmniReportPeriodic<3>;
+  template struct PolymerOmniReportPeriodic<4>;
 
-} // end of namespace geometrical_space
+} // end of namespace manybody_expansion
 
 } // end of namespace iquads
 

@@ -27,6 +27,10 @@
 #ifndef GEOMETRY_SETTINGS_HPP
 #define GEOMETRY_SETTINGS_HPP
 
+#include <string>
+
+using std::string;
+
 namespace iquads {
 
 namespace structure {
@@ -35,19 +39,35 @@ namespace structure {
 
   namespace unit {
 
-   typedef unsigned int unit_type_mask;
-
-   constexpr unit_type_mask ANGSTROM = 0x01 << 0;
-   constexpr unit_type_mask BOHR     = 0x01 << 1;
+   typedef unsigned int unit_mask_type;
+   typedef string unit_literal_type;
+   constexpr unit_mask_type ANGSTROM = 0x01 << 0;
+   constexpr unit_mask_type BOHR     = 0x01 << 1;
+   const unit_literal_type return_unit_name( unit_mask_type mask )
+    {
+      switch( mask ){
+       case( ANGSTROM ): return "angstrom"; break;
+       case( BOHR ): return "bohr"; break;
+       default: return "unknown "; break;
+      }
+    } // end of return_unit_name();
 
   } // end of namespace unit
 
   namespace coordinate_system {
 
-    typedef unsigned int coordinate_type_mask;
-
-    constexpr coordinate_type_mask CARTESIAN = 0x01 << 0;
-    constexpr coordinate_type_mask INTERNAL  = 0x01 << 1;
+    typedef unsigned int coordinate_mask_type;
+    typedef string coordinate_literal_type;
+    constexpr coordinate_mask_type CARTESIAN = 0x01 << 0;
+    constexpr coordinate_mask_type INTERNAL  = 0x01 << 1;
+    const coordinate_literal_type return_coordinate_name( coordinate_mask_type mask )
+     {
+       switch( mask ){
+        case( CARTESIAN ): return "cartesian"; break;
+        case( INTERNAL ): return "internal"; break;
+        default: return "unknown"; break;
+       } 
+     } // end of return_coordinate_name()
 
   } // end of namespace coordinate_type
 

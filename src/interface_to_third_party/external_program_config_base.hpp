@@ -38,10 +38,10 @@ using std::tuple;
 using std::string;
 using std::vector;
 using std::ostream;
-using namespace structure :: geometry;
 
 namespace iquads {
 
+using namespace structure :: geometry;
 using namespace electron_correlation;
 
 namespace interface_to_third_party {
@@ -64,7 +64,7 @@ public:
   typedef quantity :: energy :: energy_mask_type energy_solution_tag_type;
   typedef quantity :: gradient :: gradient_mask_type gradient_solution_tag_type;
 
-ublic:
+public:
   struct MemoryConfig_Base {
     public:
       typedef typename parent_config_base_type :: size_type memory_amount_type;
@@ -119,8 +119,8 @@ ublic:
     public:
       typedef typename parent_config_base_type :: precise_number_type coord_value_type;
       typedef string element_name_type;
-      typedef typename coordinate_system :: coordinate_type_mask  geometry_format_type; 
-      typedef typename unit :: unit_type_mask geometry_unit_type;
+      typedef typename coordinate_system :: coordinate_mask_type  geometry_format_type; 
+      typedef typename unit :: unit_mask_type geometry_unit_type;
       typedef tuple< element_name_type, coord_value_type, coord_value_type, coord_value_type > atomic_cartesian_coord_type;
       typedef vector< atomic_cartesian_coord_type > cartesian_coord_list_type;
     public:

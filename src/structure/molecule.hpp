@@ -28,7 +28,7 @@
 #include <fstream>
 #include <iostream>
 #include <geometrical_space/coordinate.hpp>
-#include <particle/atom.hpp>
+#include <structure/atom.hpp>
 
 using std::vector;
 using std::string;
@@ -41,8 +41,6 @@ namespace iquads {
 
 using geometrical_space :: Coord;
 using geometrical_space :: CoordList;
-using particle :: Atom;
-using particle :: AtomList;
 
 namespace structure {
 

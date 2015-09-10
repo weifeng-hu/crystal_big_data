@@ -1,20 +1,29 @@
-/*
- *  Copyright (C) 2013-2015 Weifeng Hu, all rights reserved.
- *  
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  any later version.
- *  
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *  
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * @file
+ * @author Weifeng Hu
+ *
+ * @section LICENSE
+ *
+ * Copyright (C) 2013, 2014, 2015  Weifeng Hu
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @section DESCRIPTION
+ *
  *
  */
+
 
 #ifndef THREED_SPACE_FUNCTION_HPP
 #define THREED_SPACE_FUNCTION_HPP
@@ -56,7 +65,7 @@ inline double compute_distance( Coord coord_a, Coord coord_b ){
  
   return retval;
 
-}
+} // end of compute_distance()
 
 inline double compute_charge_weighted_distance( Coord coord_a, Coord coord_b, int charge_a, int charge_b )
 { 
@@ -81,7 +90,8 @@ inline double compute_charge_weighted_distance( Coord coord_a, Coord coord_b, in
   }
  
   return retval;
-}
+
+} // end of function compute_charge_weighted_distance()
 
 inline array< double, 3 > compute_recenter_vec( array< array<double, 2>, 3> edges )
 {
@@ -95,7 +105,7 @@ inline array< double, 3 > compute_recenter_vec( array< array<double, 2>, 3> edge
   array<double, 3 > retval = { -(x_plus+x_minus)/2, -(y_plus+y_minus)/2, -(z_plus+z_minus)/2 };
   return retval;
 
-}
+} // end of function compute_recenter_vec()
 
 } // end of namespace threed_space
 
