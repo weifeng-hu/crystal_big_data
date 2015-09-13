@@ -45,11 +45,9 @@ struct ExternalProgramReport {
 public:
   typedef ExternalProgramReport parent_report_type;
   typedef
-    typename ExternalProgramConfig_Base :: GeometryConfig_Base :: atomic_cartesian_coord_type
-      atomic_cartesian_coord_type;
   typedef 
-    typename ExternalProgramConfig_Base :: GeometryConfig_Base :: cartesian_coord_list_type 
-      cartesian_coord_list_type;
+    typename ExternalProgramConfig_Base :: GeometryConfig_Base :: atom_list_type 
+      atom_list_type;
 
 public:
   struct EnergyReport {
@@ -59,7 +57,7 @@ public:
       typedef typename quantity :: energy :: energy_mask_type energy_solution_tag_type;
       typedef typename quantity :: energy :: energy_literal_type energy_solution_name_type;
     public:
-      cartesian_coord_list_type& set_atom_list()
+      atom_list_type& set_atom_list()
        { return this->atom_list_; }
       energy_data_type& set_energy()
        { return this->energy_; }
@@ -68,15 +66,19 @@ public:
       const energy_solution_name_type return_energy_solution_name() const 
        { return quantity :: energy :: return_energy_literal( this->energy_solution_tag_ ); }
     private:
-      cartesian_coord_list_type atom_list_;
+      atom_list_type atom_list_;
       energy_data_type energy_;
       energy_solution_tag_type energy_solution_tag_;
   }; // end of struct ExternalProgramReport :: EnergyReport
 
-  struct GradientReport  {
+  struct GradientReport {
 
   }; // end of struct ExternalProgramReport :: GradientReport
 
+  typedef EnergyReport    energy_bare_report_type;
+  typedef GradientReport  gradient_bare_report_type;
+
+public:
   struct ReportInterface {
     public:
 
@@ -86,19 +88,74 @@ public:
   };
 
 public:
-  typedef ExternalProgramReport :: EnergyReport energy_report_type;
-  typedef ExternalProgramReport :: GradientReport gradient_report_type;
+  struct RuntimeInfo_Base {
+    public:
+      typedef string program_name_type;
+      typedef string file_name_type;
+      typedef string path_name_type;
+    public:
+
+    protected:
+      program_name_type program_name_;
+      file_name_type input_filename_;
+      file_name_type output_filename_;
+      path_name_type input_path_;
+      path_name_type scratch_path_;
+      path_name_type output_path_;
+  }; // end of struct RuntimeInfo_Base
+  struct LocalRunInfo : public RuntimeInfo_Base {
+    LocalRunInfo( program_name_type program_name,
+                  file_name_type input_filename,
+                  file_name_type output_filename,
+                  path_name_type input_directory,
+                  path_name_type scratch_directory,
+                  path_name_type output_directory ):
+      program_name_( program_name ), input_filename_( input_filename ), output_filename_( output_filename ),
+      input_path_( input_directory ), scratch_path_ ( scratch_directory ), output_path_ ( output_directory ) { }
+    private:
+  }; // end of struct LocalRunInfo
+  struct DryRunInfo : public RuntimeInfo_Base {
+    private:
+      file_name_type run_script_filename_;
+  }; // end of struct InputRunInfo
+  struct HarvestRunInfo : public RuntimeInfo_Base {
+    private:
+  }; // end of struct OutputRunInfo
+  struct PBSRunInfo {
+    private:
+      file_name_type pbs_script_name_;
+      file_name_type pbs_group_submission_script_name_;
+  }; // end of PBSRunInfo
+  struct SBATCHRunInfo {
+    private:
+      file_name_type sbatch_script_name_;
+      file_name_type sbatch_group_submission_script_name_;
+  }; // end of SBATCHRunInfo
+
+  typedef LocalRunInfo local_run_info_type;
+  typedef DryRunInfo dry_run_info_type;
+  typedef HarvestRunInfo harvest_run_info_type;
+  typedef PBSRunInfo pbsrun_info_type;
+  typedef SBATCHRunInfo sbatchrun_info_type;
 
 public:
-  void accept_new_step_data( energy_report_type energy_report )
-   { /* to be defined */ }
-  void accept_new_step_data( gradient_report_type gradient_report )
-   { /* to be defined */ }
+  typedef tuple< energy_bare_report_type, local_run_info_type > energy_local_run_report_type;
+  typedef tuple< energy_bare_report_type, harvest_run_info_type > energy_report_harvest_run_type;
+  typedef vector< energy_report_type > energy_report_list_type;
+
+  typedef tuple< gradient_bare_report_type, local_run_info_type > gradient_local_run_report_type;
+  typedef vector< energy_report_type > energy_local_run_report_list_type;
+
+public
+  void accept_new_step_data( energy_local_run_report_type report )
+    { this->energy_local_run_report_list_.push_back( report ); }
+  void accept_new_step_data( gradient_local_run_report_type gradient_report )
+    { this->gradient_local_run_report_list_.push_back( report); }
 
 private:
   vector< shared_ptr< ReportInterface > > interface_to_step_reports_;
-  vector< EnergyReport > energy_report_backups_;
-  vector< GradientReport > gradient_report_backups_;
+  energy_local_run_report_list_type energy_local_run_report_list_;
+  vector< gradient_local_run_report_type > gradient_local_run_report_list_;
 
 }; // end of struct ExternalProgramReport
 

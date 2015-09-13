@@ -63,7 +63,7 @@ public:
   typedef typename report_type :: energy_report_type       energy_report_type;
   typedef typename report_type :: gradient_report_type     gradient_report_type;
   typedef typename base_config_type :: solution_tag_type   solution_tag_type;
-  typedef typename base_config_type :: energy_soltion_tag_type      energy_solution_tag_type;
+  typedef typename base_config_type :: energy_solution_tag_type      energy_solution_tag_type;
   typedef typename base_config_type :: gradient_solution_tag_type   gradient_solution_tag_type;
 
 public:
@@ -100,15 +100,24 @@ public:
     }
    } // end of function write_energy_input()
 
-  energy_report_type run_energy_calculation( base_config_ptr base_config_pointer )
+  tuple< energy_report_type, local_run_info_type > run_energy_calculation( base_config_ptr base_config_pointer )
    {
-     file_name_type input_filename = write_energy_input( base_config_pointer ); 
-     file_name_type output_filename = base_config_pointer->molecule_name() + ".out";
-     run_external_program( input_filename, output_filename ); // call derived class
-     energy_report_type retval = collect_energy_data_from_output( output_filename ); // call derived class
-     return retval;
+     /**
+      *
+      *  Here we use initialization list type constructor
+      *
+      */
+     local_run_info_type local_run_info( this->program_name_,
+                                         this->write_energy_input( base_config_pointer ), // write energy calculation input and return the input file name
+                                         base_config_pointer->molecule_name() + ".out",
+                                         base_config_pointer->input_dir(),
+                                         base_config_pointer->scratch_dir(),
+                                         base_config_pointer->output_dir() );
+     run_external_program( local_run_info.input_filename(), local_run_info.output_filename() ); // call derived class
+     energy_report_type energy_report 
+       = collect_energy_data_from_output( local_run_info.output_filename() ); // call derived class
+     return make_tuple( energy_report, local_run_info );
    } // end of function run_energy_calculation()
-
 
   file_name_type write_run_script( base_config_ptr base_config_pointer )
    {
@@ -116,47 +125,45 @@ public:
 
   file_name_type collect_result( file_name_type output_filename )
    {
-
    } // end of function collect_result()
 
   gradient_report_type run_gradient_calculation( base_config_ptr base_config_pointer )
    {
-
    } // end of function run_gradient_calculation()
 
 public:
   report_type sequence_local_run( request_type request )
    {
     try{
-     report_type report;
-     base_config_ptr_list base_config_pointer_list = generate_config_list_from_request( request );
-     for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ){
-      solution_tag_type solution_tag = base_config_pointer_list[istep]->solution_tag();
-      switch( solution_tag ){
-       case( energy :: return_nest_mask() ): 
-        report.accept_new_step_data( run_energy_calculation( base_config_pointer_list[istep] ) );
-        break;
-       case( gradient :: return_nest_mask() ):
-        report.accept_new_step_data( run_gradient_calculation( base_config_pointer_list[istep]) );
-        break;
-       default:
-        throw solution_tag;
-        break;
-      } // end of switch case
-     } // end of for loop
+      report_type report;
+      base_config_ptr_list base_config_pointer_list = generate_config_list_from_request( request );
+      for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ){
+        solution_tag_type solution_tag = base_config_pointer_list[istep]->solution_tag();
+        switch( solution_tag ){
+          case( energy :: return_nest_mask() ):
+            report.accept_new_step_data( run_energy_calculation( base_config_pointer_list[istep] ) );
+            break;
+          case( gradient :: return_nest_mask() ):
+            report.accept_new_step_data( run_gradient_calculation( base_config_pointer_list[istep] ) );
+            break;
+          default:
+            throw solution_tag;
+            break;
+       } // end of switch case
+      } // end of for loop
 
-     // prevent memory leak
-     for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ){
-      delete base_config_pointer_list[istep];
-     }
+      // prevent memory leak
+      for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ){
+        delete base_config_pointer_list[istep];
+      }
 
-     return report;
+      return report;
     }
     catch ( solution_tag_type unknown_solution_type ){
-     using std::cout;
-     using std::endl;
-     cout << "unknown solution type" << unknown_solution_type << endl;
-     abort();
+      using std::cout;
+      using std::endl;
+      cout << "unknown solution type" << unknown_solution_type << endl;
+      abort();
     }
    } // end of function sequence_local_run()
 

@@ -32,6 +32,7 @@
 #include <iostream>
 #include <string>
 #include <structure/geometry_settings.hpp>
+#include <structure/atom_list.hpp>
 #include <electron_correlation/quantity.hpp>
 
 using std::tuple;
@@ -121,8 +122,7 @@ public:
       typedef string element_name_type;
       typedef typename coordinate_system :: coordinate_mask_type  geometry_format_type; 
       typedef typename unit :: unit_mask_type geometry_unit_type;
-      typedef tuple< element_name_type, coord_value_type, coord_value_type, coord_value_type > atomic_cartesian_coord_type;
-      typedef vector< atomic_cartesian_coord_type > cartesian_coord_list_type;
+      typedef typename structure :: AtomList atom_list_type;
     public:
       virtual void print( ostream& os ) const = 0;
   };
