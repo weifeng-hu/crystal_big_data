@@ -35,44 +35,39 @@ namespace iquads {
 
 namespace manybody_expansion {
 
-struct CommandSetting
-{
+struct CommandSetting {
 public:
-  typedef string filename_type;
+  typedef string file_name_type;
   typedef bool condition_type;
-
-  typedef filename_type& filename_ref;
+  typedef file_name_type& file_name_ref;
   typedef condition_type& condition_ref;
 
 public:
   CommandSetting()
-   {
-     this->set_default();
-   }
-
-public:
-  void set_default()
    {
      this->input_filename_ = "not set";
      this->output_filename_ = "not set";
    }
 
 public:
-  const filename_type input_filename() const 
+  enum request_method_type { FROM_FILE, DEFAULT };
+
+public:
+  const file_name_type input_filename() const 
    { return this->input_filename_; }
-
-  filename_ref set_input_filename()
+  file_name_ref set_input_filename()
    { return this->input_filename_; }
-
-  const filename_type output_filename() const
+  const file_name_type output_filename() const
    { return this->output_filename_; }
-
-  filename_ref output_filename()
+  file_name_ref output_filename()
    { return this->output_filename_; }
+  const request_method_type request_method() const
+   { return this->request_method_; } 
 
 private:
-  filename_type input_filename_;
-  filename_type output_filename_;
+  file_name_type input_filename_;
+  file_name_type output_filename_;
+  request_method_type request_method_;
 
 }; // end of class CommandSetting
 

@@ -122,7 +122,8 @@ public:
       typedef string element_name_type;
       typedef typename coordinate_system :: coordinate_mask_type  geometry_format_type; 
       typedef typename unit :: unit_mask_type geometry_unit_type;
-      typedef typename structure :: AtomList atom_list_type;
+      typedef tuple< element_name_type, coord_value_type, coord_value_type, coord_value_type > atomic_cartesian_coord_type;
+      typedef vector< atomic_cartesian_coord_type > atomic_coord_list_type;
     public:
       virtual void print( ostream& os ) const = 0;
   };
@@ -173,8 +174,12 @@ public:
    { return this->file_extension_; }
   const molecule_name_type molecule_name() const 
    { return this->molecule_name_; }
-  const work_path_type work_path() const
-   { return this->work_path_; }
+  const work_path_type input_path() const
+   { return this->input_path_; }
+  const work_path_type scratch_path() const
+   { return this->scratch_path_; }
+  const work_path_type output_path() const
+   { return this->output_path_; }
 
 protected:
   solution_tag_type solution_tag_;
@@ -182,7 +187,9 @@ protected:
   gradient_solution_tag_type gradient_solution_tag_;
   file_extension_type file_extension_;
   molecule_name_type molecule_name_;
-  work_path_type work_path_;
+  work_path_type input_path_;
+  work_path_type scratch_path_;
+  work_path_type output_path_;
 
 }; // end of struct ExternalProgramConfig_Base
 

@@ -28,8 +28,8 @@
 #include <iostream>
 #include <algorithm>
 #include <memory>
-#include "utilities/solid_gen/molecule.h"
-#include "utilities/solid_gen/molecule_bulk.h"
+#include <structure/molecule.hpp>
+#include <structure/molecule_bulk.hpp>
 
 using namespace std;
 

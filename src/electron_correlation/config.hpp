@@ -28,6 +28,7 @@
 #define ELECTRON_CORRELATION_CONFIG_HPP
 
 #include <electron_correlation/method.hpp>
+#include <structure/molecule.hpp>
 
 namespace iquads {
 
@@ -36,7 +37,8 @@ namespace electron_correlation {
 struct Config
 {
 public:
-  typedef unsigned int condition_type;
+  typedef Molecule molecule_info_type;
+  typedef bool condition_type;
   typedef condition_type& condition_ref;
 
 public:
@@ -86,6 +88,7 @@ public:
 
 private:
   bitmask_type total_correlation_mask_;
+  molecule_info_type molecule_info_;
 
 }; // end of struct Config
 

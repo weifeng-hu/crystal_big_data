@@ -44,9 +44,8 @@ namespace interface_to_third_party {
 struct ExternalProgramReport {
 public:
   typedef ExternalProgramReport parent_report_type;
-  typedef
   typedef 
-    typename ExternalProgramConfig_Base :: GeometryConfig_Base :: atom_list_type 
+    typename ExternalProgramConfig_Base :: GeometryConfig_Base :: atomic_coord_list_type 
       atom_list_type;
 
 public:
@@ -93,7 +92,19 @@ public:
       typedef string program_name_type;
       typedef string file_name_type;
       typedef string path_name_type;
+      typedef RuntimeInfo_Base base;
     public:
+      RuntimeInfo_Base( program_name_type program_name,
+                        file_name_type input_filename,
+                        file_name_type output_filename,
+                        path_name_type input_directory,
+                        path_name_type scratch_directory,
+                        path_name_type output_directory ):
+         program_name_ ( program_name ), input_filename_ ( input_filename ), output_filename_ (output_filename),
+         input_path_ ( input_directory ), scratch_path_ ( scratch_directory ), output_path_ ( output_directory ) {}
+    public:
+      const file_name_type input_filename() const { return this->input_filename_; }
+      const file_name_type output_filename() const { return this->output_filename_; }
 
     protected:
       program_name_type program_name_;
@@ -109,9 +120,9 @@ public:
                   file_name_type output_filename,
                   path_name_type input_directory,
                   path_name_type scratch_directory,
-                  path_name_type output_directory ):
-      program_name_( program_name ), input_filename_( input_filename ), output_filename_( output_filename ),
-      input_path_( input_directory ), scratch_path_ ( scratch_directory ), output_path_ ( output_directory ) { }
+                  path_name_type output_directory ) :
+      RuntimeInfo_Base ( program_name, input_filename, output_filename, 
+                         input_directory, scratch_directory, output_directory ) { }
     private:
   }; // end of struct LocalRunInfo
   struct DryRunInfo : public RuntimeInfo_Base {
@@ -121,12 +132,12 @@ public:
   struct HarvestRunInfo : public RuntimeInfo_Base {
     private:
   }; // end of struct OutputRunInfo
-  struct PBSRunInfo {
+  struct PBSRunInfo : public RuntimeInfo_Base {
     private:
       file_name_type pbs_script_name_;
       file_name_type pbs_group_submission_script_name_;
   }; // end of PBSRunInfo
-  struct SBATCHRunInfo {
+  struct SBATCHRunInfo : public RuntimeInfo_Base {
     private:
       file_name_type sbatch_script_name_;
       file_name_type sbatch_group_submission_script_name_;
@@ -140,17 +151,16 @@ public:
 
 public:
   typedef tuple< energy_bare_report_type, local_run_info_type > energy_local_run_report_type;
-  typedef tuple< energy_bare_report_type, harvest_run_info_type > energy_report_harvest_run_type;
-  typedef vector< energy_report_type > energy_report_list_type;
+  typedef tuple< energy_bare_report_type, harvest_run_info_type > energy_harvest_run_report_type;
+  typedef vector< energy_local_run_report_type > energy_local_run_report_list_type;
 
   typedef tuple< gradient_bare_report_type, local_run_info_type > gradient_local_run_report_type;
-  typedef vector< energy_report_type > energy_local_run_report_list_type;
 
-public
+public:
   void accept_new_step_data( energy_local_run_report_type report )
     { this->energy_local_run_report_list_.push_back( report ); }
-  void accept_new_step_data( gradient_local_run_report_type gradient_report )
-    { this->gradient_local_run_report_list_.push_back( report); }
+  void accept_new_step_data( gradient_local_run_report_type report )
+    { this->gradient_local_run_report_list_.push_back( report ); }
 
 private:
   vector< shared_ptr< ReportInterface > > interface_to_step_reports_;

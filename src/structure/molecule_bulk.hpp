@@ -22,17 +22,18 @@
 #ifndef MOLECULE_BULK_HPP
 #define MOLECULE_BULK_HPP
 
+#include <utility>
 #include <vector>
 #include <tuple>
 #include <map>
-#include <memory>
 #include <structure/molecule.hpp>
-#include <structure/unit_cell.hpp>
-#include <structure/lattice_instant.hpp>
+#include <structure/unit_cell_instant.hpp>
 #include <structure/lattice_parameters.hpp>
+#include <structure/lattice_instant.hpp>
 
 using std::vector;
 using std::tuple;
+using std::pair;
 using std::multimap;
 
 namespace iquads {
@@ -42,17 +43,17 @@ namespace structure {
 struct MoleculeBulk
 {
 public:
-  MoleculeBulk(){
-   this->bulk.resize(0);
-   this->n_molecule_ = 0;
-   this->radius_ = 0.0e0;
+  MoleculeBulk() {
+    this->bulk.resize(0);
+    this->n_molecule_ = 0;
+    this->radius_ = 0.0e0;
   }
-  Molecule_bulk( molecular_lattice* ml ){
-   this->init_from( ml );
+  MoleculeBulk( molecular_lattice* ml ) {
+    this->init_from( ml );
   }
 
 public:
-  void init_from( molecular_lattice* ml ){
+  void init_from( structure :: molecular_lattice* ml ) {
    cout << "Initialising molecule bulk from lattice ..." << endl;
    ml->recenter();
    cout << "Transforming to molecule bulk ...";
@@ -70,6 +71,7 @@ public:
   }
   void recenter_to_central_molecule( tuple< array< double, 3 >, int > center_mole_info ){
    cout << "Recentering the origin to the center of mass of the central molecule ... " << endl;
+   using std::get;
    array< double, 3 > vec = get<0>( center_mole_info );
    for( size_t imole = 0; imole < this->n_molecule_; imole++ ){
     (this->bulk.at(imole)) += vec;
@@ -84,7 +86,7 @@ public:
    {
     multimap< double, int > dist_map;
     for( size_t imole = 0; imole < this->n_molecule_; imole++ ){
-     molecule mole_i = this->bulk.at(imole);
+     Molecule mole_i = this->bulk.at(imole);
      Coord com_i = mole_i.get_center_of_mass();
      Coord orig = make_tuple( 0.0, 0.0, 0.0 );
      double dist = compute_distance( com_i, orig );
@@ -94,6 +96,7 @@ public:
     index = it->second;
    }
    Coord center_of_mass = (this->bulk.at(index)).get_center_of_mass();
+   using std::get;
    recenter_vec 
     = array<double, 3>{ -get<0>(center_of_mass), -get<1>(center_of_mass), -get<2>(center_of_mass) };
    return make_tuple( recenter_vec, index );
@@ -102,9 +105,9 @@ public:
   void cut( double Radius ){
    cout << "Performing sphere cut using radius " << Radius << " Angstrom ..." << endl;
    this->radius_ = Radius;
-   vector< molecule > temp_bulk;
+   vector< Molecule > temp_bulk;
    for( size_t imole = 0; imole < this->n_molecule_; imole++ ){
-    molecule mole_local = this->bulk.at(imole);
+    Molecule mole_local = this->bulk.at(imole);
     if( mole_local.within_radius( Radius ) == true ){
      temp_bulk.push_back( mole_local );
     }
@@ -135,16 +138,18 @@ public:
 
 public:
   size_t get_nmolecule() const { return this->n_molecule_; }
-  molecule get_molecule( size_t i ) const { return this->bulk.at(i); }
+  Molecule get_molecule( size_t i ) const { return this->bulk.at(i); }
   int get_central_molecule() const { return this->central_molecule_; }
-  lattice_parameters get_constants() const { return this->lp; }
+  LatticeParameters get_constants() const { return this->lp; }
+  const bool is_filled() const { return this->is_filled_; }
 
 private:
-  vector< molecule > bulk;
-  lattice_parameters lp;
+  vector< Molecule > bulk;
+  LatticeParameters lp;
   int central_molecule_;
   double radius_;
   size_t n_molecule_;
+  bool is_filled_;
 
 }; // end of struct MoleculeBulk 
 

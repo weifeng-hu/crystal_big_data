@@ -80,20 +80,21 @@ public:
     public:
       typedef string correlation_name_type;
       typedef tuple< correlation_name_type, energy_data_type > correlated_energy_set_type;
-      typedef vector< correlated_energy_set > correlated_energy_list_type;
+      typedef vector< correlated_energy_set_type > correlated_energy_list_type;
     public:
       CorrelatedEnergyReport(){
-        correlated_energy_list_.push_back( make_tuple< "hf", 0.0e0 > );
-        correlated_energy_list_.push_back( make_tuple< "dft", 0.0e0 > );
-        correlated_energy_list_.push_back( make_tuple< "mp2", 0.0e0 > );
-        correlated_energy_list_.push_back( make_tuple< "ccsd", 0.0e0 > );
-        correlated_energy_list_.push_back( make_tuple< "ccsd(t)", 0.0e0 > );
-        correlated_energy_list_.push_back( make_tuple< "ccsdt", 0.0e0 > );
-        correlated_energy_list_.push_back( make_tuple< "ccsdt(q)", 0.0e0 > );
-        correlated_energy_list_.push_back( make_tuple< "casci", 0.0e0 > );
-        correlated_energy_list_.push_back( make_tuple< "casscf", 0.0e0 > );
-        correlated_energy_list_.push_back( make_tuple< "dmrg", 0.0e0 > );
-        correlated_energy_list_.push_back( make_tuple< "fci", 0.0e0 > );
+        using std::make_tuple;
+        correlated_energy_list_.push_back( make_tuple( "hf", 0.0e0 ) );
+        correlated_energy_list_.push_back( make_tuple( "dft", 0.0e0 ) );
+        correlated_energy_list_.push_back( make_tuple( "mp2", 0.0e0 ) );
+        correlated_energy_list_.push_back( make_tuple( "ccsd", 0.0e0 ) );
+        correlated_energy_list_.push_back( make_tuple( "ccsd(t)", 0.0e0 ) );
+        correlated_energy_list_.push_back( make_tuple( "ccsdt", 0.0e0 ) );
+        correlated_energy_list_.push_back( make_tuple( "ccsdt(q)", 0.0e0 ) );
+        correlated_energy_list_.push_back( make_tuple( "casci", 0.0e0 ) );
+        correlated_energy_list_.push_back( make_tuple( "casscf", 0.0e0 ) );
+        correlated_energy_list_.push_back( make_tuple( "dmrg", 0.0e0 ) );
+        correlated_energy_list_.push_back( make_tuple( "fci", 0.0e0 ) );
       }
     private:
       correlated_energy_list_type correlated_energy_list_;

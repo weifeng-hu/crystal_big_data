@@ -29,6 +29,7 @@
 
 #include <vector>
 #include <string>
+#include <interface_to_third_party/program_mask.hpp>
 #include <iquads/sequence.hpp>
 #include <structure/molecule.hpp>
 
@@ -41,24 +42,44 @@ using namespace sequence;
 
 namespace interface_to_third_party {
 
+/**
+ *
+ *  External Program Request 
+ *   As a request to external program agents, it should contain at least these information:
+ *   + the external program to use
+ *   + A copy of the molecule info
+ *   + quantity type request, energy? gradients?
+ *   + method request, basis set
+ *   + runtime requests: local? server? dryrun? any detailed directory requests?
+ * 
+ */
 struct ExternalProgramRequest {
 public:
-  typedef mode :: mode_mask_type mode_type;
+  typedef typename mode :: mode_mask_type mode_type;
+  typedef typename program :: program_mask_type external_program_type;
   typedef calculation :: calculation_mask_type calculation_type;
   typedef string basis_set_name_type;
   typedef vector<string> method_keyword_list_type;
-  typedef Molecule molecule_info_type;
+  typedef structure :: Molecule molecule_info_type;
 
 public:
   const mode_type mode() const 
    { return this->mode_; }
   const calculation_type calculation() const
    { return this->calculation_; }
+  molecule_info_type& set_molecule_info()
+   { return this->molecule_info_; }
+  mode_type& set_mode()
+   { return this->mode_; }
+  external_program_type& set_external_program()
+   { return this->external_program_; }
+  basis_set_name_type& set_basis_set_name()
+   { return this->basis_set_name_; }
 
 private:
+  external_program_type external_program_;
   mode_type mode_;
   calculation_type calculation_;
-
   method_keyword_list_type method_keyword_list_;
   string basis_set_name_;
   molecule_info_type molecule_info_;

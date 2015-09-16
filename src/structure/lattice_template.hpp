@@ -35,7 +35,7 @@
 #include <array>
 #include <iostream>
 #include <geometrical_space/threed_space_function.hpp>
-#include <manybody_expansion/fragment_identifier/fragment_info.hpp>
+//#include <manybody_expansion/fragment_identifier/fragment_info.hpp>
 
 using std::string;
 using std::tuple;
@@ -50,13 +50,13 @@ using namespace geometrical_space :: threed_space;
 
 namespace structure {
 
-template < class UnitCell_Type >
+template < typename UnitCell_Type >
 struct Lattice {
 public:
-  typedef vector< pair< array< int, 1 > , double > > sym_noneq_monomer_list_type;
-  typedef vector< pair< array< int, 2 > , double > > sym_noneq_dimer_list_type;
-  typedef vector< pair< array< int, 3 > , double > > sym_noneq_trimer_list_type;
-  typedef vector< pair< array< int, 4 > , double > > sym_noneq_tetramer_list_type;
+  typedef vector< tuple< array< int, 1 > , double > > sym_noneq_monomer_list_type;
+  typedef vector< tuple< array< int, 2 > , double > > sym_noneq_dimer_list_type;
+  typedef vector< tuple< array< int, 3 > , double > > sym_noneq_trimer_list_type;
+  typedef vector< tuple< array< int, 4 > , double > > sym_noneq_tetramer_list_type;
 
 public:
   Lattice() {
@@ -64,7 +64,7 @@ public:
   }
 
 public:
-  typedef typename UnitCell_Type unit_cell_type;
+  typedef UnitCell_Type unit_cell_type;
 
 public:
   void reset(){
@@ -188,6 +188,7 @@ public:
    }
 
   void generate( tuple<int, int, int> nunits ){
+   using std::get;
    size_t a = get<0>( nunits );
    size_t b = get<1>( nunits );
    size_t c = get<2>( nunits );
@@ -213,7 +214,7 @@ public:
   }
 
   friend 
-  ostream& operator<< ( ostream& os, lattice_base<unit_cell_type>& lattice ){
+  ostream& operator<< ( ostream& os, Lattice<unit_cell_type>& lattice ){
    const size_t n_cell = lattice.get_ncell();
    for( size_t icell = 0; icell < n_cell; icell++ ){
     unit_cell_type cell_i = lattice.get_cell(icell);
@@ -224,21 +225,24 @@ public:
 
   unit_cell_type get_cell( size_t i ) const { return this->store.at(i); }
   size_t get_ncell() const { return this->store.size(); }
-  lattice_parameters get_constants() const { return this->lp; }
+  LatticeParameters get_constants() const { return this->lp; }
+
+  const bool is_filled() const { return this->is_filled_; }
 
 public:
   template < size_t NUM > 
-   vector< pair< array< int, NUM > , double > > 
+   vector< tuple< array< int, NUM > , double > > 
     identify_symmetry_equvivalent_fragments_for_center( int center_index ){};
 
 private:
   vector< unit_cell_type > store;
   unit_cell_type primitive;
-  lattice_parameters lp;
+  LatticeParameters lp;
   size_t na, nb, nc;
   bool unit_cell_is_set_;
+  bool is_filled_;
 
-}; // end of struct lattice_base
+}; // end of struct Lattice
 
 } // end of namespace structure
 

@@ -29,7 +29,7 @@
 
 #include <manybody_expansion/config.hpp>
 #include <manybody_expansion/report.hpp>
-#include <manybody_expansion/compute_expansion_term_periodic_traits.hpp>
+//#include <manybody_expansion/compute_expansion_term_periodic_traits.hpp>
 
 namespace iquads {
 
@@ -46,8 +46,8 @@ class ExpansionFormulaPeriodic
 public:
   energy_data_type compute( config_type config, report_ref report )
    {
-     using manybody_expansion :: compute_expansion_term_periodic;
-     return compute_expansion_term_periodic<0>( config, report );
+//     using manybody_expansion :: compute_expansion_term_periodic;
+//     return compute_expansion_term_periodic<0>( config, report );
    } // end of compute()
 
 }; // end of class ExpansionFormulaPeriodic< Order >
@@ -58,8 +58,8 @@ class ExpansionFormulaPeriodic<1>
 public:
   energy_data_type compute( config_type config, report_ref report )
    {
-     using manybody_expansion :: compute_expansion_term_periodic;
-     return compute_expansion_term_periodic<1>( config, report );
+//     using manybody_expansion :: compute_expansion_term_periodic;
+//     return compute_expansion_term_periodic<1>( config, report );
    } // end of compute()
 
 }; // end of class ExpansionFormulaPeriodic<1>
@@ -70,9 +70,9 @@ class ExpansionFormulaPeriodic<2>
 public:
   energy_data_type compute( config_type config, report_ref report )
    {
-     using manybody_expansion :: compute_expansion_term_periodic;
-     return compute_expansion_term_periodic<1>( config, report ) +
-            compute_expansion_term_periodic<2>( config, report );
+//     using manybody_expansion :: compute_expansion_term_periodic;
+//     return compute_expansion_term_periodic<1>( config, report ) +
+//            compute_expansion_term_periodic<2>( config, report );
    } // end of compute()
 
 }; // end of class ExpansionFormulaPeriodic<2>
@@ -83,10 +83,10 @@ class ExpansionFormulaPeriodic<3>
 public:
   energy_data_type compute( config_type config, report_ref report )
    {
-     using manybody_expansion :: compute_expansion_term_periodic;
-     return compute_expansion_term_periodic<1>( config, report ) +
-            compute_expansion_term_periodic<2>( config, report ) +
-            compute_expansion_term_periodic<3>( config, report );
+//     using manybody_expansion :: compute_expansion_term_periodic;
+//     return compute_expansion_term_periodic<1>( config, report ) +
+//            compute_expansion_term_periodic<2>( config, report ) +
+//            compute_expansion_term_periodic<3>( config, report );
    } // end of compute()
 
 }; // end of class ExpansionFormulaPeriodic<3>
@@ -97,11 +97,11 @@ class ExpansionFormulaPeriodic<4>
 public:
   energy_data_type compute( config_type config, report_ref report )
    {
-     using manybody_expansion :: compute_expansion_term_periodic;
-     return compute_expansion_term_periodic<1>( config, report ) +
-            compute_expansion_term_periodic<2>( config, report ) +
-            compute_expansion_term_periodic<3>( config, report ) +
-            compute_expansion_term_periodic<4>( config, report ); 
+//     using manybody_expansion :: compute_expansion_term_periodic;
+//     return compute_expansion_term_periodic<1>( config, report ) +
+//            compute_expansion_term_periodic<2>( config, report ) +
+//            compute_expansion_term_periodic<3>( config, report ) +
+//            compute_expansion_term_periodic<4>( config, report ); 
    } // end of compute()
 
 }; // end of class ExpansionFormulaPeriodic<4>

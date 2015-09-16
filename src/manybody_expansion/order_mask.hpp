@@ -28,23 +28,44 @@
 #ifndef MANYBODY_EXPANSION_ORDER_MASK_HPP
 #define MANYBODY_EXPANSION_ORDER_MASK_HPP
 
+#include <stdlib.h>
+#include <iostream>
+
 namespace iquads {
 
-namespace manybody_expansion {
+  namespace manybody_expansion {
+  
+    namespace order {
+   
+      typedef size_t expansion_order_type; 
+      typedef unsigned int order_mask_type;
+    
+      constexpr order_mask_type FIRST_ORDER   = 0x01 << 0;
+      constexpr order_mask_type SECOND_ORDER  
+                = ( FIRST_ORDER | 0x01 << 1 );
+      constexpr order_mask_type THIRD_ORDER   
+                = ( FIRST_ORDER | SECOND_ORDER | 0x01 << 2 );
+      constexpr order_mask_type FOURTH_ORDER  
+                = ( FIRST_ORDER | SECOND_ORDER | THIRD_ORDER | 0x01 << 3 );
 
-namespace order_bitmask {
+      const inline order_mask_type return_order_mask( expansion_order_type expansion_order ) 
+       {
+         switch( expansion_order ) {
+           case( 1 ): return FIRST_ORDER;  break;
+           case( 2 ): return SECOND_ORDER; break;
+           case( 3 ): return THIRD_ORDER;  break;
+           case( 4 ): return FOURTH_ORDER; break;
+           default:
+            using std::cout;
+            using std::endl;
+            cout << " order out of range: " << expansion_order << endl;
+            abort();
+         }
+       } // end of function return_order_mask()
 
-  typedef unsigned int bitmask_type;
-
-  constexpr bitmask_type AUTO          = 0x01 << 0;
-  constexpr bitmask_type FIRST_ORDER   = 0x01 << 1;
-  constexpr bitmask_type SECOND_ORDER  = 0x01 << 2;
-  constexpr bitmask_type THIRD_ORDER   = 0x01 << 3;
-  constexpr bitmask_type FOURTH_ORDER  = 0x01 << 4;
-
-} // end of namespace order_bitmask
-
-} // end of manybody_expansion
+    } // end of namespace order
+  
+  } // end of manybody_expansion
 
 } // end of namespace iquads
 

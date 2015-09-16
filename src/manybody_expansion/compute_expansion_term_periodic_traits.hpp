@@ -27,6 +27,7 @@
 #ifndef COMPUTE_EXPANSION_TERM_PERIODIC_TRAITS_HPP
 #define COMPUTE_EXPANSION_TERM_PERIODIC_TRAITS_HPP
 
+#include <electron_correlation/setting.hpp>
 #include <manybody_expansion/config.hpp>
 #include <manybody_expansion/report.hpp>
 #include <manybody_expansion/compute_interaction_energy_traits.hpp>
@@ -39,6 +40,7 @@ typedef double energy_data_type;
 typedef Config config_type;
 typedef Report report_type;
 typedef report_type& report_ref;
+typedef electron_correlation :: Setting  external_setting_type;
 
 template < size_t Order > 
  inline energy_data_type compute_expansion_term_periodic( config_type config, report_ref report )
@@ -53,7 +55,7 @@ template <>
 {
 
   energy_data_type retval = 0.0e0;
-  external_setting_type settings; settings.generate_from_config();
+  external_setting_type settings; settings.generate_from_config( config );
 
   unit_cell_type cell_zero = config.lattice().get_cell(0);
   for( size_t inode = 0; inode < cell_zero.n_node(); inode++ ){

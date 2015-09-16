@@ -43,7 +43,7 @@ namespace structure {
    typedef string unit_literal_type;
    constexpr unit_mask_type ANGSTROM = 0x01 << 0;
    constexpr unit_mask_type BOHR     = 0x01 << 1;
-   const unit_literal_type return_unit_name( unit_mask_type mask )
+   const inline unit_literal_type return_unit_name( unit_mask_type mask )
     {
       switch( mask ){
        case( ANGSTROM ): return "angstrom"; break;
@@ -60,7 +60,7 @@ namespace structure {
     typedef string coordinate_literal_type;
     constexpr coordinate_mask_type CARTESIAN = 0x01 << 0;
     constexpr coordinate_mask_type INTERNAL  = 0x01 << 1;
-    const coordinate_literal_type return_coordinate_name( coordinate_mask_type mask )
+    const inline coordinate_literal_type return_coordinate_name( coordinate_mask_type mask )
      {
        switch( mask ){
         case( CARTESIAN ): return "cartesian"; break;

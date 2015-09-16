@@ -40,8 +40,8 @@ template < size_t Order >
 class ManyBodyExpansionGeneral 
 {
 public:
-  typedef iquads :: manybody_expansion :: Config config_type;
-  typedef iquads :: manybody_expansion :: Report report_type;
+  typedef Config config_type;
+  typedef Report report_type;
   typedef double energy_data_type;
   typedef energy_data_type& energy_data_reference;
   typedef bool condition_type;
@@ -54,9 +54,9 @@ template < size_t Order >
 class ManyBodyExpansionPeriodic
 {
 public:
-  typedef iquads :: manybody_expansion :: ExpansionFormulaPeriodic< Order > expansion_formula_type;
-  typedef iquads :: manybody_expansion :: Config config_type;
-  typedef iquads :: manybody_expansion :: Report report_type;
+  typedef ExpansionFormulaPeriodic< Order > expansion_formula_type;
+  typedef Config config_type;
+  typedef Report report_type;
   typedef double energy_data_type;
   typedef bool condition_type;
 
@@ -65,9 +65,9 @@ public:
 public:
   energy_data_type 
    compute_lattice_energy_per_unit_cell( config_type config, report_ref report )
-   {
-     this->expansion_formula_.compute( config, report );
-   } // end of compute_lattice_energy_per_unit_cell()
+    {
+      this->expansion_formula_.compute( config, report );
+    } // end of compute_lattice_energy_per_unit_cell()
 
 private:
   expansion_formula_type expansion_formula_;

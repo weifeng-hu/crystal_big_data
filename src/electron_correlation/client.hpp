@@ -27,13 +27,13 @@
 #ifndef ELECTRON_CORRELATION_CLIENT_HPP
 #define ELECTRON_CORRELATION_CLIENT_HPP
 
-#include <structure/molecule.h>
-#include <electron_correlation/report.h>
-#include <electron_correlation/setting.h>
-#include <interface_to_third_party/external_program_request.h>
-#include <interface_to_third_party/external_program_report.h>
-#include <interface_to_third_party/external_program_agent_base.h>
-#include <interface_to_third_party/external_program_agent_factory.h>
+#include <structure/molecule.hpp>
+#include <electron_correlation/report.hpp>
+#include <electron_correlation/setting.hpp>
+#include <interface_to_third_party/external_program_request.hpp>
+#include <interface_to_third_party/external_program_report.hpp>
+#include <interface_to_third_party/external_program_agent_base.hpp>
+#include <interface_to_third_party/external_program_agent_factory.hpp>
 
 namespace iquads {
 
@@ -60,17 +60,17 @@ public:
 public:
   report_type internal_solve()
    { /* to be implemented */ }
-  external_request_type file_external_request( setting_type settings );
+  external_request_type file_external_request( molecule_info_type molecule, setting_type settings );
   void driver( molecule_info_type molecule, setting_type settings )
    {
-     if( settings.use_external_solver() == false ){
+     if( settings.use_internal_solver() == false ){
       this->report_ = internal_solve();
      }
      else{
-      external_request_type external_request = this->file_external_request( settings );
+      external_request_type external_request = this->file_external_request( molecule, settings );
       external_agent_factory_type agent_factory;
       external_base_agent_ptr agent_ptr
-       = agent_factory.get_agent( settings.external_agent_mask() );
+       = agent_factory.get_agent( settings.external_program() );
       external_report_type external_report
        = agent_ptr->accept_request_and_process( external_request );
       this->set_report().collect_data_from_external_report( external_report );

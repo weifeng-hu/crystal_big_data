@@ -28,10 +28,10 @@
 #define EXTERNAL_PROGRAM_AGENT_FACTORY_HPP
 
 #include <stdlib.h>
-#include <interface_to_third_party/external_program_bitmask.hpp>
+#include <interface_to_third_party/program_mask.hpp>
 #include <interface_to_third_party/external_program_agent_base.hpp>
 #include <interface_to_third_party/molpro_agent.hpp>
-#include <interface_to_third_party/orca_agent.hpp>
+//#include <interface_to_third_party/orca_agent.hpp>
 
 namespace iquads {
 
@@ -49,11 +49,11 @@ public:
   base_agent_ptr get_agent( bitmask_type agent_mask )
    {
      switch( agent_mask ){
-      case( molpro ):
+      case( program :: MOLPRO ):
        return new MolproAgent;
        break;
-      case( orca ):
-       return new OrcaAgent;
+      case( program :: ORCA ):
+//       return new OrcaAgent;
        break;
       default:
        exit(1);

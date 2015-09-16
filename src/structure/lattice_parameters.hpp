@@ -27,7 +27,7 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
-#include <blas/blas_interface.hpp>
+#include <blas/blas_interface.h>
 #include <geometrical_space/threed_space.hpp>
 
 using std::array;
@@ -38,7 +38,7 @@ using std::fstream;
 
 namespace iquads {
 
-using namespace iquads :: geometrical_space :: threed_space;
+using namespace geometrical_space :: threed_space;
 
 namespace structure {
 
@@ -52,7 +52,7 @@ public:
                      tuple<double, double, double> angles )
   {
    this->reset();
-
+   using std::get;
    this->length_a_ = get<0>( edge_lengths );
    this->length_b_ = get<1>( edge_lengths );
    this->length_c_ = get<2>( edge_lengths );

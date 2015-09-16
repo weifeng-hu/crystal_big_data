@@ -8,7 +8,7 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -24,27 +24,26 @@
  *
  */
 
-#ifndef ELECTRON_CORRELATION_METHOD_HPP
-#define ELECTRON_CORRELATION_METHOD_HPP
+#include <electron_correlation/setting.hpp>
 
 namespace iquads {
 
- namespace electron_correlation {
+namespace electron_correlation {
 
-  namespace method {
+typedef Setting setting_type;
 
-   typedef unsigned int mask_type;
+void setting_type :: generate_from_config( mbe_config_type config ){
 
-   constexpr mask_type RHF   = 0x01 << 0;
-   constexpr mask_type MP2   = 0x01 << 1;
-   constexpr mask_type CCSD  = 0x01 << 2;
-   constexpr mask_type CCSDT = 0x01 << 3;
-   constexpr mask_type DMRG  = 0x01 << 4;
+  this->mode_ = config.mode();
+  this->use_external_ = config.use_external_solver();
+  if( this->use_external_ == true ){
+   this->external_program_ = config.external_program();
+  }
+  this->basis_set_name_ = config.basis_set_name();
+  this->method_ = config.method();
 
-  } // end of namespace method
+} // end of function generate_from_config()
 
- } // end of namespace electron_correlation
+} // end of electron_correlation
 
 } // end of namespace iquads
-
-#endif

@@ -24,7 +24,12 @@
  *
  */
 
+#include <unistd.h>
+#include <bitset>
 #include <iostream>
+#include <boost/date_time.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <interface_to_third_party/program_mask.hpp>
 #include <manybody_expansion/order_mask.hpp>
 #include <manybody_expansion/request.hpp>
 #include <manybody_expansion/config.hpp>
@@ -41,39 +46,138 @@ mbe_agent_type :: config_type
  mbe_agent_type :: setup_config_from_request( request_type request )
 {
 
+  config_type config;
+  /**
+   *  Step 1
+   *  + lattice info/bulk info
+   *  + check whether periodic system has been requested
+   */
+  if( request.lattice_info().is_filled() == true ) {
+    config.set_is_periodic() = true;
+    config.set_lattice_info() = request.lattice_info();
+  }
+  else if( request.bulk_info().is_filled() == true ) {
+    config.set_is_periodic() = false;
+    config.set_bulk_info() = request.bulk_info();
+  }
+
+  /**
+   *  Step 2
+   *  + set expansion order 
+   */
+  using order :: return_order_mask;
+  config.set_expansion_order() = return_order_mask( request.expansion_order() );
+
+  /**
+   *  Step 2
+   *  + solver info
+   *    Detailed solver/external solver interfaces will be instantiated by the agents in the 
+   *    namespace of iquads :: interface_to_third_party. 
+   *    For now, the MBE config needs to know the ''code name'' of the solver only.
+   */
+  using interface_to_third_party :: program :: return_program_mask;
+  config.set_program() = return_program_mask( request.external_program_name() );
+
+  /**
+   *  Step 3
+   *  + set electron correlation essential settings
+   *    + basis set
+   *    + method: HF? MP2?
+   */
+  config.set_basis_set_name() = request.basis_set_name();
+  using electron_correlation :: return_level_mask;
+  config.set_correlation_method() = return_level_mask( request.correlation_name() );
+
+  /**
+   *  Step 4
+   *  + set runtime info
+   *   + job name?
+   *   + prefix? scratch?
+   *   + run mode
+   */
+  if( request.job_name() == "not set" ) {
+    // then we use date, time to set the job name
+    string date_and_time;
+    using boost :: gregorian :: date;
+    using boost :: gregorian :: day_clock;
+    using boost :: gregorian :: to_simple_string;
+    date today = day_clock :: local_day();
+    date_and_time = to_simple_string( today );
+
+    using boost :: posix_time :: ptime;
+    using boost :: posix_time :: second_clock;
+    ptime now = second_clock :: universal_time();
+    date_and_time = date_and_time + to_simple_string( now );
+    config.set_job_name() = date_and_time;
+  }
+  else {
+    config.set_job_name() = request.job_name();
+  }
+
+  if( request.scratch_name() == "not set" ) {
+    char pwd_char[256];
+    getcwd( pwd_char, 256 );
+    string pwd_string = pwd_char;
+    config.set_scratch_name() = pwd_string + "/scratch/";
+  }
+  else {
+    config.set_scratch_name() = request.scratch_name();
+  }
+
+  using iquads :: sequence :: mode :: return_mode_mask;
+  config.set_run_mode() = return_mode_mask( request.run_mode_name() );
+
 } // end of function setup_config_from_request()
 
-mbe_agent_type :: report_type
- mbe_agent_type :: execute_periodic( config_type config, report_ref report ) 
+
+void  mbe_agent_type :: execute_periodic( config_type config, report_ref report )
 {
 
   using std::cout;
   using std::endl;
-  using order_bitmask :: bitmask_type;
-
   cout << " Compute lattice energy using the periodic MBE formula" << endl;
 
   try {
-   switch ( config.order() ) {
-    case ( order_bitmask :: FIRST_ORDER ):
-     ManyBodyExpansionPeriodic<1> manybody_expansion_periodic;
-     manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( config, report );
-     break;
-    default:
-     throw( config.order() );
-     break;
-   }
+    switch ( config.expansion_order() ) {
+      case ( order :: FIRST_ORDER ):
+        {
+          ManyBodyExpansionPeriodic<1> manybody_expansion_periodic;
+          manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( config, report );
+        }
+        break;
+      case ( order :: SECOND_ORDER ):
+        {
+          ManyBodyExpansionPeriodic<2> manybody_expansion_periodic;
+          manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( config, report );
+        }
+        break;
+      case ( order :: THIRD_ORDER ):
+        {
+          ManyBodyExpansionPeriodic<3> manybody_expansion_periodic;
+          manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( config, report );
+        }
+        break;
+      case ( order :: FOURTH_ORDER ):
+        {
+          ManyBodyExpansionPeriodic<4> manybody_expansion_periodic;
+          manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( config, report );
+        }
+        break;
+      default:
+        throw( config.expansion_order() );
+        break;
+    }
   }
-  catch ( bitmask_type order ) {
+  catch ( config_type :: expansion_order_type order ) {
+    using std::bitset;
     cout << " execute_periodic():" << endl;
-    cout << "  ManyBody Expansion terms of " << order << " order are not implemented! " << endl;
+    cout << "  ManyBody Expansion terms of " << bitset<16> (order) << " order are not implemented! " << endl;
     exit(1);
   }
 
 }; // end of function execute_periodic()
 
-mbe_agent_type :: report_type 
- mbe_agent_type :: execute_general( config_type config, report_ref report )
+void  mbe_agent_type :: execute_general( config_type config, report_ref report )
 {
 
   using std::cout;

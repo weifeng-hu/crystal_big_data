@@ -118,8 +118,9 @@ public:
      if( this->mbe_order_ >= 4 ) retval += this->return_four_body_interaction_energy_per_unit_cell();
      return retval;
    }
-  
+
 public:
+  void save(){}
   void add_monomer_data_to_sym_noneq_list(){}
   void add_dimer_data_to_sym_noneq_list(){}
   void add_trimer_data_to_sym_noneq_list(){}

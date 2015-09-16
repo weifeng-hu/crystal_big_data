@@ -67,6 +67,7 @@ public:
   UnitCell<node_type> 
    translational_duplicate( tuple<int, int, int> direction )
    {
+    using std::get;
     int a = get<0>( direction );
     int b = get<1>( direction );
     int c = get<2>( direction );
@@ -112,7 +113,7 @@ public:
       ifs >> node_i;
       cell.add_node( node_i );
      }
-     lattice_parameters lp;
+     LatticeParameters lp;
      ifs >> lp;
      cell.set_constants() = lp;
      return ifs;
@@ -194,8 +195,8 @@ public:
   void resize( size_t n ) { this->store.resize(n); }
   vector< node_type >  get_store() const { return this->store; }
   vector< node_type >& set_store() { return this->store; }
-  lattice_parameters& set_constants() { return this->constants; }
-  lattice_parameters  get_constants() const { return this->constants; }
+  LatticeParameters& set_constants() { return this->constants; }
+  LatticeParameters  get_constants() const { return this->constants; }
 
   size_t get_n_node() const { return this->store.size(); }
 
@@ -212,7 +213,7 @@ public:
 
 private:
   vector< node_type > store;
-  lattice_parameters constants;
+  LatticeParameters constants;
   array<int, 3> translation_vec;
 
 }; // end of struct UnitCell

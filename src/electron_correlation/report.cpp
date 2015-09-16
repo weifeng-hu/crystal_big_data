@@ -24,13 +24,13 @@
  *
  */
 
-#include <electron_correlation/report.h>
+#include <electron_correlation/report.hpp>
 
 namespace iquads {
 
 namespace electron_correlation {
 
-typedef Report :: report_type;
+typedef Report  report_type;
 
 void report_type :: collect_data_from_external_report( external_report_type external_report )
 {

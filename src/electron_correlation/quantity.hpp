@@ -39,7 +39,7 @@ namespace electron_correlation {
 
    namespace energy {
 
-    constexpr quantity_mask_type return_nest_mask()
+    constexpr inline quantity_mask_type return_nest_mask()
      { return 0x01 << 0 ; }
 
     typedef unsigned int energy_mask_type;
@@ -48,7 +48,7 @@ namespace electron_correlation {
     constexpr energy_mask_type MP2_ENERGY = 0x01 << 1;
     constexpr energy_mask_type CASSCF_ENERGY = 0x01 << 2;
 
-    const energy_literal_type return_energy_literal( energy_mask_type mask )
+    const inline energy_literal_type return_energy_literal( energy_mask_type mask )
      {
        switch( mask ){
         case( HF_ENERGY ): return "Hartree Fock Energy"; break;

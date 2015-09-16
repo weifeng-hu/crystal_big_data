@@ -44,14 +44,14 @@ namespace iquads {
 
 namespace structure {
 
-using iquads :: geometrical_space :: Coord;
+using geometrical_space :: Coord;
 
 class Atom {
 public:
   typedef Atom this_type;
   typedef int charge_type;
-  typedef double mass_type;
   typedef string element_type;
+  typedef double mass_type;
   typedef double coordinate_value_type;
   typedef Coord coordinate_type;
   typedef bool condition_type;
@@ -62,12 +62,13 @@ public:
   typedef mass_type& mass_ref;
 
 public:
-  Atom(){
-   this->element_ = "not set";
-   this->coordinate.fill(0.0e0);
-   this->charge_ = 0;
-   this->mass_ = 0.0e0;
-  }
+  Atom()
+    {
+      this->element_ = "not set";
+      this->coordinate.fill(0.0e0);
+      this->charge_ = 0;
+      this->mass_ = 0.0e0;
+    }
   Atom( element_type element, 
         coordinate_value_type x, 
         coordinate_value_type y, 
@@ -162,7 +163,7 @@ public:
   coordinate_value_type get_y() const { return this->coordinate.at(1); }
   coordinate_value_type get_z() const { return this->coordinate.at(2); }
   // interface from vector to tuple
-  coordinate_type get_coordinate_set(){
+  coordinate_type get_coordinate_set() const {
    const coordinate_value_type x = this->get_x();
    const coordinate_value_type y = this->get_y();
    const coordinate_value_type z = this->get_z();

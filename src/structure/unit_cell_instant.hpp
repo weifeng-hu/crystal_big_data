@@ -22,21 +22,19 @@
 #ifndef UNIT_CELL_INSTANT_HPP
 #define UNIT_CELL_INSTANT_HPP
 
-#include <particle/atom.hpp>
+#include <structure/atom.hpp>
 #include <structure/molecule.hpp>
 #include <structure/unit_cell_template.hpp>
 
 namespace iquads{
 
-using namespace particle;
-
 namespace structure {
 
-  template class UnitCell<atom>;
-  template class UnitCell<molecule>;
+  template class UnitCell<Atom>;
+  template class UnitCell<Molecule>;
 
-  typedef UnitCell<atom> atomic_ucell;
-  typedef UnitCell<molecule> molecular_ucell;
+  typedef UnitCell<Atom> atomic_ucell;
+  typedef UnitCell<Molecule> molecular_ucell;
 
 } // end of namespace structure 
 

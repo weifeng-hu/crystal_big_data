@@ -24,7 +24,7 @@
 
 #include <string>
 #include <vector>
-#include <structure/unit_cell.hpp>
+#include <structure/unit_cell_instant.hpp>
 #include <structure/lattice_template.hpp>
 
 namespace iquads {

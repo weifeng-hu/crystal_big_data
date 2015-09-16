@@ -125,9 +125,9 @@ public:
            case( coordinate_system :: CARTESIAN ):
              os << "geomtyp=" << object_ref.return_geomtyp_string() << endl;
              os << "geometry={" << endl;
-             for( size_t iatom = 0; iatom < object_ref.cartesian_coord_list().size(); iatom++ ){
+             for( size_t iatom = 0; iatom < object_ref.atomic_coord_list().size(); iatom++ ){
               using std::get;
-              atomic_cartesian_coord_type atomic_coord = object_ref.cartesian_coord_list()[iatom];
+              atomic_cartesian_coord_type atomic_coord = object_ref.atomic_coord_list().at(iatom);
               element_name_type element = get<0> ( atomic_coord );
               coord_value_type coord_val_x = get<1> ( atomic_coord );
               coord_value_type coord_val_y = get<2> ( atomic_coord );
@@ -201,14 +201,14 @@ public:
           abort();
         }
        }
-      const cartesian_coord_list_type cartesian_coord_list() const
-       { return this->cartesian_coord_list_; }
+      const atomic_coord_list_type atomic_coord_list() const
+       { return this->atom_list_; }
       const geometry_format_type geometry_format() const 
        { return this->geometry_format_; }
       const geometry_unit_type geometry_unit() const
        { return this->geometry_unit_; }
     private: 
-      cartesian_coord_list_type cartesian_coord_list_;
+      atomic_coord_list_type atom_list_;
       geometry_format_type geometry_format_;
       geometry_unit_type geometry_unit_;
   }; // end of MolproConfig :: GeometryConfig
@@ -248,6 +248,8 @@ public:
   struct MP2Config : public mp2_config_base_type {
     public:
       typedef MP2Config this_type;
+    public:
+      void print( ostream& os ) const { }
       /* to be implemented */
     private:
   }; // end of struct MolproConfig :: MP2Config
@@ -255,6 +257,8 @@ public:
   struct MultiConfig : public casscf_config_base_type {
     public:
      /* to be implemented */
+    public:
+      void print( ostream& os ) const {}
     private:
   }; // end of struct MolproConfig :: MultiConfig
 
@@ -275,9 +279,9 @@ public:
    { return this->geometry_config_; }
   this_hf_config_type& hartree_fock_config() 
    { return this->hf_config_; }
-  this_mp2_config_type& mp2_config() 
+  this_mp2_config_type& mp2_config()
    { return this->mp2_config_; }
-  this_casscf_config_type& casscf_config() 
+  this_casscf_config_type& casscf_config()
    { return this->multi_config_; }
 
 private:

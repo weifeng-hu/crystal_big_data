@@ -39,16 +39,18 @@ using std::string;
 
 namespace iquads {
 
+using iquads :: CommandParser;
+
 namespace manybody_expansion {
 
 class Client
 {
 public:
-  typedef typename CommandParser :: container_type command_container_type;
-  typedef typename CommandParser :: argument_type command_argument_type;
-  typedef Request request_type;
-  typedef Report  report_type;
-  typedef Agent   agent_type;
+  typedef typename CommandParser :: container_type   command_container_type;
+  typedef typename CommandParser :: argument_type    command_argument_type;
+  typedef Request  request_type;
+  typedef Report   report_type;
+  typedef Agent    agent_type;
   typedef CommandSetting command_setting_type;
 
   typedef report_type& report_ref;
@@ -57,11 +59,8 @@ public:
   static void show_help();
   static command_setting_type analyse_command( command_container_type command_container );
   request_type file_request( command_setting_type command_setting );
-
-  void print_report() const 
+  void print_report() const
    { this->report().print(); }
-   // end of function print_report()
-
   void driver( command_container_type command_container )
    {
      command_setting_type command_settings = analyse_command( command_container );
@@ -69,7 +68,7 @@ public:
      agent_type agent;
      this->set_report()
        = agent.accept_request_and_process( request );
-     this->report().save();
+//     this->report().save();  // has to be implemented
      this->print_report();
    }  // end of function driver()
 

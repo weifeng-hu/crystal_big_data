@@ -39,15 +39,15 @@ namespace manybody_expansion {
 class Agent
 {
 public:
-  typedef iquads :: manybody_expansion :: Request request_type;
-  typedef iquads :: manybody_expansion :: Config  config_type;
-  typedef iquads :: manybody_expansion :: Report  report_type;
+  typedef Request   request_type;
+  typedef Config    config_type;
+  typedef Report    report_type;
   typedef report_type& report_ref;
 
 private:
   config_type setup_config_from_request( request_type request );
-  report_type execute_general( config_type config, report_ref report );
-  report_type execute_periodic( config_type config, report_ref report );
+  void execute_general( config_type config, report_ref report );
+  void execute_periodic( config_type config, report_ref report );
 
 public:
   report_type accept_request_and_process( request_type request )
@@ -67,6 +67,7 @@ public:
       this->execute_general( config, report );
      }
 
+     return report;
    } // end of function accept_request_and_process()
 
 }; // end of class Agent

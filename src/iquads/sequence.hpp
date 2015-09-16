@@ -27,31 +27,46 @@
 #ifndef SEQUENCE_HPP
 #define SEQUENCE_HPP
 
+#include <string>
+
+using std::string;
+
 namespace iquads {
 
- namespace sequence {
+  namespace sequence {
 
-  namespace mode {
+    namespace mode {
 
-   typedef unsigned int mode_mask_type;
+      typedef string mode_name_type;
+      typedef unsigned int mode_mask_type;
 
-   constexpr mode_mask_type LOCAL_RUN           = 0x01 << 0;
-   constexpr mode_mask_type WRITE_LOCAL_INPUT   = 0x01 << 1; 
-   constexpr mode_mask_type WRITE_PBS_INPUT     = 0x01 << 2;
-   constexpr mode_mask_type WRITE_SBATCH_INPUT  = 0x01 << 3;
-   constexpr mode_mask_type COLLECT_LOCAL_OUTPUT = 0x01 << 4;
+      constexpr mode_mask_type LOCAL_RUN            = 0x01 << 0;
+      constexpr mode_mask_type WRITE_LOCAL_INPUT    = 0x01 << 1;
+      constexpr mode_mask_type WRITE_PBS_INPUT      = 0x01 << 2;
+      constexpr mode_mask_type WRITE_SBATCH_INPUT   = 0x01 << 3;
+      constexpr mode_mask_type COLLECT_LOCAL_OUTPUT = 0x01 << 4;
 
-  } // end of namespace mode
+      const inline mode_mask_type return_mode_mask( mode_name_type mode_name ) {
 
-  namespace calculation {
+        if( mode_name == "local"   ) return LOCAL_RUN;
+        if( mode_name == "pbs"     ) return WRITE_PBS_INPUT;
+        if( mode_name == "scratch" ) return WRITE_SBATCH_INPUT;
+        if( mode_name == "harvest" ) return COLLECT_LOCAL_OUTPUT;
+        if( mode_name == "dryrun"  ) return WRITE_LOCAL_INPUT;
 
-   typedef unsigned int calculation_mask_type;
+      } // end of function return_mode_mask()
 
-   constexpr calculation_masK_type SINGLE_POINT_ENERGY = 0x01 << 0;
+    } // end of namespace mode
 
-  } // end of namespace 
+    namespace calculation {
 
- } // end of namespace run_mode
+      typedef unsigned int calculation_mask_type;
+
+      constexpr calculation_mask_type SINGLE_POINT_ENERGY = 0x01 << 0;
+
+    } // end of namespace 
+
+  } // end of namespace run_mode
 
 } // end of namespace iquads
 

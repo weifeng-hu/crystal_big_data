@@ -35,12 +35,19 @@ namespace manybody_expansion {
 
 typedef Client mbe_client_type;
 
-mbe_client_type :: request_type 
+mbe_client_type :: request_type
  mbe_client_type :: file_request( command_setting_type command_setting )
 {
 
   request_type request;
-  request.read_input_file( command_setting.input_filename() );
+//  using mbe_client_type :: request_type :: request_method_type;
+  switch ( command_setting.request_method() ) {
+    case ( command_setting_type :: FROM_FILE ):
+      request.read_input_file( command_setting.input_filename() );
+      break;
+    default:
+      break;
+  }
   return request;
 
 }; // end of function file_request()
@@ -49,21 +56,27 @@ mbe_client_type :: command_setting_type
  mbe_client_type :: analyse_command( command_container_type command_container )
 {
 
-  if ( command_container.size() == 1 ){
+  try {
+    if ( command_container.size() == 1 ){
+      throw 1;
+    }
+  
+    command_setting_type command_settings;
+    for( size_t i = 0; i < command_container.size(); i++ ){
+     mbe_client_type :: command_argument_type argument = command_container[i];
+     if( argument == "--input" || argument == "-i" ){
+      command_settings.set_input_filename() = command_container.at(i+1);
+     }
+    }
+    return command_settings;
+  }
+  catch ( size_t one ) {
+    using std::cout;
+    using std::endl;
     cout << "error: no command option input" << endl;
     mbe_client_type :: show_help();
     exit(1);
   }
-
-  command_setting_type command_settings;
-  for( size_t i = 0; i < command_container.size(); i++ ){
-   mbe_client_type :: command_argument_type argument = command_container[i];
-   if( argument == "--input" || argument == "-i" ){
-    command_settings.set_input_filename() = command_container.at(i+1);
-   }
-  }
-
-  return command_settings;
 
 }; // end of function analyse_command()
 

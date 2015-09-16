@@ -60,8 +60,9 @@ public:
   typedef typename request_type :: mode_type               mode_type;
   typedef typename base_config_type :: work_path_type      work_path_type;
   typedef typename base_config_type :: file_name_type      file_name_type;
-  typedef typename report_type :: energy_report_type       energy_report_type;
-  typedef typename report_type :: gradient_report_type     gradient_report_type;
+  typedef typename report_type :: energy_bare_report_type       energy_report_type;
+  typedef typename report_type :: gradient_bare_report_type     gradient_report_type;
+  typedef typename report_type :: local_run_info_type           local_run_info_type;
   typedef typename base_config_type :: solution_tag_type   solution_tag_type;
   typedef typename base_config_type :: energy_solution_tag_type      energy_solution_tag_type;
   typedef typename base_config_type :: gradient_solution_tag_type   gradient_solution_tag_type;
@@ -92,7 +93,7 @@ public:
        throw energy_solution_tag;
      }
     }
-    catch ( energy_tag_type unknown_energy_solution ){
+    catch ( energy_solution_tag_type unknown_energy_solution ){
      using std::cout;
      using std::endl;
      cout << "unknown energy calculation type: " << unknown_energy_solution << endl;
@@ -110,12 +111,13 @@ public:
      local_run_info_type local_run_info( this->program_name_,
                                          this->write_energy_input( base_config_pointer ), // write energy calculation input and return the input file name
                                          base_config_pointer->molecule_name() + ".out",
-                                         base_config_pointer->input_dir(),
-                                         base_config_pointer->scratch_dir(),
-                                         base_config_pointer->output_dir() );
+                                         base_config_pointer->input_path(),
+                                         base_config_pointer->scratch_path(),
+                                         base_config_pointer->output_path() );
      run_external_program( local_run_info.input_filename(), local_run_info.output_filename() ); // call derived class
      energy_report_type energy_report 
        = collect_energy_data_from_output( local_run_info.output_filename() ); // call derived class
+     using std::make_tuple;
      return make_tuple( energy_report, local_run_info );
    } // end of function run_energy_calculation()
 
@@ -127,7 +129,7 @@ public:
    {
    } // end of function collect_result()
 
-  gradient_report_type run_gradient_calculation( base_config_ptr base_config_pointer )
+  tuple< gradient_report_type, local_run_info_type > run_gradient_calculation( base_config_ptr base_config_pointer )
    {
    } // end of function run_gradient_calculation()
 

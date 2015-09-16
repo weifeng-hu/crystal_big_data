@@ -26,8 +26,9 @@
 
 #include <string>
 #include <fstream>
-#include <interface_to_third_party/molpro_config.h>
-#include <interface_to_third_party/molpro_agent.h>
+#include <iquads/sequence.hpp>
+#include <interface_to_third_party/molpro_config.hpp>
+#include <interface_to_third_party/molpro_agent.hpp>
 
 namespace iquads {
 
@@ -40,9 +41,9 @@ agent_type :: base_config_ptr_list
 {
 
   base_config_ptr_list config_pointer_list;
-  if( request.calculation() == SINGLE_POINT_ENERGY ){
+  if( request.calculation() == iquads :: calculation :: SINGLE_POINT_ENERGY ){
    config_pointer_list.resize(1);
-   config_pointer_list[0] = new parent_config_type;
+   config_pointer_list[0] = new this_config_type;
    /* need to be further implemented */
   }
 
@@ -54,7 +55,7 @@ agent_type :: file_name_type
 
   using std::ofstream;
   using std::endl;
-  file_name_type input_file_name = base_config_pointer->work_path() + 
+  file_name_type input_file_name = base_config_pointer->input_path() + 
                                    base_config_pointer->molecule_name() + 
                                    base_config_pointer->file_extension();
   ofstream ofs( input_file_name.c_str(), std::ios::out );
@@ -73,7 +74,7 @@ agent_type :: file_name_type
 
   using std::ofstream;
   using std::endl;
-  file_name_type input_file_name = base_config_pointer->work_path() + 
+  file_name_type input_file_name = base_config_pointer->input_path() + 
                                    base_config_pointer->molecule_name() + 
                                    base_config_pointer->file_extension();
 
@@ -86,7 +87,7 @@ agent_type :: file_name_type
 {
   using std::ofstream;
   using std::endl;
-  file_name_type input_filename = base_config_pointer->work_path() + 
+  file_name_type input_filename = base_config_pointer->input_path() + 
                                    base_config_pointer->molecule_name() + 
                                    base_config_pointer->file_extension();
   return input_filename;
