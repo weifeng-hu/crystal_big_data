@@ -62,7 +62,7 @@ namespace structure {
    *  But right now these are included in one class, so:
    *
    *    + coordinate (for molecular uses)
-   *    + lattice contants (for crystal/periodic uses)
+   *    + lattice vector (for crystal/periodic uses, to label in which unit cell)
    */
 
 using std :: string;
@@ -77,17 +77,18 @@ using geometrical_space :: Interval3D;
 
 class Atom {
 public:
-  typedef Atom                                    this_type;
-  typedef geometrical_space :: coord_value_type   coordinate_value_type;
-  typedef CartesianCoordinate3D                   coordinate_type;
-  typedef CartesianCoordinate3DList               coordinate_list_type;
-  typedef Interval                                interval_data_type;
-  typedef Interval3D                              interval_set_type;
-  typedef string                                  element_name_type;
-  typedef double                                  mass_value_type;
-  typedef double                                  coordinate_value_type;
-  typedef int                                     charge_value_type;
-  typedef bool                                    condition_type;
+  typedef Atom                                          this_type;
+  typedef geometrical_space :: coord_value_type         coordinate_value_type;
+  typedef CartesianCoordinate3D                         coordinate_type;
+  typedef Interval                                      interval_data_type;
+  typedef Interval3D                                    interval_set_type;
+  typedef string                                        element_name_type;
+  typedef tuple< element_name_type, coordinate_type >   atom_coordinate_type;
+  typedef vector< atom_coordinate_type >                atom_coordinate_list_type;
+  typedef double                                        mass_value_type;
+  typedef double                                        coordinate_value_type;
+  typedef int                                           charge_value_type;
+  typedef bool                                          condition_type;
 
   typedef coordinate_type&   coordinate_ref;
 
@@ -97,10 +98,11 @@ public:
    */
   Atom()
     {
-      this->coordinate_.fill(0.0e0);
+      this->coordinate_ = make_tuple( 0.0e0, 0.0e0, 0.0e0 );
       this->element_ = "not set";
       this->charge_  = 0;
       this->mass_    = 0.0e0;
+      this->translation_vec_.fill(0);
     }
 
   /**
@@ -117,7 +119,8 @@ public:
         coordinate_value_type x, 
         coordinate_value_type y, 
         coordinate_value_type z ) :
-    element_(element), mass_(mass), charge_(charge), coordinate_ ( make_tuple(x, y, z) ) { }
+    element_(element), mass_(mass), charge_(charge), coordinate_ ( make_tuple(x, y, z) ) 
+      { this->translation_vec_.fill(0); }
 
 public:
   /**
@@ -125,7 +128,7 @@ public:
    */
   /**
    *   + within_radius( Radius )
-   *     Judge with the atom is within the Radius w.r.t. the origin.
+   *     Judge if the atom is within the Radius w.r.t. the origin.
    *     Return value is origin-dependent.
    *     Used in crystal.
    */
@@ -138,20 +141,23 @@ public:
     }
 
   /**
-   *   + coordinate_list()
-   *     An interface from atom to coordinate list data type.
-   *     Return the coordinate list of this atom (only one coordinate set here).
-   *     Overloaded in all object types in the namespace structure.
+   *   + atom_coordinate_list()
+   *     An interface from atom list to atom_coordinate list data type.
+   *     Return the coordinate list of this atom (only one coordinate set here),
+   *     along with the element name.
+   *     Can be overloaded in all object types in the namespace structure.
    */
-  coordinate_list_type coordinate_list() const
-    {
-
+  atom_coordinate_list_type coordinate_list() const
+    { 
+       atom_coordinate_list_type retval;
+       retval.push_back( make_tuple( this->element_name_, this->coordinate_ ) ); 
+       return retval;
     }
 
   /**
    *   + edges()
    *     An overloaded function to return edges of an atom in X, Y, Z directions.
-   *     Overloaded for all object types in the namespace structure.
+   *     Can be overloaded for all object types in the namespace structure.
    *     Return value is an interval data type, see coordinate.hpp for definition.
    *     So it actually returns the coordinates of an atom since the atom is treated
    *     as a dimensionless point.
@@ -166,7 +172,7 @@ public:
   /**
    *   + center()
    *     An overloaded function to return the geometrical center of an atom.
-   *     Overloaded for all object types in the namespace structure.
+   *     Can be overloaded for all object types in the namespace structure.
    *     Actually returns the coordinate of this atom.
    */
   coordinate_type center() const 
@@ -175,7 +181,7 @@ public:
   /**
    *   + center_of_mass()
    *     An overloaded function to return center of mass of an atom.
-   *     Overloaded for all object types in the namespace structure.
+   *     Can be overloaded for all object types in the namespace structure.
    *     Actually returns the coordinate of this atom.
    */
   coordinate_type center_of_mass() const 
@@ -245,7 +251,7 @@ public:
   /**
    *    + print_atomlist()
    *      An overloaded function to print atom coordinate list (one atom for this class).
-   *      Overloaded for all object types in the namespace structure
+   *      Can be overloaded for all object types in the namespace structure
    */
   void print_atomlist() {
     using std::cout;
@@ -288,14 +294,14 @@ public:
 
   // I just leave this function like this for now
   array<int, 3>& set_translation_vec()
-   { return this->translation_vec; }
+   { return this->translation_vec_; }
 
 private:
   /**
    *  remind that the coordinate (3D) is stored as std::tuple<double, double, double>
    */
   coordinate_type    coordinate_;
-  array<int, 3> translation_vec;
+  array<int, 3> translation_vec_;
   charge_value_type  charge_;
   mass_value_type    mass_;
   element_name_type  element_;
