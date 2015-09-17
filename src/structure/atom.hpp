@@ -124,7 +124,7 @@ public:
 
 public:
   /**
-   *  Coordinate-related functions:
+   *  Coordinate-related member functions:
    */
   /**
    *   + within_radius( Radius )
@@ -138,20 +138,6 @@ public:
       coordinate_type origin = make_tuple(0.0e0, 0.0e0, 0.0e0);
       double R = compute_distance( origin, this->coordinate_ );
       return ( R <= Radius ) ? true : false;
-    }
-
-  /**
-   *   + atom_coordinate_list()
-   *     An interface from atom list to atom_coordinate list data type.
-   *     Return the coordinate list of this atom (only one coordinate set here),
-   *     along with the element name.
-   *     Can be overloaded in all object types in the namespace structure.
-   */
-  atom_coordinate_list_type coordinate_list() const
-    { 
-       atom_coordinate_list_type retval;
-       retval.push_back( make_tuple( this->element_name_, this->coordinate_ ) ); 
-       return retval;
     }
 
   /**
@@ -211,6 +197,9 @@ public:
   }
 
   /**
+   *  I/O member functions
+   */
+  /**
    *   + stream operator>> ()
    *     Overload stream operator>> .
    *     Since we don't have mutators for data members like element and mass,
@@ -224,7 +213,7 @@ public:
     mass_value_type mass;
     charge_value_type charge;
     coordinate_value_type x,y,z;
-    ifs >> element >> x >> y >> z >> charge >> mass;
+    is >> element >> x >> y >> z >> charge >> mass;
     this_type atom_obj_local( element, mass, charge, x, y, z );
     atom_obj = atom_obj_local;
     return is;
@@ -277,6 +266,23 @@ public:
     { return this->charge_; }
   mass_value_type mass() const 
     { return this->mass_; }
+
+  /**
+   *  Auxiliary accessors
+   */
+  /**
+   *   + coordinate_list()
+   *     An interface from atom list to atom_coordinate_list data type.
+   *     Return the coordinate list of this atom (only one coordinate set here),
+   *     along with the element name.
+   *     Can be overloaded in all object types in the namespace structure.
+   */
+  atom_coordinate_list_type coordinate_list() const
+    { 
+       atom_coordinate_list_type retval;
+       retval.push_back( make_tuple( this->element_name_, this->coordinate_ ) ); 
+       return retval;
+    }
 
   /**
    *  Mutators for external properties are allowed

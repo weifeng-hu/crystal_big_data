@@ -72,21 +72,26 @@ using geometrical_space :: Interval3D;
 
 struct Molecule {
 public:
-  typedef Molecule                                     this_type;
-  typedef Atom                                         atom_type;
+  typedef Molecule   this_type;
+  typedef Atom       atom_type;
   /**
    *  We forward the below typedef from Atom class 
    *  due to the phyical dependence of molecules on atoms
    */
-  typedef typename atom_type :: coordinate_value_type  coordinate_value_type;
-  typedef typename atom_type :: coordinate_type        coordinate_type;
-  typedef typename atom_type :: coordinate_list_type   coordinate_list_type;
-  typedef Interval                                     interval_data_type;
-  typedef Interval3D                                   interval_set_type;
-  typedef AtomList                                     atom_list_type;
-  typedef int                                          charge_value_type;
-  typedef unsigned int                                 molecule_id_type;
-  typedef bool                                         condition_type;
+  typedef typename atom_type :: coordinate_value_type       coordinate_value_type;
+  typedef typename atom_type :: coordinate_type             coordinate_type;
+  typedef typename atom_type :: atom_coordinate_list_type   atom_coordinate_list_type;
+  typedef Interval                                          interval_data_type;
+  typedef Interval3D                                        interval_set_type;
+  typedef AtomList                                          atom_list_type;
+  typedef int                                               charge_value_type;
+  typedef unsigned int                                      molecule_id_type;
+  typedef bool                                              condition_type;
+
+  typedef coordinate_type&     coodinate_ref;
+  typedef atom_list_type&      atom_list_ref;
+  typedef charge_value_type&   charge_value_ref;
+  typedef molecule_id_type&    molecule_id_ref;
 
 public:
   /**
@@ -113,6 +118,7 @@ public:
         this->molecule_id_ = 0; // probably also something like id :: not_set;
       }
 
+  // needs to be edited
 public:
   void add_atom( atom_type new_atom ){
     this->atom_list.push_back( new_atom );
@@ -122,7 +128,7 @@ public:
 
 public:
   /**
-   *  Coordinate-related functions:
+   *  Coordinate-related member functions:
    */
   /**
    *   + within_radius( Radius )
@@ -133,27 +139,11 @@ public:
   condition_type within_radius( double Radius )
     {
       for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ) {
-        if( this->atom_list_.at(iatom).within_radius( Radius ) == false ) {
+        if( this->atom_list_[iatom].within_radius( Radius ) == false ) {
           return false;
         }
       }
       return true;
-    }
-
-  /**
-   *   + atom_coordinate_list()
-   *     An interface from the atom list to atom_coordinate list data type.
-   *     Return the coordinate list of this molecule, along with element names.
-   *     Can be overloaded in all object types in the namespace structure.
-   */
-  atom_coordinate_list coordinate_list() const
-    {
-      atom_coordinate_list_type retval;
-      for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ) {
-        retval.push_back( make_tuple( this->atom_list_.at(iatom).element(), 
-                                      this->atom_list_.at(iatom).coordinate() ) );
-      }
-      return retval;
     }
 
   /**
@@ -164,20 +154,20 @@ public:
    *     I adimit that this function body looks noisy.
    */
   interval_set_type edges() const {
-    coordinate_value_type x_plus  = get<0>( get<0>( this->atom_list_.at(0).edges() ) );
-    coordinate_value_type x_minus = get<1>( get<0>( this->atom_list_.at(0).edges() ) );
-    coordinate_value_type y_plus  = get<0>( get<1>( this->atom_list_.at(0).edges() ) );
-    coordinate_value_type y_minus = get<1>( get<1>( this->atom_list_.at(0).edges() ) );
-    coordinate_value_type z_plus  = get<0>( get<2>( this->atom_list_.at(0).edges() ) );
-    coordinate_value_type z_minus = get<1>( get<2>( this->atom_list_.at(0).edges() ) );
+    coordinate_value_type x_plus  = get<0>( get<0>( this->atom_list_[0].edges() ) );
+    coordinate_value_type x_minus = get<1>( get<0>( this->atom_list_[0].edges() ) );
+    coordinate_value_type y_plus  = get<0>( get<1>( this->atom_list_[0].edges() ) );
+    coordinate_value_type y_minus = get<1>( get<1>( this->atom_list_[0].edges() ) );
+    coordinate_value_type z_plus  = get<0>( get<2>( this->atom_list_[0].edges() ) );
+    coordinate_value_type z_minus = get<1>( get<2>( this->atom_list_[0].edges() ) );
     for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ) {
       interval_set_type edges_iatom = this->atom_list_.at(iatom).edges();
-      coordinate_value_type new_x_plus  = get<0>( get<0>( this->atom_list_.at(iatom).edges() ) );
-      coordinate_value_type new_x_minus = get<1>( get<0>( this->atom_list_.at(iatom).edges() ) );
-      coordinate_value_type new_y_plus  = get<0>( get<1>( this->atom_list_.at(iatom).edges() ) );
-      coordinate_value_type new_y_minus = get<1>( get<1>( this->atom_list_.at(iatom).edges() ) );
-      coordinate_value_type new_z_plus  = get<0>( get<2>( this->atom_list_.at(iatom).edges() ) );
-      coordinate_value_type new_z_minus = get<1>( get<2>( this->atom_list_.at(iatom).edges() ) );
+      coordinate_value_type new_x_plus  = get<0>( get<0>( this->atom_list_[iatom].edges() ) );
+      coordinate_value_type new_x_minus = get<1>( get<0>( this->atom_list_[iatom].edges() ) );
+      coordinate_value_type new_y_plus  = get<0>( get<1>( this->atom_list_[iatom].edges() ) );
+      coordinate_value_type new_y_minus = get<1>( get<1>( this->atom_list_[iatom].edges() ) );
+      coordinate_value_type new_z_plus  = get<0>( get<2>( this->atom_list_[iatom].edges() ) );
+      coordinate_value_type new_z_minus = get<1>( get<2>( this->atom_list_[iatom].edges() ) );
       if( ( new_x_plus - x_plus ) >= 0.0e0 ) { x_plus = new_x_plus; }
       if( ( new_y_plus - y_plus ) >= 0.0e0 ) { y_plus = new_y_plus; }
       if( ( new_z_plus - z_plus ) >= 0.0e0 ) { z_plus = new_z_plus; }
@@ -201,9 +191,9 @@ public:
     coordinate_value_type y_average = 0.0e0;
     coordinate_value_type z_average = 0.0e0;
     for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ) {
-      x_average += this->atom_list_.at(iatom).x();
-      y_average += this->atom_list_.at(iatom).y();
-      z_average += this->atom_list_.at(iatom).z();
+      x_average += this->atom_list_[iatom].x();
+      y_average += this->atom_list_[iatom].y();
+      z_average += this->atom_list_[iatom].z();
     }
     x_average = x_average/this->atom_list_.size();
     y_average = y_average/this->atom_list_.size();
@@ -221,9 +211,9 @@ public:
     coordinate_value_type y_average = 0.0e0;
     coordinate_value_type z_average = 0.0e0;
     for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ) {
-      x_average += this->atom_list_.at(iatom).x() * this->atom_list_.at(iatom).mass();
-      y_average += this->atom_list_.at(iatom).y() * this->atom_list_.at(iatom).mass();
-      z_average += this->atom_list_.at(iatom).z() * this->atom_list_.at(iatom).mass();
+      x_average += this->atom_list_[iatom].x() * this->atom_list_[iatom].mass();
+      y_average += this->atom_list_[iatom].y() * this->atom_list_[iatom].mass();
+      z_average += this->atom_list_[iatom].z() * this->atom_list_[iatom].mass();
     }
     x_average = x_average/this->mass();
     y_average = y_average/this->mass();
@@ -231,125 +221,213 @@ public:
     return make_tuple( x_average, y_average, z_average );
   }
 
-
-  void operator+= ( array<double, 3> x ){
-   size_t n_atom_local = this->atom_list.size();
-   for( size_t iatom = 0; iatom < n_atom_local; iatom++ ){
-    atom_list.at(iatom) += x;
-   }
-  }
-
-  friend ifstream& operator>> ( ifstream& ifs, Molecule& new_mole ){
-   ifs >> new_mole.set_name();
-   size_t natom;
-   ifs >> natom;
-   for( size_t iatom = 0; iatom < natom; iatom++ ){
-    atom_type new_atom;
-    ifs >> new_atom;
-    new_mole.add_atom( new_atom );
-   }
-   return ifs;
-  }
-
-public:
-  size_t get_natom() const { return this->natom_; }
-  double get_mass() const { return this->mass_; }
-
-  mass_value_type mass() const {
-    mass_value_type retval;
-    for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ) {
-      retval += this->atom_list_.at(iatom).mass();
+  /**
+   *   + operator+= ()
+   *     Overloaded arithmetic operator +=
+   *     Performs coordinate movement for an molecule object with the rhs as coordinate_type.
+   *     Invokes the operator += of atom objects.
+   *     rhs is not implemented as an molecule, since an operation like molecule + molecule can mean something else.
+   */
+  this_type& operator+= ( const coordinate_type& rhs ) {
+    for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ){
+      this->atom_list_[iatom] += rhs;
     }
-    return retval;
+    return *this;
   }
 
-  AtomList& set_atom_list() { return this->atom_list; }
-  atom_ref& set_atom( size_t i ) { return this->atom_list.at(i); }
-  string& set_name() { return this->molecule_name_; }
-  size_t& set_natom() { return this->natom_; }
-  double& set_mass() { return this->mass_; }
-
-  CoordList get_coordinate_list(){
-   CoordList retval;
-   for( size_t iatom = 0; iatom < natom_; iatom++ ){
-    const coordinate_type set = this->atom_list.at(iatom).get_coordinate_set();
-    retval.push_back(set);
-   }
-   return retval;
-  }
-
-  array<int, 3>& set_translation_vec()
-   { return this->translation_vec; }
-
-  void print_info(){
-   cout << "MOLECULE INFO" << endl;
-   cout << "{" << endl;
-   cout << "molecule name:\t" << this->molecule_name_ << endl;
-   AtomList atomlist_local = this->get_atom_list();
-   const size_t natom = atomlist_local.size();
-   cout << "number of atom:\t" << natom << endl;
-   cout << "Atom List:" << endl;
-   cout << "{" << endl;
-   for( size_t iatom = 0; iatom < natom; iatom++ ){
-    atomlist_local[iatom].print_info();
-   }
-   using std::get;
-   cout << "}" << endl;
-   cout << "centroid:\t" 
-        << get<0>( this->get_center() ) << " " 
-        << get<1>( this->get_center() ) << " " 
-        << get<2>( this->get_center() ) << endl;
-   cout << "center of mass:\t" 
-        << get<0>( this->get_center_of_mass() ) << " " 
-        << get<1>( this->get_center_of_mass() ) << " " 
-        << get<2>( this->get_center_of_mass() ) << endl;
-   cout << "}" << endl;
-  }
-
-  void print_atomlist(){
-   AtomList atomlist_local = this->get_atom_list();
-   const size_t natom = atomlist_local.size();
-   for( size_t iatom = 0; iatom < natom; iatom++ ){
-    atomlist_local[iatom].print_atomlist();
-   }
-  }
-
+  /**
+   *   + operator+ ()
+   *     Overload arithmetic operator. Along with operator+= () for coordinate operations.
+   */
   friend 
-  ostream& operator<< ( ostream& os, Molecule mole ){
-   AtomList atomlist_local = mole.get_atom_list();
-   const size_t natom = atomlist_local.size();
-   for( size_t iatom = 0; iatom < natom; iatom++ ){
-    Atom atom_i = atomlist_local.at(iatom);
-    os << atom_i << endl;
-   }
-   return os;
+  this_type operator+ ( this_type lhs, const coordinate_type& rhs ) {
+    lhs += rhs;
+    return lhs;
   }
 
-  coordinate_type get_center_of_mass(){
-   coordinate_type retval;
-   double x_average = 0.0e0;
-   double y_average = 0.0e0;
-   double z_average = 0.0e0;
-   for( size_t iatom = 0; iatom < this->natom_; iatom++ ){
-    x_average += this->atom_list.at(iatom).get_x() * this->atom_list.at(iatom).get_mass();
-    y_average += this->atom_list.at(iatom).get_y() * this->atom_list.at(iatom).get_mass();
-    z_average += this->atom_list.at(iatom).get_z() * this->atom_list.at(iatom).get_mass();
-   }
-   x_average = x_average/this->mass_;
-   y_average = y_average/this->mass_;
-   z_average = z_average/this->mass_;
-   using std::make_tuple;
-   retval = make_tuple( x_average, y_average, z_average );
-   return retval;
+
+  /**
+   *  Structure-object related functions
+   */
+  /**
+   *   + operator+= ()
+   *     Overloaded arithemetic operator +=
+   *     Attach a new atom object to the molecule, and the overall charge
+   *     remains the same (we should allow it to change in future).
+   *     The same operation as member function push_back()
+   */
+  this_type& operator+= ( const atom_type& rhs ) {
+    this->atom_list_.push_back( rhs );
+  }
+
+  /**
+   *   + operator+ ()
+   *     Overloaded arithmetic operator. 
+   *     Along with operator+= () for structural object operations.
+   *     LHS is a molecule object, and RHS is a atom object.
+   */
+  friend 
+  this_type operator+ ( this_type lhs, const atom_type& rhs ) {
+    lhs += rhs;
+    return lhs;
+  }
+
+  /**
+   *   + operator+ ()
+   *     Overloaded arithmetic operator for structural object operations.
+   *     Implemented as depending on operator+=.
+   *     LHS is a atom object, and RHS is a atom object, generates a molecule object.
+   */
+  friend 
+  this_type operator+ ( const atom_type& lhs, const atom_type& rhs ) {
+    this_type new_molecule_obj;
+    new_molecule_obj += lhs;
+    new_molecule_obj += rhs;
+    return new_molecule_obj;
+  }
+
+  /**
+   *  I/O member functions:
+   */
+  /**
+   *   + stream operator>> ()
+   *     Overload stream operator>> .
+   *     Invokes the stream operator >> of the atom class.
+   */
+  friend
+  istream& operator>> ( istream& is, this_type& molecule_obj ) {
+    size_t natom;
+    is >> natom;
+    for( size_t iatom = 0; iatom < natom; iatom++ ) {
+      atom_type new_atom_obj;
+      is >> new_atom_obj;
+      molecule_obj.push_back( new_atom_obj );
+    }
+    return is;
+  }
+
+  /**
+   *   + stream opeartor<< ()
+   *     Overloaded stream operator<< .
+   *     Invokes the stream operator >> of the atom class.
+   *     So the streaming out format is 
+   *     <Element0>  <X0>  <Y0>  <Z0>
+   *     <Element1>  <X1>  <Y1>  <Z1>
+   */
+  friend 
+  ostream& operator<< ( ostream& os, const this_type& molecule_obj ) {
+    for( size_t iatom = 0; iatom < molecule_obj.size(); iatom++ ) {
+      os << molecule_obj[iatom] << endl;
+    }
+    return os;
+  }
+
+  /**
+   *   + print_atomlist()
+   *     An overloaded function to print atom coordinate list.
+   *     Can be overloaded for all object types in the namespace structure.
+   */
+  void print_atomlist(){
+    using std::cout;
+    using std::endl;
+    for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ) {
+      this->atom_list_[iatom].print_atomlist();
+    }
   }
 
 public:
+  /**
+   *  Container-related member functions
+   *  If we treat a molecule object as a container of atoms
+   */
+  /**
+   *  + size()
+   *    Return number of atoms, actually
+   */
+  size_t size() const
+    { return this->atom_list_.size(); }
+
+  /**
+   *  + push_back()
+   *    Previously a function add_atom() was implemented
+   *    Now I think overloading push_back() can be more straigtforward
+   *    The same as operator+= .
+   */
+  void push_back( const atom_type& atom_obj )
+    { this->atom_list_.push_back( atom_obj ); }
+
+  /**
+   *  + at()
+   *    We don't perform range check, simply leave this task to the actual
+   *    vector :: at()
+   */
+  atom_type& at( size_t i )
+    { return this->atom_list_.at(i); }
+
+  /**
+   *  + operator[]
+   *    So as standard, no range check for the index i
+   */
+  atom_type& operator[] ( size_t i )
+    { return this->atom_list_[i]; }
+
+  /**
+   *  Iterators will be implemented in future when needed
+   */
+
+public:
+  /**
+   *  Accessors and mutators for all class members are allowed
+   */
   atom_list_type atom_list() const 
     { return this->atom_list_; }
   charge_value_type charge() const
     { return this->charge_; }
   molecule_id_type molecule_id() const
     { return this->molecule_id_; }
+
+  atom_list_ref set_atom_list()
+    { return this->atom_list_; }
+  charge_value_ref set_charge()
+    { return this->charge_; }
+  molecule_id_ref set_molecule_id()
+    { return this->molecule_id_; }
+
+  /**
+   *  Auxiliary Accessors
+   */
+  /**
+   *  + mass()
+   *    Return molecular mass, calculated on the fly.
+   *    We don't separately store the mass since molecular mass depends on all atoms. 
+   *    We sacrifice a little performance but to ensure the data responsibility and a clean design.
+   */
+  mass_value_type mass() const {
+    mass_value_type retval;
+    for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ) {
+      retval += this->atom_list_[iatom].mass();
+    }
+    return retval;
+  }
+
+  /**
+   *  + coordinate_list()
+   *    An interface from atom list to atom_coordinate_list data type
+   *    Return the coordinate list of this molecule, along with element names of atoms.
+   *    Can be overloaded for all object types in the namespace structure.
+   *    Invokes the coordinate_list() function of the atom class and takes the first data element.
+   */
+  atom_coordinate_list_type coordinate_list() const {
+    atom_coordinate_list_type retval;
+    for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ) {
+      retval.push_back( (this->atom_list_[iatom].coordinate_list()).at(0) );
+    }
+    return retval;
+  }
+
+  // I just leave this function for now
+  array<int, 3>& set_translation_vec()
+   { return this->translation_vec_; }
 
 private:
   atom_list_type     atom_list_;
