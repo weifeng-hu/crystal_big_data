@@ -24,25 +24,25 @@
  *
  */
 
-#ifndef ATOM_LIST_HPP
-#define ATOM_LIST_HPP
+#ifndef MOLECULE_LIST_HPP
+#define MOLECULE_LIST_HPP
 
 #include <vector>
-#include <structure/atom.hpp>
+#include <structure/molecule.hpp>
 
 namespace iquads {
 
   using std :: vector;
-    
+
   namespace structure {
-  
+
     /**
-     *  Typedef an the list of atoms.
-     *  This typedef can be useful in all higher level objects, 
-     *  summoned by molecules, lattice, unit cells, polymers, etc.
+     *  Typedef an the list of molecule.
+     *  This typedef can be useful in higher or similar level objects,
+     *  like summoned by lattice, unit cells, polymers, etc.
      */
-    typedef vector< Atom > AtomList;
-    
+    typedef vector< Molecule > MoleculeList;
+
   } // end of namespace structure
 
 } // end of namespace iquads

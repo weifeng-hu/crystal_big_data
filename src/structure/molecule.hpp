@@ -1,21 +1,26 @@
-/*
- *  This source code applies all the terms in 
- *  GNU GENERAL PUBLIC LICENSE (GPL), Version3, 29 June 2007.
+/**
+ * @file
+ * @author Weifeng Hu
  *
- *  Copyright (C) 2013-2015 Weifeng Hu, all rights reserved.
- *  
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *  
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *  
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * @section LICENSE
+ *
+ * Copyright (C) 2013, 2014, 2015  Weifeng Hu
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @section DESCRIPTION
+ *
  *
  */
 
@@ -30,40 +35,42 @@
 #include <geometrical_space/coordinate.hpp>
 #include <structure/atom.hpp>
 
-using std::vector;
-using std::string;
-using std::tuple;
-using std::cout;
-using std::endl;
-using std::fstream;
-
 namespace iquads {
-
-using geometrical_space :: Coord;
-using geometrical_space :: CoordList;
 
 namespace structure {
 
-struct Molecule{
+using std :: string;
+using std :: make_tuple;
+using std :: get;
+using std :: istream;
+using std :: ostream;
+using geometrical_space :: CartesianCoordinate3D;
+using geometrical_space :: CartesianCoordinate3DList;
+using geometrical_space :: Interval;
+using geometrical_space :: Interval3D;
+
+struct Molecule {
 public:
-  typedef Atom atom_type; 
+  typedef Atom atom_type;
   typedef Coord coordinate_type;
 
   typedef atom_type& atom_ref;
 
 public:
-  Molecule(){
-   this->atom_list.resize(0);
-   this->molecule_name_ = "not set";
-   this->natom_ = 0;
-   this->mass_ = 0.0e0;
-  }
-  Molecule( string molecule_name ){
-   this->atom_list.resize(0);
-   this->molecule_name_ = molecule_name;
-   this->natom_ = 0;
-   this->mass_ = 0.0e0;
-  }
+  Molecule()
+    {
+      this->atom_list.resize(0);
+      this->molecule_name_ = "not set";
+      this->natom_ = 0;
+      this->mass_ = 0.0e0;
+    }
+  Molecule( string molecule_name )
+    {
+      this->atom_list.resize(0);
+      this->molecule_name_ = molecule_name;
+      this->natom_ = 0;
+      this->mass_ = 0.0e0;
+    }
 
 public:
   void add_atom( atom_type new_atom ){
@@ -255,8 +262,6 @@ private:
   string molecule_name_;
 
 }; // end of class Molecule
-
-typedef vector<Molecule> MoleculeList;
 
 } // end of namespace structure
 

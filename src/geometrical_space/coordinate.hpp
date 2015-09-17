@@ -27,6 +27,7 @@
 #ifndef COORDINATE_HPP
 #define COORDINATE_HPP
 
+#include <array>
 #include <vector>
 #include <tuple>
 
@@ -34,15 +35,32 @@ namespace iquads {
 
 namespace geometrical_space {
 
-  // stack storage for a coordinate set
-  // using tuple of 3 doubles
+  /**
+   *  We enforce using double precision for coordinates
+   *  since we may encounter big coordinates like 1e5
+   *  and the significant digits after the decimal point 
+   *  can only be 8 digits 
+   */
+  typedef double coord_value_type;
 
-  // we enforce using double precision for coordinates
-  // since we may encounter big coordinates like 1e5
-  // and the significant digits after the decimal point 
-  // can only be 8 digits or so
-  typedef std::tuple< double, double, double > Coord;
-  typedef std::vector<Coord> CoordList;
+  /**
+   *  Stack storage for a 3-dimensional cartesian coordinate set
+   *  using a tuple of 3 doubles
+   */
+  typedef std::tuple< coord_value_type, coord_value_type, coord_value_type > CartesianCoordinate3D;
+
+  /**
+   *  A list of coordinates will be stored in the heap. That's fine,
+   *  as long as we use a continuous STL container
+   */
+  typedef std::vector<CartesianCoordinate3D> CartesianCoordinate3DList;
+
+  /**
+   *  Data definitions to define coordinate intervals
+   *  Can be used in storge geometrical edge/range info
+   */
+  typedef tuple< coord_value_type, coord_value_type > Interval;
+  typedef tuple< Interval, Interval, Interval > Interval3D;
 
 } // end of namespace geometrical_space
 
