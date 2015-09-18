@@ -114,17 +114,14 @@ public:
             charge_value_type charge   ) :
     atom_list_(atom_list), charge_(charge)
       {
+        /**
+         *  Don't forget to check the geometry unit.
+         */
+        using align_geometry_unit;
+        align_geometry_unit( this->atom_list_; );
         this->translation_vec_.fill(0);
         this->molecule_id_ = 0; // probably also something like id :: not_set;
       }
-
-  // needs to be edited
-public:
-  void add_atom( atom_type new_atom ){
-    this->atom_list.push_back( new_atom );
-    this->natom_ += 1;
-    this->mass_ += new_atom.get_mass();
-  }
 
 public:
   /**
@@ -254,10 +251,11 @@ public:
    *     Overloaded arithemetic operator +=
    *     Attach a new atom object to the molecule, and the overall charge
    *     remains the same (we should allow it to change in future).
-   *     The same operation as member function push_back()
+   *     Does the same operation as member function push_back()
    */
   this_type& operator+= ( const atom_type& rhs ) {
-    this->atom_list_.push_back( rhs );
+    this->push_back( rhs );
+    return *this;
   }
 
   /**
@@ -277,12 +275,15 @@ public:
    *     Overloaded arithmetic operator for structural object operations.
    *     Implemented as depending on operator+=.
    *     LHS is a atom object, and RHS is a atom object, generates a molecule object.
+   *     Used as a starter for a new molecule object.
    */
   friend 
   this_type operator+ ( const atom_type& lhs, const atom_type& rhs ) {
+    using align_geometry_unit;
     this_type new_molecule_obj;
     new_molecule_obj += lhs;
     new_molecule_obj += rhs;
+    align_geometry_unit( new_molecule_obj.set_atom_list() );
     return new_molecule_obj;
   }
 
@@ -352,9 +353,13 @@ public:
    *    Previously a function add_atom() was implemented
    *    Now I think overloading push_back() can be more straigtforward
    *    The same as operator+= .
+   *    Any other objects using this push_back() will be safe for the geometry unit.
    */
-  void push_back( const atom_type& atom_obj )
-    { this->atom_list_.push_back( atom_obj ); }
+  void push_back( const atom_type& atom_obj ) {
+    this->atom_list_.push_back( atom_obj );
+    using align_geometry_unit_for_the_last_atom;
+    align_geometry_unit_for_the_last_atom( this->atom_list_ );
+  }
 
   /**
    *  + at()

@@ -37,6 +37,7 @@
 #include <fstream>
 #include <geometrical_space/coordinate.hpp>
 #include <geometrical_space/threed_space_function.hpp>
+#include <structure/geometry_unit.hpp>
 
 using std::vector;
 using std::tuple;
@@ -63,6 +64,16 @@ namespace structure {
    *
    *    + coordinate (for molecular uses)
    *    + lattice vector (for crystal/periodic uses, to label in which unit cell)
+   *    + geometry unit
+   *
+   *  About geometry unit, all higher level objects do not hold duplicated
+   *  geometry unit info due to object and data dependence. 
+   *  For indivdually different atoms, geometry unit can be different. And operations on
+   *  coordinates are valid as long as the unit is defined.
+   *  However, when higher level objects like molecules are constructed from atoms, 
+   *  unit convertion will be peformed when detected as different between atoms, so that 
+   *  coordinate operations will remain valid for these higher level objects.
+   *
    */
 
 using std :: string;
@@ -70,6 +81,7 @@ using std :: make_tuple;
 using std :: get;
 using std :: istream;
 using std :: ostream;
+using geometrical_space :: coord_value_type;
 using geometrical_space :: CartesianCoordinate3D;
 using geometrical_space :: CartesianCoordinate3DList;
 using geometrical_space :: Interval;
@@ -78,11 +90,13 @@ using geometrical_space :: Interval3D;
 class Atom {
 public:
   typedef Atom                                          this_type;
-  typedef geometrical_space :: coord_value_type         coordinate_value_type;
+  typedef coord_value_type                              coordinate_value_type;
   typedef CartesianCoordinate3D                         coordinate_type;
   typedef Interval                                      interval_data_type;
   typedef Interval3D                                    interval_set_type;
   typedef string                                        element_name_type;
+  typedef geometry_unit :: unit_mask_type               geometry_unit_type;
+  typedef geometry_unit :: unit_literal_type            geometry_unit_name_type;
   typedef tuple< element_name_type, coordinate_type >   atom_coordinate_type;
   typedef vector< atom_coordinate_type >                atom_coordinate_list_type;
   typedef double                                        mass_value_type;
@@ -90,7 +104,10 @@ public:
   typedef int                                           charge_value_type;
   typedef bool                                          condition_type;
 
-  typedef coordinate_type&   coordinate_ref;
+  typedef coordinate_value_type&   coordinate_value_ref;
+  typedef coordinate_type&         coordinate_ref;
+  typedef geometry_unit_type&      geometry_unit_ref;
+  
 
 public:
   /**
@@ -103,6 +120,7 @@ public:
       this->charge_  = 0;
       this->mass_    = 0.0e0;
       this->translation_vec_.fill(0);
+      this->geometry_unit_ = geometry_unit :: UNKNOWN;
     }
 
   /**
@@ -118,13 +136,16 @@ public:
         charge_value_type     charge, 
         coordinate_value_type x, 
         coordinate_value_type y, 
-        coordinate_value_type z ) :
-    element_(element), mass_(mass), charge_(charge), coordinate_ ( make_tuple(x, y, z) ) 
+        coordinate_value_type z,
+        geometry_unit_name_type unit_name ) :
+    element_(element), mass_(mass), charge_(charge), 
+    coordinate_ ( make_tuple(x, y, z) ), unit_ ( geometry_unit :: return_unit_mask( unit_name ) )
       { this->translation_vec_.fill(0); }
 
 public:
   /**
    *  Coordinate-related member functions:
+   *    ( We assume the geometry unit is defined )
    */
   /**
    *   + within_radius( Radius )
@@ -180,9 +201,8 @@ public:
    *     rhs is not implemented as an atom, since an operation like atom + atom can mean something else.
    */
   this_type& operator+= ( const coordinate_type& rhs ) {
-    get<0>( this->coordinate_ ) += get<0>( rhs );
-    get<1>( this->coordinate_ ) += get<1>( rhs );
-    get<2>( this->coordinate_ ) += get<2>( rhs );
+    using namespace geometrical_space :: threed_space;
+    this->coordinate_ += rhs;
     return *this;
   }
 
@@ -205,7 +225,11 @@ public:
    *     Since we don't have mutators for data members like element and mass,
    *     we have to use the initialize list constructor and the copy constructor.
    *     The standard input sequence (or what users should write in input files ) is:
-   *     C 0.5 0.3 1.0 6 12.0
+   *
+   *     C 0.5 0.3 1.0 6 12.0 angstrom
+   *
+   *     In future we will implement the periodic table so that uses don't have to 
+   *     specify nuclear charge and mass.
    */
   friend
   istream& operator>> ( istream& is, this_type& atom_obj ) {
@@ -213,8 +237,9 @@ public:
     mass_value_type mass;
     charge_value_type charge;
     coordinate_value_type x,y,z;
-    is >> element >> x >> y >> z >> charge >> mass;
-    this_type atom_obj_local( element, mass, charge, x, y, z );
+    geometry_unit_name_type geometry_unit_name;
+    is >> element >> x >> y >> z >> charge >> mass >> geometry_unit_name;
+    this_type atom_obj_local( element, mass, charge, x, y, z, geometry_unit_name );
     atom_obj = atom_obj_local;
     return is;
   }
@@ -266,6 +291,8 @@ public:
     { return this->charge_; }
   mass_value_type mass() const 
     { return this->mass_; }
+  geometry_unit_type geometry_unit() const
+    { return this->geometry_unit_; }
 
   /**
    *  Auxiliary accessors
@@ -297,6 +324,8 @@ public:
     { return this->coordinate_; }
   void set_coordinate( coordinate_value_type x, coordinate_value_type y, coordinate_value_type z )
     { this->coordinate_ = make_tuple( x, y, z ); }
+  geometry_unit_ref set_geometry_unit()
+    { return this->geometry_unit_; }
 
   // I just leave this function like this for now
   array<int, 3>& set_translation_vec()
@@ -307,10 +336,11 @@ private:
    *  remind that the coordinate (3D) is stored as std::tuple<double, double, double>
    */
   coordinate_type    coordinate_;
-  array<int, 3> translation_vec_;
+  array<int, 3>      translation_vec_;
   charge_value_type  charge_;
   mass_value_type    mass_;
   element_name_type  element_;
+  geometry_unit_type geometry_unit_;
 
 };  // end of class Atom
 
