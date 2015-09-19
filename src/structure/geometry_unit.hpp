@@ -28,6 +28,7 @@
 #define GEOMETRY_UNIT_HPP
 
 #include <stdlib.h>
+#include <iostream>
 #include <string>
 
 using std::string;
@@ -74,6 +75,8 @@ namespace iquads {
       inline
       double unit_conversion_constant( unit_mask_type from, unit_mask_type to )
         {
+          using std :: cout;
+          using std :: endl;
           if( !(from & UNKNOWN) ) { 
             cout << " unknown geometry unit type in FROM " << endl;
             abort();

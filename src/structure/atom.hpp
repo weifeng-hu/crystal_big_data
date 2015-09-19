@@ -76,6 +76,7 @@ namespace structure {
    *
    */
 
+using std :: array;
 using std :: string;
 using std :: make_tuple;
 using std :: get;
@@ -100,7 +101,6 @@ public:
   typedef tuple< element_name_type, coordinate_type >   atom_coordinate_type;
   typedef vector< atom_coordinate_type >                atom_coordinate_list_type;
   typedef double                                        mass_value_type;
-  typedef double                                        coordinate_value_type;
   typedef int                                           charge_value_type;
   typedef bool                                          condition_type;
 
@@ -139,7 +139,7 @@ public:
         coordinate_value_type z,
         geometry_unit_name_type unit_name ) :
     element_(element), mass_(mass), charge_(charge), 
-    coordinate_ ( make_tuple(x, y, z) ), unit_ ( geometry_unit :: return_unit_mask( unit_name ) )
+    coordinate_ ( make_tuple(x, y, z) ), geometry_unit_ ( geometry_unit :: return_unit_mask( unit_name ) )
       { this->translation_vec_.fill(0); }
 
 public:
@@ -306,7 +306,7 @@ public:
   atom_coordinate_list_type coordinate_list() const
     { 
        atom_coordinate_list_type retval;
-       retval.push_back( make_tuple( this->element_name_, this->coordinate_ ) ); 
+       retval.push_back( make_tuple( this->element_, this->coordinate_ ) ); 
        return retval;
     }
 

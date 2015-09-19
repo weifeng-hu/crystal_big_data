@@ -47,20 +47,20 @@ namespace geometrical_space {
    *  Stack storage for a 3-dimensional cartesian coordinate set
    *  using a tuple of 3 doubles
    */
-  typedef std::tuple< coord_value_type, coord_value_type, coord_value_type > CartesianCoordinate3D;
+  typedef std :: tuple< coord_value_type, coord_value_type, coord_value_type > CartesianCoordinate3D;
 
   /**
    *  A list of coordinates will be stored in the heap. That's fine,
    *  as long as we use a continuous STL container
    */
-  typedef std::vector<CartesianCoordinate3D> CartesianCoordinate3DList;
+  typedef std :: vector<CartesianCoordinate3D> CartesianCoordinate3DList;
 
   /**
    *  Data definitions to define coordinate intervals
    *  Can be used in storge geometrical edge/range info
    */
-  typedef tuple< coord_value_type, coord_value_type > Interval;
-  typedef tuple< Interval, Interval, Interval > Interval3D;
+  typedef std :: tuple< coord_value_type, coord_value_type > Interval;
+  typedef std :: tuple< Interval, Interval, Interval > Interval3D;
 
 } // end of namespace geometrical_space
 

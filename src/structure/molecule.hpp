@@ -81,6 +81,7 @@ public:
   typedef typename atom_type :: coordinate_value_type       coordinate_value_type;
   typedef typename atom_type :: coordinate_type             coordinate_type;
   typedef typename atom_type :: atom_coordinate_list_type   atom_coordinate_list_type;
+  typedef typename atom_type :: mass_value_type             mass_value_type;
   typedef Interval                                          interval_data_type;
   typedef Interval3D                                        interval_set_type;
   typedef AtomList                                          atom_list_type;
@@ -117,8 +118,8 @@ public:
         /**
          *  Don't forget to check the geometry unit.
          */
-        using align_geometry_unit;
-        align_geometry_unit( this->atom_list_; );
+        using structure :: align_geometry_unit;
+        align_geometry_unit( this->atom_list_ );
         this->translation_vec_.fill(0);
         this->molecule_id_ = 0; // probably also something like id :: not_set;
       }
@@ -278,7 +279,7 @@ public:
    */
   friend 
   this_type operator+ ( const atom_type& lhs, const atom_type& rhs ) {
-    using align_geometry_unit;
+    using structure :: align_geometry_unit;
     this_type new_molecule_obj;
     new_molecule_obj += lhs;
     new_molecule_obj += rhs;
@@ -313,9 +314,13 @@ public:
    *     So the streaming out format is 
    *     <Element0>  <X0>  <Y0>  <Z0>
    *     <Element1>  <X1>  <Y1>  <Z1>
+   *     
+   *     Note that we made the this_type& to be non-const such that we can use 
+   *     operator[] of molecule class 
    */
   friend 
-  ostream& operator<< ( ostream& os, const this_type& molecule_obj ) {
+  ostream& operator<< ( ostream& os, this_type& molecule_obj ) {
+    using std :: endl;
     for( size_t iatom = 0; iatom < molecule_obj.size(); iatom++ ) {
       os << molecule_obj[iatom] << endl;
     }
@@ -356,7 +361,7 @@ public:
    */
   void push_back( const atom_type& atom_obj ) {
     this->atom_list_.push_back( atom_obj );
-    using align_geometry_unit_for_the_last_atom;
+    using structure :: align_geometry_unit_for_the_last_atom;
     align_geometry_unit_for_the_last_atom( this->atom_list_ );
   }
 

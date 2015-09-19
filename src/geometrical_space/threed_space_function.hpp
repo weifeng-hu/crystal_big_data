@@ -28,6 +28,7 @@
 #define THREED_SPACE_FUNCTION_HPP
 
 #include <array>
+#include <tuple>
 #include <math.h>
 #include <geometrical_space/coordinate.hpp>
 
@@ -39,10 +40,11 @@ namespace iquads {
 
     namespace threed_space {
     
-      typedef typename CartesianCoordinate3D Coord;
+      typedef CartesianCoordinate3D Coord;
     
       inline
       void operator+= ( Coord& lhs, const Coord& rhs ) {
+        using std :: get;
         get<0> ( lhs ) += get<0>( rhs );
         get<1> ( lhs ) += get<1>( rhs );
         get<2> ( lhs ) += get<2>( rhs );
@@ -50,6 +52,7 @@ namespace iquads {
 
       inline
       void operator*= ( Coord& lhs, const double rhs ) {
+        using std :: get;
         get<0> ( lhs ) *= rhs;
         get<1> ( lhs ) *= rhs;
         get<2> ( lhs ) *= rhs;

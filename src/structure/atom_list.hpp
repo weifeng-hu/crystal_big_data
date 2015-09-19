@@ -28,13 +28,15 @@
 #define ATOM_LIST_HPP
 
 #include <vector>
+#include <geometrical_space/threed_space_function.hpp>
 #include <structure/atom.hpp>
 #include <structure/geometry_unit.hpp>
 
 namespace iquads {
 
   using std :: vector;
-    
+  using namespace geometrical_space :: threed_space;
+
   namespace structure {
   
     /**
