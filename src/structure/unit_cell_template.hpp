@@ -29,23 +29,24 @@
 #include <geometrical_space/threed_space.hpp>
 #include <structure/lattice_parameters.hpp>
 
-using std::vector;
-using std::string;
 using std::cout;
 using std::endl;
 using std::tuple;
 
-namespace iquads{
+namespace iquads {
 
 using namespace geometrical_space :: threed_space;
+using std :: vector;
+using std :: string;
 
 namespace structure {
 
-template < class node_type >
-struct UnitCell
-{
+template < class NodeType > class UnitCell {
 public:
-  void add_node( node_type new_node )
+  typedef vector<NodeType> node_list_type;
+
+public:
+  void add_node( NodeType new_node )
    {
     this->store.push_back(new_node);
    }
@@ -55,7 +56,7 @@ public:
     size_t n_node_local = this->store.size();
     bool within_radius_local = true;
     for( size_t inode = 0; inode < n_node_local; inode++ ){
-     node_type node_local = store.at(inode);
+     NodeType node_local = store.at(inode);
      if( node_local.within_radius( Radius ) == false ){
       within_radius_local = false;
       break;
@@ -64,7 +65,7 @@ public:
     return within_radius_local;
    }
  
-  UnitCell<node_type> 
+  UnitCell<NodeType> 
    translational_duplicate( tuple<int, int, int> direction )
    {
     using std::get;
@@ -74,18 +75,18 @@ public:
     return this->translational_duplicate( a, b, c );
    }
 
-  UnitCell<node_type> 
+  UnitCell<NodeType> 
   translational_duplicate( int a_, int b_, int c_ )
    {
     double a = a_;
     double b = b_;
     double c = c_;
-    UnitCell <node_type> copy;
+    UnitCell <NodeType> copy;
     copy.set_translation_vec() = array<int, 3> { a_, b_, c_ };
     copy.set_constants() = this->get_constants();
     size_t n_node_local = this->store.size();
     for( size_t inode = 0; inode < n_node_local; inode++ ){
-     node_type new_node = this->store.at(inode);
+     NodeType new_node = this->store.at(inode);
      new_node.set_translation_vec() = array<int, 3> { a_, b_, c_ };
      new_node += this->get_trans_vector_a() * a;
      new_node += this->get_trans_vector_b() * b;
@@ -104,12 +105,12 @@ public:
    }
 
   friend 
-   ifstream& operator>> ( ifstream& ifs, UnitCell<node_type>& cell )
+   ifstream& operator>> ( ifstream& ifs, UnitCell<NodeType>& cell )
     {
      size_t n_node;
      ifs >> n_node;
      for( size_t inode = 0; inode < n_node; inode++ ){
-      node_type node_i;
+      NodeType node_i;
       ifs >> node_i;
       cell.add_node( node_i );
      }
@@ -120,11 +121,11 @@ public:
     }
 
   friend
-   ostream& operator<< ( ostream& os, UnitCell<node_type>& cell )
+   ostream& operator<< ( ostream& os, UnitCell<NodeType>& cell )
    {
     const size_t n_node = cell.get_n_node();
     for( size_t inode = 0; inode < n_node; inode++ ){
-     node_type node_i = cell.get_node( inode );
+     NodeType node_i = cell.get_node( inode );
      os << node_i << endl;
     }
     return os;
@@ -171,7 +172,7 @@ public:
    for( size_t inode = 0; inode < n_node; inode++ ){
     cout << "Node " << inode << endl;
     cout << "{" << endl;
-    node_type node_local = store.at(inode);
+    NodeType node_local = store.at(inode);
     node_local.print_info();
     cout << "}" << endl;
    }
@@ -184,17 +185,17 @@ public:
   {
    const size_t n_node = this->store.size();
    for( size_t inode = 0; inode < n_node; inode++ ){
-    node_type node_local = store.at(inode);
+    NodeType node_local = store.at(inode);
     node_local.print_atomlist();
    }
   }
 
 public:
-  node_type  get_node( size_t i ) const { return store.at(i); }
-  node_type& set_node( size_t i ) { return store.at(i); }
+  NodeType  get_node( size_t i ) const { return store.at(i); }
+  NodeType& set_node( size_t i ) { return store.at(i); }
   void resize( size_t n ) { this->store.resize(n); }
-  vector< node_type >  get_store() const { return this->store; }
-  vector< node_type >& set_store() { return this->store; }
+  vector< NodeType >  get_store() const { return this->store; }
+  vector< NodeType >& set_store() { return this->store; }
   LatticeParameters& set_constants() { return this->constants; }
   LatticeParameters  get_constants() const { return this->constants; }
 
@@ -212,11 +213,11 @@ public:
    { return this->translation_vec; }
 
 private:
-  vector< node_type > store;
+  node_list_type node_list_;
   LatticeParameters constants;
   array<int, 3> translation_vec;
 
-}; // end of struct UnitCell
+}; // end of class UnitCell
 
 } // end of namespace structure
 

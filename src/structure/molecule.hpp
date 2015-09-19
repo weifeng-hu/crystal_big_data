@@ -40,7 +40,7 @@ namespace iquads {
 namespace structure {
 
   /**
-   *  A class to store molecule information
+   *  A class to store molecule information (approximates a true molecule)
    *   + A list of atoms
    *   + charge
    *
@@ -70,7 +70,7 @@ using std :: ostream;
 using geometrical_space :: Interval;
 using geometrical_space :: Interval3D;
 
-struct Molecule {
+class Molecule {
 public:
   typedef Molecule   this_type;
   typedef Atom       atom_type;
@@ -226,7 +226,7 @@ public:
    *     rhs is not implemented as an molecule, since an operation like molecule + molecule can mean something else.
    */
   this_type& operator+= ( const coordinate_type& rhs ) {
-    for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ){
+    for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ) {
       this->atom_list_[iatom] += rhs;
     }
     return *this;
@@ -241,7 +241,6 @@ public:
     lhs += rhs;
     return lhs;
   }
-
 
   /**
    *  Structure-object related functions

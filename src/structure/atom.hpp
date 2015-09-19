@@ -239,8 +239,7 @@ public:
     coordinate_value_type x,y,z;
     geometry_unit_name_type geometry_unit_name;
     is >> element >> x >> y >> z >> charge >> mass >> geometry_unit_name;
-    this_type atom_obj_local( element, mass, charge, x, y, z, geometry_unit_name );
-    atom_obj = atom_obj_local;
+    atom_obj = Atom( element, mass, charge, x, y, z, geometry_unit_name );
     return is;
   }
 
