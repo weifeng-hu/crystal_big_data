@@ -1,21 +1,26 @@
-/*
- *  This source code applies all the terms in 
- *  GNU GENERAL PUBLIC LICENSE (GPL), Version3, 29 June 2007.
+/**
+ * @file
+ * @author Weifeng Hu
  *
- *  Copyright (C) 2013-2015 Weifeng Hu, all rights reserved.
- *  
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *  
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *  
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * @section LICENSE
+ *
+ * Copyright (C) 2013, 2014, 2015  Weifeng Hu
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @section DESCRIPTION
+ *
  *
  */
 
@@ -27,7 +32,7 @@
 #include <iostream>
 #include <tuple>
 #include <geometrical_space/threed_space.hpp>
-#include <structure/lattice_parameters.hpp>
+#include <structure/lattice_parameter.hpp>
 
 using std::cout;
 using std::endl;
@@ -39,11 +44,31 @@ using namespace geometrical_space :: threed_space;
 using std :: vector;
 using std :: string;
 
+  /**
+   *   A template class to represent primitive unit cells in crystals
+   *
+   *   It is designed to be a template class, with the template
+   *   parameter as node type. to be instantiated as molecular 
+   *   unit cells or atomic unit cells, thus can be used for 
+   *   ionic, molecular, and atomic crystals.
+   *
+   *   Data members are:
+   *    + a list of nodes in the unit cell
+   *    + lattice parameter
+   *
+   *   These are external quantities of an unit cell
+   *    + unit cell id
+   *    + translational vector from the original primitive cell
+   */
+
 namespace structure {
 
 template < class NodeType > class UnitCell {
 public:
   typedef vector<NodeType> node_list_type;
+  typedef LatticeParameter lattice_parameter_type;
+  typedef unsigned int     cell_id_type;
+  typedef array< int, 3 >  translation_
 
 public:
   void add_node( NodeType new_node )
@@ -191,15 +216,30 @@ public:
   }
 
 public:
-  NodeType  get_node( size_t i ) const { return store.at(i); }
-  NodeType& set_node( size_t i ) { return store.at(i); }
-  void resize( size_t n ) { this->store.resize(n); }
+  /**
+   *  Container-related overloaded functions
+   */
+
+  /**
+   *   + at()
+   *     We do not perform range check for index i, leaving
+   *     it to the at() function of std :: vector.
+   */
+  NodeType& at( size_t i )
+    { return this->node_list_.at(i) }
   vector< NodeType >  get_store() const { return this->store; }
   vector< NodeType >& set_store() { return this->store; }
   LatticeParameters& set_constants() { return this->constants; }
   LatticeParameters  get_constants() const { return this->constants; }
 
   size_t get_n_node() const { return this->store.size(); }
+
+public:
+  /**
+   *  Accessors
+   *
+   */
+  node
 
   // lattice constant
   array<double, 3> get_trans_vector_a() const 
@@ -213,8 +253,9 @@ public:
    { return this->translation_vec; }
 
 private:
-  node_list_type node_list_;
-  LatticeParameters constants;
+  node_list_type           node_list_;
+  lattice_parameter_type   lattice_parameter_;
+  cell_id_type             cell_id_;
   array<int, 3> translation_vec;
 
 }; // end of class UnitCell
