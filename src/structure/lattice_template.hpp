@@ -50,8 +50,29 @@ using namespace geometrical_space :: threed_space;
 
 namespace structure {
 
-template < typename UnitCell_Type >
-struct Lattice {
+  /**
+   *  A template class to store lattice information
+   *
+   *  It is designed to be a template class, with the template
+   *  parameter as the unit cell type. It can be atomic, molecular,
+   *  and ionic lattice types.
+   *
+   *  Data members are:
+   *  + a list of primitive unit cells
+   *  + 
+   *
+   *  We don't store copy of lattice parameter to ensure the data 
+   *  dependence.
+   *
+   */
+
+template < typename UnitCell_Type > class Lattice {
+public:
+  typedef Lattice< UnitCell_Type > this_type;
+  typedef vector< UnitCell_Type >  unit_cell_list_type;
+  typedef UnitCell_Type :: lattice_parameter_type  lattice_parameter_type;
+  typedef bool condition_type;
+
 public:
   typedef vector< tuple< array< int, 1 > , double > > sym_noneq_monomer_list_type;
   typedef vector< tuple< array< int, 2 > , double > > sym_noneq_dimer_list_type;
@@ -59,12 +80,16 @@ public:
   typedef vector< tuple< array< int, 4 > , double > > sym_noneq_tetramer_list_type;
 
 public:
-  Lattice() {
-   this->reset();
-  }
+  Lattice()
+    {
+      this->unit_cell_list_.resize(0);
+      this->is_filled_ = false;
+    }
+  Lattice( unit_cell_list_type& unit_cell_list ) :
+    unit_cell_list_ ( unit_cell_list ) { this->is_filled_ = true; }
 
 public:
-  typedef UnitCell_Type unit_cell_type;
+  typedef UnitCell_Type UnitCell_Type;
 
 public:
   void reset(){
@@ -138,7 +163,7 @@ public:
    }
   } // end of recenter() 
 
-  void set_primitive( unit_cell_type prim ){
+  void set_primitive( UnitCell_Type prim ){
    this->primitive = prim;
    this->lp = prim.get_constants();
    this->unit_cell_is_set_ = true;
@@ -159,7 +184,7 @@ public:
      for( size_t j = 0; j < lb; j++ ){
       for( size_t k = 0; k < lc; k++ ){
        tuple< int, int, int > direction = make_tuple( i, j, k );
-       unit_cell_type copy = primitive.translational_duplicate( direction );
+       UnitCell_Type copy = primitive.translational_duplicate( direction );
        store.push_back( copy );
       }
      }
@@ -180,7 +205,7 @@ public:
       for( int k = -lc; k <= lc; k++ ){
        if( i == 0 && j == 0 && k == 0 ) continue;
        tuple< int, int, int > direction = make_tuple( i, j, k );
-       unit_cell_type copy = primitive.translational_duplicate( direction );
+       UnitCell_Type copy = primitive.translational_duplicate( direction );
        store.push_back( copy );
       }
      }
@@ -200,7 +225,7 @@ public:
    cout << "Lattice Info" << endl;
    for( size_t icell = 0; icell < store.size(); icell++ ){
     cout << " Unit Cell " << icell << endl;
-    unit_cell_type unit_cell_local = store.at(icell);
+    UnitCell_Type unit_cell_local = store.at(icell);
     unit_cell_local.print_info();
    }
   }
@@ -208,22 +233,22 @@ public:
   void print_atomlist(){
    cout << "Atom List" << endl;
    for( size_t icell = 0; icell < store.size(); icell++ ){
-    unit_cell_type unit_cell_local = store.at(icell);
+    UnitCell_Type unit_cell_local = store.at(icell);
     unit_cell_local.print_atomlist();
    }
   }
 
   friend 
-  ostream& operator<< ( ostream& os, Lattice<unit_cell_type>& lattice ){
+  ostream& operator<< ( ostream& os, Lattice<UnitCell_Type>& lattice ){
    const size_t n_cell = lattice.get_ncell();
    for( size_t icell = 0; icell < n_cell; icell++ ){
-    unit_cell_type cell_i = lattice.get_cell(icell);
+    UnitCell_Type cell_i = lattice.get_cell(icell);
     os << cell_i << endl;
    }
    return os;
   }
 
-  unit_cell_type get_cell( size_t i ) const { return this->store.at(i); }
+  UnitCell_Type get_cell( size_t i ) const { return this->store.at(i); }
   size_t get_ncell() const { return this->store.size(); }
   LatticeParameters get_constants() const { return this->lp; }
 
@@ -235,8 +260,7 @@ public:
     identify_symmetry_equvivalent_fragments_for_center( int center_index ){};
 
 private:
-  vector< unit_cell_type > store;
-  unit_cell_type primitive;
+  unit_cell_list_type unit_cell_list_;
   LatticeParameters lp;
   size_t na, nb, nc;
   bool unit_cell_is_set_;
