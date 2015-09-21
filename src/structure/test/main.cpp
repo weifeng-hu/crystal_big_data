@@ -28,6 +28,7 @@
 #include <structure/molecule.hpp>
 #include <structure/lattice_parameter.hpp>
 #include <structure/unit_cell_template.hpp>
+#include <structure/polymer_template.hpp>
 
 int main( int argc, char* arg[] ) {
 
@@ -43,5 +44,13 @@ int main( int argc, char* arg[] ) {
   using iquads :: structure :: UnitCell;
   UnitCell< Molecule > mole_cell;
   UnitCell< Molecule > new_mole_cell = mole_cell.translational_duplicate(0,0,0);
+
+  using iquads :: structure :: Polymer;
+  Polymer<2> dimer;
+  dimer.within_distance( 0.0e0 );
+  Polymer<3> trimer;
+  Polymer<5> five = dimer + trimer;
+  using iquads :: structure :: convert_polymer_to_molecule;
+  Molecule five_mole = convert_polymer_to_molecule<5> ( five );
 
 } //  end of function main()
