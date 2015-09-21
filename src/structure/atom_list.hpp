@@ -71,6 +71,24 @@ namespace iquads {
 
     /**
      *  + align_geometry_unit()
+     *    Overloaded function, for two different atom_lists
+     *    geometry units of all atoms in atom_list_new will be aligned 
+     *    to be the same as that of the first atom 
+     *    in the atom list atom_list_old. we assume that the first atom_list 
+     *    units are already aligned.
+     */
+    inline 
+    void align_geometry_unit( AtomList& atom_list_old, AtomList& atom_list_new ) {
+      using geometry_unit :: unit_conversion_constant;
+      for( size_t iatom = 0; iatom < atom_list_new.size(); iatom++ ) {
+        atom_list_new[iatom].set_coordinate() *= unit_conversion_constant( atom_list_new.at(iatom).geometry_unit(), 
+                                                                           atom_list_old.at(0).geometry_unit() );
+      }
+    } // end of inline function align_geometry_unit()
+
+
+    /**
+     *  + align_geometry_unit()
      *    geometry units of the last atom will be aligned 
      *    to be the same as that of the first atom 
      *    in the atom list.
@@ -88,7 +106,7 @@ namespace iquads {
                  unit_conversion_constant( (atom_list_obj.rbegin())->geometry_unit(), 
                                            (atom_list_obj.begin())->geometry_unit() );
     } // end of inline function align_geometry_unit_for_the_last_atom()
- 
+
   } // end of namespace structure
 
 } // end of namespace iquads

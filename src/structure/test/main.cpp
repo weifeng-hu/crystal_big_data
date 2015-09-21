@@ -27,6 +27,7 @@
 #include <structure/atom.hpp>
 #include <structure/molecule.hpp>
 #include <structure/lattice_parameter.hpp>
+#include <structure/unit_cell_template.hpp>
 
 int main( int argc, char* arg[] ) {
 
@@ -38,5 +39,9 @@ int main( int argc, char* arg[] ) {
 
   using iquads :: structure :: LatticeParameter;
   LatticeParameter lattice_parameter( 1.0e0, 1.0e0, 1.0e0, 90.0e0, 90.0e0, 90.0e0 );
+
+  using iquads :: structure :: UnitCell;
+  UnitCell< Molecule > mole_cell;
+  UnitCell< Molecule > new_mole_cell = mole_cell.translational_duplicate(0,0,0);
 
 } //  end of function main()

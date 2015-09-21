@@ -55,11 +55,20 @@ namespace threed_space {
   const array< tuple<double, double, double>,3 > e_3d
    = { e_x, e_y, e_z };
 
-  inline array< double, 3 >  
-  operator* ( array< double, 3 > vec, double a ){
-   array< double, 3 > retval
-    = { vec.at(0) * a, vec.at(1) * a, vec.at(2) * a };
-   return retval;
+  inline
+  array< double, 3 > operator* ( array< double, 3 > vec, double a ) {
+    array< double, 3 > retval
+     = { vec.at(0) * a, vec.at(1) * a, vec.at(2) * a };
+    return retval;
+  }
+
+  inline 
+  array< double, 3 > operator+ ( array<double, 3 > lhs, array<double, 3> rhs ) {
+    array< double, 3 > retval;
+    retval[0] = lhs[0] + rhs[0];
+    retval[1] = lhs[1] + rhs[1];
+    retval[2] = lhs[2] + rhs[2];
+    return retval;
   }
 
 } // end of namespace threed_space

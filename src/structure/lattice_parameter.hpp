@@ -176,21 +176,21 @@ private:
   /**
    *  Functions to calculate the a, b, c vectors from lattice constants 
    *  and angles.
-   *   + a_vec()
-   *   + b_vec()
-   *   + c_vec()
+   *   - a_vec()
+   *   - b_vec()
+   *   - c_vec()
    */
-  threed_vector_type a_vec() {
+  threed_vector_type a_vec() const {
     threed_vector_type retval = { this->a(), 0.0e0, 0.0e0 };
     return retval;
   }
 
-  threed_vector_type b_vec() {
+  threed_vector_type b_vec() const {
     threed_vector_type retval = { this->b() * cos( gamma() ), this->b() * sin( this->gamma() ), 0.0e0 };
     return retval;
   }
 
-  threed_vector_type c_vec() {
+  threed_vector_type c_vec() const {
     threed_vector_type retval;
     retval.at(0) = this->a() * cos( this->alpha() );
     {
@@ -203,6 +203,7 @@ private:
     return retval;
   }
 
+public:
   /**
    *   + compute_translation_coefficient_for_point()
    *     Given the coordinate of an arbitrary point in the space,
@@ -258,9 +259,9 @@ public:
    */
   primitive_translation_vectors_type primitive_translation_vectors() const {
     // the order must be maintained
-    threed_vector_type a_vec = this->a_vector();
-    threed_vector_type b_vec = this->b_vector();
-    threed_vector_type c_vec = this->c_vector();
+    threed_vector_type a_vec = this->a_vec();
+    threed_vector_type b_vec = this->b_vec();
+    threed_vector_type c_vec = this->c_vec();
     return array < threed_vector_type, 3 > { a_vec, b_vec, c_vec };
   }
 
@@ -269,11 +270,11 @@ public:
    *   primitive translation vectors, but rely on a 
    *   call to the actual computing function primitive_translation_vectors()
    */
-  threed_vector_type a_vector() const 
+  threed_vector_type a_vector() 
     { return this->primitive_translation_vectors().at(0); }
-  threed_vector_type b_vector() const
+  threed_vector_type b_vector()
     { return this->primitive_translation_vectors().at(1); }
-  threed_vector_type c_vector() const
+  threed_vector_type c_vector()
     { return this->primitive_translation_vectors().at(2); }
 
   /**

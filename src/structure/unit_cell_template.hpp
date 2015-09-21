@@ -31,16 +31,18 @@
 #include <string>
 #include <iostream>
 #include <tuple>
+#include <geometrical_space/coordinate.hpp>
 #include <geometrical_space/threed_space.hpp>
+#include <geometrical_space/threed_space_function.hpp>
 #include <structure/lattice_parameter.hpp>
-
-using std::cout;
-using std::endl;
-using std::tuple;
 
 namespace iquads {
 
-using namespace geometrical_space :: threed_space;
+using std :: cout;
+using std :: endl;
+using std :: tuple;
+using std :: make_tuple;
+using std :: array;
 using std :: vector;
 using std :: string;
 
@@ -49,7 +51,7 @@ using std :: string;
    *
    *   It is designed to be a template class, with the template
    *   parameter as node type. to be instantiated as molecular 
-   *   unit cells or atomic unit cells, thus can be used for 
+   *   unit cells or atomic unit cells, thus can be to construct 
    *   ionic, molecular, and atomic crystals.
    *
    *   Data members are:
@@ -65,198 +67,275 @@ namespace structure {
 
 template < class NodeType > class UnitCell {
 public:
-  typedef vector<NodeType> node_list_type;
-  typedef LatticeParameter lattice_parameter_type;
-  typedef unsigned int     cell_id_type;
-  typedef array< int, 3 >  translation_
+  typedef UnitCell < NodeType >   this_type;
+  typedef coord_value_type        coordinate_value_type;
+  typedef CartesianCoordinate3D   coordinate_type;
+  typedef vector<NodeType>        node_list_type;
+  typedef LatticeParameter        lattice_parameter_type;
+  typedef Interval                interval_data_type;
+  typedef Interval3D              interval_set_type;
+  typedef array<double, 3>        threed_vector_type;
+  typedef unsigned int            cell_id_type;
+  typedef bool                    condition_type;
+
+  typedef node_list_type&         node_list_ref;
+  typedef lattice_parameter_type& lattice_parameter_ref;
+  typedef cell_id_type&           cell_id_ref;
 
 public:
-  void add_node( NodeType new_node )
-   {
-    this->store.push_back(new_node);
-   }
-
-  bool within_radius( double Radius )
-   {
-    size_t n_node_local = this->store.size();
-    bool within_radius_local = true;
-    for( size_t inode = 0; inode < n_node_local; inode++ ){
-     NodeType node_local = store.at(inode);
-     if( node_local.within_radius( Radius ) == false ){
-      within_radius_local = false;
-      break;
-     }
-    }
-    return within_radius_local;
-   }
- 
-  UnitCell<NodeType> 
-   translational_duplicate( tuple<int, int, int> direction )
-   {
-    using std::get;
-    int a = get<0>( direction );
-    int b = get<1>( direction );
-    int c = get<2>( direction );
-    return this->translational_duplicate( a, b, c );
-   }
-
-  UnitCell<NodeType> 
-  translational_duplicate( int a_, int b_, int c_ )
-   {
-    double a = a_;
-    double b = b_;
-    double c = c_;
-    UnitCell <NodeType> copy;
-    copy.set_translation_vec() = array<int, 3> { a_, b_, c_ };
-    copy.set_constants() = this->get_constants();
-    size_t n_node_local = this->store.size();
-    for( size_t inode = 0; inode < n_node_local; inode++ ){
-     NodeType new_node = this->store.at(inode);
-     new_node.set_translation_vec() = array<int, 3> { a_, b_, c_ };
-     new_node += this->get_trans_vector_a() * a;
-     new_node += this->get_trans_vector_b() * b;
-     new_node += this->get_trans_vector_c() * c;
-     copy.add_node( new_node );
-    }
-    return copy;
-   } 
-
-  void operator+= ( array<double, 3> disp )
-   {
-    size_t n_node_local = this->store.size();
-    for( size_t inode = 0; inode < n_node_local; inode++ ){
-     this->store.at(inode) += disp;
-    }
-   }
-
-  friend 
-   ifstream& operator>> ( ifstream& ifs, UnitCell<NodeType>& cell )
+  /**
+   *  Default constructor sets everything to be zero.
+   *  Currently I don't know 
+   */
+  UnitCell()
     {
-     size_t n_node;
-     ifs >> n_node;
-     for( size_t inode = 0; inode < n_node; inode++ ){
-      NodeType node_i;
-      ifs >> node_i;
-      cell.add_node( node_i );
-     }
-     LatticeParameters lp;
-     ifs >> lp;
-     cell.set_constants() = lp;
-     return ifs;
+      this->node_list_.resize(0);
+      this->lattice_parameter_ = LatticeParameter( 0, 0, 0, 0, 0, 0 );
+      this->cell_id_ = 0;
+      this->translation_vec_.fill(0);
+    }
+  UnitCell( node_list_type           node_list,
+            lattice_parameter_type   lattice_parameter) :
+    node_list_ (node_list), lattice_parameter_ (lattice_parameter)
+      {
+        /**
+         *  Don't forget to check the geometry unit.
+         *  Here we run the loop from 0, so the first atom list units can also be aligned
+         */
+        using structure :: align_geometry_unit;
+        for( size_t inode = 0; inode < this->node_list_.size(); inode++ ) {
+          align_geometry_unit( this->node_list_[0].set_atom_list(), this->node_list[inode].set_atom_list() );
+        }
+        this->translation_vec_.fill(0);
+        this->cell_id_ = 0;
+      }
+
+  /**
+   *  Coordinate-related member functions:
+   */
+  /**
+   *   + within_radius( Radius )
+   *     Judge if all nodes of the molecule are within the Radius w.r.t. the origin.
+   *     Return value is origin-dependent.
+   *     Used in crystal.
+   */
+  condition_type within_radius( double Radius )
+    {
+      for( size_t inode = 0; inode < this->node_list_.size(); inode++ ) {
+        if( this->node_list_[inode].within_radius() == false ) {
+          return false;
+        }
+      }
+      return true;
     }
 
-  friend
-   ostream& operator<< ( ostream& os, UnitCell<NodeType>& cell )
-   {
-    const size_t n_node = cell.get_n_node();
-    for( size_t inode = 0; inode < n_node; inode++ ){
-     NodeType node_i = cell.get_node( inode );
-     os << node_i << endl;
+  /**
+   *   + edges()
+   *     An overloaded function to return edges of an node in X, Y, Z directions.
+   *     Can be overloaded for all object types in the namespace structure.
+   *     Return value is an interval data type, see coordinate.hpp for definition.
+   */
+  interval_set_type edges() const {
+    coordinate_value_type x_plus  = get<0>( get<0>( this->atom_list_[0].edges() ) );
+    coordinate_value_type x_minus = get<1>( get<0>( this->atom_list_[0].edges() ) );
+    coordinate_value_type y_plus  = get<0>( get<1>( this->atom_list_[0].edges() ) );
+    coordinate_value_type y_minus = get<1>( get<1>( this->atom_list_[0].edges() ) );
+    coordinate_value_type z_plus  = get<0>( get<2>( this->atom_list_[0].edges() ) );
+    coordinate_value_type z_minus = get<1>( get<2>( this->atom_list_[0].edges() ) );
+    for( size_t inode = 0; inode < this->node_list_.size(); inode++ ) {
+      interval_set_type edges_node = this->node_list_.at(inode).edges();
+      coordinate_value_type new_x_plus  = get<0>( get<0>( this->node_list_[inode].edges() ) );
+      coordinate_value_type new_x_minus = get<1>( get<0>( this->node_list_[inode].edges() ) );
+      coordinate_value_type new_y_plus  = get<0>( get<1>( this->node_list_[inode].edges() ) );
+      coordinate_value_type new_y_minus = get<1>( get<1>( this->node_list_[inode].edges() ) );
+      coordinate_value_type new_z_plus  = get<0>( get<2>( this->node_list_[inode].edges() ) );
+      coordinate_value_type new_z_minus = get<1>( get<2>( this->node_list_[inode].edges() ) );
+      if( ( new_x_plus - x_plus ) >= 0.0e0 ) { x_plus = new_x_plus; }
+      if( ( new_y_plus - y_plus ) >= 0.0e0 ) { y_plus = new_y_plus; }
+      if( ( new_z_plus - z_plus ) >= 0.0e0 ) { z_plus = new_z_plus; }
+  
+      if( ( new_x_minus - x_minus ) < 0.0e0 ) { x_minus = new_x_minus; }
+      if( ( new_y_minus - y_minus ) < 0.0e0 ) { y_minus = new_y_minus; }
+      if( ( new_z_minus - z_minus ) < 0.0e0 ) { z_minus = new_z_minus; }
     }
-    return os;
-   }
-
-  array< array<double, 2>, 3 > get_edges(){
-   array< array<double, 2>, 3 > retval;
-   size_t n_node_local = this->store.size();
-   double x_plus  = this->store.at(0).get_edges().at(0).at(0); 
-   double x_minus = this->store.at(0).get_edges().at(0).at(1); 
-   double y_plus  = this->store.at(0).get_edges().at(1).at(0); 
-   double y_minus = this->store.at(0).get_edges().at(1).at(1); 
-   double z_plus  = this->store.at(0).get_edges().at(2).at(0); 
-   double z_minus = this->store.at(0).get_edges().at(2).at(1); 
-   for( size_t inode = 0; inode < n_node_local; inode++ ){
-    array< array<double, 2>, 3 > edges_node
-     = this->store.at(inode).get_edges();
-    if( ( edges_node.at(0).at(0) - x_plus ) >= 1.0e-5 )
-     { x_plus = edges_node.at(0).at(0); }
-    if( ( edges_node.at(1).at(0) - y_plus ) >= 1.0e-5 )
-     { y_plus = edges_node.at(1).at(0); }
-    if( ( edges_node.at(2).at(0) - z_plus ) >= 1.0e-5 )
-     { z_plus = edges_node.at(2).at(0); }
-
-    if( ( edges_node.at(0).at(1) - x_minus ) <= -1.0e-5 )
-     { x_minus = edges_node.at(0).at(1); }
-    if( ( edges_node.at(1).at(1) - y_minus ) <= -1.0e-5 )
-     { y_minus = edges_node.at(1).at(1); }
-    if( ( edges_node.at(2).at(1) - z_minus ) <= -1.0e-5 )
-     { z_minus = edges_node.at(2).at(1); }
-   }
-   retval.at(0) = array<double, 2> { x_plus, x_minus };
-   retval.at(1) = array<double, 2> { y_plus, y_minus };
-   retval.at(2) = array<double, 2> { z_plus, z_minus };
-   return retval;
+    return make_tuple( make_tuple( x_plus, x_minus ),
+                       make_tuple( y_plus, y_minus ),
+                       make_tuple( z_plus, z_minus ) );
   }
 
-  void print_info()
-  {
-   cout << "Unit Cell Info" << endl;
-   cout << "{" << endl;
-   cout << "Node List:" << endl;
-   const size_t n_node = this->store.size();
-   for( size_t inode = 0; inode < n_node; inode++ ){
-    cout << "Node " << inode << endl;
-    cout << "{" << endl;
-    NodeType node_local = store.at(inode);
-    node_local.print_info();
-    cout << "}" << endl;
-   }
-   cout << "Crystal Constants" << endl;
-   this->constants.print_info();
-   cout << "}" << endl;
-  } // end of print_info()
 
-  void print_atomlist()
-  {
-   const size_t n_node = this->store.size();
-   for( size_t inode = 0; inode < n_node; inode++ ){
-    NodeType node_local = store.at(inode);
-    node_local.print_atomlist();
-   }
+  /**
+   *  We don't overload center() and center_of_mass() here
+   *  for now.
+   */
+
+  /**
+   *   + translational_duplicate()
+   *     Returns a new unit cell by a translational operation.
+   *     Need to use the lattice parameters stored in the object.
+   *     The final direction vector is 
+   *     vec = a * vec_a + b * vec_b + c * vec_c
+   *     a, b, c can be non integers.
+   *     invokes the operator+=
+   */
+  this_type translational_duplicate( double a, double b, double c ) {
+    this_type copy = *this;
+    copy.set_translation_vec() = array<double, 3> { a, b, c };
+    using geometrical_space :: threed_space :: operator+;
+    using geometrical_space :: threed_space :: operator*;
+    threed_vector_type translation_vector = this->lattice_parameter_.a_vector() * a +
+                                            this->lattice_parameter_.b_vector() * b +
+                                            this->lattice_parameter_.c_vector() * c;
+    coordinate_type rhs = make_tuple( translation_vector[0], translation_vector[1], translation_vector[2] );
+    copy += rhs;
+    return copy;
+  } 
+
+  /**
+   *   + operator+= ()
+   *     Overloaded arithmetic operator +=
+   *     Performs coordinate movement for an unit cell object with the rhs as coordinate_type (3d vector).
+   *     Invokes the operator += of atom objects.
+   */
+  this_type& operator+= ( const coordinate_type& rhs ) {
+    for( size_t inode = 0; inode < this->node_list_.size(); inode++ ) {
+      this->node_list_[inode] += rhs;
+    }
+    return *this;
+  }
+
+
+  /**
+   *  I/O member functions:
+   */
+  /**
+   *   + stream operator>> ()
+   *     Overload stream operator>> .
+   *     Invokes the stream operator >> of the node class.
+   *     Also stream in the lattice parameters.
+   */
+  friend 
+  istream& operator>> ( istream& is, this_type& unit_cell_obj )
+    {
+      size_t n_node;
+      is >> n_node;
+      for( size_t inode = 0; inode < n_node; inode++ ) {
+        NodeType new_node_obj;
+        is >> new_node_obj;
+        unit_cell_obj.push_back( new_node_obj );
+      }
+      lattice_parameter_type new_lattice_parameter;
+      is >> new_lattice_parameter;
+      unit_cell_obj.set_lattice_parameter() = new_lattice_parameter;
+      return is;
+    }
+
+  /**
+   *   + stream operator<< ()
+   *     Overload stream operator<<.
+   *     Invokes the stream operator<< of the node class
+   *     Note that we made the this_type& to be non-const so we can use 
+   *     operator[] of the node class.
+   *     Print out the atom list.
+   */
+  friend
+  ostream& operator<< ( ostream& os, this_type& unit_cell_obj ) {
+    using std :: endl;
+    for( size_t inode = 0; inode < unit_cell_obj.size(); inode++ ) {
+      os << unit_cell_obj[inode] << endl;
+    }
+    return os;
+  }
+
+  /**
+   *   + print_atomlist()
+   *     An overloaded function to print atom coordinate list.
+   *     Can be overloaded for all object types in the namespace structure.
+   */
+  void print_atomlist() {
+    for( size_t inode = 0; inode < this->node_list_.size(); inode++ ) {
+      this->node_list_[inode].print_atomlist();
+    }
   }
 
 public:
   /**
    *  Container-related overloaded functions
+   *  If we treat a unit cell object as a container as nodes
    */
+  /**
+   *  + size()
+   *    Return number of nodes, depends on the actual node type
+   */
+  size_t size() const
+    { return this->node_list_.size(); }
 
+  /**
+   *   + push_back()
+   *     Previously a function add_node() was implemented
+   *     Now we use the STL container naming, also with a 
+   *     geometry unit check.
+   */
+  void push_back( const NodeType& node_obj  )
+    {
+      this->node_list_.push_back( node_obj );
+      using structure :: align_geometry_unit;
+      align_geometry_unit( this->node_type_.begin()->atom_list(), 
+                           this->node_type_.end()->atom_list() );
+    }
+ 
   /**
    *   + at()
    *     We do not perform range check for index i, leaving
    *     it to the at() function of std :: vector.
    */
   NodeType& at( size_t i )
-    { return this->node_list_.at(i) }
-  vector< NodeType >  get_store() const { return this->store; }
-  vector< NodeType >& set_store() { return this->store; }
-  LatticeParameters& set_constants() { return this->constants; }
-  LatticeParameters  get_constants() const { return this->constants; }
+    { return this->node_list_.at(i); }
 
-  size_t get_n_node() const { return this->store.size(); }
+  /**
+   *   + operator []
+   *     no range check
+   */
+  NodeType& operator[] ( size_t i )
+    { return this->node_list_[i]; }
+
+  /**
+   *  Iterators will be implemented in future when needed
+   */
 
 public:
   /**
    *  Accessors
-   *
    */
-  node
+  node_list_type node_list() const 
+    { return this->node_list_; }
+  lattice_parameter_type lattice_parameter() const
+    { return this->lattice_parameter_; }
+  cell_id_type cell_id() const
+    { return this->cell_id_; }
 
-  // lattice constant
-  array<double, 3> get_trans_vector_a() const 
-   { return this->constants.get_trans_vector_a(); }
-  array<double, 3> get_trans_vector_b() const
-   { return this->constants.get_trans_vector_b(); }
-  array<double, 3> get_trans_vector_c() const
-   { return this->constants.get_trans_vector_c(); }
+  /**
+   *  Mutators
+   *  Here we provide the mutators, since there is no strong 
+   *  rule against changes to a unit cell. But developers 
+   *  should know what they are doing when changing the data
+   *  members.
+   */
+  node_list_ref set_node_list()
+    { return this->node_list_; }
+  lattice_parameter_ref set_lattice_parameter()
+    { return this->lattice_paramter_; }
+  cell_id_ref set_cell_id()
+    { return this->cell_id_; }
+  array<double, 3>& set_translation_vec()
+   { return this->translation_vec_; }
 
-  array<int, 3>& set_translation_vec()
-   { return this->translation_vec; }
 
 private:
   node_list_type           node_list_;
   lattice_parameter_type   lattice_parameter_;
   cell_id_type             cell_id_;
-  array<int, 3> translation_vec;
+  array<double, 3>         translation_vec_;
 
 }; // end of class UnitCell
 
