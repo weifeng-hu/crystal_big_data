@@ -57,9 +57,16 @@ namespace structure {
    *  parameter as the unit cell type. It can be atomic, molecular,
    *  and ionic lattice types.
    *
+   *  We don't store a big array of unit cells since it will eat up
+   *  a big chunk of memory also cannot be put into the stack memory 
+   *  easily. Therefore we rely on ultrafast front end CPU power 
+   *  to generate a certain unit cell object in the lattice on the fly
+   *  whenever needed.
+   *
    *  Data members are:
-   *  + a list of primitive unit cells
-   *  + 
+   *  + A primitive unit cell
+   *  + number of duplication in a, b, c directions
+   *  + a flag to tell whether data is filled
    *
    *  We don't store copy of lattice parameter to ensure the data 
    *  dependence.
@@ -71,6 +78,7 @@ public:
   typedef Lattice< UnitCell_Type > this_type;
   typedef vector< UnitCell_Type >  unit_cell_list_type;
   typedef UnitCell_Type :: lattice_parameter_type  lattice_parameter_type;
+  typedef size_t size_type;
   typedef bool condition_type;
 
 public:
@@ -80,26 +88,29 @@ public:
   typedef vector< tuple< array< int, 4 > , double > > sym_noneq_tetramer_list_type;
 
 public:
+  /**
+   *  The default constructor sets everything to be zero
+   */
   Lattice()
     {
       this->unit_cell_list_.resize(0);
+      this->na_ = 0;
+      this->nb_ = 0;
+      this->nc_ = 0;
       this->is_filled_ = false;
     }
-  Lattice( unit_cell_list_type& unit_cell_list ) :
-    unit_cell_list_ ( unit_cell_list ) { this->is_filled_ = true; }
+
+  /**
+   *  The initialize list constructor will set the is_flag_ as true 
+   *  but we don't have a good algorithm to check whether the lattice is valid.
+   *  so a developer must make sure the lattice will be a valid object when using this 
+   *  constructor.
+   */
+  Lattice( unit_cell_list_type& unit_cell_list,
+           size_type na, size_type nb, size_type nc ) :
+    unit_cell_list_ ( unit_cell_list ), na_(na), nb_(nb), nc_(nc) { this->is_filled_ = true; }
 
 public:
-  typedef UnitCell_Type UnitCell_Type;
-
-public:
-  void reset(){
-   this->store.resize(0);
-   this->na = 0;
-   this->nb = 0;
-   this->nc = 0;
-   this->unit_cell_is_set_ = false;
-  }
-
   array< array<double, 2>, 3 > get_edges(){
    array< array<double, 2>, 3 > retval;
    size_t n_cell_local = this->store.size();
@@ -261,10 +272,8 @@ public:
 
 private:
   unit_cell_list_type unit_cell_list_;
-  LatticeParameters lp;
-  size_t na, nb, nc;
-  bool unit_cell_is_set_;
-  bool is_filled_;
+  size_t na_, nb_, nc_;
+  condition_type is_filled_;
 
 }; // end of struct Lattice
 
