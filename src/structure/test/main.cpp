@@ -31,6 +31,7 @@
 #include <structure/polymer_template.hpp>
 #include <structure/unit_cell_instant.hpp>
 #include <structure/lattice_template.hpp>
+#include <structure/bulk_template.hpp>
 
 int main( int argc, char* arg[] ) {
 
@@ -58,5 +59,9 @@ int main( int argc, char* arg[] ) {
   using iquads :: structure :: Lattice;
   using iquads :: structure :: MolecularUnitCell;
   Lattice< MolecularUnitCell > molecule_lattice;
+
+  using iquads :: structure :: Bulk;
+  Bulk< Atom > atom_bulk;
+  Bulk< Molecule > molecule_bulk = iquads :: structure :: convert_lattice_to_bulk< Molecule > ( molecule_lattice );
 
 } //  end of function main()
