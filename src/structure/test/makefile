@@ -15,7 +15,7 @@ $(PGM): $(COBJS)
 	$(CXX) -o $(PGM) $(CFLAGS) $(COPT) $(COBJS) $(LIBS)
 	cp $(PGM) $(IQUADS_BIN)
 
-main.o:
+main.o: ../*.hpp
 	$(CXX) -c $(CFLAGS) $(COPT) main.cpp
 
 clean:

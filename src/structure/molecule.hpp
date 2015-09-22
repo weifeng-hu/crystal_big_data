@@ -159,7 +159,7 @@ public:
     coordinate_value_type z_plus  = get<0>( get<2>( this->atom_list_[0].edges() ) );
     coordinate_value_type z_minus = get<1>( get<2>( this->atom_list_[0].edges() ) );
     for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ) {
-      interval_set_type edges_iatom = this->atom_list_.at(iatom).edges();
+      interval_set_type edges_iatom = this->atom_list_[iatom].edges();
       coordinate_value_type new_x_plus  = get<0>( get<0>( this->atom_list_[iatom].edges() ) );
       coordinate_value_type new_x_minus = get<1>( get<0>( this->atom_list_[iatom].edges() ) );
       coordinate_value_type new_y_plus  = get<0>( get<1>( this->atom_list_[iatom].edges() ) );

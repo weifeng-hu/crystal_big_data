@@ -34,6 +34,7 @@
 #include <geometrical_space/coordinate.hpp>
 #include <geometrical_space/threed_space.hpp>
 #include <geometrical_space/threed_space_function.hpp>
+#include <structure/atom_list.hpp>
 #include <structure/lattice_parameter.hpp>
 
 namespace iquads {
@@ -104,7 +105,7 @@ public:
          */
         using structure :: align_geometry_unit;
         for( size_t inode = 0; inode < this->node_list_.size(); inode++ ) {
-          align_geometry_unit( this->node_list_[0].set_atom_list(), this->node_list[inode].set_atom_list() );
+          align_geometry_unit( this->node_list_[0].set_atom_list(), this->node_list_[inode].set_atom_list() );
         }
         this->translation_vec_.fill(0);
         this->cell_id_ = 0;
@@ -122,7 +123,7 @@ public:
   condition_type within_radius( double Radius )
     {
       for( size_t inode = 0; inode < this->node_list_.size(); inode++ ) {
-        if( this->node_list_[inode].within_radius() == false ) {
+        if( this->node_list_[inode].within_radius( Radius ) == false ) {
           return false;
         }
       }
@@ -136,12 +137,12 @@ public:
    *     Return value is an interval data type, see coordinate.hpp for definition.
    */
   interval_set_type edges() const {
-    coordinate_value_type x_plus  = get<0>( get<0>( this->atom_list_[0].edges() ) );
-    coordinate_value_type x_minus = get<1>( get<0>( this->atom_list_[0].edges() ) );
-    coordinate_value_type y_plus  = get<0>( get<1>( this->atom_list_[0].edges() ) );
-    coordinate_value_type y_minus = get<1>( get<1>( this->atom_list_[0].edges() ) );
-    coordinate_value_type z_plus  = get<0>( get<2>( this->atom_list_[0].edges() ) );
-    coordinate_value_type z_minus = get<1>( get<2>( this->atom_list_[0].edges() ) );
+    coordinate_value_type x_plus  = get<0>( get<0>( this->node_list_[0].edges() ) );
+    coordinate_value_type x_minus = get<1>( get<0>( this->node_list_[0].edges() ) );
+    coordinate_value_type y_plus  = get<0>( get<1>( this->node_list_[0].edges() ) );
+    coordinate_value_type y_minus = get<1>( get<1>( this->node_list_[0].edges() ) );
+    coordinate_value_type z_plus  = get<0>( get<2>( this->node_list_[0].edges() ) );
+    coordinate_value_type z_minus = get<1>( get<2>( this->node_list_[0].edges() ) );
     for( size_t inode = 0; inode < this->node_list_.size(); inode++ ) {
       interval_set_type edges_node = this->node_list_.at(inode).edges();
       coordinate_value_type new_x_plus  = get<0>( get<0>( this->node_list_[inode].edges() ) );
@@ -163,6 +164,18 @@ public:
                        make_tuple( z_plus, z_minus ) );
   }
 
+
+  /**
+   *   + reorigin()
+   *     Reorigin all coordinate in the unit cell
+   */
+  void reorigin() {
+    threed_vector_type reorigin_vector = compute_recenter_vec( this->edges() );
+    coordinate_type coord = make_tuple( reorigin_vector[0], reorigin_vector[1], reorigin_vector[2] );
+    for( size_t inode = 0; inode < this->node_list_.size(); inode++ ) {
+      this->node_list_[inode] += coord;
+    }
+  }
 
   /**
    *  We don't overload center() and center_of_mass() here
@@ -271,6 +284,12 @@ public:
     { return this->node_list_.size(); }
 
   /**
+   *  + resize()
+   */
+  void resize( size_t size )
+    { this->node_list_.resize(size); }
+
+  /**
    *   + push_back()
    *     Previously a function add_node() was implemented
    *     Now we use the STL container naming, also with a 
@@ -280,8 +299,8 @@ public:
     {
       this->node_list_.push_back( node_obj );
       using structure :: align_geometry_unit;
-      align_geometry_unit( this->node_type_.begin()->atom_list(), 
-                           this->node_type_.end()->atom_list() );
+      align_geometry_unit( this->node_list_.begin()->set_atom_list(), 
+                           this->node_list_.end()->set_atom_list() );
     }
  
   /**
@@ -324,12 +343,11 @@ public:
   node_list_ref set_node_list()
     { return this->node_list_; }
   lattice_parameter_ref set_lattice_parameter()
-    { return this->lattice_paramter_; }
+    { return this->lattice_parameter_; }
   cell_id_ref set_cell_id()
     { return this->cell_id_; }
   array<double, 3>& set_translation_vec()
    { return this->translation_vec_; }
-
 
 private:
   node_list_type           node_list_;

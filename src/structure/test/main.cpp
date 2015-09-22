@@ -29,6 +29,8 @@
 #include <structure/lattice_parameter.hpp>
 #include <structure/unit_cell_template.hpp>
 #include <structure/polymer_template.hpp>
+#include <structure/unit_cell_instant.hpp>
+#include <structure/lattice_template.hpp>
 
 int main( int argc, char* arg[] ) {
 
@@ -52,5 +54,9 @@ int main( int argc, char* arg[] ) {
   Polymer<5> five = dimer + trimer;
   using iquads :: structure :: convert_polymer_to_molecule;
   Molecule five_mole = convert_polymer_to_molecule<5> ( five );
+
+  using iquads :: structure :: Lattice;
+  using iquads :: structure :: MolecularUnitCell;
+  Lattice< MolecularUnitCell > molecule_lattice;
 
 } //  end of function main()

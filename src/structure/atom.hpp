@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <vector>
 #include <array>
+#include <algorithm>
 #include <string>
 #include <tuple>
 #include <iostream>
@@ -41,6 +42,7 @@
 
 using std::vector;
 using std::tuple;
+using std::move;
 
 namespace iquads {
 
@@ -311,6 +313,13 @@ public:
     }
 
   /**
+   *  This function is an overload to Molecule objects, to fulfill template instantiation.
+   *  It returns nothing
+   *  An AtomList for an atom object is meanless.
+   */
+  vector< Atom > atom_list() const {}
+
+  /**
    *  Mutators for external properties are allowed
    */
   coordinate_value_ref set_x()
@@ -325,6 +334,13 @@ public:
     { this->coordinate_ = make_tuple( x, y, z ); }
   geometry_unit_ref set_geometry_unit()
     { return this->geometry_unit_; }
+
+  /**
+   *  This function is an overload to Molecule objects, to fulfill template instantiation.
+   *  It returns nothing
+   *  An AtomList for an atom object is meanless.
+   */
+  vector< Atom >& set_atom_list() { }
 
   // I just leave this function like this for now
   array<int, 3>& set_translation_vec()
