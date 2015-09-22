@@ -31,11 +31,14 @@ namespace iquads {
 
 namespace structure {
 
-  template class Lattice< atomic_ucell >;
-  template class Lattice< molecular_ucell >;
+  /**
+   * explicit template instantiation and typedef for lattice
+   */
+  template class Lattice< AtomicUnitCell >;
+  template class Lattice< MolecularUnitCell >;
 
-  typedef Lattice< atomic_ucell > atomic_lattice;
-  typedef Lattice< molecular_ucell > molecular_lattice;
+  typedef Lattice< AtomicUnitCell >    AtomicLattice;
+  typedef Lattice< MolecularUnitCell > MolecularLattice;
 
 } // end of namespace structure
 
