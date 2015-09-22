@@ -24,26 +24,28 @@
  *
  */
 
-#ifndef LATTICE_INSTANT_HPP
-#define LATTICE_INSTANT_HPP
 
-#include <string>
-#include <vector>
-#include <structure/unit_cell_instant.hpp>
-#include <structure/lattice_template.hpp>
+#ifndef POLYMER_INSTANT_HPP
+#define POLYMER_INSTANT_HPP
+
+#include <structure/polymer_template.hpp>
 
 namespace iquads {
 
 namespace structure {
 
   /**
-   * explicit template instantiation and typedef for lattice
+   * explicit template instantiation and typedef for polymers
    */
-  template class Lattice< AtomicUnitCell >;
-  template class Lattice< MolecularUnitCell >;
+  template class Polymer<1>;
+  template class Polymer<2>;
+  template class Polymer<3>;
+  template class Polymer<4>;
 
-  typedef Lattice< AtomicUnitCell >    AtomicLattice;
-  typedef Lattice< MolecularUnitCell > MolecularLattice;
+  typedef Polymer<1> Monomer;
+  typedef Polymer<2> Dimer;
+  typedef Polymer<3> Trimer;
+  typedef Polymer<4> Tetramer;
 
 } // end of namespace structure
 

@@ -108,13 +108,14 @@ namespace iquads {
       } // end of function compute_charge_weighted_distance()
       
       inline
-      array< double, 3 > compute_recenter_vec( array< array<double, 2>, 3> edges ) {
-        const double x_plus = edges.at(0).at(0);
-        const double x_minus = edges.at(0).at(1);
-        const double y_plus = edges.at(1).at(0);
-        const double y_minus = edges.at(1).at(1);
-        const double z_plus = edges.at(2).at(0);
-        const double z_minus = edges.at(2).at(1);
+      array< double, 3 > compute_recenter_vec( Interval3D edges ) {
+        using std :: get;
+        const double x_plus  = get<0> ( get<0> ( edges ) );
+        const double x_minus = get<1> ( get<0> ( edges ) );
+        const double y_plus  = get<0> ( get<1> ( edges ) );
+        const double y_minus = get<1> ( get<1> ( edges ) );
+        const double z_plus  = get<0> ( get<2> ( edges ) );
+        const double z_minus = get<1> ( get<2> ( edges ) );
         array<double, 3 > retval = { -(x_plus+x_minus)/2, -(y_plus+y_minus)/2, -(z_plus+z_minus)/2 };
         return retval;
       } // end of function compute_recenter_vec()

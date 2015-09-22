@@ -1,4 +1,4 @@
-IQUADS_ROOT     = /home/wh288/iquads/
+IQUADS_ROOT     = /home/wh288/Development/iquads/
 IQUADS_SRC      = $(IQUADS_ROOT)/src/
 IQUADS_BIN      = $(IQUADS_ROOT)/bin/
 CC              = gcc
@@ -15,7 +15,7 @@ $(PGM): $(COBJS)
 	$(CXX) -o $(PGM) $(CFLAGS) $(COPT) $(COBJS) $(LIBS)
 	cp $(PGM) $(IQUADS_BIN)
 
-main.o:
+main.o: ../*.hpp
 	$(CXX) -c $(CFLAGS) $(COPT) main.cpp
 
 clean:

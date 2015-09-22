@@ -159,7 +159,7 @@ public:
     coordinate_value_type z_plus  = get<0>( get<2>( this->atom_list_[0].edges() ) );
     coordinate_value_type z_minus = get<1>( get<2>( this->atom_list_[0].edges() ) );
     for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ) {
-      interval_set_type edges_iatom = this->atom_list_.at(iatom).edges();
+      interval_set_type edges_iatom = this->atom_list_[iatom].edges();
       coordinate_value_type new_x_plus  = get<0>( get<0>( this->atom_list_[iatom].edges() ) );
       coordinate_value_type new_x_minus = get<1>( get<0>( this->atom_list_[iatom].edges() ) );
       coordinate_value_type new_y_plus  = get<0>( get<1>( this->atom_list_[iatom].edges() ) );
@@ -222,7 +222,7 @@ public:
   /**
    *   + operator+= ()
    *     Overloaded arithmetic operator +=
-   *     Performs coordinate movement for an molecule object with the rhs as coordinate_type.
+   *     Performs coordinate movement for an molecule object with the rhs as coordinate_type (3d vector).
    *     Invokes the operator += of atom objects.
    *     rhs is not implemented as an molecule, since an operation like molecule + molecule can mean something else.
    */
@@ -308,7 +308,7 @@ public:
   }
 
   /**
-   *   + stream opeartor<< ()
+   *   + stream operator<< ()
    *     Overloaded stream operator<< .
    *     Invokes the stream operator >> of the atom class.
    *     So the streaming out format is 
@@ -331,10 +331,9 @@ public:
    *   + print_atomlist()
    *     An overloaded function to print atom coordinate list.
    *     Can be overloaded for all object types in the namespace structure.
+   *     Actually this function is doing the same thing as operator<<
    */
   void print_atomlist(){
-    using std::cout;
-    using std::endl;
     for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ) {
       this->atom_list_[iatom].print_atomlist();
     }

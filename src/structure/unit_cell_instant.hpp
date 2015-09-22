@@ -30,11 +30,14 @@ namespace iquads{
 
 namespace structure {
 
+  /**
+   * explicit template instantiation and typedef for unit cells
+   */
   template class UnitCell<Atom>;
   template class UnitCell<Molecule>;
 
-  typedef UnitCell<Atom> atomic_ucell;
-  typedef UnitCell<Molecule> molecular_ucell;
+  typedef UnitCell<Atom>       AtomicUnitCell;
+  typedef UnitCell<Molecule>   MolecularUnitCell;
 
 } // end of namespace structure 
 

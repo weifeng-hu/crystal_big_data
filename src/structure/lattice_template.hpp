@@ -34,6 +34,7 @@
 #include <vector>
 #include <array>
 #include <iostream>
+#include <geometrical_space/coordinate.hpp>
 #include <geometrical_space/threed_space_function.hpp>
 //#include <manybody_expansion/fragment_identifier/fragment_info.hpp>
 
@@ -50,197 +51,288 @@ using namespace geometrical_space :: threed_space;
 
 namespace structure {
 
-template < typename UnitCell_Type >
-struct Lattice {
+  /**
+   *  A template class to store lattice information
+   *
+   *  It is designed to be a template class, with the template
+   *  parameter as the unit cell type. It can be atomic, molecular,
+   *  and ionic lattice types.
+   *
+   *  We don't store a big array of unit cells since it will eat up
+   *  a big chunk of memory also cannot be put into the stack memory 
+   *  easily. Therefore we rely on ultrafast front end CPU power 
+   *  to generate a certain unit cell object in the lattice on the fly
+   *  whenever needed.
+   *
+   *  Data members are:
+   *  + A primitive unit cell, this cell will be the central cell, with id [ 0, 0, 0 ]
+   *  + number of duplication in +/-a, +/-b, +/-c directions
+   *    In the lattice object, we enforce number of cells in a, b, c directions to be odd,
+   *    So we can easily have a central cell well-define to have a id [0, 0, 0].
+   *    This is based on the rationale that in a perioidic lattice whether a, b, c are
+   *    even and odd do not change the macro properties of the system, e.g. lattice energy per unit cell.
+   *    If a user wants to compute some quantity which is dependent on the size of 
+   *    a system, like a finite system, then their probably should use the Bulk object class in 
+   *    this namespace. The Bulk class does not have any information about periodicity.
+   *  + a flag to tell whether data is filled
+   *
+   *  We don't store copy of lattice parameter to ensure the data 
+   *  dependence.
+   *
+   */
+
+template < typename UnitCell_Type > class Lattice {
 public:
-  typedef vector< tuple< array< int, 1 > , double > > sym_noneq_monomer_list_type;
-  typedef vector< tuple< array< int, 2 > , double > > sym_noneq_dimer_list_type;
-  typedef vector< tuple< array< int, 3 > , double > > sym_noneq_trimer_list_type;
-  typedef vector< tuple< array< int, 4 > , double > > sym_noneq_tetramer_list_type;
+  typedef Lattice< UnitCell_Type >   this_type;
+  typedef typename UnitCell_Type :: lattice_parameter_type   lattice_parameter_type;
+  typedef coord_value_type                          coordinate_value_type;
+  typedef CartesianCoordinate3D                     coordinate_type;
+  typedef Interval                                  interval_data_type;
+  typedef Interval3D                                interval_set_type;
+  typedef tuple< int, int >                         cell_interval_type;
+  typedef size_t                                    size_type;
+  typedef bool                                      condition_type;
 
-public:
-  Lattice() {
-   this->reset();
-  }
-
-public:
-  typedef UnitCell_Type unit_cell_type;
-
-public:
-  void reset(){
-   this->store.resize(0);
-   this->na = 0;
-   this->nb = 0;
-   this->nc = 0;
-   this->unit_cell_is_set_ = false;
-  }
-
-  array< array<double, 2>, 3 > get_edges(){
-   array< array<double, 2>, 3 > retval;
-   size_t n_cell_local = this->store.size();
-   double x_plus  = this->store.at(0).get_edges().at(0).at(0); 
-   double x_minus = this->store.at(0).get_edges().at(0).at(1); 
-   double y_plus  = this->store.at(0).get_edges().at(1).at(0); 
-   double y_minus = this->store.at(0).get_edges().at(1).at(1); 
-   double z_plus  = this->store.at(0).get_edges().at(2).at(0); 
-   double z_minus = this->store.at(0).get_edges().at(2).at(1); 
-   for( size_t icell = 0; icell < n_cell_local; icell++ ){
-    array< array<double, 2>, 3 > edges_cell
-     = this->store.at(icell).get_edges();
-    if( ( edges_cell.at(0).at(0) - x_plus ) >= 1.0e-5 )
-     { x_plus = edges_cell.at(0).at(0); }
-    if( ( edges_cell.at(1).at(0) - y_plus ) >= 1.0e-5 )
-     { y_plus = edges_cell.at(1).at(0); }
-    if( ( edges_cell.at(2).at(0) - z_plus ) >= 1.0e-5 )
-     { z_plus = edges_cell.at(2).at(0); }
-
-    if( ( edges_cell.at(0).at(1) - x_minus ) <= -1.0e-5 )
-     { x_minus = edges_cell.at(0).at(1); }
-    if( ( edges_cell.at(1).at(1) - y_minus ) <= -1.0e-5 )
-     { y_minus = edges_cell.at(1).at(1); }
-    if( ( edges_cell.at(2).at(1) - z_minus ) <= -1.0e-5 )
-     { z_minus = edges_cell.at(2).at(1); }
-   }
-   retval.at(0) = array<double,2>{ x_plus, x_minus };
-   retval.at(1) = array<double,2>{ y_plus, y_minus };
-   retval.at(2) = array<double,2>{ z_plus, z_minus };
-   return retval;
-  }
-
-  void recenter(){
-   cout << "Re-centering lattice ..." << endl;
-   array< array<double,2>, 3 > lattice_edges = this->get_edges();
-   {
-    cout << "  Original lattice edges: " << endl;
-    cout << "  x:  [ " << lattice_edges.at(0).at(0) << " <--> " << lattice_edges.at(0).at(1) << " ]" << endl;
-    cout << "  y:  [ " << lattice_edges.at(1).at(0) << " <--> " << lattice_edges.at(1).at(1) << " ]" << endl;
-    cout << "  z:  [ " << lattice_edges.at(2).at(0) << " <--> " << lattice_edges.at(2).at(1) << " ]" << endl;
-   }
-   array< double, 3> recenter_vec
-    = compute_recenter_vec( lattice_edges );
-   {
-    cout << "  Recenter vector:" << endl;
-    cout << "  [ ";
-    cout << recenter_vec.at(0) << " " << recenter_vec.at(1) << " " << recenter_vec.at(2);
-    cout << " ]";
-    cout << endl;
-   }
-   size_t n_node_local = this->store.size();
-   for( size_t inode = 0; inode < n_node_local; inode++ ){
-    this->store.at(inode) += recenter_vec;
-   }
-   array< array<double,2>, 3> new_lattice_edges = this->get_edges();
-   {
-    cout << "  Adjusted lattice edges: " << endl;
-    cout << "  x:  [ " << new_lattice_edges.at(0).at(0) << " <--> " << new_lattice_edges.at(0).at(1) << " ]" << endl;
-    cout << "  y:  [ " << new_lattice_edges.at(1).at(0) << " <--> " << new_lattice_edges.at(1).at(1) << " ]" << endl;
-    cout << "  z:  [ " << new_lattice_edges.at(2).at(0) << " <--> " << new_lattice_edges.at(2).at(1) << " ]" << endl;
-   }
-  } // end of recenter() 
-
-  void set_primitive( unit_cell_type prim ){
-   this->primitive = prim;
-   this->lp = prim.get_constants();
-   this->unit_cell_is_set_ = true;
-  } // end of set_primitive()
-  bool unit_cell_is_set() { return unit_cell_is_set_; }
+  typedef UnitCell_Type&        unit_cell_ref;
+  typedef cell_interval_type&   cell_interval_ref;
 
 public:
-  void generate_cell( size_t la, size_t lb, size_t lc )
-   {
-    cout << "Generating lattice from unit cell ... " << endl;
-    cout << "  Times of duplication:" << endl;
-    cout << "  a direction: " << la << "\tb direction: " << lb << "\tc direction: " << lc << endl;
-    if( unit_cell_is_set_ == false ){
-     cout << "error: unit cell is not defined " << endl;
-     abort();
+//  typedef vector< tuple< array< int, 1 > , double > > sym_noneq_monomer_list_type;
+//  typedef vector< tuple< array< int, 2 > , double > > sym_noneq_dimer_list_type;
+//  typedef vector< tuple< array< int, 3 > , double > > sym_noneq_trimer_list_type;
+//  typedef vector< tuple< array< int, 4 > , double > > sym_noneq_tetramer_list_type;
+
+public:
+  /**
+   *  The default constructor sets everything to be zero
+   */
+  Lattice()
+    {
+      this->unit_cell_.resize(0);
+      this->interval_a_ = make_tuple( 0, 0 );
+      this->interval_b_ = make_tuple( 0, 0 );
+      this->interval_c_ = make_tuple( 0, 0 );
+      this->is_filled_ = false;
     }
-    for( size_t i = 0; i < la; i++ ){
-     for( size_t j = 0; j < lb; j++ ){
-      for( size_t k = 0; k < lc; k++ ){
-       tuple< int, int, int > direction = make_tuple( i, j, k );
-       unit_cell_type copy = primitive.translational_duplicate( direction );
-       store.push_back( copy );
+
+  /**
+   *  The initialize list constructor will set the is_flag_ as true 
+   *  but we don't have a good algorithm to check whether the lattice is valid.
+   *  so a developer must make sure the lattice will be a valid object when using this 
+   *  constructor.
+   */
+  Lattice( UnitCell_Type& unit_cell,
+           size_type na, size_type nb, size_type nc ) :
+    unit_cell_ ( unit_cell ), 
+    interval_a_ ( make_tuple( -na, na ) ),
+    interval_b_ ( make_tuple( -nb, nb ) ),
+    interval_c_ ( make_tuple( -nc, nc ) ) { this->is_filled_ = true; }
+
+public:
+  /**
+   *  Coordinate-related functions
+   */
+  /**
+   *  + edges()
+   *    An overloaded function to return edges of an lattice in X, Y, Z directions.
+   *    Can be overloaded for all object types in the namespace structure.
+   *    Return value is an interval data type, see coordinate.hpp for definition.
+   *    This function relies on the unit cell generation on the fly, and performs
+   *    the rigorous edge check, does not rely on cell intervals.
+   */
+  interval_set_type edges() {
+    coordinate_value_type x_plus  = get<0>( get<0> ( this->at(0,0,0).edges() ) ); 
+    coordinate_value_type x_minus = get<1>( get<0> ( this->at(0,0,0).edges() ) ); 
+    coordinate_value_type y_plus  = get<0>( get<1> ( this->at(0,0,0).edges() ) ); 
+    coordinate_value_type y_minus = get<1>( get<1> ( this->at(0,0,0).edges() ) ); 
+    coordinate_value_type z_plus  = get<0>( get<2> ( this->at(0,0,0).edges() ) ); 
+    coordinate_value_type z_minus = get<1>( get<2> ( this->at(0,0,0).edges() ) ); 
+    for( int index_a = this->a_min(); index_a <= this->a_max(); index_a++ ) {
+      for( int index_b = this->b_min(); index_b <= this->b_max(); index_b++ ) {
+        for( int index_c = this->c_min(); index_c <= this->c_max(); index_c++ ) {
+          interval_set_type edges_inode = this->at( index_a, index_b, index_c ).edges();
+          coordinate_value_type new_x_plus  = get<0>( get<0>( this->at( index_a, index_b, index_c ).edges() ) );
+          coordinate_value_type new_x_minus = get<1>( get<0>( this->at( index_a, index_b, index_c ).edges() ) );
+          coordinate_value_type new_y_plus  = get<0>( get<1>( this->at( index_a, index_b, index_c ).edges() ) );
+          coordinate_value_type new_y_minus = get<1>( get<1>( this->at( index_a, index_b, index_c ).edges() ) );
+          coordinate_value_type new_z_plus  = get<0>( get<2>( this->at( index_a, index_b, index_c ).edges() ) );
+          coordinate_value_type new_z_minus = get<1>( get<2>( this->at( index_a, index_b, index_c ).edges() ) );
+          if( ( new_x_plus - x_plus ) >= 0.0e0 ) { x_plus = new_x_plus; }
+          if( ( new_y_plus - y_plus ) >= 0.0e0 ) { y_plus = new_y_plus; }
+          if( ( new_z_plus - z_plus ) >= 0.0e0 ) { z_plus = new_z_plus; }
+      
+          if( ( new_x_minus - x_minus ) < 0.0e0 ) { x_minus = new_x_minus; }
+          if( ( new_y_minus - y_minus ) < 0.0e0 ) { y_minus = new_y_minus; }
+          if( ( new_z_minus - z_minus ) < 0.0e0 ) { z_minus = new_z_minus; }
+        }
       }
-     }
     }
-   }
-
-  void generate_cell_from_center( size_t la, size_t lb, size_t lc )
-   {
-    cout << "Generating lattice from unit cell, spread from center ... " << endl;
-    cout << "  Times of duplication:" << endl;
-    cout << "  a+ direction: " << la << "\tb+ direction: " << lb << "\tc+ direction: " << lc << endl;
-    if( unit_cell_is_set_ == false ){
-     cout << "error: unit cell is not defined " << endl;
-     abort();
-    }
-    for( int i = -la; i <= la; i++ ){
-     for( int j = -lb; j <= lb; j++ ){
-      for( int k = -lc; k <= lc; k++ ){
-       if( i == 0 && j == 0 && k == 0 ) continue;
-       tuple< int, int, int > direction = make_tuple( i, j, k );
-       unit_cell_type copy = primitive.translational_duplicate( direction );
-       store.push_back( copy );
-      }
-     }
-    }
-   }
-
-  void generate( tuple<int, int, int> nunits ){
-   using std::get;
-   size_t a = get<0>( nunits );
-   size_t b = get<1>( nunits );
-   size_t c = get<2>( nunits );
-   generate_cell( a, b, c );
-   //generate_cell_from_center( a, b, c );
+    return make_tuple( make_tuple( x_plus, x_minus ),
+                       make_tuple( y_plus, y_minus ),
+                       make_tuple( z_plus, z_minus ) );
   }
 
-  void print_info(){
-   cout << "Lattice Info" << endl;
-   for( size_t icell = 0; icell < store.size(); icell++ ){
-    cout << " Unit Cell " << icell << endl;
-    unit_cell_type unit_cell_local = store.at(icell);
-    unit_cell_local.print_info();
-   }
-  }
 
-  void print_atomlist(){
-   cout << "Atom List" << endl;
-   for( size_t icell = 0; icell < store.size(); icell++ ){
-    unit_cell_type unit_cell_local = store.at(icell);
-    unit_cell_local.print_atomlist();
-   }
-  }
+  /**
+   *  + reorigin()
+   *    An overloaded function to unit cell objects
+   *    Reorigin all coordinates in the lattice.
+   *    Invokes the reorigin() of the unit cell.
+   *    Nothings needs to be done to the cell interval data since they are
+   *    irrelevant to actual coordinates, just indices.
+   *    The reorigin will affect all unit cells generated afterward, so developers 
+   *    should make sure all unit cell instants generated in some pieces of code are consistent.
+   */
+  void reorigin() 
+    { this->unit_cell_.reorigin(); }
 
+
+public:
+  /**
+   *  Stream operators
+   *  We don't provide insert operator since a lattice objcect is created not from reading files
+   */
+  /**
+   *  + operator<< 
+   *    Creates a unit_cell object and then use the operator<< of it
+   */
   friend 
-  ostream& operator<< ( ostream& os, Lattice<unit_cell_type>& lattice ){
-   const size_t n_cell = lattice.get_ncell();
-   for( size_t icell = 0; icell < n_cell; icell++ ){
-    unit_cell_type cell_i = lattice.get_cell(icell);
-    os << cell_i << endl;
-   }
-   return os;
+  ostream& operator<< ( ostream& os, this_type& lattice_obj ) {
+    for( int index_a = lattice_obj.a_min(); index_a <= lattice_obj.a_max(); index_a++ ) {
+      for( int index_b = lattice_obj.b_min(); index_b <= lattice_obj.b_max(); index_b++ ) {
+        for( int index_c = lattice_obj.c_min(); index_c <= lattice_obj.c_max(); index_c++ ) {
+          os << lattice_obj( index_a, index_b, index_c ) << endl;
+        }
+      }
+    }
+    return os;
   }
 
-  unit_cell_type get_cell( size_t i ) const { return this->store.at(i); }
-  size_t get_ncell() const { return this->store.size(); }
-  LatticeParameters get_constants() const { return this->lp; }
+  /**
+   *  + operator<< 
+   *    Creates a unit_cell object and then use the print_atomlist() function of it
+   */
+  void print_atomlist() {
+    for( int index_a = this->a_min(); index_a <= this->a_max(); index_a++ ) {
+      for( int index_b = this->b_min(); index_b <= this->b_max(); index_b++ ) {
+        for( int index_c = this->c_min(); index_c <= this->c_max(); index_c++ ) {
+          this->at( index_a, index_b, index_c ).print_atomlist(); 
+        }
+      }
+    }
+  }
 
-  const bool is_filled() const { return this->is_filled_; }
 
+/*  I should put these into the fragment handling classes
 public:
   template < size_t NUM > 
    vector< tuple< array< int, NUM > , double > > 
     identify_symmetry_equvivalent_fragments_for_center( int center_index ){};
+*/
+
+public:
+  /**
+   *  Container-related functions
+   */
+  /**
+   *  + at()
+   *    Returns a duplicate of the unit cell
+   *    we perform range check for a, b, c
+   *    The return type is different from standard containers
+   *    Since this function performs on the fly unit cell generation
+   */
+  UnitCell_Type at( int a, int b, int c ) {
+    try {
+      if( a > this->a_max() || a < this->a_min() ) { throw make_tuple( 0, a ); }
+      if( b > this->b_max() || b < this->b_min() ) { throw make_tuple( 1, b ); }
+      if( c > this->c_max() || c < this->c_min() ) { throw make_tuple( 2, c ); }
+      return this->unit_cell_.translational_duplicate( a, b, c );
+    } catch ( tuple< int, int > error_info ) {
+      cout << " out of range index " << get<1>( error_info );
+      cout << " requested for direction " << get<0> ( error_info ) << endl;
+      abort();
+    }
+  }
+
+  /**
+   *  + operator()
+   *    Returns a duplicate of the unit cell
+   *    NO  range check for a, b, c
+   *    The return type is different from standard containers
+   *    Since this function performs on the fly unit cell generation
+   */
+  UnitCell_Type operator() ( int a, int b, int c ) {
+    return this->unit_cell_.translational_duplicate( a, b, c );
+  }
+
+  /**
+   *  + size()
+   *    This function also is not like the standard container size()
+   *    functions. It returns a virtual number of unit cells in this
+   *    lattice.
+   */
+  size_type size() const 
+    { return this->na() * this->nb() * this->nc(); }
+
+public:
+  /**
+   *  Accessors
+   */
+  UnitCell_Type unit_cell() const 
+    { return this->unit_cell_; }
+  cell_interval_type interval_a() const
+    { return this->interval_a_; }
+  cell_interval_type interval_b() const
+    { return this->interval_b_; }
+  cell_interval_type interval_c() const
+    { return this->interval_c_; }
+  condition_type is_filled() const
+    { return this->is_filled_; }
+
+  /**
+   *  Auxiliary accessors
+   */
+  lattice_parameter_type lattice_parameter() const
+    { return this->unit_cell_.lattice_parameter_; }
+  int a_min() const 
+    { return get<0>( interval_a_ ); }
+  int a_max() const 
+    { return get<1>( interval_a_ ); }
+  int b_min() const 
+    { return get<0>( interval_b_ ); }
+  int b_max() const 
+    { return get<1>( interval_b_ ); }
+  int c_min() const 
+    { return get<0>( interval_c_ ); }
+  int c_max() const 
+    { return get<1>( interval_c_ ); }
+  size_type na() const 
+    { return this->a_max() - this->a_min() + 1; }
+  size_type nb() const 
+    { return this->b_max() - this->b_min() + 1; }
+  size_type nc() const 
+    { return this->c_max() - this->c_min() + 1; }
+
+  /**
+   *  Mutators
+   *  We allow developers to change the unit cells and intervals
+   *  This is probably useful in phase transition applications
+   */
+  unit_cell_ref set_unit_cell()
+    { return this->unit_cell_; }
+  cell_interval_ref set_interval_a()
+    { return this->interval_a_; }
+  cell_interval_ref set_interval_b()
+    { return this->interval_b_; }
+  cell_interval_ref set_interval_c()
+    { return this->interval_c_; }
 
 private:
-  vector< unit_cell_type > store;
-  unit_cell_type primitive;
-  LatticeParameters lp;
-  size_t na, nb, nc;
-  bool unit_cell_is_set_;
-  bool is_filled_;
+  UnitCell_Type unit_cell_;
+  cell_interval_type interval_a_;
+  cell_interval_type interval_b_;
+  cell_interval_type interval_c_;
+  condition_type is_filled_;
 
 }; // end of struct Lattice
 

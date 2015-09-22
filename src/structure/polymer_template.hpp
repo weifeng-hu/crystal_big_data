@@ -33,182 +33,318 @@
 #include <geometrical_space/threed_space.hpp>
 #include <geometrical_space/threed_space_function.hpp>
 #include <geometrical_space/coordinate.hpp>
-#include <particle/atom.hpp>
+#include <structure/atom_list.hpp>
 #include <structure/molecule.hpp>
+#include <structure/molecule_list.hpp>
 
-using std::vector;
-using std::cout;
-using std::endl;
 
 namespace iquads {
 
 using namespace geometrical_space :: threed_space;
-using namespace particle;
+using std :: cout;
+using std :: endl;
+using std :: array;
+
+
+  /**
+   *  A template class to store polymer information
+   *   + A list of molecules
+   *     We use std :: array instead of std :: vector for molecule list
+   *     because this polymer class can be compile-time instantiated in 
+   *     the code, i.e., a developer always knows how many molecules will 
+   *     be included.
+   *
+   *  In many body expansion, polymers are also the interface to different 
+   *  terms, as well as the object to produce the euclidean distance matrix
+   *
+   */
 
 namespace structure {
 
-template< size_t NUM >
-struct Polymer {
+template< size_t NUM > class Polymer {
 public:
-  Polymer(){
-   this->n_molecule_ = NUM;
-   this->group.resize( NUM );
-   this->natom_ = 0;
-   this->mass_ = 0.0e0;
+  typedef Polymer< NUM >  this_type;
+  typedef Molecule         molecule_type;
+  /**
+   *  This is the vector< Molecule >, we call it external.
+   *  The number of molecules is known at run-time.
+   */
+  typedef MoleculeList                  external_molecule_list_type;
+  typedef array< molecule_type, NUM >   molecule_list_type;
+  typedef AtomList                      atom_list_type;
+  typedef molecule_type :: charge_value_type      charge_value_type;
+  typedef molecule_type :: mass_value_type        mass_value_type;
+  typedef molecule_type :: coordinate_type        coordinate_type;
+  typedef vector< coordinate_type >               coordinate_list_type;
+  typedef bool condition_type;
+
+  typedef molecule_list_type& molecule_list_ref;
+
+public:
+  /**
+   *  We let the compiler make the default constructor, as long 
+   *  as the Molecule object has its well-defined default constructor
+   *  Here we write a simple initialize list constructor
+   */
+  Polymer() {};
+  Polymer( molecule_list_type molecule_list ) :
+    molecule_list_ ( molecule_list ) { }
+
+public:
+  /**
+   *  These functions can be useful in actual crystal treatments
+   *  in a typical many body expansion calculation
+   */
+
+  /**
+   *  + within_distance()
+   *    Judges whether all atoms in the polymer are within the distance.
+   */
+  condition_type within_distance( double distance ){
+    condition_type retval = true;
+    coordinate_list_type coord_list_local = this->coordinate_list();
+    for( size_t icoord = 0; icoord < coord_list_local.size(); icoord++ ) {
+      for( size_t jcoord = 0; jcoord < coord_list_local.size(); jcoord++ ) {
+        double dist = compute_distance( coord_list_local[icoord], coord_list_local[jcoord] );
+        if( ( dist - distance ) > 0.0e0 ) { return false; }
+      }
+    }
+    return true;
   }
-  Polymer( MoleculeList poly ){
-   this->n_molecule_ = NUM;
-   this->group.resize( NUM );
-   this->natom_ = 0;
-   this->mass_ = 0.0e0;
-   this->init_from( poly );
+
+  /**
+   *  + within_mean_distance_by_center_of_mass()
+   *    Judges whether all molecule pairs are within the mean distance among 
+   *    all molecules in the polymer, and a distance is compute by centers of mass.
+   */
+  condition_type within_mean_distance_by_center_of_mass( double distance ) {
+    return ( this->mean_distance_by_center_of_mass() <= distance ? true : false );
+  }
+
+  /**
+   *  + within_mean_distance_by_center()
+   *    Judge whether all molecule pairs are within the mean distance among all molecules 
+   *    in the polymer, and a distance is compute by geometrical centers.
+   */
+  condition_type within_mean_distance_by_center( double distance ) {
+    return ( this->mean_distance_by_center() <= distance ? true : false );
   }
 
 public:
-  friend
-    template < size_t N > 
-     Molecule convert_polymer_to_molecule( Polymer<N> polymer )
+  /**
+   *  Stream operators
+   *  + operator <<
+   *    Also we have to set this_type as non-const for the cv qualification
+   *    in order to use operator[] of molcule objects.
+   *    Invokes the operator<< of molecule objects
+   */  
+  friend 
+  ostream& operator<< ( ostream& os, this_type& polymer_obj ) {
+    for( size_t imolecule = 0; imolecule < NUM; imolecule++ ) {
+      os << polymer_obj[imolecule] << endl;
+    }
+    return os;
+  }
+
+public:
+  /**
+   *  Container related member functions
+   *  This polymer object class is like a std::array,
+   *  so not like std::vector, we only have quite a few 
+   *  member functions here.
+   */
+  molecule_type& at( size_t i )
+    { return this->molecule_list_.at(i); }
+  molecule_type& operator[] ( size_t i )
+    { return this->molecule_list_[i]; }
+
+  /**
+   *  This operator() allows us to return a 
+   *  monomer object, when can be used for further 
+   *  arithmetic operations of polymers.
+   *  We cannot overload at() since function cannot be 
+   *  overloaded simply by return type.
+   */
+  Polymer<1> operator() ( size_t i ) 
     {
-
+      array< molecule_type, 1 > monomer_obj;
+      monomer_obj[0] = this->molecule_list_[i];
+      return Polymer<1>( monomer_obj );
     }
-  void init_from( MoleculeList new_molecule_list ){
-   try{
-    const size_t n_molecule = new_molecule_list.size();
-    if( n_molecule != this->n_molecule_ ) throw n_molecule;
-    for( size_t imolecule = 0; imolecule < this->n_molecule_; imolecule++ ){
-     this->group.at(imolecule) = new_molecule_list.at(imolecule);
-     const size_t natom_i = new_molecule_list.at(imolecule).get_natom();
-     this->natom_ += natom_i;
-     const double mass_i = new_molecule_list.at(imolecule).get_mass();
-     this->mass_ += mass_i;
-    }
-   }
-   catch ( size_t n ){
-    cout << " polymer exception: init_from() " << endl;
-    cout << " n_molecule " << n << " != " << this->n_molecule_ << endl;
-    abort();
-   }
-  }
 
 public:
-  bool within_radius( double radius ){
-   bool retval = true;
-   CoordList coordlist_local = this->get_coordinate_list();
-   const size_t ncoord_local = coordlist_local.size();
-   for( size_t icoord = 0; icoord < ncoord_local; icoord++ ){
-    for( size_t jcoord = 0; jcoord < icoord; jcoord++ ){
-     double dist = compute_distance( coordlist_local.at(icoord), coordlist_local.at(jcoord) );
-     if( ( dist - radius ) > 0.0e0 ){
-      retval = false;
-      goto end;
-     }
+  /**
+   *  Accessors
+   */
+  molecule_list_type molecule_list() const 
+    { return this->molecule_list_; }
+
+  /**
+   *  Auxiliary accessors
+   */
+
+  /**
+   *  + atom_list()
+   *    A handy function to return the whole atom list of the polymer object
+   */
+  atom_list_type atom_list() const {
+    atom_list_type retval;
+    for( size_t imolecule = 0; imolecule < NUM; imolecule++ ) {
+      atom_list_type atomlist_i = this->molecule_list_[imolecule].atom_list();
+      retval.insert( retval.end(), atomlist_i.begin(), atomlist_i.end() );
     }
-   }
-end:
-   return retval;
-  }
-
-  bool within_mean_radius_by_center_of_mass( double radius ){
-//    const double dist = this->compute_mean_distance_by_center_of_mass();
-//    cout << " dist of center of mass "  << dist << "  radius " << radius << "  dist <= radius ? " << (dist <= radius) << endl;
-    return ( this->compute_mean_distance_by_center_of_mass() <= radius ? true : false );
-  }
-
-  bool within_mean_radius_by_center( double radius ){
-   return ( this->compute_mean_distance_by_center() <= radius ? true : false );
-  }
-
-  double compute_mean_distance_by_center(){
-   double retval = 0.0e0;
-   int count = 0;
-   for( size_t imole = 0; imole < this->n_molecule_; imole++ ){
-    Coord com_i = this->group.at(imole).get_center();
-    for( size_t jmole = imole+1; jmole < this->n_molecule_; jmole++ ){
-     Coord com_j = this->group.at(jmole).get_center();
-     retval += compute_distance( com_i, com_j );
-     count = count + 1;
-    }
-   }
-   retval = retval/count;
-   return retval;
-  }
-
-  double compute_mean_distance_by_center_of_mass(){
-   double retval = 0.0e0;
-   int count = 0;
-   for( size_t imole = 0; imole < this->n_molecule_; imole++ ){
-    Coord com_i = this->group.at(imole).get_center_of_mass();
-    for( size_t jmole = imole+1; jmole < this->n_molecule_; jmole++ ){
-     Coord com_j = this->group.at(jmole).get_center_of_mass();
-     retval += compute_distance( com_i, com_j );
-     count = count + 1;
-    }
-   }
-   retval = retval/count;
-   return retval;
-  }
-
-public:
-  // interface to Euclidean distance matrix
-  CoordList get_coordinate_list(){
-   CoordList retval;
-   for( size_t imolecule = 0; imolecule < NUM; imolecule++ ){
-    Molecule mole_i = group.at(imolecule);
-    CoordList coordlist_i = mole_i.get_coordinate_list();
-    retval.insert( retval.end(), coordlist_i.begin(), coordlist_i.end() );
-   }
-   return retval;
-  }
-  AtomList get_atom_list(){
-   AtomList retval;
-   for( size_t imolecule = 0; imolecule < NUM; imolecule++ ){
-    Molecule mole_i = group.at(imolecule);
-    AtomList atomlist_i = mole_i.get_atom_list();
-    retval.insert( retval.end(), atomlist_i.begin(), atomlist_i.end() );
-   }
-   return retval;
+    return retval;
   }
   // should think about using std::move() to append vectors
 
-  friend 
-  ostream& operator<< ( ostream& os, Polymer<NUM> polymer ){
-   const size_t n_member = NUM;
-   for( size_t imember = 0; imember < n_member; imember++ ){
-    Molecule mole_i = polymer.set_member(imember);
-    os << mole_i << endl;
-   }
-   return os;
+  /**
+   *  + charge()
+   *    charge value is computed on the fly.
+   */
+  charge_value_type charge() const {
+    charge_value_type retval = 0;
+    for( size_t imolecule = 0; imolecule < NUM; imolecule++ ) {
+      retval += this->molecule_list_[imolecule].charge();
+    }
+    return retval;
   }
 
-public:
-  MoleculeList get_group() const { return this->group; }
-  size_t get_natom() const { return this->natom_; }
-  double get_mass() const { return this->mass_; }
-public:
-  Polymer<1> at( size_t i ) 
-   { 
-     MoleculeList mole_list;
-     mole_list.push_back( group.at(i) );
-     Polymer<1> retval(mole_list);
-     return retval;
-   }
+  /**
+   *  + natom()
+   *    natom value is computed on the fly.
+   *    We don't use size() to name it since it can mean 
+   *    number of molecules in the polymer. So we name it 
+   *    here more specifically.
+   */
+  size_t natom() const {
+    size_t retval = 0;
+    for( size_t imolecule = 0; imolecule < NUM; imolecule++ ) {
+      retval += this->molecule_list_[imolecule].size();
+    }
+    return retval;
+  }
+
+  /**
+   *  + mass()
+   *    mass value is computed on the fly.
+   */
+  mass_value_type mass() const {
+    mass_value_type retval = 0;
+    for( size_t imolecule = 0; imolecule < NUM; imolecule++ ) {
+      retval += this->molecule_list_[imolecule].mass();
+    }
+    return retval;
+  }
+
+  /**
+   *  + coordinate_list()
+   *    Returns the pure coordinate list
+   *    This function serves as an interface to build the euclidean distance matrix
+   */
+  coordinate_list_type coordinate_list(){
+    coordinate_list_type retval;
+    for( size_t imolecule = 0; imolecule < NUM; imolecule++ ) {
+      for( size_t iatom = 0; iatom < this->molecule_list_[imolecule].size(); iatom++ ) {
+        retval.push_back( this->molecule_list_[imolecule][iatom].coordinate() );
+      }
+    }
+    return retval;
+  }
+
+  /**
+   *  + mean_distance_by_center()
+   *    Returns the mean distance among molecular geometrical centers.
+   */
+  double mean_distance_by_center() {
+    double retval = 0.0e0;
+    int count = 0;
+    for( size_t imolecule = 0; imolecule < NUM; imolecule++ ) {
+      coordinate_type coord_i = this->molecule_list_[imolecule].center();
+      for( size_t jmolecule = imolecule + 1; jmolecule < NUM; jmolecule++ ) {
+        coordinate_type coord_j = this->molecule_list_[jmolecule].center();
+        retval += compute_distance( coord_i, coord_j );
+        count = count + 1;
+      }
+    }
+    retval = retval/count;
+    return retval;
+  }
+
+  /**
+   *  + mean_distance_by_center_of_mass()
+   *    Returns the mean distance among molecular centers of mass.
+   */
+  double mean_distance_by_center_of_mass() {
+    double retval = 0.0e0;
+    int count = 0;
+    for( size_t imolecule = 0; imolecule < NUM; imolecule++ ){
+      coordinate_type coord_i = this->molecule_list_[imolecule].center_of_mass();
+      for( size_t jmolecule = imolecule+1; jmolecule < this->NUM; jmolecule++ ){
+        coordinate_type coord_j = this->molecule_list_[imolecule].center_of_mass();
+        retval += compute_distance( coord_i, coord_j );
+        count = count + 1;
+      }
+    }
+    retval = retval/count;
+    return retval;
+  }
+
+  /**
+   *  Mutators
+   */
+  molecule_list_ref set_molecule_list() const 
+    { return this->molecule_list_; }
 
 private:
-  Molecule& set_member( size_t i ){ return group.at(i); }
-
-private:
-  vector< Molecule > group;
-  double mass_;
-  size_t n_molecule_;
-  size_t natom_;
+  molecule_list_type molecule_list_;
 
 }; // end of template class Polymer
 
-template < size_t NUM_1, size_t NUM_2, size_t NUM_3 = NUM_1 + NUM_2 > Polymer< NUM_3 > 
- operator+ ( Polymer<NUM_1> poly_a, Polymer<NUM_2> poly_b )
-{
 
-}
+/**
+ *  These are auxiliary functions 
+ *  as interfaces between molecules and polymers
+ */
+
+/**
+ *  convert_polymer_to_molecule()
+ *  Returns a Molecule object by feeding a polymer object
+ *  We did put this function as Molecule class or Polymer class member functions
+ *  because it may produce a loop "include" of molecule and polymer head files.
+ *  Also because these functions do not necessarily need to work with an object
+ *  They can be static.
+ */
+
+template < size_t NUM > inline Molecule convert_polymer_to_molecule( Polymer<NUM> polymer_obj ) {
+
+  typename Polymer<NUM> :: atom_list_type new_atom_list = polymer_obj.atom_list();
+  typename Polymer<NUM> :: charge_value_type charge = polymer_obj.charge();
+  return Molecule( new_atom_list, charge );
+
+} // end of function convert_polymer_to_molecule()
+
+
+/**
+ *  This operator+ will be useful as we combine two 
+ *  polymers together into a big polymer.
+ */
+
+template < size_t NUM_1, size_t NUM_2, size_t NUM_3 = NUM_1 + NUM_2 > inline Polymer< NUM_3 > 
+operator+ ( Polymer<NUM_1> polymer_obj_1, Polymer<NUM_2> polymer_obj_2 ) {
+
+  typename Polymer<NUM_1> :: molecule_list_type molecule_list_1 = polymer_obj_1.molecule_list();
+  typename Polymer<NUM_2> :: molecule_list_type molecule_list_2 = polymer_obj_2.molecule_list();
+  typename Polymer<NUM_3> :: molecule_list_type molecule_list_3;
+  for( size_t i = 0; i < NUM_1; i++ ) {
+    molecule_list_3[i] = molecule_list_1[i];
+  }
+  for( size_t i = 0; i < NUM_2; i++ ) {
+    molecule_list_3[ i + NUM_1 ] = molecule_list_2[i];
+  }
+
+  return Polymer< NUM_3 > ( molecule_list_3 );
+
+} // end of operator+ ()
 
 } // end of structure
 

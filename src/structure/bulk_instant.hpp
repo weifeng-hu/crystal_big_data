@@ -24,13 +24,14 @@
  *
  */
 
-#ifndef LATTICE_INSTANT_HPP
-#define LATTICE_INSTANT_HPP
+#ifndef BULK_INSTANT_HPP
+#define BULK_INSTANT_HPP
 
 #include <string>
 #include <vector>
-#include <structure/unit_cell_instant.hpp>
-#include <structure/lattice_template.hpp>
+#include <structure/atom.hpp>
+#include <structure/molecule.hpp>
+#include <structure/bulk_template.hpp>
 
 namespace iquads {
 
@@ -39,11 +40,11 @@ namespace structure {
   /**
    * explicit template instantiation and typedef for lattice
    */
-  template class Lattice< AtomicUnitCell >;
-  template class Lattice< MolecularUnitCell >;
+  template class Bulk< Atom >;
+  template class Bulk< Molecule >;
 
-  typedef Lattice< AtomicUnitCell >    AtomicLattice;
-  typedef Lattice< MolecularUnitCell > MolecularLattice;
+  typedef Bulk< Atom >    AtomicBulk;
+  typedef Bulk< Molecule > MolecularBulk;
 
 } // end of namespace structure
 
