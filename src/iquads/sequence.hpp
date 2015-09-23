@@ -40,6 +40,7 @@ namespace iquads {
       typedef string mode_name_type;
       typedef unsigned int mode_mask_type;
 
+      constexpr mode_mask_type UNKNOWN              = 0x00;
       constexpr mode_mask_type LOCAL_RUN            = 0x01 << 0;
       constexpr mode_mask_type WRITE_LOCAL_INPUT    = 0x01 << 1;
       constexpr mode_mask_type WRITE_PBS_INPUT      = 0x01 << 2;

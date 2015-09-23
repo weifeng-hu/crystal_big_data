@@ -49,8 +49,7 @@ namespace iquads {
       constexpr program_mask_type PSI3   = 0x01 << 2;
       
       inline program_mask_type 
-       return_program_mask( program_name_type program_name )
-      {
+      return_program_mask( program_name_type program_name ) {
       
         if( program_name == "molpro" || 
             program_name == "Molpro" ) {
@@ -71,7 +70,7 @@ namespace iquads {
         else{
          using std::cout;
          using std::endl;
-         cout << "retrieve_external_program_mask():" << endl;
+         cout << "return_external_program_mask():" << endl;
          cout << "Unknown program name: " << program_name << endl;
          exit(1);
         }

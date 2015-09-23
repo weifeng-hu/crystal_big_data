@@ -37,29 +37,105 @@ namespace iquads {
 
 namespace electron_correlation {
 
+  /**
+   *  A electron correlation calculation "setting" object
+   *  is some object to store general environment variables.
+   *  These variables, can be universal for a lot of similar 
+   *  calculations, like a series of calculations in crystal 
+   *  lattice energy ones. Therefore, these instances do not 
+   *  have the data of any actual molecule information, since 
+   *  molecule information can change from one calculation to 
+   *  another.
+   *
+   *  This definition is different from the one of Config object,
+   *  which is designed to strongly depend on individual calculation.
+   *  Config struct has molecule information.
+   *
+   *  A general view about what data this struct can hold (and can be
+   *  kind of universal for a large amount of calculations) are:
+   *   + Run mode (dryrun, remote, etc. )
+   *   + basis set info
+   *   + external program info
+   *   + main directories
+   *
+   *  There are duplicated functionalities between Setting
+   *  and Config. But they are designed for different purposes.
+   *
+   */
+
+using namespace iquads :: sequence;
+using namespace iquads :: interface_to_third_party;
+using std :: string;
+
 struct Setting {
 public:
-  typedef structure :: Molecule molecule_info_type;
-  typedef string basis_set_name_type;
-  typedef typename interface_to_third_party :: program :: program_mask_type external_program_type;
-  typedef typename sequence :: mode :: mode_mask_type mode_type;
-  typedef manybody_expansion :: Config mbe_config_type;
+  typedef string                         basis_set_name_type;
+  typedef string                         path_name_type;
+  typedef program :: program_mask_type   external_program_type;
+  typedef mode :: mode_mask_type         mode_type;
+  typedef manybody_expansion :: Config   mbe_config_type;
   typedef bool condition_type;
 
 public:
-  void generate_from_config( mbe_config_type config );
-  const condition_type use_internal_solver() const 
-    { return external_program_ == interface_to_third_party :: program :: IQUADS ? true : false; }
-  const external_program_type external_program() const 
+  /**
+   *  Default constructor
+   */
+  Setting()
+    {
+      this->mode_ = mode :: UNKNOWN;
+      this->basis_set_name_ = "not set";
+      /**
+       *  We don't have UNKNOWN for program
+       *  since IQUADS solvers should always be ready.
+       */
+      this->external_program_ = program :: IQUADS;
+      this->input_path_ = "not set";
+      this->scratch_path_ = "not set";
+      this->output_path_ = "not set";
+    }
+
+public:
+  /**
+   *  Overloaded functions generate_from()
+   *  To generate this struct instance from various external info
+   *  As interface between this object and other external info objects
+   *  + manybody_expansion Config, holds universal settings for 
+   *    all fragment calculations
+   *  + Other
+   *  Only this function can modify the data members of this struct
+   */
+  void generate_from() {}
+  void generate_from( mbe_config_type config );
+
+  /**
+   *  Accessors
+   */
+  mode_type mode() const
+    { return this->mode_; }
+  basis_set_name_type basis_set_name() const
+    { return this->basis_set_name_; }
+  external_program_type external_program() const 
     { return this->external_program_; }
-  const mode_type mode() const { return this->mode_; }
-  const basis_set_name_type basis_set_name() const { return this->basis_set_name_; }
+  path_name_type input_path() const
+    { return this->input_path_; }
+  path_name_type scratch_path() const
+    { return this->scratch_path_; }
+  path_name_type output_path() const
+    { return this->output_path_; }
+
+  /**
+   *  Auxiliary accessors
+   */
+  condition_type use_internal_solver() const 
+    { return external_program_ == program :: IQUADS ? true : false; }
 
 private:
-  mode_type mode_;
-  molecule_info_type molecule_info_;
-  basis_set_name_type basis_set_name_;
-  external_program_type external_program_;
+  mode_type              mode_;
+  basis_set_name_type    basis_set_name_;
+  external_program_type  external_program_;
+  path_name_type         input_path_;
+  path_name_type         scratch_path_;
+  path_name_type         output_path_;
 
 }; // end of struct Setting
 

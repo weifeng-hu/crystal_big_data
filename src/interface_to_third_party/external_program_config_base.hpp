@@ -181,7 +181,7 @@ public:
   const work_path_type output_path() const
    { return this->output_path_; }
 
-protected:
+private:
   solution_tag_type solution_tag_;
   energy_solution_tag_type energy_solution_tag_;
   gradient_solution_tag_type gradient_solution_tag_;
