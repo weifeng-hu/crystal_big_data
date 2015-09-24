@@ -293,7 +293,7 @@ public:
    *  Auxiliary accessors
    */
   lattice_parameter_type lattice_parameter() const
-    { return this->unit_cell_.lattice_parameter_; }
+    { return this->unit_cell_.lattice_parameter(); }
   int a_min() const 
     { return get<0>( interval_a_ ); }
   int a_max() const 

@@ -31,7 +31,7 @@
 #include <tuple>
 #include <iostream>
 #include <string>
-#include <structure/geometry_settings.hpp>
+#include <structure/coordinate_representation.hpp>
 #include <structure/atom_list.hpp>
 #include <electron_correlation/quantity.hpp>
 

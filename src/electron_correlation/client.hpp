@@ -29,19 +29,11 @@
 
 #include <structure/molecule.hpp>
 #include <interface_to_third_party/external_program_request.hpp>
-#include <interface_to_third_party/external_program_report.hpp>
-#include <interface_to_third_party/external_program_agent_base.hpp>
 #include <interface_to_third_party/external_program_agent_factory.hpp>
 #include <electron_correlation/report.hpp>
 #include <electron_correlation/setting.hpp>
 
 namespace iquads {
-
-using interface_to_third_party :: ExternalProgramRequest;
-using interface_to_third_party :: ExternalProgramReport;
-using interface_to_third_party :: ExternalProgramAgent_Factory;
-using interface_to_third_party :: ExternalProgramAgent_Base;
-using structure :: Molecule;
 
 namespace electron_correlation {
 
@@ -55,22 +47,17 @@ namespace electron_correlation {
    */
 
 using interface_to_third_party :: ExternalProgramRequest;
-using interface_to_third_party :: ExternalProgramReport;
 using interface_to_third_party :: ExternalProgramAgent_Factory;
-using interface_to_third_party :: ExternalProgramAgent_Base;
-using structure :: Molecule;
 
 class Client {
 public:
   typedef double      energy_data_type;
   typedef Report      report_type;
   typedef Setting     setting_type;
-  typedef report_type :: molecule_info_type   molecule_info_type;
   typedef ExternalProgramRequest              external_request_type;
-  typedef ExternalProgramReport               external_report_type;
   typedef ExternalProgramAgent_Factory        external_agent_factory_type;
-  typedef ExternalProgramAgent_Base           external_base_agent_type;
-  typedef external_base_agent_type*           external_base_agent_ptr;
+
+  typedef report_type :: molecule_info_type   molecule_info_type;
 
 public:
   /**
@@ -88,28 +75,29 @@ public:
    *    The method to construct an request to external calculation agents, which are 
    *    in the namespace interface_to_third_party.
    */
-  external_request_type file_external_request( molecule_info_type molecule, setting_type settings );
+  external_request_type file_external_request( molecule_info_type molecule_info, setting_type settings );
 
   /**
    *  + driver()
+   *    This is a driver depending on other information.
    *    The actual top level method to do an electron correlation calculation.
    *    The general sequence is to fork between using external and internal solvers, since they 
    *    may use different actual methods. 
    *    The definition of the method is kind of constant so we write it here in the head file.
+   *    The only strange place in this function is that the driver still needs to know the Setting
+   *    which is not offered by any of member functions in this Client class. This is the incomplete 
+   *    part of this design, also due to the real cases in which electron correlation calculations 
+   *    are dependent on other higher level tasks which needs correlation information, and the Setting
+   *    will be decided by the actual higher level task variables.
    */
-  void driver( molecule_info_type molecule, setting_type settings )
+  void driver( molecule_info_type molecule_info, setting_type setting )
     {
-      if( settings.use_internal_solver() == false ) {
+      if( setting.use_internal_solver() == false ) {
         this->report_ = internal_solve();
       }
       else {
-        external_request_type external_request = this->file_external_request( molecule, settings );
-        external_agent_factory_type agent_factory;
-        external_base_agent_ptr agent_ptr
-          = agent_factory.get_agent( settings.external_program() );
-        external_report_type external_report
-          = agent_ptr->accept_request_and_process( external_request );
-        this->set_report().collect_data_from_external_report( external_report );
+        external_request_type external_request = this->file_external_request( molecule_info, setting );
+//        this->set_report().collect_data_from_external_report( ( this->agent_factory_.get_agent( setting.external_program() ) )->accept_request_and_process( external_request ) );
       }
     } // end of driver()
 
@@ -124,6 +112,7 @@ public:
 
 private:
   report_type report_;
+  external_agent_factory_type agent_factory_;
 
 }; // end of class Client
 

@@ -31,8 +31,8 @@
 #include <memory>
 #include <iquads/sequence.hpp>
 #include <structure/lattice_instant.hpp>
-#include <structure/molecule_bulk.hpp>
-#include <electron_correlation/level.hpp>
+#include <structure/bulk_instant.hpp>
+#include <electron_correlation/correlation_level.hpp>
 #include <manybody_expansion/order_mask.hpp>
 #include <interface_to_third_party/program_mask.hpp>
 
@@ -41,8 +41,8 @@ using std::shared_ptr;
 
 namespace iquads {
 
-using structure :: molecular_lattice;
-using structure :: MoleculeBulk;
+using structure :: MolecularLattice;
+using structure :: MolecularBulk;
 //using namespace interface_to_third_party :: program;
 
 namespace manybody_expansion {
@@ -50,8 +50,8 @@ namespace manybody_expansion {
 class Config
 {
 public:
-  typedef molecular_lattice     lattice_info_type;
-  typedef MoleculeBulk                  bulk_info_type;
+  typedef MolecularLattice     lattice_info_type;
+  typedef MolecularBulk        bulk_info_type;
   typedef typename electron_correlation :: level_mask_type correlation_method_type;
   typedef typename order :: order_mask_type                expansion_order_type;
   typedef typename interface_to_third_party :: program :: program_mask_type            program_type;

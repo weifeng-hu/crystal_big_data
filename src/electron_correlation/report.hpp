@@ -32,7 +32,7 @@
 #include <tuple>
 #include <structure/molecule.hpp>
 #include <electron_correlation/correlation_level.hpp>
-#include <interface_to_third_party/external_program_report.hpp>
+//#include <interface_to_third_party/external_program_report.hpp>
 
 namespace iquads {
 
@@ -76,15 +76,18 @@ namespace electron_correlation {
 
 using std :: string;
 using std :: map;
+using std :: tuple;
+using std :: pair;
+using std :: get;
 using structure :: Molecule;
-using interface_to_third_party :: ExternalProgramReport;
+//using interface_to_third_party :: ExternalProgramReport;
 
 struct Report {
 public:
   typedef string     molecule_name_type;
   typedef Molecule   molecule_obj_type;
   typedef tuple < molecule_name_type, molecule_obj_type > molecule_info_type;
-  typedef ExternalProgramReport   external_report_type;
+//  typedef ExternalProgramReport   external_report_type;
   typedef double                  energy_data_type;
   typedef level_mask_type         correlation_level_type;
 
@@ -97,7 +100,7 @@ public:
   struct CorrelatedEnergyReport {
     public:
       typedef map< correlation_level_type, energy_data_type >   correlated_energy_list_type;
-      typeder correlated_energy_list_type :: iterator           list_iterator_type;
+      typedef correlated_energy_list_type :: iterator           list_iterator_type;
 
     public:
     /**
@@ -105,7 +108,13 @@ public:
      *  We can add many other kinds of correlated energy types into this list.
      */
       CorrelatedEnergyReport() {
-        using std::make_tuple;
+        using namespace electron_correlation :: single_reference :: mean_field;
+        using namespace electron_correlation :: single_reference :: mollet_plesset;
+        using namespace electron_correlation :: single_reference :: coupled_cluster;
+        using namespace electron_correlation :: multi_reference :: ci;
+        using namespace electron_correlation :: multi_reference :: scf;
+        using namespace electron_correlation :: multi_reference :: dmrg;
+        using namespace electron_correlation :: fci;
         this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( RHF, 0.0e0 ) );
         this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( UHF, 0.0e0 ) );
         this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( DFT, 0.0e0 ) );
@@ -124,12 +133,12 @@ public:
      *  Accessors and mutators
      *  Here we provide methods directly to the actual energy data
      */
-    energy_data_type correlated_energy_of( correlation_level_type, correlation_level ) {
+    energy_data_type correlated_energy_of( correlation_level_type correlation_level ) {
       list_iterator_type list_iterator = this->correlated_energy_list_.find( correlation_level );
       return (*list_iterator).second;
     }
 
-    energy_data_type& set_correlated_energy_of( correlation_level_type, correlation_level ) {
+    energy_data_type& set_correlated_energy_of( correlation_level_type correlation_level ) {
       list_iterator_type list_iterator = this->correlated_energy_list_.find( correlation_level );
       return list_iterator->second;
     }
@@ -146,7 +155,7 @@ public:
   /**
    *  Only this function can to manipulate data members in this struct
    */
-  void collect_data_from_external_report( external_report_type external_report );
+//  void collect_data_from_external_report( external_report_type external_report ){};
 
 public:
   /**
@@ -158,9 +167,9 @@ public:
   molecule_name_type molecule_name() const
     { return get<0>( this->molecule_info_ ); }
   molecule_obj_type molecule_obj() const
-    { return get<1>( this->molecule_obj_ ); }
+    { return get<1>( this->molecule_info_ ); }
   energy_data_type energy() const 
-    { return this->energy; }
+    { return this->energy_; }
 
 private:
   molecule_info_type   molecule_info_;

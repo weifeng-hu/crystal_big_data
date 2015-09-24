@@ -32,7 +32,7 @@
 #include <tuple>
 #include <iostream>
 #include <string>
-#include <structure/geometry_settings.hpp>
+#include <structure/coordinate_representation.hpp>
 #include <interface_to_third_party/external_program_config_base.hpp>
 
 namespace iquads {

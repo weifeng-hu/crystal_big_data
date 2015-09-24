@@ -33,66 +33,19 @@ namespace iquads {
 
   namespace electron_correlation {
 
+   /**
+    *  Previously, explicit definitions of quantities related to 
+    *  specific correlated methods were coded here, like HF_ENERGy.
+    *  Here we simply use this head file to define general quantities 
+    *  since explicit quantities w.r.t actual correlated methods can 
+    *  be identified along with the correlation_level head file.
+    */
     namespace quantity {
   
       typedef unsigned int quantity_mask_type;
+      const quantity_mask_type ENERGY   = 0x01 << 0;
+      const quantity_mask_type GRADIENT = 0x01 << 1;
 
-      /**
-       *  Global naming and mask of the energy quantities 
-       *  computed from electronic structure methods.
-       *  identifiers are for:
-       *  + Hartree Fock energy
-       *  + MP2 energy
-       *  + CASSCF energy
-       *  Can be further expanded
-       */
-      namespace energy {
-  
-        constexpr inline quantity_mask_type return_nest_mask()
-          { return 0x01 << 0 ; }
-    
-        typedef unsigned int energy_mask_type;
-        typedef const string energy_literal_type;
-        constexpr energy_mask_type HF_ENERGY     = 0x01 << 0;
-        constexpr energy_mask_type MP2_ENERGY    = 0x01 << 1;
-        constexpr energy_mask_type CASSCF_ENERGY = 0x01 << 2;
-    
-        const inline energy_literal_type return_energy_literal( energy_mask_type mask )
-          {
-            switch( mask ) {
-              case( HF_ENERGY ):      return "Hartree Fock Energy";  break;
-              case( MP2_ENERGY ):     return "MP2 Energy";           break;
-              case( CASSCF_ENERGY ):  return "CASSCF Energy";        break;
-              default:                return "Unknown Energy type";  break;
-            }
-          }
-
-      } // end of namespace energy
-
-
-      /**
-       *  Global naming and mask of the energy gradient quantities, 
-       *  so they are for first order quantities of energies.
-       *  Computed from electronic structure methods.
-       *  identifiers are for:
-       *  + Hartree Fock energy gradient
-       *  + MP2 energy energy gradient
-       *  + CASSCF energy energy
-       *  Can be further expanded
-       */
-      namespace gradient {
-   
-        constexpr quantity_mask_type return_nest_mask()
-          { return 0x01 << 1 ; }
-    
-        typedef unsigned int gradient_mask_type;
-        typedef const string gradient_literal_type;
-        constexpr gradient_mask_type HF_GRADIENT     = 0x01 << 0;
-        constexpr gradient_mask_type MP2_GRADIENT    = 0x01 << 1;
-        constexpr gradient_mask_type CASSCF_GRADIENT = 0x01 << 2;
-   
-      } // end of namespace gradient
-  
     } // end of namespac quantity
   
   } // end of namespace electron_correlation

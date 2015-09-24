@@ -27,7 +27,7 @@
 #ifndef ELECTRON_CORRELATION_CONFIG_HPP
 #define ELECTRON_CORRELATION_CONFIG_HPP
 
-#include <electron_correlation/method.hpp>
+#include <electron_correlation/sequence.hpp>
 #include <structure/molecule.hpp>
 
 namespace iquads {
