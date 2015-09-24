@@ -32,7 +32,6 @@ namespace electron_correlation {
 
 typedef Client client_type;
 
-
 /**
  *
  *  << interface function >>
@@ -47,7 +46,7 @@ typedef Client client_type;
  */
 
 client_type :: external_request_type
- client_type :: file_external_request( molecule_info_type molecule_info, setting_type settings )
+client_type :: file_external_request( molecule_info_type molecule_info, setting_type settings )
 {
 
   external_request_type request;

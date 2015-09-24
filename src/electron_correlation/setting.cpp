@@ -32,15 +32,23 @@ namespace electron_correlation {
 
 typedef Setting setting_type;
 
+  /**
+   *  + generate_from_config()
+   *    Generate a computation environment setting from the many body expansion
+   *    configuration object.
+   *    This is an interface function. It translates the information from config 
+   *    to this object.
+   *
+   */
 void setting_type :: generate_from_config( mbe_config_type config ){
 
   this->mode_ = config.mode();
-  this->use_external_ = config.use_external_solver();
-  if( this->use_external_ == true ){
-   this->external_program_ = config.external_program();
-  }
+  this->external_program_ = config.external_program();
   this->basis_set_name_ = config.basis_set_name();
   this->method_ = config.method();
+  this->input_path_   = config.input_path();
+  this->scratch_path_ = config.scratch_path();
+  this->output_path_  = config.output_path();
 
 } // end of function generate_from_config()
 

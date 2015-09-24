@@ -63,7 +63,14 @@ namespace electron_correlation {
  *   + DMRG wavefunction
  * 
  *  A suggested way is to create subreports for each method, and fill results if
- *  the calculation type was requested
+ *  the calculation type was requested.
+ *
+ *  As a design point, this report serves as the "final" meta-data container.
+ *  But for specific calculations which are run by the actual calculation agents,
+ *  They can have specific runtime and result reports, which are different types 
+ *  of objects from this one. A method in this class is responsible for convey 
+ *  the data in those reports to this class, i.e., interface. And only this method 
+ *  can change the data member in this class.
  * 
  */
 
