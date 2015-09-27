@@ -59,46 +59,46 @@ public:
 
 public:
   energy_data_type return_one_body_energy_per_unit_cell()
-   {
-     energy_data_type retval = 0.0e0;
-     for( size_t i = 0; i < this->monomer_report_list_.size(); i++ ){
-      retval += this->monomer_report_list_[i].total_energy();
-     }
-     return retval;
-   }
+    {
+      energy_data_type retval = 0.0e0;
+      for( size_t i = 0; i < this->monomer_report_list_.size(); i++ ){
+       retval += this->monomer_report_list_[i].total_energy();
+      }
+      return retval;
+    }
   energy_data_type return_two_body_interaction_energy_per_unit_cell()
-   {
-     energy_data_type retval = 0.0e0;
-     for( size_t i = 0; i < this->dimer_report_list_.size(); i++ ){
-      retval += this->dimer_report_list_[i].interaction_energy();
-     }
-     return retval;
-   }
+    {
+      energy_data_type retval = 0.0e0;
+      for( size_t i = 0; i < this->dimer_report_list_.size(); i++ ){
+       retval += this->dimer_report_list_[i].interaction_energy();
+      }
+      return retval;
+    }
   energy_data_type return_three_body_interaction_energy_per_unit_cell()
-   {
-     energy_data_type retval = 0.0e0;
-     for( size_t i = 0; i < this->trimer_report_list_.size(); i++ ){
-      retval += this->trimer_report_list_[i].interaction_energy();
-     }
-     return retval;
-   }
+    {
+      energy_data_type retval = 0.0e0;
+      for( size_t i = 0; i < this->trimer_report_list_.size(); i++ ){
+       retval += this->trimer_report_list_[i].interaction_energy();
+      }
+      return retval;
+    }
   energy_data_type return_four_body_interaction_energy_per_unit_cell()
-   {
-     energy_data_type retval = 0.0e0;
-     for( size_t i = 0; i < this->tetramer_report_list_.size(); i++ ){
-      retval += this->tetramer_report_list_[i].interaction_energy();
-     }
-     return retval;
-   }
+    {
+      energy_data_type retval = 0.0e0;
+      for( size_t i = 0; i < this->tetramer_report_list_.size(); i++ ){
+       retval += this->tetramer_report_list_[i].interaction_energy();
+      }
+      return retval;
+    }
   energy_data_type return_total_energy_per_unit_cell()
-   {
-     energy_data_type retval = 0.0e0;
-     if( this->mbe_order >= 1 ) retval += this->return_one_body_energy_per_unit_cell();
-     if( this->mbe_order >= 2 ) retval += this->return_two_body_interaction_per_unit_cell();
-     if( this->mbe_order >= 3 ) retval += this->return_three_body_interaction_per_unit_cell();
-     if( this->mbe_order >= 4 ) retval += this->return_four_body_interaction_per_unit_cell();
-     return retval;
-   }
+    {
+      energy_data_type retval = 0.0e0;
+      if( this->mbe_order >= 1 ) retval += this->return_one_body_energy_per_unit_cell();
+      if( this->mbe_order >= 2 ) retval += this->return_two_body_interaction_per_unit_cell();
+      if( this->mbe_order >= 3 ) retval += this->return_three_body_interaction_per_unit_cell();
+      if( this->mbe_order >= 4 ) retval += this->return_four_body_interaction_per_unit_cell();
+      return retval;
+    }
   
 public:
   void add_monomer_data_to_sym_noneq_list(){}
