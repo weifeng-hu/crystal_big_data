@@ -32,7 +32,7 @@
 #include <manybody_expansion/command_setting.hpp>
 #include <manybody_expansion/agent.hpp>
 #include <manybody_expansion/request.hpp>
-#include <manybody_expansion/report.hpp>
+//#include <manybody_expansion/report.hpp>
 
 namespace iquads {
 
@@ -68,7 +68,7 @@ public:
   typedef CommandParser :: argument_type    command_argument_type;
   typedef CommandSetting                    command_setting_type;
   typedef Request  request_type;
-  typedef Report   report_type;
+//  typedef Report   report_type;
   typedef Agent    agent_type;
 
 public:
@@ -98,19 +98,19 @@ public:
   void driver( command_container_type command_container )
     {
       agent_type agent;
-      this->report_ = 
-         agent.accept_request_and_process( this->file_request( this->analyse_command( command_container ) ) );
+//      this->report_ = 
+//         agent.accept_request_and_process( this->file_request( this->analyse_command( command_container ) ) );
 //     this->report().save();  // to be implemented
     }  // end of function driver()
 
 public:
-  report_type report() const 
-    { return this->report_; }
-  report_type& set_report()
-    { return this->report_; }
+//  report_type report() const 
+//    { return this->report_; }
+//  report_type& set_report()
+//    { return this->report_; }
 
 private:
-  report_type report_;
+//  report_type report_;
 
 }; // end of class Client
 

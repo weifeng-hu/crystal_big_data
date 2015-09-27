@@ -77,8 +77,9 @@ namespace manybody_expansion {
 
 using std :: string;
 using std :: tuple;
-using structure :: MoleculeLattice;
-using structure :: MoleculeBulk;
+using std :: get;
+using structure :: MolecularLattice;
+using structure :: MolecularBulk;
 
 struct Request {
 public:
@@ -93,7 +94,7 @@ public:
       get<0> ( this->lattice_info_ ) = "not set";
       get<0> ( this->bulk_info_ ) = "not set";
       this->expansion_order_ = 0;
-      this->correlation_name_type = "not set";
+      this->correlation_name_ = "not set";
       this->external_program_name_ = "not set";
       this->basis_set_name_ = "not set";
       this->run_mode_name_ = "not set";
@@ -110,7 +111,7 @@ public:
   typedef string                                     bulk_name_type;
   typedef MolecularLattice                           bulk_type;
   typedef tuple< bulk_name_type, bulk_type >         bulk_info_type;
-  typedef order :: expansian_order_type              expansion_order_type;
+  typedef order :: expansion_order_type              expansion_order_type;
   typedef string    correlation_name_type;
   typedef string    external_program_name_type;
   typedef string    file_name_type;
