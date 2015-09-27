@@ -42,9 +42,11 @@ namespace manybody_expansion {
 
 typedef Agent mbe_agent_type;
 
+  /**
+   *  This function manipulates the data member in the config object
+   */
 mbe_agent_type :: config_type 
- mbe_agent_type :: setup_config_from_request( request_type request )
-{
+mbe_agent_type :: setup_config_from_request( request_type request ) {
 
   config_type config;
   /**
@@ -130,15 +132,19 @@ mbe_agent_type :: config_type
 } // end of function setup_config_from_request()
 
 
-void  mbe_agent_type :: execute_periodic( config_type config, report_ref report )
-{
+void mbe_agent_type :: execute_periodic( config_type config, report_ref report ) {
 
-  using std::cout;
-  using std::endl;
+  using std :: cout;
+  using std :: endl;
   cout << " Compute lattice energy using the periodic MBE formula" << endl;
 
   try {
     switch ( config.expansion_order() ) {
+      /**
+       *  The runtime choice of different orders of many body expansion
+       *  relies on explicit instantiation of different orders of actual
+       *  many body expansion formulism.
+       */
       case ( order :: FIRST_ORDER ):
         {
           ManyBodyExpansionPeriodic<1> manybody_expansion_periodic;
@@ -169,7 +175,7 @@ void  mbe_agent_type :: execute_periodic( config_type config, report_ref report 
     }
   }
   catch ( config_type :: expansion_order_type order ) {
-    using std::bitset;
+    using std :: bitset;
     cout << " execute_periodic():" << endl;
     cout << "  ManyBody Expansion terms of " << bitset<16> (order) << " order are not implemented! " << endl;
     exit(1);
@@ -177,16 +183,56 @@ void  mbe_agent_type :: execute_periodic( config_type config, report_ref report 
 
 }; // end of function execute_periodic()
 
-void  mbe_agent_type :: execute_general( config_type config, report_ref report )
-{
+
+void mbe_agent_type :: execute_general( config_type config, report_ref report ) {
 
   using std::cout;
   using std::endl;
+  cout << " Compute lattice energy using the general MBE formula" << endl;
 
-  cout << " Compute lattice energy using the general MBE formula " << endl;
-  cout << " general non periodic MBE formula algorithm not implemented "  << endl;
-  exit(1);
-
+  try {
+    switch ( config.expansion_order() ) {
+      /**
+       *  The runtime choice of different orders of many body expansion
+       *  relies on implicit instantiation of the MBE system object which 
+       *  depends on explicit instantiation of different orders of actual
+       *  many body expansion formulism.
+       */
+      case ( order :: FIRST_ORDER ):
+        {
+          ManyBodyExpansionGeneral<1> manybody_expansion_general;
+          manybody_expansion_general.compute_bulk_energy( config, report );
+        }
+        break;
+      case ( order :: SECOND_ORDER ):
+        {
+          ManyBodyExpansionGeneral<2> manybody_expansion_general;
+          manybody_expansion_general.compute_bulk_energy( config, report );
+        }
+        break;
+      case ( order :: THIRD_ORDER ):
+        {
+          ManyBodyExpansionGeneral<3> manybody_expansion_general;
+          manybody_expansion_general.compute_bulk_energy( config, report );
+        }
+        break;
+      case ( order :: FOURTH_ORDER ):
+        {
+          ManyBodyExpansionGeneral<4> manybody_expansion_general;
+          manybody_expansion_general.compute_bulk_energy( config, report );
+        }
+        break;
+      default:
+        throw( config.expansion_order() );
+        break;
+    }
+  }
+  catch ( config_type :: expansion_order_type order ) {
+    using std :: bitset;
+    cout << " execute_periodic():" << endl;
+    cout << "  ManyBody Expansion terms of " << bitset<16> (order) << " order are not implemented! " << endl;
+    exit(1);
+  }
 
 }; // end of function execute_general()
 

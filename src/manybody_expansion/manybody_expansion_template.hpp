@@ -27,47 +27,96 @@
 #ifndef MANYBODY_EXPANSION_TEMPLATE_HPP
 #define MANYBODY_EXPANSION_TEMPLATE_HPP
 
-#include <memory>
-#include <manybody_expansion/expansion_formula_periodic_traits.hpp>
 #include <manybody_expansion/config.hpp>
 #include <manybody_expansion/report.hpp>
+#include <manybody_expansion/expansion_formula_general_traits.hpp>
+#include <manybody_expansion/expansion_formula_periodic_traits.hpp>
 
 namespace iquads {
 
 namespace manybody_expansion {
 
-template < size_t Order >
-class ManyBodyExpansionGeneral 
-{
+  /**
+   *  A class template for the top level many expansion expansion formulism
+   *  Here we have two different classes: periodic and non-periodic.
+   *  Periodic many body expansion uses the typename ManybodyExpansionPeriodic for 
+   *  periodic but infinite lattice, and it can return a lattice energy PER UNIT CELL.
+   *  The non-periodic version uses ManyBodyExpansionGeneral as the typename, which 
+   *  can return a total energy or an averaged energy per node, e.g., a molecule.
+   *
+   *  The purpose of this template class is to give a object which represents the 
+   *  "many body expansion system". Therefore, this class should have a method
+   *  to use the actual formalism for a specific input target physical/chemical system.
+   *
+   *  Since different expansion order can give different numbers of terms when using
+   *  many body expansion formalism, so the actual formula for different expansion orders
+   *  in both the general expansion and periodic expansion schemes, are different.
+   *  Instead of implementing distinct formalism objects for different expansion orders,
+   *  here we use the template with the expansion order as the parameter, to define 
+   *  a general purpose object for any order of expansion formalism. This enables the 
+   *  same interface to invoke the actual formalism for a certain expansion order, though 
+   *  formalism for different orders need to be implemented explicitly using traits, and 
+   *  further explicitly instantiated at compile-time.
+   *
+   *  As a templated system object, it can either holds a templated member 
+   *  function/method which will be differently instantiated for different orders.
+   *  Or it can hold an actual formalism object which will be differently instantiated 
+   *  for different orders, but provide the same interface to be invoked.
+   *  We choose the latter way, by implementing a lower level object, the actual 
+   *  fomulars, to enforece the concept "an actual computational system contains the 
+   *  fomular but also should have other elements, like input and output".
+   *
+   *  This many body expansion system will be used by an agent, which passes in a config
+   *  meta-data object and waits for the report object returned by this system.
+   *  The report object is created outside the system, and use reference to be passed in,
+   *  since it can contain a big amount of data and we avoid using the copy constructor.
+   *  This system returns a final energy value but also manipulates the report data.
+   *
+   */
+
+  /**
+   *  Templated class ManyBodyExpansionGeneral
+   *  for non-periodic calculations
+   */
+template < size_t Order > class ManyBodyExpansionGeneral {
 public:
-  typedef Config config_type;
-  typedef Report report_type;
-  typedef double energy_data_type;
-  typedef energy_data_type& energy_data_reference;
-  typedef bool condition_type;
+  typedef ExpansionFormulaGeneral<Order>  expansion_formula_type;
+  typedef Config                          config_type;
+  typedef Report                          report_type;
+  typedef double   energy_data_type;
+  typedef bool     condition_type;
 
   typedef report_type& report_ref;
 
+public:
+  energy_data_type
+  compute_bulk_energy( config_type config, report_ref report )
+    { return this->expansion_formula_.compute( config, report ); }
+
+private:
+  expansion_formula_type expansion_formula_;
+
 }; // end of template class manybody_expansion_general
 
-template < size_t Order >
-class ManyBodyExpansionPeriodic
-{
+
+  /**
+   *  Templated class ManyBodyExpansionPeriodic
+   *  for periodic calculations
+   */
+template < size_t Order >  class ManyBodyExpansionPeriodic {
 public:
-  typedef ExpansionFormulaPeriodic< Order > expansion_formula_type;
-  typedef Config config_type;
-  typedef Report report_type;
-  typedef double energy_data_type;
-  typedef bool condition_type;
+  typedef ExpansionFormulaPeriodic<Order>  expansion_formula_type;
+  typedef Config                           config_type;
+  typedef Report                           report_type;
+  typedef double   energy_data_type;
+  typedef bool     condition_type;
 
   typedef report_type& report_ref;
 
 public:
   energy_data_type 
-   compute_lattice_energy_per_unit_cell( config_type config, report_ref report )
-    {
-      this->expansion_formula_.compute( config, report );
-    } // end of compute_lattice_energy_per_unit_cell()
+  compute_lattice_energy_per_unit_cell( config_type config, report_ref report )
+    { return this->expansion_formula_.compute( config, report ); }
 
 private:
   expansion_formula_type expansion_formula_;
