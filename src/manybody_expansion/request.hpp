@@ -29,63 +29,149 @@
 
 #include <string>
 #include <structure/lattice_instant.hpp>
-#include <structure/molecule_bulk.hpp>
-
-using std::string;
+#include <structure/bulk_instant.hpp>
+#include <manybody_expansion/order_mask.hpp>
 
 namespace iquads {
 
-using structure :: molecular_lattice;
-using structure :: MoleculeBulk;
-
 namespace manybody_expansion {
+
+  /**
+   *  A meta-data struct as a request for general many body expansion
+   *  calculations.
+   *
+   *  This request is set as a struct since it is usually not an entity.
+   *  The many body expansion calculation request is an object to be 
+   *  initialized by the a many body expansion client object at runtime.
+   *
+   *  The request object will be submitted to a many body expansion agent 
+   *  object which actually invokes the many body expansion formalism.
+   *
+   *  The information of a request should be general, and the data in this
+   *  request can be set by an actual user, but need to be properly defined.
+   *  Information in the request should be understandable by human, following 
+   *  the actual scientific terminology for the many body expansion formalism.
+   *
+   *  The request object does not have any runtime settings or information to 
+   *  control the runtime sequence, which will actually be handled by the 
+   *  config structure. The config structure can contain actual technical 
+   *  information which are related to the actual calculation but not related 
+   *  to the general result of a calculation.
+   *
+   *  Data members of this request struct are:
+   *   + the lattice info/bulk info, i.e. geometrical structure
+   *     Note: this request object holds info for both a lattice and a bulk.
+   *           Although only one data member will be filled in each use,
+   *           We keep both here, just waste some quite little amount of memory.
+   *           For the simplicity of the code, we plan not to use boost::any or 
+   *           c++0x unions currently for the time-being, but can be future options.
+   *   + for a many body expansion calculation, order of the truncation
+   *   + correlation method, basis set
+   *   + external program
+   *   + file path info
+   *
+   *  Since this struct is an interface between the program and an user, we use literal
+   *  data type, i.e., string, integer for data members, althrough they will be further
+   *  translated to masks in later stages.
+   */
+
+using std :: string;
+using std :: tuple;
+using structure :: MoleculeLattice;
+using structure :: MoleculeBulk;
 
 struct Request {
 public:
-  typedef molecular_lattice lattice_info_type;
-  typedef MoleculeBulk bulk_info_type;
-  typedef string correlation_name_type;
-  typedef string external_program_name_type;
-  typedef string file_name_type;
-  typedef string path_name_type;
-  typedef string job_name_type;
-  typedef string basis_set_name_type;
-  typedef string run_mode_name_type;
-  typedef size_t expansion_order_type;
+  /**
+   *  Default constructor
+   *  --- make everything undefined
+   *  There is no other user-defined constructor so sanity check is 
+   *  essential for this struct. See member function check_sanity()
+   */
+  Request()
+    {
+      get<0> ( this->lattice_info_ ) = "not set";
+      get<0> ( this->bulk_info_ ) = "not set";
+      this->expansion_order_ = 0;
+      this->correlation_name_type = "not set";
+      this->external_program_name_ = "not set";
+      this->basis_set_name_ = "not set";
+      this->run_mode_name_ = "not set";
+      this->job_name_ = "not set";
+      this->input_name_ = "not set";
+      this->scratch_name_ = "not set";
+      this->output_name_ = "not set";
+    }
 
 public:
+  typedef string                                     lattice_name_type;
+  typedef MolecularLattice                           lattice_type;
+  typedef tuple< lattice_name_type, lattice_type >   lattice_info_type;
+  typedef string                                     bulk_name_type;
+  typedef MolecularLattice                           bulk_type;
+  typedef tuple< bulk_name_type, bulk_type >         bulk_info_type;
+  typedef order :: expansian_order_type              expansion_order_type;
+  typedef string    correlation_name_type;
+  typedef string    external_program_name_type;
+  typedef string    file_name_type;
+  typedef string    path_name_type;
+  typedef string    job_name_type;
+  typedef string    basis_set_name_type;
+  typedef string    run_mode_name_type;
+  typedef bool      condition_type;
+
+public:
+  /**
+   *  + read_input_file()
+   */
   void read_input_file( file_name_type input_filename );
+  /**
+   *  + check_sanity()
+   *    This function is only responsible for checking
+   *    the essential data for a calculation
+   */
+  condition_type check_sanity();
 
 public:
-  const lattice_info_type lattice_info() const 
-   { return this->lattice_info_; }
-  const bulk_info_type bulk_info() const 
-   { return this->bulk_info_; }
-  const expansion_order_type expansion_order() const 
-   { return this->expansion_order_; }
-  const external_program_name_type external_program_name() const 
-   { return this->external_program_name_; }
-  const basis_set_name_type basis_set_name() const
-   { return this->basis_set_name_; }
-  const correlation_name_type correlation_name() const
-   { return this->correlation_name_; }
-  const job_name_type job_name() const 
-   { return this->job_name_; }
-  const path_name_type scratch_name() const 
-   { return this->scratch_name_; }
-  const run_mode_name_type run_mode_name() const
-   { return this->run_mode_name_; }
+  /**
+   *  Accessors
+   */
+  lattice_info_type lattice_info() const 
+    { return this->lattice_info_; }
+  bulk_info_type bulk_info() const 
+    { return this->bulk_info_; }
+  expansion_order_type expansion_order() const 
+    { return this->expansion_order_; }
+  external_program_name_type external_program_name() const 
+    { return this->external_program_name_; }
+  basis_set_name_type basis_set_name() const
+    { return this->basis_set_name_; }
+  correlation_name_type correlation_name() const
+    { return this->correlation_name_; }
+  job_name_type job_name() const 
+    { return this->job_name_; }
+  path_name_type scratch_name() const 
+    { return this->scratch_name_; }
+  run_mode_name_type run_mode_name() const
+    { return this->run_mode_name_; }
+
+  /**
+   *  Mutators - none
+   *  A request should not be changed once setup
+   */
 
 private:
   lattice_info_type            lattice_info_;
   bulk_info_type               bulk_info_;
   expansion_order_type         expansion_order_;
-  correlation_name_type      correlation_name_;
+  correlation_name_type        correlation_name_;
   external_program_name_type   external_program_name_;
   basis_set_name_type          basis_set_name_;
   run_mode_name_type           run_mode_name_;
   job_name_type                job_name_;
+  path_name_type               input_name_;
   path_name_type               scratch_name_;
+  path_name_type               output_name_;
 
 }; // end of struct Request
 

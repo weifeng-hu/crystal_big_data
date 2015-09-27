@@ -36,11 +36,9 @@ namespace manybody_expansion {
 typedef Client mbe_client_type;
 
 mbe_client_type :: request_type
- mbe_client_type :: file_request( command_setting_type command_setting )
-{
+mbe_client_type :: file_request( command_setting_type command_setting ) {
 
   request_type request;
-//  using mbe_client_type :: request_type :: request_method_type;
   switch ( command_setting.request_method() ) {
     case ( command_setting_type :: FROM_FILE ):
       request.read_input_file( command_setting.input_filename() );
@@ -53,22 +51,22 @@ mbe_client_type :: request_type
 }; // end of function file_request()
 
 mbe_client_type :: command_setting_type 
- mbe_client_type :: analyse_command( command_container_type command_container )
-{
+mbe_client_type :: analyse_command( command_container_type command_container ) {
 
   try {
     if ( command_container.size() == 1 ){
       throw 1;
     }
   
-    command_setting_type command_settings;
-    for( size_t i = 0; i < command_container.size(); i++ ){
-     mbe_client_type :: command_argument_type argument = command_container[i];
-     if( argument == "--input" || argument == "-i" ){
-      command_settings.set_input_filename() = command_container.at(i+1);
-     }
+    command_setting_type command_setting;
+    for( size_t i = 0; i < command_container.size(); i++ ) {
+      mbe_client_type :: command_argument_type argument = command_container[i];
+      if( argument == "--input" || argument == "-i" ){
+        command_setting.set_input_filename() = command_container.at(i+1);
+        command_setting.set_request_source() = command_setting_type :: FROM_FILE;
+      }
     }
-    return command_settings;
+    return command_setting;
   }
   catch ( size_t one ) {
     using std::cout;
@@ -80,18 +78,16 @@ mbe_client_type :: command_setting_type
 
 }; // end of function analyse_command()
 
-void mbe_client_type :: show_help()
-{
+void mbe_client_type :: show_help() {
 
   using std::cout;
   using std::endl;
-
+  cout << "Many body expansion module" << endl;
   cout << "Usage:" << endl;
-  cout << " mbe -i/--input <config_filename>" << endl;
+  cout << " mbe -i/--input <input_filename>" << endl;
   cout << endl;
-  cout << " Options:" << endl;
 
-} // end of function show_help()
+}; // end of function show_help()
 
 } // end of namespace manybody_expansion
 

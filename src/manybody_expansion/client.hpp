@@ -32,51 +32,82 @@
 #include <manybody_expansion/command_setting.hpp>
 #include <manybody_expansion/agent.hpp>
 #include <manybody_expansion/request.hpp>
-#include <manybody_expansion/config.hpp>
 #include <manybody_expansion/report.hpp>
-
-using std::string;
 
 namespace iquads {
 
-using iquads :: CommandParser;
-
 namespace manybody_expansion {
 
-class Client
-{
+
+  /**
+   *  A client class for many body expansion calculations
+   *
+   *  The tasks of a many body expansion client, i.e., leading to the 
+   *  actual definition of a client, are:
+   *   + file a request, which contains essential information about
+   *     "what to solve".
+   *   + find a many body expansion agent, which will further start the 
+   *     actual method for calculations.
+   *   + collect and keep a report from the calculation, which is returned 
+   *     by the agent.
+   *   + also do post-calculation handling of a report, like storage, 
+   *     transferring, etc.
+   *
+   *  Based on these conceptions, client instances can be viewed as entities, since 
+   *  the features (methods, tasks) makes any client instance at a valid state and 
+   *  always keep valid at runtime. We therefore use keyword class 
+   *  to implement it.
+   */
+
+using iquads :: CommandParser;
+using std::string;
+
+class Client {
 public:
-  typedef typename CommandParser :: container_type   command_container_type;
-  typedef typename CommandParser :: argument_type    command_argument_type;
+  typedef CommandParser :: container_type   command_container_type;
+  typedef CommandParser :: argument_type    command_argument_type;
+  typedef CommandSetting                    command_setting_type;
   typedef Request  request_type;
   typedef Report   report_type;
   typedef Agent    agent_type;
-  typedef CommandSetting command_setting_type;
-
-  typedef report_type& report_ref;
 
 public:
+  /**
+   *  + show_help()
+   *    Probably users need to get help any time, even when no client object or calculation is needed.
+   */
   static void show_help();
+
+  /**
+   *  + analyse_command()
+   *    command analyser, translate a command string to execution options for further 
+   *    sequence.
+   */
   static command_setting_type analyse_command( command_container_type command_container );
+
+  /**
+   *  + file_request()
+   *    A request doesn't prepare itself usually, and here it is prepared by a client.
+   */
   request_type file_request( command_setting_type command_setting );
-  void print_report() const
-   { this->report().print(); }
+
+  /**
+   *  + driver()
+   *    The actual method to start a many body expansion calculation, based on an external command string.
+   */
   void driver( command_container_type command_container )
-   {
-     command_setting_type command_settings = analyse_command( command_container );
-     request_type request = file_request( command_settings );
-     agent_type agent;
-     this->set_report()
-       = agent.accept_request_and_process( request );
-//     this->report().save();  // has to be implemented
-     this->print_report();
-   }  // end of function driver()
+    {
+      agent_type agent;
+      this->report_ = 
+         agent.accept_request_and_process( this->file_request( this->analyse_command( command_container ) ) );
+//     this->report().save();  // to be implemented
+    }  // end of function driver()
 
 public:
-  const report_type report() const 
-   { return this->report_; }
-  report_ref set_report()
-   { return this->report_; }
+  report_type report() const 
+    { return this->report_; }
+  report_type& set_report()
+    { return this->report_; }
 
 private:
   report_type report_;

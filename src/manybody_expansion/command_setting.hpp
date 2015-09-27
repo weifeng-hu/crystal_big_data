@@ -29,47 +29,71 @@
 
 #include <string>
 
-using std::string;
-
 namespace iquads {
 
 namespace manybody_expansion {
 
+  /**
+   *  A data container to store command information for 
+   *  a many body expansion calculation.
+   *
+   *  Essential data members are:
+   *   + input, output file names, input file name is essential if
+   *     actual calculation parameters are read from a file.
+   *   + It has an enum type, to tell the source to file an request.
+   *   + We can add some faster keywords to the data member to 
+   *     further help define a calculation. But these data member/
+   *     command options should be "enviromental" rather than 
+   *     "calculation data related, e.g. the order of the expansion".
+   *
+   *  Since a data container usually does not manipulate data 
+   *  by itself, we leave the task for setting data to the 
+   *  analyse_command() method defined in the client class.
+   *  And we use keyword struct for this container since 
+   *  data stored are not always at a valid state.
+   */
+
+using std::string;
+
 struct CommandSetting {
 public:
-  typedef string file_name_type;
-  typedef bool condition_type;
-  typedef file_name_type& file_name_ref;
-  typedef condition_type& condition_ref;
+  typedef string   file_name_type;
+  enum request_source_type { FROM_FILE, DEFAULT };
 
 public:
   CommandSetting()
-   {
-     this->input_filename_ = "not set";
-     this->output_filename_ = "not set";
-   }
+    {
+      this->input_filename_ = "not set";
+      this->output_filename_ = "not set";
+    }
 
 public:
-  enum request_method_type { FROM_FILE, DEFAULT };
+  /**
+   *  Accessors
+   */
+  file_name_type input_filename() const 
+    { return this->input_filename_; }
+  file_name_type output_filename() const
+    { return this->output_filename_; }
+  request_source_type request_source() const
+    { return this->request_source_; } 
 
-public:
-  const file_name_type input_filename() const 
-   { return this->input_filename_; }
-  file_name_ref set_input_filename()
-   { return this->input_filename_; }
-  const file_name_type output_filename() const
-   { return this->output_filename_; }
-  file_name_ref output_filename()
-   { return this->output_filename_; }
-  const request_method_type request_method() const
-   { return this->request_method_; } 
+  /**
+   *  Mutators 
+   */
+  file_name_type& set_input_filename()
+    { return this->input_filename_; }
+  file_name_type& set_output_filename()
+    { return this->output_filename_; }
+  request_source_type& request_source_type()
+    { return this->request_source_type_; } 
 
 private:
-  file_name_type input_filename_;
-  file_name_type output_filename_;
-  request_method_type request_method_;
+  file_name_type   input_filename_;
+  file_name_type   output_filename_;
+  request_source_type   request_source_;
 
-}; // end of class CommandSetting
+}; // end of struct CommandSetting
 
 } // end of namespace manybody_expansion
 

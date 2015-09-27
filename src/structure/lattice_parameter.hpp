@@ -63,8 +63,9 @@ using std::make_tuple;
    *     the actual structural object
    *
    *  We use struct instead of class to define this object type, because this 
-   *  object type is really a data holder rather than an entity object.
-   *
+   *  object type is really a data holder rather than an entity object, i.e., 
+   *  (generated) data are not guaranteed to be valid, even though 
+   *  methods for data calculation are well-defined.
    */
 
 struct LatticeParameter {

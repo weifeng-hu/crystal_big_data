@@ -31,7 +31,6 @@
 #include <array>
 #include <manybody_expansion/polymer_report_omni_template.hpp>
 
-
 using std::vector;
 using std::array;
 
