@@ -31,24 +31,144 @@
 #include <array>
 #include <manybody_expansion/polymer_report_omni_template.hpp>
 
-using std::vector;
-using std::array;
-
 namespace iquads {
 
 namespace manybody_expansion {
 
-template < typename PolymerOmniReport_Type > struct Report {
+  /**
+   *   A meta-data to contain results from many body expansion calculations
+   *
+   *   We include all possible types of data types and sub reports (which are 
+   *   implemented as templates) in this Report object. Therefore this Report 
+   *   object can serve for both periodic and non-periodic calculations.
+   *
+   *   Data members are (both for periodic and non-periodic):
+   *   + A list of single report objects for 
+   *     + monomers
+   *     + dimers
+   *     + trimers
+   *     + tetramers.
+   *   And each piece of the report object in a report list contains 
+   *   calculation results of quantities, e.g., energies, input geometries,
+   *   runtime variables, etc.
+   *   See "Implementation 4" below for detailed design notes.
+   */
+
+using std :: vector;
+using std :: array;
+
+  /**
+   *   About using template template class
+   *
+   *   Since the actual report type may depend on whether the calculation 
+   *   is for a periodic system or not, the report struct can be templated
+   *   using the periodicity as the parameter. Also the report depends on 
+   *   another parameter which is the size of the polymers, but this parameter 
+   *   more or less belongs the the actual sub-reports. In all, it is possible
+   *   to design a template template class for the report to be like
+   *   Report< Periodicity< N > >.
+   *
+   *   There is no problem to do this, also this can help avoid registering 
+   *   possible sub-report types. The payoff is to write out the explicit 
+   *   instantiation head files, also the method to use an actual templated class 
+   *   must also be templated.
+   *
+   *   There are two ways to implement this kind of templated template report class, 
+   *   though essentially they are the same.
+   *   
+   */
+
+  /**
+   *   Implementation 1
+   */
+  /**
+   template < template < size_t N> class PolymerOmniReport_Type > struct Report {
+     public:
+       typedef PolymerOmniReport_Type<1> monomer_report_type;
+       typedef PolymerOmniReport_Type<2> dimer_report_type;
+       typedef PolymerOmniReport_Type<3> trimer_report_type;
+       typedef PolymerOmniReport_Type<4> tetramer_report_type; // we should include the size_t N here since it has been declared for typename PolymerOmniReport_Type
+     private:
+       monomer_report_type  monomer_report;
+       dimer_report_type    dimer_report;
+       trimer_report_type   trimer_report;
+       tetramer_report_type tetramer_report;
+   };
+
+   Report< PolymerOmniReportPeriodic >  report;  // We should not indicate the parameter size_t N since it is invible to object Report in definition.
+   */
+
+  /**
+   *   Implementation 2
+   */
+  /**
+   template < template < size_t > class PolymerOmniReport_Type, size_t N > struct Report {
+     public:
+       typedef PolymerOmniReport_Type monomer_report_type;
+       typedef PolymerOmniReport_Type dimer_report_type;
+       typedef PolymerOmniReport_Type trimer_report_type;
+       typedef PolymerOmniReport_Type tetramer_report_type;  // we should not include the size_t N here since it has not been declared for typename PolymerOmniReport_Type
+     private:
+       monomer_report_type  monomer_report;
+       dimer_report_type    dimer_report;
+       trimer_report_type   trimer_report;
+       tetramer_report_type tetramer_report;
+   };
+   
+   Report< PolymerOmniReportPeriodic, 1 > report; // size_t N now is a template parameter so we have to include it.
+   */
+
+  /**
+   *   Implementation 3
+   *   This implementation is trivial compared to previous two cases
+   */
+  /**
+   template < class PolymerOmniReport_Type > struct Report {
+     public:
+       typedef PolymerOmniReport_Type monomer_report_type;
+       typedef PolymerOmniReport_Type dimer_report_type;
+       typedef PolymerOmniReport_Type trimer_report_type;
+       typedef PolymerOmniReport_Type tetramer_report_type;
+     private:
+       monomer_report_type  monomer_report;
+       dimer_report_type    dimer_report;
+       trimer_report_type   trimer_report;
+       tetramer_report_type tetramer_report;
+   };
+   
+   Report< PolymerOmniReportPeriodic<1> > report; // 1 is a template parameter of PolymerOmniReportPeriodic so we have to include it
+   */
+
+  /**
+   *   Implementation 4
+   *   We do not use template class for Report, and we include all explicitly instantiated 
+   *   template as member types and members. This won't bring too much waste of resource since 
+   *   the individual subreport are of finite size and the data array container std :: vector
+   *   is chosen to use with being initialized as with size 0 (by GNU C++ compiler). But we
+   *   have to implement methods to choose the use of subreport members at runtime. The runtime 
+   *   choice can be implemented by virtual methods, which we should try to avoid here, because 
+   *   this generally implies a mix of dynamic polymorphism(virtual methods) and static polymorphism
+   *   (templated data members) and will not in general result in a good design.
+   *
+   *   The main reason to use non-templated design is that the stategies to use a "Report" object, 
+   *   by agents and clients, are strongly run-time dependent(like the choice of periodicity) 
+   *   and non-generic, implying a static polymorphism not an agile design. Another reason is that
+   *   since this report object is a meta-data type it is more reasonable to include all kinds 
+   *   of possible information in this object.
+   *
+   */
+
+struct Report {
 public:
   typedef double energy_data_type;
   typedef size_t mbe_order_type;
   typedef bool condition_type;
 
 public:
-  typedef PolymerOmniReport_Type monomer_report_type;
-  typedef PolymerOmniReportPeriodic<2> dimer_report_type;
-  typedef PolymerOmniReportPeriodic<3> trimer_report_type;
-  typedef PolymerOmniReportPeriodic<4> tetramer_report_type;
+  typedef PolymerOmniReport_Type   monomer_report_type;
+  typedef PolymerOmniReport_Type   dimer_report_type;
+  typedef PolymerOmniReport_Type   trimer_report_type;
+  typedef PolymerOmniReport_Type   tetramer_report_type;
   typedef vector< monomer_report_type >  monomer_report_list_type;
   typedef vector< dimer_report_type >    dimer_report_list_type;
   typedef vector< trimer_report_type >   trimer_report_list_type;
