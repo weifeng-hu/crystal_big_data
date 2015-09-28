@@ -34,6 +34,7 @@
 #include <structure/coordinate_representation.hpp>
 #include <structure/atom_list.hpp>
 #include <electron_correlation/quantity.hpp>
+#include <electron_correlation/correlation_level.hpp>
 
 using std::tuple;
 using std::string;
@@ -42,7 +43,7 @@ using std::ostream;
 
 namespace iquads {
 
-using namespace structure :: geometry;
+using namespace structure;
 using namespace electron_correlation;
 
 namespace interface_to_third_party {
@@ -61,9 +62,9 @@ public:
   typedef string         file_name_type;
   typedef string         molecule_name_type;
   typedef string         work_path_type;
-  typedef quantity :: quantity_mask_type solution_tag_type;
-  typedef quantity :: energy :: energy_mask_type energy_solution_tag_type;
-  typedef quantity :: gradient :: gradient_mask_type gradient_solution_tag_type;
+  typedef quantity ::  quantity_mask_type solution_tag_type;
+  typedef level_mask_type energy_solution_tag_type;
+  typedef level_mask_type gradient_solution_tag_type;
 
 public:
   struct MemoryConfig_Base {
@@ -118,10 +119,10 @@ public:
 
   struct GeometryConfig_Base {
     public:
-      typedef typename parent_config_base_type :: precise_number_type coord_value_type;
+      typedef parent_config_base_type :: precise_number_type coord_value_type;
       typedef string element_name_type;
-      typedef typename coordinate_system :: coordinate_mask_type  geometry_format_type; 
-      typedef typename unit :: unit_mask_type geometry_unit_type;
+      typedef coordinate_representation :: representation_mask_type  geometry_format_type; 
+      typedef geometry_unit :: unit_mask_type geometry_unit_type;
       typedef tuple< element_name_type, coord_value_type, coord_value_type, coord_value_type > atomic_cartesian_coord_type;
       typedef vector< atomic_cartesian_coord_type > atomic_coord_list_type;
     public:

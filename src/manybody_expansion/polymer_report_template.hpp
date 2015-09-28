@@ -30,8 +30,9 @@
 #include <string>
 #include <array>
 #include <structure/atom_list.hpp>
-#include <structure/geometry_settings.hpp>
+#include <structure/geometry_unit.hpp>
 #include <electron_correlation/quantity.hpp>
+#include <electron_correlation/correlation_level.hpp>
 #include <electron_correlation/report.hpp>
 #include <interface_to_third_party/external_program_report.hpp>
 
@@ -54,8 +55,9 @@ using std::array;
 namespace iquads {
 
 using structure :: AtomList;
-using namespace structure :: geometry;
+using namespace structure :: geometry_unit;
 using namespace electron_correlation :: quantity;
+using namespace electron_correlation;
 
 namespace manybody_expansion {
 
@@ -63,10 +65,10 @@ template < size_t NUM  > struct PolymerReport {
 public:
   typedef AtomList atom_list_type;
   typedef array< int, NUM > composition_list_type;
-  typedef typename unit :: unit_mask_type geometry_unit_type;
-  typedef typename unit :: unit_literal_type geometry_unit_name_type;
+  typedef geometry_unit :: unit_mask_type geometry_unit_type;
+  typedef geometry_unit :: unit_literal_type geometry_unit_name_type;
   typedef double energy_data_type;
-  typedef typename energy :: energy_mask_type correlation_level_type;
+  typedef level_mask_type correlation_level_type;
   typedef electron_correlation :: Report electron_correlation_report_type;
   typedef interface_to_third_party :: ExternalProgramReport external_program_report_type;
   typedef size_t mbe_order_type;
@@ -80,7 +82,7 @@ public:
   const atom_list_type atom_list() const { return this->atom_list_; }
   const geometry_unit_name_type geometry_unit_name() const 
    { 
-     using iquads :: structure :: geometry :: unit :: return_unit_name;
+     using iquads :: structure :: geometry_unit :: return_unit_name;
      return return_unit_name( this->geometry_unit_ );
    }
   const composition_list_type composition_list() const { return this->composition_list_; }

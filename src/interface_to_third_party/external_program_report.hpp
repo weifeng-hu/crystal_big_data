@@ -31,6 +31,7 @@
 #include <tuple>
 #include <vector>
 #include <electron_correlation/quantity.hpp>
+#include <electron_correlation/correlation_level.hpp>
 #include <interface_to_third_party/external_program_config_base.hpp>
 
 using std::tuple;
@@ -38,6 +39,8 @@ using std::vector;
 using std::shared_ptr;
 
 namespace iquads {
+
+using namespace electron_correlation;
 
 namespace interface_to_third_party {
 
@@ -53,8 +56,8 @@ public:
     public:
       typedef EnergyReport this_type;
       typedef double energy_data_type;
-      typedef typename quantity :: energy :: energy_mask_type energy_solution_tag_type;
-      typedef typename quantity :: energy :: energy_literal_type energy_solution_name_type;
+      typedef level_mask_type energy_solution_tag_type;
+      typedef correlation_name_type energy_solution_name_type;
     public:
       atom_list_type& set_atom_list()
        { return this->atom_list_; }
@@ -63,7 +66,7 @@ public:
       energy_solution_tag_type& set_energy_solution_tag()
        { return this->energy_solution_tag_; }
       const energy_solution_name_type return_energy_solution_name() const 
-       { return quantity :: energy :: return_energy_literal( this->energy_solution_tag_ ); }
+       {  }
     private:
       atom_list_type atom_list_;
       energy_data_type energy_;

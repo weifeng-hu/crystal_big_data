@@ -38,7 +38,7 @@ namespace iquads {
 
 namespace manybody_expansion {
 
-template < template < class > class PolyerOmniReport_Type > struct Report {
+template < typename PolymerOmniReport_Type > struct Report {
 public:
   typedef double energy_data_type;
   typedef size_t mbe_order_type;
@@ -46,9 +46,9 @@ public:
 
 public:
   typedef PolymerOmniReport_Type monomer_report_type;
-  typedef PolymerOmniReport<2> dimer_report_type;
-  typedef PolymerOmniReport<3> trimer_report_type;
-  typedef PolymerOmniReport<4> tetramer_report_type;
+  typedef PolymerOmniReportPeriodic<2> dimer_report_type;
+  typedef PolymerOmniReportPeriodic<3> trimer_report_type;
+  typedef PolymerOmniReportPeriodic<4> tetramer_report_type;
   typedef vector< monomer_report_type >  monomer_report_list_type;
   typedef vector< dimer_report_type >    dimer_report_list_type;
   typedef vector< trimer_report_type >   trimer_report_list_type;
