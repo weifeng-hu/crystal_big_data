@@ -27,15 +27,19 @@
 #include <manybody_expansion/request.hpp>
 #include <manybody_expansion/config.hpp>
 #include <manybody_expansion/report.hpp>
+#include <manybody_expansion/agent.hpp>
+#include <manybody_expansion/client.hpp>
 
 int main( int argc, char* argv[] ) {
 
   using iquads :: manybody_expansion :: Request;
   using iquads :: manybody_expansion :: Config;
+  using iquads :: manybody_expansion :: Client;
+  using iquads :: manybody_expansion :: Agent;
 
   Request request;
   Config config;
-//  iquads :: manybody_expansion :: PolymerOmniReportPeriodic<1> polymer_rep;
-//  iquads :: manybody_expansion :: Report< iquads :: manybody_expansion :: PolymerOmniReportPeriodic<1> > report;
+  Client client;
+  Agent agent;
 
 } 

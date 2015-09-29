@@ -48,17 +48,18 @@ typedef Agent mbe_agent_type;
 mbe_agent_type :: config_type 
 mbe_agent_type :: setup_config_from_request( request_type request ) {
 
+  using std :: get;
   config_type config;
   /**
    *  Step 1
    *  + lattice info/bulk info
    *  + check whether periodic system has been requested
    */
-  if( request.lattice_info().is_filled() == true ) {
+  if( get<1> ( request.lattice_info() ).is_filled() == true ) {
     config.set_is_periodic() = true;
     config.set_lattice_info() = request.lattice_info();
   }
-  else if( request.bulk_info().is_filled() == true ) {
+  else if( get<1> ( request.bulk_info() ).is_filled() == true ) {
     config.set_is_periodic() = false;
     config.set_bulk_info() = request.bulk_info();
   }

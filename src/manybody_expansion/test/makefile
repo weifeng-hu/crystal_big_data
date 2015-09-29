@@ -7,9 +7,12 @@ COPT		= -g -std=c++11
 CFLAGS          = -I$(IQUADS_SRC)
 CHEADS          =
 CSRCS           =\
+		request.cpp\
+		agent.cpp\
+		client.cpp\
 		main.cpp
 COBJS           = $(CSRCS:.cpp=.o)
-LIBS            =
+LIBS            = -lboost_date_time
 PGM             = test
 
 $(PGM): $(COBJS)
@@ -18,6 +21,15 @@ $(PGM): $(COBJS)
 
 main.o: ../*.hpp
 	$(CXX) -c $(CFLAGS) $(COPT) main.cpp
+
+request.o: ../*.hpp
+	$(CXX) -c $(CFLAGS) $(COPT) ../request.cpp
+
+agent.o: ../*.hpp
+	$(CXX) -c $(CFLAGS) $(COPT) ../agent.cpp
+
+client.o: ../*.hpp
+	$(CXX) -c $(CFLAGS) $(COPT) ../client.cpp
 
 clean:
 	rm *.o; rm $(PGM); rm $(IQUADS_BIN)/$(PGM)

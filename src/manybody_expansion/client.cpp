@@ -38,7 +38,7 @@ mbe_client_type :: request_type
 mbe_client_type :: file_request( command_setting_type command_setting ) {
 
   request_type request;
-  switch ( command_setting.request_method() ) {
+  switch ( command_setting.request_source() ) {
     case ( command_setting_type :: FROM_FILE ):
       request.read_input_file( command_setting.input_filename() );
       break;

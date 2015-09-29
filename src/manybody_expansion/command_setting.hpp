@@ -56,15 +56,16 @@ namespace manybody_expansion {
 using std::string;
 
 struct CommandSetting {
-public:
-  typedef string   file_name_type;
   enum request_source_type { FROM_FILE, DEFAULT };
+public:
+  typedef string file_name_type;
 
 public:
   CommandSetting()
     {
       this->input_filename_ = "not set";
       this->output_filename_ = "not set";
+      this->request_source_ = DEFAULT;
     }
 
 public:
@@ -85,8 +86,8 @@ public:
     { return this->input_filename_; }
   file_name_type& set_output_filename()
     { return this->output_filename_; }
-  request_source_type& request_source_type()
-    { return this->request_source_type_; } 
+  request_source_type& set_request_source()
+    { return this->request_source_; } 
 
 private:
   file_name_type   input_filename_;
