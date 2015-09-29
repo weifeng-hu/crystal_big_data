@@ -29,7 +29,7 @@
 
 #include <vector>
 #include <array>
-#include <manybody_expansion/polymer_report_omni_template.hpp>
+#include <manybody_expansion/polymer_report_omni_instant.hpp>
 
 namespace iquads {
 
@@ -165,14 +165,23 @@ public:
   typedef bool condition_type;
 
 public:
-  typedef PolymerOmniReport_Type   monomer_report_type;
-  typedef PolymerOmniReport_Type   dimer_report_type;
-  typedef PolymerOmniReport_Type   trimer_report_type;
-  typedef PolymerOmniReport_Type   tetramer_report_type;
-  typedef vector< monomer_report_type >  monomer_report_list_type;
-  typedef vector< dimer_report_type >    dimer_report_list_type;
-  typedef vector< trimer_report_type >   trimer_report_list_type;
-  typedef vector< tetramer_report_type > tetramer_report_list_type;
+  typedef PolymerOmniReportGeneral<1>   non_periodic_monomer_report_type;
+  typedef PolymerOmniReportGeneral<2>   non_periodic_dimer_report_type;
+  typedef PolymerOmniReportGeneral<3>   non_periodic_trimer_report_type;
+  typedef PolymerOmniReportGeneral<4>   non_periodic_tetramer_report_type;
+  typedef vector< non_periodic_monomer_report_type >    non_periodic_monomer_report_list_type;
+  typedef vector< non_periodic_dimer_report_type >      non_periodic_dimer_report_list_type;
+  typedef vector< non_periodic_trimer_report_type >     non_periodic_trimer_report_list_type;
+  typedef vector< non_periodic_tetramer_report_type >   non_periodic_tetramer_report_list_type;
+
+  typedef PolymerOmniReportPeriodic<1>   periodic_monomer_report_type;
+  typedef PolymerOmniReportPeriodic<2>   periodic_dimer_report_type;
+  typedef PolymerOmniReportPeriodic<3>   periodic_trimer_report_type;
+  typedef PolymerOmniReportPeriodic<4>   periodic_tetramer_report_type;
+  typedef vector< periodic_monomer_report_type >    periodic_monomer_report_list_type;
+  typedef vector< periodic_dimer_report_type >      periodic_dimer_report_list_type;
+  typedef vector< periodic_trimer_report_type >     periodic_trimer_report_list_type;
+  typedef vector< periodic_tetramer_report_type >   periodic_tetramer_report_list_type;
 
 public:
   void print() const;
@@ -181,42 +190,42 @@ public:
   energy_data_type return_one_body_energy_per_unit_cell()
     {
       energy_data_type retval = 0.0e0;
-      for( size_t i = 0; i < this->monomer_report_list_.size(); i++ ){
-       retval += this->monomer_report_list_[i].total_energy();
+      for( size_t i = 0; i < this->periodic_monomer_report_list_.size(); i++ ){
+       retval += this->periodic_monomer_report_list_[i].total_energy();
       }
       return retval;
     }
   energy_data_type return_two_body_interaction_energy_per_unit_cell()
     {
       energy_data_type retval = 0.0e0;
-      for( size_t i = 0; i < this->dimer_report_list_.size(); i++ ){
-       retval += this->dimer_report_list_[i].interaction_energy();
+      for( size_t i = 0; i < this->periodic_dimer_report_list_.size(); i++ ){
+       retval += this->periodic_dimer_report_list_[i].interaction_energy();
       }
       return retval;
     }
   energy_data_type return_three_body_interaction_energy_per_unit_cell()
     {
       energy_data_type retval = 0.0e0;
-      for( size_t i = 0; i < this->trimer_report_list_.size(); i++ ){
-       retval += this->trimer_report_list_[i].interaction_energy();
+      for( size_t i = 0; i < this->periodic_trimer_report_list_.size(); i++ ){
+       retval += this->periodic_trimer_report_list_[i].interaction_energy();
       }
       return retval;
     }
   energy_data_type return_four_body_interaction_energy_per_unit_cell()
     {
       energy_data_type retval = 0.0e0;
-      for( size_t i = 0; i < this->tetramer_report_list_.size(); i++ ){
-       retval += this->tetramer_report_list_[i].interaction_energy();
+      for( size_t i = 0; i < this->periodic_tetramer_report_list_.size(); i++ ){
+       retval += this->periodic_tetramer_report_list_[i].interaction_energy();
       }
       return retval;
     }
   energy_data_type return_total_energy_per_unit_cell()
     {
       energy_data_type retval = 0.0e0;
-      if( this->mbe_order >= 1 ) retval += this->return_one_body_energy_per_unit_cell();
-      if( this->mbe_order >= 2 ) retval += this->return_two_body_interaction_per_unit_cell();
-      if( this->mbe_order >= 3 ) retval += this->return_three_body_interaction_per_unit_cell();
-      if( this->mbe_order >= 4 ) retval += this->return_four_body_interaction_per_unit_cell();
+      if( this->mbe_order_ >= 1 ) retval += this->return_one_body_energy_per_unit_cell();
+      if( this->mbe_order_ >= 2 ) retval += this->return_two_body_interaction_energy_per_unit_cell();
+      if( this->mbe_order_ >= 3 ) retval += this->return_three_body_interaction_energy_per_unit_cell();
+      if( this->mbe_order_ >= 4 ) retval += this->return_four_body_interaction_energy_per_unit_cell();
       return retval;
     }
   
@@ -226,14 +235,23 @@ public:
   void add_trimer_data_to_sym_noneq_list(){}
   void add_tetramer_data_to_sym_noneq_list(){}
 
-  void attach_new_monomer_report( monomer_report_type monomer_report )
-   { this->monomer_report_list_.push_back( monomer_report ); }
-  void attach_new_dimer_report( dimer_report_type dimer_report )
-   { this->dimer_report_list_.push_back( dimer_report ); }
-  void attach_new_trimer_report( trimer_report_type trimer_report )
-   { this->trimer_report_list_.push_back( trimer_report ); }
-  void attach_new_tetramer_report( tetramer_report_type tetramer_report )
-   { this->tetramer_report_list_.push_back( tetramer_report ); }
+  void attach_new_monomer_report( periodic_monomer_report_type monomer_report )
+    { this->periodic_monomer_report_list_.push_back( monomer_report ); }
+  void attach_new_dimer_report( periodic_dimer_report_type dimer_report )
+    { this->periodic_dimer_report_list_.push_back( dimer_report ); }
+  void attach_new_trimer_report( periodic_trimer_report_type trimer_report )
+    { this->periodic_trimer_report_list_.push_back( trimer_report ); }
+  void attach_new_tetramer_report( periodic_tetramer_report_type tetramer_report )
+    { this->periodic_tetramer_report_list_.push_back( tetramer_report ); }
+
+  void attach_new_monomer_report( non_periodic_monomer_report_type monomer_report )
+    { this->non_periodic_monomer_report_list_.push_back( monomer_report ); }
+  void attach_new_dimer_report( non_periodic_dimer_report_type dimer_report )
+    { this->non_periodic_dimer_report_list_.push_back( dimer_report ); }
+  void attach_new_trimer_report( non_periodic_trimer_report_type trimer_report )
+    { this->non_periodic_trimer_report_list_.push_back( trimer_report ); }
+  void attach_new_tetramer_report( non_periodic_tetramer_report_type tetramer_report )
+    { this->non_periodic_tetramer_report_list_.push_back( tetramer_report ); }
 
 private:
   /*
@@ -244,10 +262,16 @@ private:
    *  Periodicity allows the use of fragment identifier
    *  manybody expansion order, here we have implemented MBE formula for order<=4
    */
-  monomer_report_list_type    monomer_report_list_;
-  dimer_report_list_type      dimer_report_list_;
-  trimer_report_list_type     trimer_report_list_;
-  tetramer_report_list_type   tetramer_report_list_;
+  non_periodic_monomer_report_list_type    non_periodic_monomer_report_list_;
+  non_periodic_dimer_report_list_type      non_periodic_dimer_report_list_;
+  non_periodic_trimer_report_list_type     non_periodic_trimer_report_list_;
+  non_periodic_tetramer_report_list_type   non_periodic_tetramer_report_list_;
+
+  periodic_monomer_report_list_type    periodic_monomer_report_list_;
+  periodic_dimer_report_list_type      periodic_dimer_report_list_;
+  periodic_trimer_report_list_type     periodic_trimer_report_list_;
+  periodic_tetramer_report_list_type   periodic_tetramer_report_list_;
+
   mbe_order_type              mbe_order_;
 
 }; // end of struct Report
