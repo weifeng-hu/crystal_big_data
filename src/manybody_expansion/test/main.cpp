@@ -35,7 +35,7 @@ int main( int argc, char* argv[] ) {
 
   Request request;
   Config config;
-  iquads :: manybody_expansion :: PolymerOmniReportPeriodic<1> polymer_rep;
-  iquads :: manybody_expansion :: Report< iquads :: manybody_expansion :: PolymerOmniReportPeriodic<1> > report;
+//  iquads :: manybody_expansion :: PolymerOmniReportPeriodic<1> polymer_rep;
+//  iquads :: manybody_expansion :: Report< iquads :: manybody_expansion :: PolymerOmniReportPeriodic<1> > report;
 
 } 

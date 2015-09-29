@@ -78,19 +78,26 @@ public:
   typedef string fragment_name_type;
 
 public:
-  const fragment_name_type fragment_name() const { return this->fragment_name_; }
-  const atom_list_type atom_list() const { return this->atom_list_; }
-  const geometry_unit_name_type geometry_unit_name() const 
-   { 
-     using iquads :: structure :: geometry_unit :: return_unit_name;
-     return return_unit_name( this->geometry_unit_ );
-   }
-  const composition_list_type composition_list() const { return this->composition_list_; }
-  const energy_data_type fragment_energy() const { return this->fragment_energy_; }
-  const energy_data_type interaction_energy() const { return this->interaction_energy_; }
-  const electron_correlation_report_ref electron_correlation_report() const 
+  fragment_name_type fragment_name() const
+    { return this->fragment_name_; }
+  atom_list_type atom_list() const
+    { return this->atom_list_; }
+  geometry_unit_name_type geometry_unit_name() const 
+    { 
+      using iquads :: structure :: geometry_unit :: return_unit_name;
+      return return_unit_name( this->geometry_unit_ );
+    }
+  geometry_unit_type geometry_unit() const
+    { return this->geometry_unit_; }
+  composition_list_type composition_list() const
+    { return this->composition_list_; }
+  energy_data_type fragment_energy() const
+    { return this->fragment_energy_; }
+  energy_data_type interaction_energy() const
+    { return this->interaction_energy_; }
+  electron_correlation_report_type electron_correlation_report() const 
     { return this->electron_correlation_report_; }
-  const external_program_report_ref external_program_report() const 
+  external_program_report_type external_program_report() const 
     { return this->external_program_report_; }
 
 protected:
