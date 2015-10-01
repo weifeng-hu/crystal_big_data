@@ -34,55 +34,56 @@ namespace iquads {
 
 namespace manybody_expansion {
 
-typedef double energy_data_type;
-typedef Config config_type;
-typedef Report report_type;
-typedef report_type& report_ref;
+  /**
+   *  Explicit instantiation of many body expansion formulas (as class objects)  for 
+   *  non peridic systems
+   *
+   */
 
-template < size_t Order > class ExpansionFormulaGeneral {
-public:
-  energy_data_type compute( config_type config, report_ref report )
-    {
-    } // end of compute()
+  typedef double energy_data_type;
+  typedef Config config_type;
+  typedef Report report_type;
+  typedef report_type& report_ref;
 
-}; // end of class ExpansionFormulaPeriodic< Order >
+  template < size_t Order > class ExpansionFormulaGeneral {
+    public:
+      energy_data_type compute( config_type config, report_ref report )
+        {
+        } // end of compute()
+  
+  }; // end of class ExpansionFormulaPeriodic< Order >
 
+  template <> class ExpansionFormulaGeneral<1> {
+    public:
+      energy_data_type compute( config_type config, report_ref report )
+        {
+        } // end of compute()
+  
+  }; // end of class ExpansionFormulaPeriodic<1>
 
-template <> class ExpansionFormulaGeneral<1> {
-public:
-  energy_data_type compute( config_type config, report_ref report )
-    {
-    } // end of compute()
+  template <> class ExpansionFormulaGeneral<2> {
+  public:
+    energy_data_type compute( config_type config, report_ref report )
+      {
+      } // end of compute()
+  
+  }; // end of class ExpansionFormulaPeriodic<2>
 
-}; // end of class ExpansionFormulaPeriodic<1>
+  template <> class ExpansionFormulaGeneral<3> {
+    public:
+      energy_data_type compute( config_type config, report_ref report )
+        {
+        } // end of compute()
+  
+  }; // end of class ExpansionFormulaPeriodic<3>
 
-
-template <> class ExpansionFormulaGeneral<2> {
-public:
-  energy_data_type compute( config_type config, report_ref report )
-    {
-    } // end of compute()
-
-}; // end of class ExpansionFormulaPeriodic<2>
-
-
-template <> class ExpansionFormulaGeneral<3> {
-public:
-  energy_data_type compute( config_type config, report_ref report )
-    {
-    } // end of compute()
-
-}; // end of class ExpansionFormulaPeriodic<3>
-
-
-template <> class ExpansionFormulaGeneral<4> {
-public:
-  energy_data_type compute( config_type config, report_ref report )
-    {
-    } // end of compute()
-
-}; // end of class ExpansionFormulaPeriodic<4>
-
+  template <> class ExpansionFormulaGeneral<4> {
+    public:
+      energy_data_type compute( config_type config, report_ref report )
+        {
+        } // end of compute()
+  
+  }; // end of class ExpansionFormulaPeriodic<4>
 
 } // end of manybody_expansion
 

@@ -26,7 +26,7 @@
 #include <structure/molecule.hpp>
 #include <structure/unit_cell_template.hpp>
 
-namespace iquads{
+namespace iquads {
 
 namespace structure {
 

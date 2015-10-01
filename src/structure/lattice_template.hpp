@@ -83,6 +83,7 @@ namespace structure {
 
 template < typename UnitCell_Type > class Lattice {
 public:
+  typedef UnitCell_Type              unit_cell_type;
   typedef Lattice< UnitCell_Type >   this_type;
   typedef typename UnitCell_Type :: lattice_parameter_type   lattice_parameter_type;
   typedef coord_value_type                          coordinate_value_type;

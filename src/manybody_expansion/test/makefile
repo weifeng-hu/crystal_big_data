@@ -8,6 +8,7 @@ CFLAGS          = -I$(IQUADS_SRC)
 CHEADS          =
 CSRCS           =\
 		request.cpp\
+		report.cpp\
 		agent.cpp\
 		client.cpp\
 		main.cpp
@@ -24,6 +25,9 @@ main.o: ../*.hpp
 
 request.o: ../*.hpp
 	$(CXX) -c $(CFLAGS) $(COPT) ../request.cpp
+
+report.o: ../*.hpp
+	$(CXX) -c $(CFLAGS) $(COPT) ../report.cpp
 
 agent.o: ../*.hpp
 	$(CXX) -c $(CFLAGS) $(COPT) ../agent.cpp

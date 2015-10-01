@@ -28,6 +28,7 @@
 #define MANYBODY_EXPANSION_CONFIG_HPP
 
 #include <string>
+#include <tuple>
 #include <iquads/sequence.hpp>
 #include <structure/lattice_instant.hpp>
 #include <structure/bulk_instant.hpp>
@@ -76,6 +77,8 @@ namespace manybody_expansion {
 
 
 using std :: string;
+using std :: tuple;
+using std :: get;
 using structure :: MolecularLattice;
 using structure :: MolecularBulk;
 using namespace interface_to_third_party;
@@ -124,7 +127,7 @@ public:
    */
   lattice_info_type lattice_info() const
     { return this->lattice_info_; }
-  bulk_info_type set_bulk_info() const
+  bulk_info_type bulk_info() const
     { return this->bulk_info_; }
   expansion_order_type expansion_order() const
     { return this->expansion_order_; }
@@ -143,6 +146,14 @@ public:
   run_mode_type run_mode() const
     { return this->run_mode_; }
 
+  /**
+   *  Auxiliary accessors
+   */
+  lattice_type lattice() const
+    { return get<1> ( this->lattice_info_ ); }
+  bulk_type bulk() const
+    { return get<1> ( this->bulk_info_ ); }
+ 
   /**
    *  Mutators
    *  A agent is allowed to change the config at runtime for

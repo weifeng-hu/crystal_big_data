@@ -36,8 +36,10 @@
 #include <electron_correlation/report.hpp>
 #include <interface_to_third_party/external_program_report.hpp>
 
-using std::string;
-using std::array;
+
+namespace iquads {
+
+namespace manybody_expansion {
 
   /*
    *  each piece of info must have( for each possible polymer )
@@ -52,14 +54,12 @@ using std::array;
    *                           the output back to a safe place
    */
 
-namespace iquads {
-
+using std::string;
+using std::array;
 using structure :: AtomList;
 using namespace structure :: geometry_unit;
 using namespace electron_correlation :: quantity;
 using namespace electron_correlation;
-
-namespace manybody_expansion {
 
 template < size_t NUM  > struct PolymerReport {
 public:
