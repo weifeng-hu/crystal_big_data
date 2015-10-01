@@ -31,64 +31,56 @@
 #include <structure/polymer_template.hpp>
 #include <electron_correlation/setting.hpp>
 #include <electron_correlation/client.hpp>
-#include <manybody_expansion/polymer_report_omni_template.h>
+#include <manybody_expansion/polymer_report_omni_template.hpp>
 
 namespace iquads {
 
 using structure :: Molecule;
+typedef Molecule molecule_info_type;
 
 template < size_t NUM > 
- using polymer_type = typename structure :: Polymer < NUM >;
+using polymer_type = typename structure :: Polymer < NUM >;
 
 typedef electron_correlation :: Client molecular_energy_client_type;
-typedef clectron_correlation :: Setting energy_calc_setting_type;
+typedef electron_correlation :: Setting energy_calc_setting_type;
 
 namespace manybody_expansion {
 
 typedef double energy_data_type;
 
-template < size_t Order >
- inline energy_data_type compute_interaction_energy( polymer_type<Order> x, energy_calc_setting_type settings, PolymerOmniReport<Order>& report )
-{
+template < size_t Order > inline energy_data_type compute_interaction_energy( polymer_type<Order> x, energy_calc_setting_type settings, PolymerOmniReportGeneral<Order>& report )
+  { return 0.0e0; } // end of function compute_interaction_energy<Order>
 
-  return 0.0e0;
-
-}; // end of function compute_interaction_energy<Order>
-
-template <>
- inline energy_data_type compute_interaction_energy<1> ( polymer_type<1> x, energy_calc_setting_type settings, PolymerOmniReport<1>& report )
-{
+template <> inline energy_data_type compute_interaction_energy<1> ( polymer_type<1> x, energy_calc_setting_type settings, PolymerOmniReportGeneral<1>& report ) {
 
   energy_data_type energy_monomer_0;
   {
-   molecule_info_type molecule = convert_polymer_to_molecule<1>( x );
-   molecular_energy_client_type client;
-   client.driver( molecule, settings );
-   energy_monomer_0 = client.report().energy();
-   PolymerReport<1> report_local( client.report().molecule_name(), 
-                                      client.report().atom_list(),
-                                      client.report().geometry_unit(),
-                                      report.composition_list(),
-                                      client.report().energy(),
-                                      0.0e0,
-                                      client.report().raw(),
-                                      client.report().raw_external());
-   report.set_report_cover( report_local );
+    molecule_info_type molecule = convert_polymer_to_molecule<1>( x );
+    molecular_energy_client_type client;
+//    client.driver( molecule, settings );
+    energy_monomer_0 = client.report().energy();
+    PolymerReport<1> report_local( client.report().molecule_name(), 
+                                       client.report().atom_list(),
+                                       client.report().geometry_unit(),
+                                       report.composition_list(),
+                                       client.report().energy(),
+                                       0.0e0,
+                                       client.report().raw(),
+                                       client.report().raw_external());
+    report.set_report_cover( report_local );
   }
   return energy_monomer_0;
 
 }; // end of function compute_interaction_energy<1>
 
-template <>
-inline energy_data_type compute_interaction_energy<2>( polymer_type<2> x, energy_calc_setting_type settings, PolymerOmniReport<2>& report )
-{
+template <> inline energy_data_type compute_interaction_energy<2>( polymer_type<2> x, energy_calc_setting_type settings, PolymerOmniReportGeneral<2>& report ) {
 
   energy_data_type energy_dimer_01;
   {
-   molecule_info_type molecule_01 = convert_polymer_to_molecule<2> ( x );
-   molecular_energy_client_type client;
-   client.driver( molecule_01, settings );
-   energy_dimer_01 = client.report().energy();
+    molecule_info_type molecule_01 = convert_polymer_to_molecule<2> ( x );
+    molecular_energy_client_type client;
+//    client.driver( molecule_01, settings );
+    energy_dimer_01 = client.report().energy();
   }
 
   energy_data_type energy_monomer_0 = compute_interaction_energy<1> ( x.at(0), settings, report.monomer_reports().at(0) );
@@ -108,15 +100,15 @@ inline energy_data_type compute_interaction_energy<2>( polymer_type<2> x, energy
 }; // end of function compute_interaction_energy<2>
 
 template <>
-inline energy_data_type compute_interaction_energy<3>( polymer_type<3> x, energy_calc_setting_type settings, PolymerOmniReport<3>& report )
+inline energy_data_type compute_interaction_energy<3>( polymer_type<3> x, energy_calc_setting_type settings, PolymerOmniReportGeneral<3>& report )
 {
 
   energy_data_type energy_trimer_012;
   {
-   molecule_info_type molecule_012 = convert_polymer_to_molecule<3> ( x );
-   molecular_energy_client_type client;
-   client.driver( molecule_012, settings );
-   energy_trimer_012 = client.report().energy();
+    molecule_info_type molecule_012 = convert_polymer_to_molecule<3> ( x );
+    molecular_energy_client_type client;
+//    client.driver( molecule_012, settings );
+    energy_trimer_012 = client.report().energy();
   }
 
   energy_data_type energy_monomer_0 = compute_interaction_energy<1> ( x.at(0), settings, report.monomer_reports().at(0) );
@@ -144,16 +136,14 @@ inline energy_data_type compute_interaction_energy<3>( polymer_type<3> x, energy
 
 }; // end of function compute_interaction_energy<3>
 
-template <>
- inline energy_data_type compute_interaction_energy < 4 > ( polymer_type<4> x, energy_calc_setting_type settings, PolymerOmniReport<4> report )
-{
+template <> inline energy_data_type compute_interaction_energy < 4 > ( polymer_type<4> x, energy_calc_setting_type settings, PolymerOmniReportGeneral<4> report ) {
 
   energy_data_type energy_tetramer_0123;
   {
-   molecule_info_type molecule_0123 = convert_polymer_to_molecule<4> ( x );
-   molecule_energy_client_type client;
-   client.driver( molecule_0123, settings );
-   energy_tetramer_0123 = client.report().energy();
+    molecule_info_type molecule_0123 = convert_polymer_to_molecule<4> ( x );
+    molecule_energy_client_type client;
+//    client.driver( molecule_0123, settings );
+    energy_tetramer_0123 = client.report().energy();
   }
 
   energy_data_type energy_monomer_0 = compute_interaction_energy<1> ( x.at(0), settings, report.monomer_reports().at(0) );

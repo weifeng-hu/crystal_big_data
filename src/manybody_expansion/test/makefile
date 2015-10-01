@@ -11,6 +11,7 @@ CSRCS           =\
 		report.cpp\
 		agent.cpp\
 		client.cpp\
+		setting.cpp\
 		main.cpp
 COBJS           = $(CSRCS:.cpp=.o)
 LIBS            = -lboost_date_time
@@ -34,6 +35,9 @@ agent.o: ../*.hpp
 
 client.o: ../*.hpp
 	$(CXX) -c $(CFLAGS) $(COPT) ../client.cpp
+
+setting.o: ../../electron_correlation/setting.hpp
+	$(CXX) -c $(CFLAGS) $(COPT) ../../electron_correlation/setting.cpp
 
 clean:
 	rm *.o; rm $(PGM); rm $(IQUADS_BIN)/$(PGM)

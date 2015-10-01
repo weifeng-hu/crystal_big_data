@@ -76,7 +76,7 @@ public:
   typedef Interval                interval_data_type;
   typedef Interval3D              interval_set_type;
   typedef array<double, 3>        threed_vector_type;
-  typedef unsigned int            cell_id_type;
+  typedef array<int, 3>           cell_id_type;
   typedef bool                    condition_type;
 
   typedef node_list_type&         node_list_ref;
@@ -92,7 +92,7 @@ public:
     {
       this->node_list_.resize(0);
       this->lattice_parameter_ = LatticeParameter( 0, 0, 0, 0, 0, 0 );
-      this->cell_id_ = 0;
+      this->cell_id_ = array< int, 3 > { 0, 0, 0 };
       this->translation_vec_.fill(0);
     }
   UnitCell( node_list_type           node_list,
@@ -108,7 +108,7 @@ public:
           align_geometry_unit( this->node_list_[0].set_atom_list(), this->node_list_[inode].set_atom_list() );
         }
         this->translation_vec_.fill(0);
-        this->cell_id_ = 0;
+        this->cell_id_.fill(0);
       }
 
   /**
@@ -217,6 +217,20 @@ public:
     return *this;
   }
 
+  /**
+   *  + operator == ()
+   *    Judge whether two unit cell objects are the same in the lattice,
+   *    by comparing the translation vector coefficients
+   */
+  friend
+  inline condition_type operator== ( const this_type& lhs, const this_type& rhs ) {
+    threed_vector_type vec_lhs = lhs.translation_vec();
+    threed_vector_type vec_rhs = rhs.translation_vec();
+    if( fabs( vec_lhs[0] - vec_rhs[0] ) > 1.0e-3 ) return false;
+    if( fabs( vec_lhs[1] - vec_rhs[1] ) > 1.0e-3 ) return false;
+    if( fabs( vec_lhs[2] - vec_rhs[2] ) > 1.0e-3 ) return false;
+    return true;
+  }
 
   /**
    *  I/O member functions:
@@ -332,6 +346,8 @@ public:
     { return this->lattice_parameter_; }
   cell_id_type cell_id() const
     { return this->cell_id_; }
+  array<double, 3> translation_vec() const
+   { return this->translation_vec_; }
 
   /**
    *  Mutators

@@ -40,15 +40,15 @@ typedef Setting setting_type;
    *    to this object.
    *
    */
-void setting_type :: generate_from_config( mbe_config_type config ){
+void setting_type :: generate_from( mbe_config_type config ){
 
-  this->mode_ = config.mode();
-  this->external_program_ = config.external_program();
+  this->mode_ = config.run_mode();
+  this->external_program_ = config.program();
   this->basis_set_name_ = config.basis_set_name();
-  this->method_ = config.method();
-  this->input_path_   = config.input_path();
-  this->scratch_path_ = config.scratch_path();
-  this->output_path_  = config.output_path();
+//  this->method_ = config.correlation_method();
+//  this->input_path_   = config.input_path();
+  this->scratch_path_ = config.scratch_name();
+//  this->output_path_  = config.output_path();
 
 } // end of function generate_from_config()
 
