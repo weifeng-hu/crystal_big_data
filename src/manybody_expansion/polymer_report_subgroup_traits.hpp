@@ -28,7 +28,6 @@
 #define MANYBODY_EXPANSION_POLYMER_SUBGROUP_REPORT_TRAITS_HPP
 
 #include <array>
-#include <manybody_expansion/polymer_report_template.hpp>
 
 using std::array;
 
@@ -36,17 +35,21 @@ namespace iquads {
 
 namespace manybody_expansion {
 
-template < size_t N > struct PolymerSubGroupReport { };
-  // end of template struct PolymerSubGroupReport general definition
+template < template < size_t NS > class SubGroup_Type, size_t N > struct PolymerSubGroupReport { };
+// end of template struct PolymerSubGroupReport general definition
 
 
-template <> struct PolymerSubGroupReport<2> {
+  /**
+   * partial specializations
+   */
+
+template < template < size_t NS > class SubGroup_Type > struct PolymerSubGroupReport< SubGroup_Type, 2 > {
   public:
-    typedef PolymerReport<1> monomer_report_type;
+    typedef SubGroup_Type<1> monomer_report_type;
 
   public:
-    const array< monomer_report_type, 2 >& monomer_reports() const 
-     { return this->monomer_reports_; }
+    array< monomer_report_type, 2 >& set_monomer_reports()
+      { return this->monomer_reports_; }
 
   protected:
     array< monomer_report_type, 2 > monomer_reports_;
@@ -54,37 +57,37 @@ template <> struct PolymerSubGroupReport<2> {
 }; // end of template struct trait PolymerSubGroupReport<2>
 
 
-template <> struct PolymerSubGroupReport<3> {
+template < template < size_t NS > class SubGroup_Type > struct PolymerSubGroupReport< SubGroup_Type, 3 > {
   public:
-    typedef PolymerReport<1> monomer_report_type;
-    typedef PolymerReport<2> dimer_report_type;
+    typedef SubGroup_Type<1> monomer_report_type;
+    typedef SubGroup_Type<2> dimer_report_type;
 
   public:
-    const array< monomer_report_type, 3 >& monomer_reports() const 
-     { return this->monomer_reports_; }
-    const array< dimer_report_type, 3 >& dimer_reports() const 
-     { return this->dimer_reports_; }
+    array< monomer_report_type, 3 >& set_monomer_reports() const 
+      { return this->monomer_reports_; }
+    array< dimer_report_type, 3 >& set_dimer_reports() const 
+      { return this->dimer_reports_; }
 
   protected:
-    array< monomer_report_type, 3 > monomer_reports_;
-    array< dimer_report_type, 3 > dimer_reports_;
+    array< monomer_report_type, 3 >  monomer_reports_;
+    array< dimer_report_type, 3 >    dimer_reports_;
 
 }; // end of template struct trait PolymerSubGroupReport<3>
 
 
-template <> struct PolymerSubGroupReport<4> {
+template < template < size_t NS > class SubGroup_Type > struct PolymerSubGroupReport< SubGroup_Type, 4 > {
   public:
-    typedef PolymerReport<1> monomer_report_type;
-    typedef PolymerReport<2> dimer_report_type;
-    typedef PolymerReport<3> trimer_report_type;
+    typedef SubGroup_Type<1> monomer_report_type;
+    typedef SubGroup_Type<2> dimer_report_type;
+    typedef SubGroup_Type<3> trimer_report_type;
 
   public:
-    const array< monomer_report_type, 4 >& monomer_reports() const 
-     { return this->monomer_reports_; }
-    const array< dimer_report_type, 6 >& dimer_reports() const 
-     { return this->dimer_reports_; }
-    const array< trimer_report_type, 4 >& trimer_reports() const 
-     { return this->trimer_reports_; }
+    array< monomer_report_type, 4 >& set_monomer_reports()
+      { return this->monomer_reports_; }
+    array< dimer_report_type, 6 >& set_dimer_reports()
+      { return this->dimer_reports_; }
+    array< trimer_report_type, 4 >& set_trimer_reports()
+      { return this->trimer_reports_; }
 
   protected:
     array< monomer_report_type, 4 > monomer_reports_;

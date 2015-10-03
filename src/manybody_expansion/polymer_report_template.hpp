@@ -78,6 +78,36 @@ public:
   typedef string fragment_name_type;
 
 public:
+  /**
+   *  Default constructor
+   *
+   */
+  PolymerReport() {
+    this->fragment_name_ = "unknown";
+    this->atom_list_.resize(0);
+    this->geometry_unit_ = UNKNOWN;
+    this->composition_list_.fill(0);
+    this->fragment_energy_ = 0.0e0;
+    this->interaction_energy_ = 0.0e0;
+  }
+
+  /**
+   *  Initialize list constructor
+   */
+  PolymerReport ( fragment_name_type     fragment_name, 
+           atom_list_type         atom_list,
+           geometry_unit_type     geometry_unit,
+           composition_list_type  composition_list,
+           energy_data_type       fragment_energy,
+           energy_data_type       interaction_energy,
+           electron_correlation_report_type electron_correlation_report,
+           external_program_report_type external_program_report ) :
+           fragment_name_ ( fragment_name ), atom_list_ ( atom_list ),
+           geometry_unit_ ( geometry_unit ), composition_list_ ( composition_list ),
+           fragment_energy_ ( fragment_energy ), interaction_energy_ ( interaction_energy ),
+           electron_correlation_report_ ( electron_correlation_report ), external_program_report_ ( external_program_report ) { }
+
+public:
   fragment_name_type fragment_name() const
     { return this->fragment_name_; }
   atom_list_type atom_list() const
@@ -111,6 +141,14 @@ protected:
   external_program_report_type     external_program_report_;
 
 }; // end of templated struct PolymerReport
+
+
+  /**
+   *  THIS IS A MUST-HAVE TYPE TRATIS THAT STOP THE RECURSIVE 
+   *  INSTANTIATION OF THIS TEMPLATE WITH INFINITE MINUS PAREMETERS!!!
+   *
+   */
+//template <> struct PolymerReport<0> { };
 
 } // end of manybody_expansion
 

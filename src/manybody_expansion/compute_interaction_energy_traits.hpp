@@ -31,7 +31,7 @@
 #include <structure/polymer_template.hpp>
 #include <electron_correlation/setting.hpp>
 #include <electron_correlation/client.hpp>
-#include <manybody_expansion/polymer_report_omni_template.hpp>
+#include <manybody_expansion/polymer_report_omni_instant.hpp>
 
 namespace iquads {
 
@@ -46,9 +46,14 @@ typedef electron_correlation :: Setting energy_calc_setting_type;
 
 namespace manybody_expansion {
 
+  /**
+   *  We have to have an additional protrocol to test whether the calculations of a
+   *  certain fragment has been done already.
+   *
+   */
 typedef double energy_data_type;
 
-template < size_t Order > inline energy_data_type compute_interaction_energy( polymer_type<Order> x, energy_calc_setting_type settings, PolymerOmniReportGeneral<Order>& report )
+template < size_t Order > inline energy_data_type compute_interaction_energy( polymer_type<Order> x, energy_calc_setting_type settings, PolymerReport<Order>& report )
   { return 0.0e0; } // end of function compute_interaction_energy<Order>
 
 template <> inline energy_data_type compute_interaction_energy<1> ( polymer_type<1> x, energy_calc_setting_type settings, PolymerOmniReportGeneral<1>& report ) {
@@ -57,7 +62,7 @@ template <> inline energy_data_type compute_interaction_energy<1> ( polymer_type
   {
     molecule_info_type molecule = convert_polymer_to_molecule<1>( x );
     molecular_energy_client_type client;
-//    client.driver( molecule, settings );
+    client.driver( molecule, settings );
     energy_monomer_0 = client.report().energy();
     PolymerReport<1> report_local( client.report().molecule_name(), 
                                        client.report().atom_list(),
@@ -79,12 +84,12 @@ template <> inline energy_data_type compute_interaction_energy<2>( polymer_type<
   {
     molecule_info_type molecule_01 = convert_polymer_to_molecule<2> ( x );
     molecular_energy_client_type client;
-//    client.driver( molecule_01, settings );
+    client.driver( molecule_01, settings );
     energy_dimer_01 = client.report().energy();
   }
 
-  energy_data_type energy_monomer_0 = compute_interaction_energy<1> ( x.at(0), settings, report.monomer_reports().at(0) );
-  energy_data_type energy_monomer_1 = compute_interaction_energy<1> ( x.at(1), settings, report.monomer_reports().at(1) );
+  energy_data_type energy_monomer_0 = compute_interaction_energy<1> ( x(0), settings, report.monomer_reports().at(0) );
+  energy_data_type energy_monomer_1 = compute_interaction_energy<1> ( x(1), settings, report.monomer_reports().at(1) );
 
   PolymerReport<2> report_local( client.report().molecule_name(),
                                      client.report().atom_list(),
@@ -99,25 +104,23 @@ template <> inline energy_data_type compute_interaction_energy<2>( polymer_type<
 
 }; // end of function compute_interaction_energy<2>
 
-template <>
-inline energy_data_type compute_interaction_energy<3>( polymer_type<3> x, energy_calc_setting_type settings, PolymerOmniReportGeneral<3>& report )
-{
+template <> inline energy_data_type compute_interaction_energy<3>( polymer_type<3> x, energy_calc_setting_type settings, PolymerOmniReportGeneral<3>& report ) {
 
   energy_data_type energy_trimer_012;
-  {
+//  {
     molecule_info_type molecule_012 = convert_polymer_to_molecule<3> ( x );
     molecular_energy_client_type client;
-//    client.driver( molecule_012, settings );
+    client.driver( molecule_012, settings );
     energy_trimer_012 = client.report().energy();
-  }
+//  }
 
-  energy_data_type energy_monomer_0 = compute_interaction_energy<1> ( x.at(0), settings, report.monomer_reports().at(0) );
-  energy_data_type energy_monomer_1 = compute_interaction_energy<1> ( x.at(1), settings, report.monomer_reports().at(1) );
-  energy_data_type energy_monomer_2 = compute_interaction_energy<1> ( x.at(2), settings, report.monomer_reports().at(2) );
+  energy_data_type energy_monomer_0 = compute_interaction_energy<1> ( x(0), settings, report.monomer_reports().at(0) );
+  energy_data_type energy_monomer_1 = compute_interaction_energy<1> ( x(1), settings, report.monomer_reports().at(1) );
+  energy_data_type energy_monomer_2 = compute_interaction_energy<1> ( x(2), settings, report.monomer_reports().at(2) );
 
-  energy_data_type interaction_energy_dimer_01 = compute_interaction_energy<2>( x.at(0) + x.at(1), settings, report.dimer_reports().at(0) );
-  energy_data_type interaction_energy_dimer_02 = compute_interaction_energy<2>( x.at(0) + x.at(2), settings, report.dimer_reports().at(1) );
-  energy_data_type interaction_energy_dimer_12 = compute_interaction_energy<2>( x.at(1) + x.at(2), settings, report.dimer_reports().at(2) );
+  energy_data_type interaction_energy_dimer_01 = compute_interaction_energy<2>( x(0) + x(1), settings, report.dimer_reports().at(0) );
+  energy_data_type interaction_energy_dimer_02 = compute_interaction_energy<2>( x(0) + x(2), settings, report.dimer_reports().at(1) );
+  energy_data_type interaction_energy_dimer_12 = compute_interaction_energy<2>( x(1) + x(2), settings, report.dimer_reports().at(2) );
 
   energy_data_type interaction_energy = energy_trimer_012 - 
                                         energy_monomer_0 - energy_monomer_1 - energy_monomer_2 - 
@@ -146,22 +149,22 @@ template <> inline energy_data_type compute_interaction_energy < 4 > ( polymer_t
     energy_tetramer_0123 = client.report().energy();
   }
 
-  energy_data_type energy_monomer_0 = compute_interaction_energy<1> ( x.at(0), settings, report.monomer_reports().at(0) );
-  energy_data_type energy_monomer_1 = compute_interaction_energy<1> ( x.at(1), settings, report.monomer_reports().at(1) );
-  energy_data_type energy_monomer_2 = compute_interaction_energy<1> ( x.at(2), settings, report.monomer_reports().at(2) );
-  energy_data_type energy_monomer_3 = compute_interaction_energy<1> ( x.at(3), settings, report.monomer_reports().at(3) );
+  energy_data_type energy_monomer_0 = compute_interaction_energy<1> ( x(0), settings, report.monomer_reports().at(0) );
+  energy_data_type energy_monomer_1 = compute_interaction_energy<1> ( x(1), settings, report.monomer_reports().at(1) );
+  energy_data_type energy_monomer_2 = compute_interaction_energy<1> ( x(2), settings, report.monomer_reports().at(2) );
+  energy_data_type energy_monomer_3 = compute_interaction_energy<1> ( x(3), settings, report.monomer_reports().at(3) );
 
-  energy_data_type interaction_energy_dimer_01 = compute_interaction_energy<2> ( x.at(0) + x.at(1), settings, report.dimer_reports().at(0) );
-  energy_data_type interaction_energy_dimer_02 = compute_interaction_energy<2> ( x.at(0) + x.at(2), settings, report.dimer_reports().at(1) );
-  energy_data_type interaction_energy_dimer_03 = compute_interaction_energy<2> ( x.at(0) + x.at(3), settings, report.dimer_reports().at(2) );
-  energy_data_type interaction_energy_dimer_12 = compute_interaction_energy<2> ( x.at(1) + x.at(2), settings, report.dimer_reports().at(3) );
-  energy_data_type interaction_energy_dimer_13 = compute_interaction_energy<2> ( x.at(1) + x.at(3), settings, report.dimer_reports().at(4) );
-  energy_data_type interaction_energy_dimer_23 = compute_interaction_energy<2> ( x.at(2) + x.at(3), settings, report.dimer_reports().at(5) );
+  energy_data_type interaction_energy_dimer_01 = compute_interaction_energy<2> ( x(0) + x(1), settings, report.dimer_reports().at(0) );
+  energy_data_type interaction_energy_dimer_02 = compute_interaction_energy<2> ( x(0) + x(2), settings, report.dimer_reports().at(1) );
+  energy_data_type interaction_energy_dimer_03 = compute_interaction_energy<2> ( x(0) + x(3), settings, report.dimer_reports().at(2) );
+  energy_data_type interaction_energy_dimer_12 = compute_interaction_energy<2> ( x(1) + x(2), settings, report.dimer_reports().at(3) );
+  energy_data_type interaction_energy_dimer_13 = compute_interaction_energy<2> ( x(1) + x(3), settings, report.dimer_reports().at(4) );
+  energy_data_type interaction_energy_dimer_23 = compute_interaction_energy<2> ( x(2) + x(3), settings, report.dimer_reports().at(5) );
 
-  energy_data_type interaction_energy_trimer_012 = compute_interaction_energy<3>(x.at(0)+x.at(1)+x.at(2), settings, report.trimer_reports.at(0) );
-  energy_data_type interaction_energy_trimer_013 = compute_interaction_energy<3>(x.at(0)+x.at(1)+x.at(3), settings, report.trimer_reports.at(1) );
-  energy_data_type interaction_energy_trimer_023 = compute_interaction_energy<3>(x.at(0)+x.at(2)+x.at(3), settings, report.trimer_reports.at(2) );
-  energy_data_type interaction_energy_trimer_123 = compute_interaction_energy<3>(x.at(1)+x.at(2)+x.at(3), settings, report.trimer_reports.at(3) );
+  energy_data_type interaction_energy_trimer_012 = compute_interaction_energy<3>(x(0)+x(1)+x(2), settings, report.trimer_reports.at(0) );
+  energy_data_type interaction_energy_trimer_013 = compute_interaction_energy<3>(x(0)+x(1)+x(3), settings, report.trimer_reports.at(1) );
+  energy_data_type interaction_energy_trimer_023 = compute_interaction_energy<3>(x(0)+x(2)+x(3), settings, report.trimer_reports.at(2) );
+  energy_data_type interaction_energy_trimer_123 = compute_interaction_energy<3>(x(1)+x(2)+x(3), settings, report.trimer_reports.at(3) );
 
   energy_data_type interaction_energy =  energy_tetramer_0123 -
                                          energy_monomer_0 - energy_monomer_1 - energy_monomer_2 - energy_monomer_3 -

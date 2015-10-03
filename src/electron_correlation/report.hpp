@@ -32,7 +32,7 @@
 #include <tuple>
 #include <structure/molecule.hpp>
 #include <electron_correlation/correlation_level.hpp>
-//#include <interface_to_third_party/external_program_report.hpp>
+#include <interface_to_third_party/external_program_report.hpp>
 
 namespace iquads {
 
@@ -80,14 +80,17 @@ using std :: tuple;
 using std :: pair;
 using std :: get;
 using structure :: Molecule;
-//using interface_to_third_party :: ExternalProgramReport;
+using interface_to_third_party :: ExternalProgramReport;
 
 struct Report {
 public:
+  typedef Report     this_type;
   typedef string     molecule_name_type;
   typedef Molecule   molecule_obj_type;
+  typedef molecule_obj_type :: atom_list_type atom_list_type;
+  typedef molecule_obj_type :: geometry_unit_type geometry_unit_type;
   typedef tuple < molecule_name_type, molecule_obj_type > molecule_info_type;
-//  typedef ExternalProgramReport   external_report_type;
+  typedef ExternalProgramReport   external_report_type;
   typedef double                  energy_data_type;
   typedef level_mask_type         correlation_level_type;
 
@@ -161,18 +164,30 @@ public:
   /**
    *  Accessors - no mutators since we don't allow changes of data once they are filled
    */
-  const Report raw() const { return *this; }
+  this_type raw() const 
+    { return *this; }
+  external_report_type raw_external() const
+    { return this->external_report_; }
   molecule_info_type molecule_info() const 
     { return this->molecule_info_; }
+  energy_data_type energy() const 
+    { return this->energy_; }
+
+  /**
+   *  Auxiliary accessors 
+   */
   molecule_name_type molecule_name() const
     { return get<0>( this->molecule_info_ ); }
   molecule_obj_type molecule_obj() const
     { return get<1>( this->molecule_info_ ); }
-  energy_data_type energy() const 
-    { return this->energy_; }
+  atom_list_type atom_list() const 
+    { return this->molecule_obj().atom_list(); }
+  geometry_unit_type geometry_unit() const
+    { return this->molecule_obj().geometry_unit(); }
 
 private:
   molecule_info_type   molecule_info_;
+  external_report_type external_report_;
   correlated_energy_report_type correlated_energy_report_;
   energy_data_type     energy_;
 

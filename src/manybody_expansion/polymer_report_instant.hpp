@@ -24,24 +24,19 @@
  *
  */
 
-#ifndef MANYBODY_EXPANSION_POLYMER_REPORT_OMNI_INSTANT_HPP
-#define MANYBODY_EXPANSION_POLYMER_REPORT_OMNI_INSTANT_HPP
+#ifndef MANYBODY_EXPANSION_POLYMER_REPORT_INSTANT_HPP
+#define MANYBODY_EXPANSION_POLYMER_REPORT_INSTANT_HPP
 
-#include <manybody_expansion/polymer_report_omni_template.hpp>
+#include <manybody_expansion/polymer_report_template.hpp>
 
 namespace iquads {
 
 namespace manybody_expansion {
 
-  template struct PolymerOmniReportGeneral<1>;
-  template struct PolymerOmniReportGeneral<2>;
-  template struct PolymerOmniReportGeneral<3>;
-  template struct PolymerOmniReportGeneral<4>;
-
-//  template struct PolymerOmniReportPeriodic<1>;
-//  template struct PolymerOmniReportPeriodic<2>;
-//  template struct PolymerOmniReportPeriodic<3>;
-//  template struct PolymerOmniReportPeriodic<4>;
+  template struct PolymerReport<1>;
+  template struct PolymerReport<2>;
+  template struct PolymerReport<3>;
+  template struct PolymerReport<4>;
 
 } // end of namespace manybody_expansion
 

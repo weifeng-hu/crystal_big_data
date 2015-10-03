@@ -60,7 +60,8 @@ public:
   typedef calculation :: calculation_mask_type calculation_type;
   typedef string basis_set_name_type;
   typedef vector<string> method_keyword_list_type;
-  typedef structure :: Molecule molecule_info_type;
+  typedef string molecule_name_type;
+  typedef tuple< molecule_name_type, structure :: Molecule > molecule_info_type;
 
 public:
   const mode_type mode() const 

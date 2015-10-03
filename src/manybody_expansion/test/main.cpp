@@ -29,6 +29,9 @@
 #include <manybody_expansion/report.hpp>
 #include <manybody_expansion/agent.hpp>
 #include <manybody_expansion/client.hpp>
+#include <manybody_expansion/polymer_report_subgroup_traits.hpp>
+#include <manybody_expansion/polymer_report_template.hpp>
+#include <manybody_expansion/polymer_report_omni_template.hpp>
 
 int main( int argc, char* argv[] ) {
 
@@ -36,6 +39,15 @@ int main( int argc, char* argv[] ) {
   using iquads :: manybody_expansion :: Config;
   using iquads :: manybody_expansion :: Client;
   using iquads :: manybody_expansion :: Agent;
+  using iquads :: manybody_expansion :: PolymerReport;
+  using iquads :: manybody_expansion :: PolymerOmniReportGeneral;
+  PolymerReport<1> monomer_report;
+  PolymerOmniReportGeneral<1> report_x;
+  
+
+  using std :: cout;
+  using std :: endl;
+//  cout << trimer_report.composition_list().size() << endl;
 
   Request request;
   Config config;

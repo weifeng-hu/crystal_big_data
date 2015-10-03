@@ -8,9 +8,6 @@ CFLAGS          = -I$(IQUADS_SRC)
 CHEADS          =
 CSRCS           =\
 		request.cpp\
-		report.cpp\
-		agent.cpp\
-		client.cpp\
 		setting.cpp\
 		main.cpp
 COBJS           = $(CSRCS:.cpp=.o)

@@ -82,6 +82,7 @@ public:
   typedef typename atom_type :: coordinate_type             coordinate_type;
   typedef typename atom_type :: atom_coordinate_list_type   atom_coordinate_list_type;
   typedef typename atom_type :: mass_value_type             mass_value_type;
+  typedef typename atom_type :: geometry_unit_type          geometry_unit_type;
   typedef Interval                                          interval_data_type;
   typedef Interval3D                                        interval_set_type;
   typedef AtomList                                          atom_list_type;
@@ -433,9 +434,17 @@ public:
     return retval;
   }
 
+  /**
+   *  + geometry_unit()
+   *    Return the geometry unit of the first atom, normally geometry units
+   *    of all atoms are aligned once the this object is created
+   */
+  geometry_unit_type geometry_unit() const
+    { return this->atom_list_[0].geometry_unit(); }
+
   // I just leave this function for now
   array<int, 3>& set_translation_vec()
-   { return this->translation_vec_; }
+    { return this->translation_vec_; }
 
 private:
   atom_list_type     atom_list_;
