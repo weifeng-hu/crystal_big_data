@@ -64,18 +64,18 @@ public:
   typedef tuple< molecule_name_type, structure :: Molecule > molecule_info_type;
 
 public:
-  const mode_type mode() const 
-   { return this->mode_; }
-  const calculation_type calculation() const
-   { return this->calculation_; }
+  mode_type mode() const 
+    { return this->mode_; }
+  calculation_type calculation() const
+    { return this->calculation_; }
   molecule_info_type& set_molecule_info()
-   { return this->molecule_info_; }
+    { return this->molecule_info_; }
   mode_type& set_mode()
-   { return this->mode_; }
+    { return this->mode_; }
   external_program_type& set_external_program()
-   { return this->external_program_; }
+    { return this->external_program_; }
   basis_set_name_type& set_basis_set_name()
-   { return this->basis_set_name_; }
+    { return this->basis_set_name_; }
 
 private:
   external_program_type external_program_;

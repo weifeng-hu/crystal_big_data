@@ -97,7 +97,7 @@ public:
       }
       else {
         external_request_type external_request = this->file_external_request( molecule_info, setting );
-//        this->set_report().collect_data_from_external_report( ( this->agent_factory_.get_agent( setting.external_program() ) )->accept_request_and_process( external_request ) );
+        this->set_report().collect_data_from_external_report( ( this->agent_factory_.get_agent( setting.external_program() ) )->accept_request_and_process( external_request ) );
       }
     } // end of driver()
 
