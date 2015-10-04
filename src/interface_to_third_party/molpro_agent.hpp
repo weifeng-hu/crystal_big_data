@@ -41,53 +41,47 @@ namespace iquads {
 
 namespace interface_to_third_party {
 
-class MolproAgent 
-  : public ExternalProgramAgent_Base
-{
+class MolproAgent : public ExternalProgramAgent_Base {
 public:
   typedef MolproConfig this_config_type;
   typedef this_config_type* this_config_ptr;
   typedef ExternalProgramReport report_type;
 
 public:
-  MolproAgent()
-   {
-    try
-     {
+  MolproAgent() {
+    try {
       using std::getenv;
       const char* program_path = getenv("MOLPRO_PATH");
-      if( program_path == nullptr ){
+      if( program_path == nullptr ) {
        throw 1;
       }
       this->program_path_ = program_path;
       this->program_name_ = "molpro";
       this->file_extension_ = ".com";
-     }
-    catch ( int signal ){
+    } catch ( int signal ) {
       using std::cout;
       using std::endl;
       cout << "Environment Variable $MOLPRO_PATH not set" << endl;
       abort();
     }
-   } // end of default constructor
+  } // end of default constructor
 
 public:
   base_config_ptr_list generate_config_list_from_request( request_type request );
-  void run_external_program( file_name_type input_filename, file_name_type output_filename )
-   {
-     command_line_type command_line 
-       = this->program_path_ + " " + input_filename;
-     try{
+  void run_external_program( file_name_type input_filename, file_name_type output_filename ) {
+    command_line_type command_line 
+      = this->program_path_ + " " + input_filename;
+    try {
       int res = system( command_line.c_str() );
       if( res != 0 ){ throw 1; }
-     }
-     catch ( int signal ){
+    } catch ( int signal ) {
       using std::cout;
       using std::endl;
       cout << "molpro program returns an error" << endl;
       abort();
      }
-   }
+  }
+
   file_name_type write_input_hf_energy( base_config_ptr base_config_pointer );
   file_name_type write_input_mp2_energy( base_config_ptr base_config_pointer );
   file_name_type write_input_casscf_energy( base_config_ptr base_config_pointer );

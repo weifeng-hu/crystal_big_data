@@ -145,7 +145,7 @@ template <> inline energy_data_type compute_interaction_energy < 4 > ( polymer_t
   {
     molecule_info_type molecule_0123 = convert_polymer_to_molecule<4> ( x );
     molecule_energy_client_type client;
-//    client.driver( molecule_0123, settings );
+    client.driver( molecule_0123, settings );
     energy_tetramer_0123 = client.report().energy();
   }
 

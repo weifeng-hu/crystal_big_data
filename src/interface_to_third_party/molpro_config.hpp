@@ -43,7 +43,7 @@ using std::ostream;
 using std::string;
 using std::tuple;
 using std::vector;
-using namespace structure :: geometry;
+using namespace structure;
 
 struct MolproConfig : public ExternalProgramConfig_Base
 {
@@ -122,7 +122,7 @@ public:
           os << object_ref.return_geom_unit_string() << endl;
           geometry_format_type geometry_format = object_ref.geometry_format();
           switch( geometry_format ) {
-           case( coordinate_system :: CARTESIAN ):
+           case( coordinate_representation :: CARTESIAN ):
              os << "geomtyp=" << object_ref.return_geomtyp_string() << endl;
              os << "geometry={" << endl;
              for( size_t iatom = 0; iatom < object_ref.atomic_coord_list().size(); iatom++ ){
@@ -136,7 +136,7 @@ public:
              }
              os << "}" << endl;
              break;
-           case( coordinate_system :: INTERNAL ):
+           case( coordinate_representation :: INTERNAL ):
              using std::cout;
              cout << "Internal geometry for molpro has not been implemented" << endl;
              abort();
@@ -162,10 +162,10 @@ public:
        {
         try {
          switch( this->geometry_format_ ){
-          case( coordinate_system :: CARTESIAN ):
+          case( coordinate_representation :: CARTESIAN ):
            return "xyz";
            break;
-          case( coordinate_system :: INTERNAL ):
+          case( coordinate_representation :: INTERNAL ):
            return "internal"; // this is not actually used in molpro when using z-matrix
            break;
           default:
@@ -182,10 +182,10 @@ public:
        {
         try {
          switch ( this->geometry_unit_ ){
-          case( unit :: ANGSTROM ):
+          case( geometry_unit :: ANGSTROM ):
            return "angstrom";
            break;
-          case( unit :: BOHR ):
+          case( geometry_unit :: BOHR ):
            return "bohr";
            break;
           default:

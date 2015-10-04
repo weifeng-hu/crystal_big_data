@@ -37,21 +37,19 @@ namespace interface_to_third_party {
 typedef MolproAgent agent_type;
 
 agent_type :: base_config_ptr_list
- agent_type :: generate_config_list_from_request( request_type request )
-{
+agent_type :: generate_config_list_from_request( request_type request ) {
 
   base_config_ptr_list config_pointer_list;
-  if( request.calculation() == iquads :: calculation :: SINGLE_POINT_ENERGY ){
-   config_pointer_list.resize(1);
-   config_pointer_list[0] = new this_config_type;
-   /* need to be further implemented */
+  if( request.calculation() == iquads :: sequence :: calculation :: SINGLE_POINT_ENERGY ) {
+    config_pointer_list.resize(1);
+    config_pointer_list[0] = new this_config_type;
+    /* need to be further implemented */
   }
 
 }; // end of function generate_config_list_from_request()
 
 agent_type :: file_name_type 
- agent_type :: write_input_hf_energy( base_config_ptr base_config_pointer )
-{
+agent_type :: write_input_hf_energy( base_config_ptr base_config_pointer ) {
 
   using std::ofstream;
   using std::endl;
@@ -69,8 +67,7 @@ agent_type :: file_name_type
 }; // end of function write_input_hf_energy()
 
 agent_type :: file_name_type
- agent_type :: write_input_mp2_energy( base_config_ptr base_config_pointer )
-{
+agent_type :: write_input_mp2_energy( base_config_ptr base_config_pointer ) {
 
   using std::ofstream;
   using std::endl;
@@ -83,8 +80,7 @@ agent_type :: file_name_type
 }; // end of function write_input_mp2_energy()
 
 agent_type :: file_name_type
- agent_type :: write_input_casscf_energy( base_config_ptr base_config_pointer )
-{
+agent_type :: write_input_casscf_energy( base_config_ptr base_config_pointer ) {
   using std::ofstream;
   using std::endl;
   file_name_type input_filename = base_config_pointer->input_path() + 
@@ -95,8 +91,7 @@ agent_type :: file_name_type
 }; // end of function write_input_casscf_energy()
 
 agent_type :: energy_report_type 
- agent_type :: collect_energy_data_from_output( file_name_type output_filename )
-{
+agent_type :: collect_energy_data_from_output( file_name_type output_filename ) {
 
 }; // end of function collect_energy_data_from_output()
 

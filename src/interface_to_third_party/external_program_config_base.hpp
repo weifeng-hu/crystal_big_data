@@ -36,20 +36,46 @@
 #include <electron_correlation/quantity.hpp>
 #include <electron_correlation/correlation_level.hpp>
 
-using std::tuple;
-using std::string;
-using std::vector;
-using std::ostream;
-
 namespace iquads {
-
-using namespace structure;
-using namespace electron_correlation;
 
 namespace interface_to_third_party {
 
-struct ExternalProgramConfig_Base 
-{
+  /**
+   *  A base struct for third party configuration
+   *
+   *  There is no fixed way to design a runtime configuration data set 
+   *  like this. But for general external quantum chemistry software, 
+   *  sub-datasets to run a calculation can be:
+   *
+   *   + memory usage control
+   *   + parallelization control
+   *   + file I/O control
+   *   + basis set info
+   *   + geometry info
+   *   + Hatree Fock control
+   *   + MP2 control
+   *   + Kohn-Sham DFT control
+   *   + MCSCF/CASSCF control
+   *   + CC control
+   *   etc.
+   *
+   *  So in this struct, base struct for sub-configs are included.
+   *  These sub-config are responsible to hold the actual data members,
+   *  WHICH SHOULD BE GENERAL FOR ALL QUANTUM CHEMISTRY PACKAGES,
+   *  and let the derived struct to manipulate them using virtual methods.
+   *  Derived sub-configures can have additional data member but should not
+   *  duplicate the functionality to already-have data.
+   *
+   */
+
+using std :: tuple;
+using std :: string;
+using std :: vector;
+using std :: ostream;
+using namespace structure;
+using namespace electron_correlation;
+
+struct ExternalProgramConfig_Base {
 public:
   typedef ExternalProgramConfig_Base parent_config_base_type;
 
@@ -165,32 +191,32 @@ public:
   virtual casscf_config_base_type& casscf_config() = 0;
 
 public:
-  const solution_tag_type solution_tag() const
-   { return this->solution_tag_; }
-  const energy_solution_tag_type energy_solution_tag() const 
-   { return this->energy_solution_tag_; }
-  const gradient_solution_tag_type gradient_solution_tag() const
-   { return this->gradient_solution_tag_; }
-  const file_extension_type file_extension() const 
-   { return this->file_extension_; }
-  const molecule_name_type molecule_name() const 
-   { return this->molecule_name_; }
-  const work_path_type input_path() const
-   { return this->input_path_; }
-  const work_path_type scratch_path() const
-   { return this->scratch_path_; }
-  const work_path_type output_path() const
-   { return this->output_path_; }
+  solution_tag_type solution_tag() const
+    { return this->solution_tag_; }
+  energy_solution_tag_type energy_solution_tag() const 
+    { return this->energy_solution_tag_; }
+  gradient_solution_tag_type gradient_solution_tag() const
+    { return this->gradient_solution_tag_; }
+  file_extension_type file_extension() const 
+    { return this->file_extension_; }
+  molecule_name_type molecule_name() const 
+    { return this->molecule_name_; }
+  work_path_type input_path() const
+    { return this->input_path_; }
+  work_path_type scratch_path() const
+    { return this->scratch_path_; }
+  work_path_type output_path() const
+    { return this->output_path_; }
 
 private:
-  solution_tag_type solution_tag_;
-  energy_solution_tag_type energy_solution_tag_;
-  gradient_solution_tag_type gradient_solution_tag_;
-  file_extension_type file_extension_;
-  molecule_name_type molecule_name_;
-  work_path_type input_path_;
-  work_path_type scratch_path_;
-  work_path_type output_path_;
+  solution_tag_type            solution_tag_;
+  energy_solution_tag_type     energy_solution_tag_;
+  gradient_solution_tag_type   gradient_solution_tag_;
+  file_extension_type          file_extension_;
+  molecule_name_type           molecule_name_;
+  work_path_type               input_path_;
+  work_path_type               scratch_path_;
+  work_path_type               output_path_;
 
 }; // end of struct ExternalProgramConfig_Base
 

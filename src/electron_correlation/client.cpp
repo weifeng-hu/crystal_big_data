@@ -24,6 +24,8 @@
  *
  */
 
+#include <iquads/sequence.hpp>
+#include <electron_correlation/correlation_level.hpp>
 #include <electron_correlation/client.hpp>
 
 namespace iquads {
@@ -46,15 +48,16 @@ typedef Client client_type;
  */
 
 client_type :: external_request_type
-client_type :: file_external_request( molecule_info_type molecule_info, setting_type settings )
-{
+client_type :: file_external_request( molecule_info_type molecule_info, setting_type setting ) {
 
-  external_request_type request;
-  request.set_molecule_info() = molecule_info;
-  request.set_mode() = settings.mode();
-  request.set_basis_set_name() = settings.basis_set_name();
-  request.set_external_program() = settings.external_program();
-
+  using std :: get;
+  external_request_type request ( get<0>( molecule_info ),
+                                  get<1>( molecule_info ),
+                                  setting.basis_set_name(),
+                                  setting.external_program(),
+                                  setting.mode(),
+                                  iquads :: sequence :: calculation :: SINGLE_POINT_ENERGY,
+                                  iquads :: electron_correlation :: single_reference :: mean_field :: RHF );
   return request;
 
 }; // end of file_external_request

@@ -90,16 +90,15 @@ public:
    *    are dependent on other higher level tasks which needs correlation information, and the Setting
    *    will be decided by the actual higher level task variables.
    */
-  void driver( molecule_info_type molecule_info, setting_type setting )
-    {
-      if( setting.use_internal_solver() == false ) {
-        this->report_ = internal_solve();
-      }
-      else {
-        external_request_type external_request = this->file_external_request( molecule_info, setting );
-        this->set_report().collect_data_from_external_report( ( this->agent_factory_.get_agent( setting.external_program() ) )->accept_request_and_process( external_request ) );
-      }
-    } // end of driver()
+  void driver( molecule_info_type molecule_info, setting_type setting ) {
+    if( setting.use_internal_solver() == false ) {
+      this->report_ = internal_solve();
+    }
+    else {
+      external_request_type external_request = this->file_external_request( molecule_info, setting );
+      this->set_report().collect_data_from_external_report( ( this->agent_factory_.get_agent( setting.external_program() ) )->accept_request_and_process( external_request ) );
+    }
+  } // end of driver()
 
 public:
   /**

@@ -29,8 +29,8 @@
 
 #include <stdlib.h>
 #include <interface_to_third_party/program_mask.hpp>
-//#include <interface_to_third_party/external_program_agent_base.hpp>
-//#include <interface_to_third_party/molpro_agent.hpp>
+#include <interface_to_third_party/external_program_agent_base.hpp>
+#include <interface_to_third_party/molpro_agent.hpp>
 //#include <interface_to_third_party/orca_agent.hpp>
 
 namespace iquads {
@@ -42,27 +42,21 @@ using namespace program;
 class ExternalProgramAgent_Factory {
 public:
   typedef ExternalProgramAgent_Factory   this_type;
-//  typedef ExternalProgramAgent_Base      base_agent_type;
+  typedef ExternalProgramAgent_Base      base_agent_type;
   typedef program :: program_mask_type   agent_mask_type;
-
-//  typedef base_agent_type*               base_agent_ptr;
+  typedef base_agent_type*               base_agent_ptr;
 
 public:
-/*
-  base_agent_ptr get_agent( agent_mask_type agent_mask )
-   {
-     switch( agent_mask ){
-      case( program :: MOLPRO ):
-//       return new MolproAgent;
+  base_agent_ptr get_agent( agent_mask_type agent_mask ) {
+   switch( agent_mask ){
+     case( program :: MOLPRO ):
+       return new MolproAgent;
        break;
-      case( program :: ORCA ):
-//       return new OrcaAgent;
-       break;
-      default:
+     case( program :: ORCA ):
+     default:
        exit(1);
      }
    } // end of get_agent()
-*/
 
 }; // end of class ExternalProgramAgent_Factory
 

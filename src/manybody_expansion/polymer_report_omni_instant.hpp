@@ -38,10 +38,10 @@ namespace manybody_expansion {
   template struct PolymerOmniReportGeneral<3>;
   template struct PolymerOmniReportGeneral<4>;
 
-//  template struct PolymerOmniReportPeriodic<1>;
-//  template struct PolymerOmniReportPeriodic<2>;
-//  template struct PolymerOmniReportPeriodic<3>;
-//  template struct PolymerOmniReportPeriodic<4>;
+  template struct PolymerOmniReportPeriodic<1>;
+  template struct PolymerOmniReportPeriodic<2>;
+  template struct PolymerOmniReportPeriodic<3>;
+  template struct PolymerOmniReportPeriodic<4>;
 
 } // end of namespace manybody_expansion
 

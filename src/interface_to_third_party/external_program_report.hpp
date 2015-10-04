@@ -34,22 +34,38 @@
 #include <electron_correlation/correlation_level.hpp>
 #include <interface_to_third_party/external_program_config_base.hpp>
 
-using std::tuple;
-using std::vector;
-using std::shared_ptr;
-
 namespace iquads {
 
-using namespace electron_correlation;
-
 namespace interface_to_third_party {
+
+  /**
+   *  A report struct for third party results
+   *
+   *  There is no fixed way to design this report meta-data.
+   *  In order to interface with other modules, e.g., the dynamics,
+   *  MBE, etc., also considering command quantity types and runtime
+   *  behaviors of external program, there are sub-report types are 
+   *  included in this report type.
+   *   + Energy data, contains the geometry and energies.
+   *     the goal is, users can easily dump out the geometry and rerun a calcultion.
+   *   + Gradient data, similar to energy data
+   *   + Runtime info data
+   *
+   *  An additional design is each actual quantity report is accompanied with a runtime
+   *  report. Each quantity is considered as a single run. This report can have an 
+   *  arbitrary number of report pairs.
+   *
+   */
+
+using std :: tuple;
+using std :: vector;
+using std :: shared_ptr;
+using namespace electron_correlation;
 
 struct ExternalProgramReport {
 public:
   typedef ExternalProgramReport parent_report_type;
-  typedef 
-    typename ExternalProgramConfig_Base :: GeometryConfig_Base :: atomic_coord_list_type 
-      atom_list_type;
+  typedef ExternalProgramConfig_Base :: GeometryConfig_Base :: atomic_coord_list_type  atom_list_type;
 
 public:
   struct EnergyReport {
@@ -60,34 +76,26 @@ public:
       typedef correlation_name_type energy_solution_name_type;
     public:
       atom_list_type& set_atom_list()
-       { return this->atom_list_; }
+        { return this->atom_list_; }
       energy_data_type& set_energy()
-       { return this->energy_; }
+        { return this->energy_; }
       energy_solution_tag_type& set_energy_solution_tag()
-       { return this->energy_solution_tag_; }
-      const energy_solution_name_type return_energy_solution_name() const 
-       {  }
+        { return this->energy_solution_tag_; }
+      energy_solution_name_type return_energy_solution_name() const 
+        {  }
     private:
       atom_list_type atom_list_;
       energy_data_type energy_;
       energy_solution_tag_type energy_solution_tag_;
   }; // end of struct ExternalProgramReport :: EnergyReport
 
-  struct GradientReport {
-
-  }; // end of struct ExternalProgramReport :: GradientReport
+  struct GradientReport { }; // end of struct ExternalProgramReport :: GradientReport
 
   typedef EnergyReport    energy_bare_report_type;
   typedef GradientReport  gradient_bare_report_type;
 
 public:
-  struct ReportInterface {
-    public:
-
-    public:
-
-    private:
-  };
+  struct ReportInterface { };
 
 public:
   struct RuntimeInfo_Base {
@@ -106,8 +114,8 @@ public:
          program_name_ ( program_name ), input_filename_ ( input_filename ), output_filename_ (output_filename),
          input_path_ ( input_directory ), scratch_path_ ( scratch_directory ), output_path_ ( output_directory ) {}
     public:
-      const file_name_type input_filename() const { return this->input_filename_; }
-      const file_name_type output_filename() const { return this->output_filename_; }
+      file_name_type input_filename() const { return this->input_filename_; }
+      file_name_type output_filename() const { return this->output_filename_; }
 
     protected:
       program_name_type program_name_;
@@ -117,6 +125,7 @@ public:
       path_name_type scratch_path_;
       path_name_type output_path_;
   }; // end of struct RuntimeInfo_Base
+
   struct LocalRunInfo : public RuntimeInfo_Base {
     LocalRunInfo( program_name_type program_name,
                   file_name_type input_filename,
@@ -128,18 +137,22 @@ public:
                          input_directory, scratch_directory, output_directory ) { }
     private:
   }; // end of struct LocalRunInfo
+
   struct DryRunInfo : public RuntimeInfo_Base {
     private:
       file_name_type run_script_filename_;
   }; // end of struct InputRunInfo
+
   struct HarvestRunInfo : public RuntimeInfo_Base {
     private:
   }; // end of struct OutputRunInfo
+
   struct PBSRunInfo : public RuntimeInfo_Base {
     private:
       file_name_type pbs_script_name_;
       file_name_type pbs_group_submission_script_name_;
   }; // end of PBSRunInfo
+
   struct SBATCHRunInfo : public RuntimeInfo_Base {
     private:
       file_name_type sbatch_script_name_;

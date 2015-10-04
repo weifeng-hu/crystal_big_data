@@ -158,7 +158,7 @@ public:
   /**
    *  Only this function can to manipulate data members in this struct
    */
-//  void collect_data_from_external_report( external_report_type external_report ){};
+  void collect_data_from_external_report( external_report_type external_report ){};
 
 public:
   /**
