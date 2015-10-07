@@ -24,15 +24,27 @@
  *
  */
 
+#include <iostream>
+#include <vector>
+#include <tuple>
 #include <electron_correlation/report.hpp>
 #include <electron_correlation/client.hpp>
 #include <electron_correlation/setting.hpp>
 
 int main( int argc, char* argv[] ) {
 
+  using std :: cout;
+  using std :: endl;
   using iquads :: electron_correlation :: Report;
   using iquads :: electron_correlation :: Client;
   using iquads :: electron_correlation :: Setting;
+
+  // let's create a molecule
+  iquads :: structure :: AtomList atom_list = { iquads :: structure :: Atom( "H", 1, 0, 0.5e0, 0.0e0, 0.0e0, "angstrom" ), 
+                                                iquads :: structure :: Atom( "H", 1, 0, -0.5e0, 0.0e0, 0.0e0, "angstrom" ),
+                                                iquads :: structure :: Atom( "O", 16, 0, 0.0e0, 0.0e0, 0.0e0, "angstrom" ) };
+  iquads :: structure :: Molecule molecule( atom_list, 0 ); // the second parameter is the charge
+  cout << molecule << endl;
 
   Report report;
   Setting setting;

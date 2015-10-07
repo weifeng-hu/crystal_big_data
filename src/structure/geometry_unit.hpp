@@ -77,11 +77,12 @@ namespace iquads {
         {
           using std :: cout;
           using std :: endl;
-          if( !(from & UNKNOWN) ) { 
+          cout << "from " << from << " " << UNKNOWN << endl;
+          if( (from & UNKNOWN) ) {
             cout << " unknown geometry unit type in FROM " << endl;
             abort();
           }
-          if( !(to   & UNKNOWN) ) {
+          if( (to   & UNKNOWN) ) {
             cout << " unknown geometry unit type in TO " << endl;
             abort();
           }
