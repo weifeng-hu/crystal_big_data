@@ -68,6 +68,13 @@ public:
   typedef base_config_type :: gradient_solution_tag_type   gradient_solution_tag_type;
 
 public:
+  ExternalProgramAgent_Base() {
+    this->program_path_ = "not set";
+    this->program_name_ = "not set";
+    this->file_extension_ = "not set";
+  };
+
+public:
   virtual void run_external_program( file_name_type input_filename, file_name_type output_filename ) = 0;
   virtual energy_report_type collect_energy_data_from_output( file_name_type output_filename ) = 0;
   virtual base_config_ptr_list generate_config_list_from_request( request_type request ) = 0;
@@ -117,7 +124,7 @@ public:
   } // end of function run_energy_calculation()
 
   file_name_type write_run_script( base_config_ptr base_config_pointer )
-    {   } // end of function write_run_script()
+    { return string("");  } // end of function write_run_script()
 
   file_name_type collect_result( file_name_type output_filename )
     {   } // end of function collect_result()

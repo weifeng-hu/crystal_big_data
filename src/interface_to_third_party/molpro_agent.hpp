@@ -48,7 +48,7 @@ public:
   typedef ExternalProgramReport report_type;
 
 public:
-  MolproAgent() {
+  MolproAgent() : ExternalProgramAgent_Base() {
     try {
       using std::getenv;
       const char* program_path = getenv("MOLPRO_PATH");
@@ -79,7 +79,7 @@ public:
       using std::endl;
       cout << "molpro program returns an error" << endl;
       abort();
-     }
+    }
   }
 
   file_name_type write_input_hf_energy( base_config_ptr base_config_pointer );

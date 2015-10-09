@@ -27,9 +27,11 @@
 #ifndef ELECTRON_CORRELATION_SETTING_HPP
 #define ELECTRON_CORRELATION_SETTING_HPP
 
+#include <iostream>
 #include <string>
 #include <iquads/sequence.hpp>
 #include <structure/molecule.hpp>
+//#include <electron_correlation/config.hpp>
 #include <manybody_expansion/config.hpp>
 #include <interface_to_third_party/program_mask.hpp>
 
@@ -66,13 +68,16 @@ namespace electron_correlation {
 using namespace iquads :: sequence;
 using namespace iquads :: interface_to_third_party;
 using std :: string;
+using std :: ostream;
 
 struct Setting {
 public:
+  typedef Setting                        this_type;
   typedef string                         basis_set_name_type;
   typedef string                         path_name_type;
   typedef program :: program_mask_type   external_program_type;
   typedef mode :: mode_mask_type         mode_type;
+//  typedef electron_correlation :: Config config_type;
   typedef manybody_expansion :: Config   mbe_config_type;
   typedef bool condition_type;
 
@@ -93,6 +98,20 @@ public:
       this->scratch_path_ = "not set";
       this->output_path_ = "not set";
     }
+  /**
+   *  Initialize list constructor
+   */
+  Setting( mode_type mode,
+           basis_set_name_type basis_set_name,
+           external_program_type external_program,
+           path_name_type input_path,
+           path_name_type scratch_path,
+           path_name_type output_path ) :
+    mode_ ( mode ), basis_set_name_ ( basis_set_name ), 
+    external_program_ ( external_program ),
+    input_path_   ( input_path ),
+    scratch_path_ ( scratch_path ),
+    output_path_  ( output_path ) { }
 
 public:
   /**
@@ -104,8 +123,28 @@ public:
    *  + Other
    *  Only this function can modify the data members of this struct
    */
-  void generate_from() {}
+//  void generate_from( config_type config ) {}
   void generate_from( mbe_config_type config );
+
+public:
+  /**
+   *  Stream operators
+   */
+  /**
+   *  + operator <<
+   */
+  friend
+  ostream& operator<< ( ostream& os, this_type& setting_obj ) {
+    using std :: cout;
+    using std :: endl;
+    os << "run mode: "          << setting_obj.mode()              << endl;
+    os << "basis set: "         << setting_obj.basis_set_name()    << endl;
+    os << "external program: "  << setting_obj.external_program()  << endl;
+    os << "input path: "        << setting_obj.input_path()        << endl;
+    os << "scratch path: "      << setting_obj.scratch_path()      << endl;
+    os << "output path: "       << setting_obj.output_path()       << endl;
+    return os;
+  } // end of operator<<
 
   /**
    *  Accessors

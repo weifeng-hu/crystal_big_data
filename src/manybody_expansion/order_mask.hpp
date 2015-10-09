@@ -48,7 +48,7 @@ namespace iquads {
       constexpr order_mask_type FOURTH_ORDER  
                 = ( FIRST_ORDER | SECOND_ORDER | THIRD_ORDER | 0x01 << 3 );
 
-      const inline order_mask_type return_order_mask( expansion_order_type expansion_order ) 
+      inline order_mask_type return_order_mask( expansion_order_type expansion_order ) 
        {
          switch( expansion_order ) {
            case( 1 ): return FIRST_ORDER;  break;

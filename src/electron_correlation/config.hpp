@@ -27,25 +27,23 @@
 #ifndef ELECTRON_CORRELATION_CONFIG_HPP
 #define ELECTRON_CORRELATION_CONFIG_HPP
 
-#include <electron_correlation/sequence.hpp>
+#include <iquads/sequence.hpp>
 #include <structure/molecule.hpp>
 
 namespace iquads {
 
 namespace electron_correlation {
 
-struct Config
-{
+struct Config {
 public:
   typedef Molecule molecule_info_type;
   typedef bool condition_type;
   typedef condition_type& condition_ref;
 
 public:
-  Config()
-   {
+  Config() {
      this->total_correlation_mask_ = 0x00;
-   }
+  }
 
 public:
   void enable_hf()
@@ -75,20 +73,20 @@ public:
    }
 
 public:
-  const condition_type hf_requested() const
-   { return ( this->total_correlation_mask_ & RHF ); }
-  const condition_type mp2_requested() const 
-   { return ( this->total_correlation_mask_ & MP2 ); }
-  const condition_type ccsd_requested() const 
-   { return ( this->total_correlation_mask_ & CCSD ); }
-  const condition_type ccsdt_requested() const 
-   { return ( this->total_correlation_mask_ & CCSDT ); }
-  const condition_type dmrg_requested() const
-   { return ( this->total_correlation_mask_ & DMRG ); }
+  condition_type hf_requested() const
+    { return ( this->total_correlation_mask_ & RHF ); }
+  condition_type mp2_requested() const 
+    { return ( this->total_correlation_mask_ & MP2 ); }
+  condition_type ccsd_requested() const 
+    { return ( this->total_correlation_mask_ & CCSD ); }
+  condition_type ccsdt_requested() const 
+    { return ( this->total_correlation_mask_ & CCSDT ); }
+  condition_type dmrg_requested() const
+    { return ( this->total_correlation_mask_ & DMRG ); }
 
 private:
-  bitmask_type total_correlation_mask_;
   molecule_info_type molecule_info_;
+  bitmask_type total_correlation_mask_;
 
 }; // end of struct Config
 

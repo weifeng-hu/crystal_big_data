@@ -27,27 +27,33 @@
 #include <iostream>
 #include <vector>
 #include <tuple>
-#include <electron_correlation/report.hpp>
-#include <electron_correlation/client.hpp>
 #include <electron_correlation/setting.hpp>
+#include <electron_correlation/client.hpp>
 
 int main( int argc, char* argv[] ) {
 
-  using std :: cout;
-  using std :: endl;
-  using iquads :: electron_correlation :: Report;
-  using iquads :: electron_correlation :: Client;
-  using iquads :: electron_correlation :: Setting;
-
   // let's create a molecule
-  iquads :: structure :: AtomList atom_list = { iquads :: structure :: Atom( "H", 1, 0, 0.5e0, 0.0e0, 0.0e0, "angstrom" ), 
-                                                iquads :: structure :: Atom( "H", 1, 0, -0.5e0, 0.0e0, 0.0e0, "angstrom" ),
-                                                iquads :: structure :: Atom( "O", 16, 0, 0.0e0, 0.0e0, 0.0e0, "angstrom" ) };
+  iquads :: structure :: AtomList atom_list = { iquads :: structure :: Atom( string("H"), 1,  0,  0.5e0, 0.0e0, 0.0e0, "angstrom" ),
+                                                iquads :: structure :: Atom( string("H"), 1,  0, -0.5e0, 0.0e0, 0.0e0, "angstrom" ),
+                                                iquads :: structure :: Atom( string("O"), 16, 0,  0.0e0, 0.0e0, 0.0e0, "angstrom" ) };
   iquads :: structure :: Molecule molecule( atom_list, 0 ); // the second parameter is the charge
-  cout << molecule << endl;
+  std :: tuple < std :: string, iquads :: structure :: Molecule > molecule_info = std :: make_tuple( string("water"), molecule );
+  std :: cout << "Molecule created:" << std :: endl;
+  std :: cout << "name: " << std :: get<0>( molecule_info ) << std :: endl;
+  std :: cout << "geometry: " << endl << std :: get<1>( molecule_info ) << endl;
 
-  Report report;
-  Setting setting;
-  Client client;
+  // let's create an electron correlation setting
+  iquads :: electron_correlation :: Setting  calculation_setting( iquads :: sequence :: mode :: LOCAL_RUN,
+                                                                  "sto-3g",
+                                                                  iquads :: interface_to_third_party :: program :: MOLPRO,
+                                                                  "./",
+                                                                  "./scratch/",
+                                                                  "./result/");
+  std :: cout << calculation_setting << std :: endl;
+
+  // let's create a client
+  iquads :: electron_correlation :: Client client;
+  // and run application
+  client.driver( molecule_info, calculation_setting );
 
 } // end of main()

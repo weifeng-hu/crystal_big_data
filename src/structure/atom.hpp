@@ -118,7 +118,7 @@ public:
   Atom()
     {
       this->coordinate_ = make_tuple( 0.0e0, 0.0e0, 0.0e0 );
-      this->element_ = "not set";
+      this->element_ = string("not set");
       this->charge_  = 0;
       this->mass_    = 0.0e0;
       this->translation_vec_.fill(0);
@@ -133,15 +133,15 @@ public:
    *  Developers must know what they are doing when using the copy constructor to change a
    *  already initialized atom object.
    */
-  Atom( element_name_type     element, 
-        mass_value_type       mass,
-        charge_value_type     charge, 
-        coordinate_value_type x, 
-        coordinate_value_type y, 
-        coordinate_value_type z,
+  Atom( element_name_type     element_value, 
+        mass_value_type       mass_value,
+        charge_value_type     charge_value, 
+        coordinate_value_type x_value, 
+        coordinate_value_type y_value, 
+        coordinate_value_type z_value,
         geometry_unit_name_type unit_name ) :
-    element_(element), mass_(mass), charge_(charge), 
-    coordinate_ ( make_tuple(x, y, z) ), geometry_unit_ ( geometry_unit :: return_unit_mask( unit_name ) )
+    element_(element_value), mass_(mass_value), charge_(charge_value), 
+    coordinate_ ( make_tuple(x_value, y_value, z_value) ), geometry_unit_ ( geometry_unit :: return_unit_mask( unit_name ) )
       { this->translation_vec_.fill(0); }
 
 public:
@@ -330,8 +330,8 @@ public:
     { return get<2>( this->coordinate_ ); }
   coordinate_ref set_coordinate()
     { return this->coordinate_; }
-  void set_coordinate( coordinate_value_type x, coordinate_value_type y, coordinate_value_type z )
-    { this->coordinate_ = make_tuple( x, y, z ); }
+  void set_coordinate( coordinate_value_type x_value, coordinate_value_type y_value, coordinate_value_type z_value )
+    { this->coordinate_ = make_tuple( x_value, y_value, z_value); }
   geometry_unit_ref set_geometry_unit()
     { return this->geometry_unit_; }
 

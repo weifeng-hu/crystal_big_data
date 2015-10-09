@@ -104,9 +104,9 @@ public:
    *  The initialize list constructor eats the lengths and angles.
    *  Be careful! The unit format for input angles are degrees, always.
    */
-  LatticeParameter( length_set_type length_set,
-                    angle_set_type  angle_set ) :
-    length_set_ (length_set), angle_set_ (angle_set) { }
+  LatticeParameter( length_set_type length_set_obj,
+                    angle_set_type  angle_set_obj ) :
+    length_set_ (length_set_obj), angle_set_ (angle_set_obj) { }
   LatticeParameter( length_data_type a, length_data_type b, length_data_type c,
                     angle_data_type alpha, angle_data_type beta, angle_data_type gamma ):
     length_set_ ( make_tuple( a, b, c ) ), angle_set_ ( make_tuple( alpha, beta, gamma ) ) { }

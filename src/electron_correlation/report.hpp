@@ -84,15 +84,21 @@ using interface_to_third_party :: ExternalProgramReport;
 
 struct Report {
 public:
-  typedef Report     this_type;
-  typedef string     molecule_name_type;
-  typedef Molecule   molecule_obj_type;
-  typedef molecule_obj_type :: atom_list_type atom_list_type;
-  typedef molecule_obj_type :: geometry_unit_type geometry_unit_type;
-  typedef tuple < molecule_name_type, molecule_obj_type > molecule_info_type;
-  typedef ExternalProgramReport   external_report_type;
-  typedef double                  energy_data_type;
-  typedef level_mask_type         correlation_level_type;
+  typedef Report                                            this_type;
+  typedef string                                            molecule_name_type;
+  typedef Molecule                                          molecule_obj_type;
+  typedef molecule_obj_type :: atom_list_type               atom_list_type;
+  typedef molecule_obj_type :: geometry_unit_type           geometry_unit_type;
+  typedef tuple < molecule_name_type, molecule_obj_type >   molecule_info_type;
+  typedef ExternalProgramReport                             external_report_type;
+  typedef double                                            energy_data_type;
+  typedef level_mask_type                                   correlation_level_type;
+
+public:
+  Report(){}
+  Report( molecule_info_type molecule_info ) :
+//    molecule_name_ ( get<0> ( molecule_info ) ),
+    molecule_obj_  ( get<1> ( molecule_info ) ) { }
 
 public:
   /**
@@ -102,7 +108,7 @@ public:
    */
   struct CorrelatedEnergyReport {
     public:
-      typedef map< correlation_level_type, energy_data_type >   correlated_energy_list_type;
+      typedef map< int, energy_data_type >   correlated_energy_list_type;
       typedef correlated_energy_list_type :: iterator           list_iterator_type;
 
     public:
@@ -118,17 +124,18 @@ public:
         using namespace electron_correlation :: multi_reference :: scf;
         using namespace electron_correlation :: multi_reference :: dmrg;
         using namespace electron_correlation :: fci;
-        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( RHF, 0.0e0 ) );
-        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( UHF, 0.0e0 ) );
-        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( DFT, 0.0e0 ) );
-        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( MP2, 0.0e0 ) );
-        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( CCSD_T, 0.0e0 ) );
-        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( CCSDT, 0.0e0 ) );
-        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( CCSDT_Q, 0.0e0 ) );
-        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( CASCI, 0.0e0 ) );
-        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( CASSCF, 0.0e0 ) );
-        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( DMRG, 0.0e0 ) );
-        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( FCI, 0.0e0 ) );
+        using std :: make_pair;
+//        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( RHF, 0.0e0 ) );
+//        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( UHF, 0.0e0 ) );
+//        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( DFT, 0.0e0 ) );
+//        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( MP2, 0.0e0 ) );
+//        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( CCSD_T, 0.0e0 ) );
+//        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( CCSDT, 0.0e0 ) );
+//        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( CCSDT_Q, 0.0e0 ) );
+//        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( CASCI, 0.0e0 ) );
+//        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( CASSCF, 0.0e0 ) );
+//        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( DMRG, 0.0e0 ) );
+//        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( FCI, 0.0e0 ) );
       }
 
     public:
@@ -137,17 +144,17 @@ public:
      *  Here we provide methods directly to the actual energy data
      */
     energy_data_type correlated_energy_of( correlation_level_type correlation_level ) {
-      list_iterator_type list_iterator = this->correlated_energy_list_.find( correlation_level );
-      return (*list_iterator).second;
+//      list_iterator_type list_iterator = this->correlated_energy_list_.find( correlation_level );
+//      return (*list_iterator).second;
     }
 
     energy_data_type& set_correlated_energy_of( correlation_level_type correlation_level ) {
-      list_iterator_type list_iterator = this->correlated_energy_list_.find( correlation_level );
-      return list_iterator->second;
+//      list_iterator_type list_iterator = this->correlated_energy_list_.find( correlation_level );
+//      return list_iterator->second;
     }
 
     private:
-      correlated_energy_list_type correlated_energy_list_;
+//      correlated_energy_list_type correlated_energy_list_;
 
   }; // end of sub struct CorrelatedEnergyReport
 
@@ -158,7 +165,7 @@ public:
   /**
    *  Only this function can to manipulate data members in this struct
    */
-  void collect_data_from_external_report( external_report_type external_report ){};
+  void collect_data_from_external_report( external_report_type external_report ) {};
 
 public:
   /**
@@ -166,28 +173,30 @@ public:
    */
   this_type raw() const 
     { return *this; }
-  external_report_type raw_external() const
-    { return this->external_report_; }
-  molecule_info_type molecule_info() const 
-    { return this->molecule_info_; }
+  external_report_type raw_external() const {}
+//    { return this->external_report_; }
+//  molecule_info_type molecule_info() const 
+//    { return this->molecule_info_; }
   energy_data_type energy() const 
     { return this->energy_; }
 
   /**
    *  Auxiliary accessors 
    */
-  molecule_name_type molecule_name() const
-    { return get<0>( this->molecule_info_ ); }
-  molecule_obj_type molecule_obj() const
-    { return get<1>( this->molecule_info_ ); }
+  molecule_name_type molecule_name() const  {}
+//    { return get<0>( this->molecule_info_ ); }
+  molecule_obj_type molecule_obj() const  {}
+//    { return get<1>( this->molecule_info_ ); }
   atom_list_type atom_list() const 
     { return this->molecule_obj().atom_list(); }
   geometry_unit_type geometry_unit() const
     { return this->molecule_obj().geometry_unit(); }
 
 private:
-  molecule_info_type   molecule_info_;
-  external_report_type external_report_;
+//  molecule_info_type   molecule_info_;
+  molecule_obj_type molecule_obj_;
+//  molecule_name_type molecule_name_;
+//  external_report_type external_report_;
   correlated_energy_report_type correlated_energy_report_;
   energy_data_type     energy_;
 

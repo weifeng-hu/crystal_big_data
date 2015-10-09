@@ -163,7 +163,7 @@ namespace iquads {
 
     } // end of namespace fci
 
-    const inline level_mask_type return_level_mask( correlation_name_type correlation_name ) {
+    inline level_mask_type return_level_mask( correlation_name_type correlation_name ) {
 
       if( correlation_name == "hf" || correlation_name == "rhf" ) return single_reference :: mean_field :: RHF;
       if( correlation_name == "uhf" ) return single_reference :: mean_field :: UHF;

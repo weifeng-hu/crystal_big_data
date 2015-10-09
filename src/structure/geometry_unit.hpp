@@ -57,7 +57,7 @@ namespace iquads {
         } // end of inline function return_unit_name();
 
       inline 
-      const unit_mask_type return_unit_mask( unit_literal_type literal )
+      unit_mask_type return_unit_mask( unit_literal_type literal )
         {
           if( literal == "ang" || literal == "angstrom" 
            || literal == "Ang" || literal == "Angstrom"
@@ -77,12 +77,11 @@ namespace iquads {
         {
           using std :: cout;
           using std :: endl;
-          cout << "from " << from << " " << UNKNOWN << endl;
           if( (from & UNKNOWN) ) {
             cout << " unknown geometry unit type in FROM " << endl;
             abort();
           }
-          if( (to   & UNKNOWN) ) {
+          if( ( to & UNKNOWN) ) {
             cout << " unknown geometry unit type in TO " << endl;
             abort();
           }

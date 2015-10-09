@@ -101,7 +101,7 @@ public:
    */
   Molecule()
     {
-      this->atom_list_.resize(0);
+      this->atom_list_.resize(1);
       this->charge_ = 0;  // probably we should write something like charge :: not_set
       this->translation_vec_.fill(0);
     }
@@ -112,9 +112,9 @@ public:
    *  In chemistry, a molecule can change in reactions, so essentially a molecule object
    *  is volatile, and mutators are allowed for any data member.
    */
-  Molecule( atom_list_type    atom_list,
-            charge_value_type charge   ) :
-    atom_list_(atom_list), charge_(charge)
+  Molecule( atom_list_type    atom_list_obj,
+            charge_value_type charge_value   ) :
+    atom_list_(atom_list_obj), charge_(charge_value)
       {
         /**
          *  Don't forget to check the geometry unit.
@@ -194,9 +194,9 @@ public:
       y_average += this->atom_list_[iatom].y();
       z_average += this->atom_list_[iatom].z();
     }
-    x_average = x_average/this->atom_list_.size();
-    y_average = y_average/this->atom_list_.size();
-    z_average = z_average/this->atom_list_.size();
+    x_average = x_average/double(this->atom_list_.size());
+    y_average = y_average/double(this->atom_list_.size());
+    z_average = z_average/double(this->atom_list_.size());
     return make_tuple( x_average, y_average, z_average );
   }
 

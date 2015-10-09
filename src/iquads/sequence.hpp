@@ -47,7 +47,7 @@ namespace iquads {
       constexpr mode_mask_type WRITE_SBATCH_INPUT   = 0x01 << 3;
       constexpr mode_mask_type COLLECT_LOCAL_OUTPUT = 0x01 << 4;
 
-      const inline mode_mask_type return_mode_mask( mode_name_type mode_name ) {
+      inline mode_mask_type return_mode_mask( mode_name_type mode_name ) {
 
         if( mode_name == "local"   ) return LOCAL_RUN;
         if( mode_name == "pbs"     ) return WRITE_PBS_INPUT;

@@ -78,9 +78,9 @@ public:
         os << *this << endl;
        }
     public:
-      const memory_amount_type memory_amount() const 
+      memory_amount_type memory_amount() const 
        { return this->memory_amount_; }
-      const memory_unit_type memory_unit() const 
+      memory_unit_type memory_unit() const 
        { return this->memory_unit_; }
     private:
       memory_amount_type memory_amount_;
@@ -201,11 +201,11 @@ public:
           abort();
         }
        }
-      const atomic_coord_list_type atomic_coord_list() const
+      atomic_coord_list_type atomic_coord_list() const
        { return this->atom_list_; }
-      const geometry_format_type geometry_format() const 
+      geometry_format_type geometry_format() const 
        { return this->geometry_format_; }
-      const geometry_unit_type geometry_unit() const
+      geometry_unit_type geometry_unit() const
        { return this->geometry_unit_; }
     private: 
       atomic_coord_list_type atom_list_;
@@ -233,11 +233,11 @@ public:
          using std::endl;
          os << *this << endl;
        }
-      const nelec_type nelec() const 
+      nelec_type nelec() const 
        { return this->nelec_; }
-      const spin_type spin() const
+      spin_type spin() const
        { return this-> spin_; }
-      const sym_type sym() const 
+      sym_type sym() const 
        { return this->sym_; }
     private:
       nelec_type nelec_;

@@ -48,11 +48,13 @@ public:
 
 public:
   base_agent_ptr get_agent( agent_mask_type agent_mask ) {
-   switch( agent_mask ){
+   switch( agent_mask ) {
      case( program :: MOLPRO ):
+       std :: cout << "returning MOLPRO" << std :: endl;
        return new MolproAgent;
        break;
      case( program :: ORCA ):
+       break;
      default:
        exit(1);
      }
