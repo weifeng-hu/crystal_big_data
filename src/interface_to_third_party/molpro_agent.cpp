@@ -43,7 +43,13 @@ agent_type :: generate_config_list_from_request( request_type request ) {
   if( request.calculation() == iquads :: sequence :: calculation :: SINGLE_POINT_ENERGY ) {
     config_pointer_list.resize(1);
     config_pointer_list[0] = new this_config_type;
-    /* need to be further implemented */
+
+    config_pointer_list[0] -> set_memory_config() = this_config_type :: MemoryConfig( 400, "m" );
+    config_pointer_list[0] -> set_basis_set_config() = this_config_type :: BasisSetConfig( request.basis_set_name() );
+    config_pointer_list[0] -> set_geometry_config() = this_config_type :: GeometryConfig( request.molecule_obj().coordinate_list(), coordinate_representation :: CARTESIAN, request.molecule_obj().geometry_unit() );
+    config_pointer_list[0] -> set_hartree_fock_config() = this_config_type :: HartreeFockConfig( 0, 0, 0 ); // I need to get the periodic table! 
+    config_pointer_list[0] -> set_mp2_config() = this_config_type :: MP2Config();
+    config_pointer_list[0] -> set_casscf_config() = this_config_type :: MultiConfig();
   }
 
 }; // end of function generate_config_list_from_request()
@@ -57,10 +63,10 @@ agent_type :: write_input_hf_energy( base_config_ptr base_config_pointer ) {
                                    base_config_pointer->molecule_name() + 
                                    base_config_pointer->file_extension();
   ofstream ofs( input_file_name.c_str(), std::ios::out );
-  base_config_pointer->memory_config().print( ofs );
-  base_config_pointer->basis_set_config().print( ofs );
-  base_config_pointer->geometry_config().print( ofs );
-  base_config_pointer->hartree_fock_config().print( ofs );
+  base_config_pointer->set_memory_config().print( ofs );
+  base_config_pointer->set_basis_set_config().print( ofs );
+  base_config_pointer->set_geometry_config().print( ofs );
+  base_config_pointer->set_hartree_fock_config().print( ofs );
   ofs.close();
   return input_file_name;
 

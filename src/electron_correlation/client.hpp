@@ -68,7 +68,7 @@ public:
    *    haven't decided yet.
    */
   report_type internal_solve()
-    {/* return Report(); */ }
+    { return Report();  }
 
   /**
    *  + file_external_requestion()
@@ -91,12 +91,10 @@ public:
    *    will be decided by the actual higher level task variables.
    */
   void driver( molecule_info_type molecule_info, setting_type setting ) {
-    this->set_report() = Report( molecule_info );
-    if( setting.use_internal_solver() == false ) {
+    if( setting.use_internal_solver() == true ) {
       this->report_ = internal_solve();
     }
     else {
-      std :: cout << "we are in" << std :: endl;
       external_request_type external_request = this->file_external_request( molecule_info, setting );
       this->set_report().collect_data_from_external_report( ( this->agent_factory_.get_agent( setting.external_program() ) )->accept_request_and_process( external_request ) );
     }

@@ -272,7 +272,7 @@ public:
     using std::cout;
     using std::endl;
     cout << *this << endl;
-  } 
+  }
 
 public:
   /**
@@ -344,7 +344,7 @@ public:
 
   // I just leave this function like this for now
   array<int, 3>& set_translation_vec()
-   { return this->translation_vec_; }
+    { return this->translation_vec_; }
 
 private:
   /**

@@ -56,4 +56,4 @@ int main( int argc, char* argv[] ) {
   // and run application
   client.driver( molecule_info, calculation_setting );
 
-} // end of main()
+}  // end of main()

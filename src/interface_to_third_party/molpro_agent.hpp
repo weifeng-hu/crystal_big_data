@@ -48,7 +48,7 @@ public:
   typedef ExternalProgramReport report_type;
 
 public:
-  MolproAgent() : ExternalProgramAgent_Base() {
+  MolproAgent() {
     try {
       using std::getenv;
       const char* program_path = getenv("MOLPRO_PATH");
@@ -70,7 +70,7 @@ public:
   base_config_ptr_list generate_config_list_from_request( request_type request );
   void run_external_program( file_name_type input_filename, file_name_type output_filename ) {
     command_line_type command_line 
-      = this->program_path_ + " " + input_filename;
+      = this->program_path_ + "/" + program_name_ + " " + input_filename;
     try {
       int res = system( command_line.c_str() );
       if( res != 0 ){ throw 1; }

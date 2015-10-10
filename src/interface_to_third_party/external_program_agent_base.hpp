@@ -133,23 +133,34 @@ public:
     {   } // end of function run_gradient_calculation()
 
 public:
+  /**
+   *  + sequence_local_run()
+   *    Perform calculation on the local machine, according different targeted quantity types
+   *
+   *    The method will build a "list" of config instances, and each config is for one step of 
+   *    a calculation. The actual way to build the config list depends on the request, and 
+   *    performed by virtual method generate_config_from_request(), since different external programs 
+   *    have different derived config.
+   */
   report_type sequence_local_run( request_type request ) {
     try {
       report_type report;
+      return report;
       base_config_ptr_list base_config_pointer_list = generate_config_list_from_request( request );
+      return report;
       for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ) {
-        solution_tag_type solution_tag = base_config_pointer_list[istep]->solution_tag();
-        switch( solution_tag ){
-          case( ENERGY ):
-            report.accept_new_step_data( run_energy_calculation( base_config_pointer_list[istep] ) );
-            break;
-          case( GRADIENT ):
-            report.accept_new_step_data( run_gradient_calculation( base_config_pointer_list[istep] ) );
-            break;
-          default:
-            throw solution_tag;
-            break;
-       } // end of switch case
+         solution_tag_type solution_tag = base_config_pointer_list[istep]->solution_tag();
+         switch( solution_tag ) {
+           case( ENERGY ):
+             report.accept_new_step_data( run_energy_calculation( base_config_pointer_list[istep] ) );
+             break;
+           case( GRADIENT ):
+             report.accept_new_step_data( run_gradient_calculation( base_config_pointer_list[istep] ) );
+             break;
+           default:
+             throw solution_tag;
+             break;
+        } // end of switch case
       } // end of for loop
 
       // prevent memory leak
@@ -180,7 +191,7 @@ public:
 
 public:
   report_type accept_request_and_process( request_type request ) {
-    try{
+    try {
       switch( request.mode() ){
         case( mode :: LOCAL_RUN ):
           return sequence_local_run( request );

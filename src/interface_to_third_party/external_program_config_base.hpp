@@ -149,7 +149,7 @@ public:
       typedef string element_name_type;
       typedef coordinate_representation :: representation_mask_type  geometry_format_type; 
       typedef geometry_unit :: unit_mask_type geometry_unit_type;
-      typedef tuple< element_name_type, coord_value_type, coord_value_type, coord_value_type > atomic_cartesian_coord_type;
+      typedef tuple< element_name_type, tuple< coord_value_type, coord_value_type, coord_value_type > >  atomic_cartesian_coord_type;
       typedef vector< atomic_cartesian_coord_type > atomic_coord_list_type;
     public:
       virtual void print( ostream& os ) const = 0;
@@ -183,12 +183,12 @@ public:
   typedef CASSCFConfig_Base        casscf_config_base_type;
 
 public:
-  virtual memory_config_base_type& memory_config() = 0;
-  virtual basis_set_config_base_type& basis_set_config() = 0;
-  virtual geometry_config_base_type& geometry_config() = 0;
-  virtual hartree_fock_config_base_type& hartree_fock_config() = 0;
-  virtual mp2_config_base_type& mp2_config() = 0;
-  virtual casscf_config_base_type& casscf_config() = 0;
+  virtual memory_config_base_type& set_memory_config() = 0;
+  virtual basis_set_config_base_type& set_basis_set_config() = 0;
+  virtual geometry_config_base_type& set_geometry_config() = 0;
+  virtual hartree_fock_config_base_type& set_hartree_fock_config() = 0;
+  virtual mp2_config_base_type& set_mp2_config() = 0;
+  virtual casscf_config_base_type& set_casscf_config() = 0;
 
 public:
   solution_tag_type solution_tag() const

@@ -21,9 +21,9 @@ COPT		= -g\
 -Wstrict-aliasing=2 -Wswitch-default \
 -Wswitch-enum \
 -Wunreachable-code \
--Wunused-parameter \
 -Wvariadic-macros \
 -Wwrite-strings -std=c++11
+#-Wunused-parameter
 CFLAGS          = -I$(IQUADS_SRC)
 CHEADS          =
 CSRCS           = main.cpp\

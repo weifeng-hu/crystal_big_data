@@ -107,7 +107,6 @@ public:
   method_type method() const
     { return this->method_; }
 
-
   /**
    *  Auxiliary accessors
    */
