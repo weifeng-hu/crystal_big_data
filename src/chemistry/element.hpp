@@ -40,6 +40,53 @@ using std :: array;
 
 class Element {
 public:
+  /**
+   *  A subclass, struct, to store electron shell configuration of an element
+   *
+   *  About the design, previously I was thinking about using some template 
+   *  class to automatically, at compile-time, generate the container for 
+   *  a specific element, using some parameter, e.g., period number.
+   *
+   *  The outer most is the shell level, and a possible implementation of the 
+   *  data member is 
+   *    array< SubShellInfo, PERIOD_NUMBER > 
+   *  where PERIOD_NUMBER must be given as a template parameter of 
+   *  ElectronConfiguration, as the number of subshells. Like Carbon has 
+   *  PERIOD_NUMBER = 2, and has 2 subshells: 1s  |  2s  2p.
+   *
+   *  Then the SubShellInfo contains data structure of all angular momenta
+   *  of the current subshell, for example, for the second subshell of carbon 
+   *  SubShellInfo has 2s 2p occupation info. A possible implementation of the 
+   *  subshell is
+   *    SubShellInfo<1> = tuple< n_1s > or array< int, 1 >
+   *    SubShellInfo<2> = tuple< n_2s, n_2p > or array< int, 2 >
+   *    SubShellInfo<3> = tuple< n_3s, n_3p, n_3d > or array< int, 3 >
+   *    ...
+   *  And number of elements in tuple or array is decided by the index of 
+   *  array< SubShellInfo, PERIOD_NUMBER >, and the index goes from 0 to PERIOD_NUMBER-1.
+   *
+   *  Note that the number of orbitals to an angular momentum i is 2x + 1, this can 
+   *  give a template class to store detailed occupation of orbitals in subshells,
+   *  but here in periodic table, we don't know which orbitals are occupied.
+   *  This is an irrelevant point here.
+   *
+   *  Since the actual definition of SubShellInfo depends on another parameter, which 
+   *  is the indices of period allowed, this means element of array< SubShellInfo, PERIOD_NUMBER > 
+   *  is not uniform. So array does not fit anymore (unless we want to use a "unified" 
+   *  SubshellInfo container)
+   *
+   *  Still, SubShellInfo can be defined using explicit instantiation 
+   *  if we want to stick to template class. We also have to use explict instantiation 
+   *  to implement all possible cases of ElectronConfiguration with different 
+   *  PERIOD_NUMBER. Probably there is no trivial design, like using array<>, to do it.
+   *
+   *  Here we simply use an easy design, without using explicit instantiation of template 
+   *  classes. Another reason is since we use constexpr to get element objects,
+   *  we hope the constexpr contructor to be easy to implement, without using template 
+   *  parameters. So we just store all occupation numbers in a 1d array, which has 28 
+   *  elements, if we count all 7 periods of the periodic table.
+   *
+   */
   struct ElectronConfiguration {
     public:
       constexpr ElectronConfiguration(
@@ -69,19 +116,6 @@ public:
           */
        }
 
-//    public:
-//      struct SubShellConfiguration {
-//        public:
-//        private:
-//          array< array< 2 * NUM + 1 >, NUM > store;
-//      };
-//    public:
-//      ElectronConfiguration() { };
-//      ElectronConfiguration( string config_info ) {
-//
-//      };
-//    private:
-//      array< array< array< int, MSHELL = 2 * JSHELL + 1 >, ISHELL >, N_SHELL > config_;
     public:
       size_t nelec() const {
         size_t retval;
