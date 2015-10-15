@@ -27,6 +27,7 @@
 #ifndef MOLPRO_CONFIG_HPP
 #define MOLPRO_CONFIG_HPP
 
+#include <cmath>
 #include <stdlib.h>
 #include <vector>
 #include <tuple>
@@ -87,10 +88,17 @@ public:
         using std :: endl;
         os << *this << endl;
       }
+      void print() const {
+        std :: cout << *this << std :: endl;
+      }
     public:
       memory_amount_type memory_amount() const 
         { return this->memory_amount_; }
       memory_unit_type memory_unit() const 
+        { return this->memory_unit_; }
+      memory_amount_type& set_memory_amount()
+        { return this->memory_amount_; }
+      memory_unit_type& set_memory_unit()
         { return this->memory_unit_; }
     private:
       memory_amount_type   memory_amount_;
@@ -115,8 +123,13 @@ public:
         using std::endl;
         os << *this << endl;
       }
+      void print() const {
+        std :: cout << *this << std :: endl;
+      }
     public:
       basis_set_name_type basis_set_name() const
+        { return this->basis_set_name_; }
+      basis_set_name_type& set_basis_set_name()
         { return this->basis_set_name_; }
     private:
       basis_set_name_type basis_set_name_;
@@ -133,6 +146,13 @@ public:
         atom_list_ ( atom_list_object ), 
         geometry_format_ ( geometry_format_value ),
         geometry_unit_ ( geometry_unit_value ) { }
+      GeometryConfig( this_type& base_ref ) {
+        std :: cout << "using self defined copy constructor" << std :: endl;
+        this->atom_list_ = base_ref.set_atomic_coord_list();
+        this->geometry_format_ = base_ref.set_geometry_format();
+        this->geometry_unit_ = base_ref.set_geometry_unit();
+      }
+      GeometryConfig_Base& operator= ( GeometryConfig x );
     public:
       friend 
       ostream& operator<< ( ostream& os, const this_type& object_ref ) {
@@ -175,6 +195,9 @@ public:
         using std::endl;
         os << *this << endl;
       }
+      void print() const {
+        std :: cout << *this << std :: endl;
+      }
       string return_geomtyp_string() const {
         try {
           switch( this->geometry_format_ ){
@@ -191,7 +214,8 @@ public:
         } catch ( geometry_format_type unknown_geometry_format ) {
           using std::cout;
           using std::endl;
-          cout << "unknown geometry format type" << unknown_geometry_format << endl;
+          cout << "unknown geometry format type " << unknown_geometry_format << endl;
+          abort();
         }
       }
       string return_geom_unit_string() const {
@@ -220,6 +244,14 @@ public:
         { return this->geometry_format_; }
       geometry_unit_type geometry_unit() const
         { return this->geometry_unit_; }
+
+      atomic_coord_list_type& set_atomic_coord_list()
+        { return this->atom_list_; }
+      geometry_format_type& set_geometry_format()
+        { return this->geometry_format_; }
+      geometry_unit_type& set_geometry_unit()
+        { return this->geometry_unit_; }
+
     private: 
       atomic_coord_list_type atom_list_;
       geometry_format_type geometry_format_;
@@ -291,18 +323,37 @@ public:
   typedef MultiConfig       this_casscf_config_type;
 
 public:
-  memory_config_base_type& set_memory_config() 
+  size_t check_spin( size_t spin, size_t nelec ) 
+    {
+      try {
+        if( (spin + nelec)% 2  == 0 ) return spin;
+        throw 1;
+      } catch ( int signal ) {
+         std :: cout << "molpro config: spin symmetry " << spin << " does not fit number of electron " << nelec << std :: endl;
+         abort();
+      }
+    }
+
+public:
+  this_memory_config_type& set_memory_config()
     { return this->memory_config_; }
   this_basis_set_config_type& set_basis_set_config()
     { return this->basis_set_config_; }
   this_geometry_config_type& set_geometry_config()
-    { return this->geometry_config_; }
-  this_hf_config_type& set_hartree_fock_config() 
+    { return this->geometry_config_;  }
+  this_hf_config_type& set_hartree_fock_config()
     { return this->hf_config_; }
   this_mp2_config_type& set_mp2_config()
     { return this->mp2_config_; }
   this_casscf_config_type& set_casscf_config()
     { return this->multi_config_; }
+
+  void set_geometry_config( GeometryConfig_Base* obj )
+    {
+      this->set_geometry_config().set_atomic_coord_list() = obj->atomic_coord_list();
+      this->set_geometry_config().set_geometry_format()   = obj->geometry_format();
+      this->set_geometry_config().set_geometry_unit()     = obj->geometry_unit();
+    }
 
 private:
   this_memory_config_type memory_config_;

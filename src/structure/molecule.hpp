@@ -419,6 +419,14 @@ public:
     return retval;
   }
 
+  size_t neutral_nelec() const {
+    size_t retval;
+    for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ) {
+      retval += this->atom_list_[iatom].charge();
+    }
+    return retval;
+  }
+
   /**
    *  + coordinate_list()
    *    An interface from atom list to atom_coordinate_list data type

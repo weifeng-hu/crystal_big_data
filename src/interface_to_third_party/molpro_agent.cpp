@@ -24,9 +24,11 @@
  *
  */
 
+#include <stdlib.h>
 #include <string>
 #include <fstream>
 #include <iquads/sequence.hpp>
+#include <chemistry/periodic_table.hpp>
 #include <interface_to_third_party/molpro_config.hpp>
 #include <interface_to_third_party/molpro_agent.hpp>
 
@@ -47,10 +49,14 @@ agent_type :: generate_config_list_from_request( request_type request ) {
     config_pointer_list[0] -> set_memory_config() = this_config_type :: MemoryConfig( 400, "m" );
     config_pointer_list[0] -> set_basis_set_config() = this_config_type :: BasisSetConfig( request.basis_set_name() );
     config_pointer_list[0] -> set_geometry_config() = this_config_type :: GeometryConfig( request.molecule_obj().coordinate_list(), coordinate_representation :: CARTESIAN, request.molecule_obj().geometry_unit() );
-    config_pointer_list[0] -> set_hartree_fock_config() = this_config_type :: HartreeFockConfig( 0, 0, 0 ); // I need to get the periodic table! 
+    size_t nelec = request.molecule_obj().neutral_nelec() - request.molecule_obj().charge();
+    size_t spin  = config_pointer_list[0]->check_spin( request.spin(), nelec );
+    config_pointer_list[0] -> set_hartree_fock_config() = this_config_type :: HartreeFockConfig( nelec, spin, request.sym() ); // I need to get the periodic table! 
     config_pointer_list[0] -> set_mp2_config() = this_config_type :: MP2Config();
     config_pointer_list[0] -> set_casscf_config() = this_config_type :: MultiConfig();
   }
+
+  return config_pointer_list;
 
 }; // end of function generate_config_list_from_request()
 

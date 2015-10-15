@@ -27,7 +27,9 @@
 #ifndef PERIODIC_TABLE_HPP
 #define PERIODIC_TABLE_HPP
 
+#include <iostream>
 #include <array>
+#include <string>
 #include <chemistry/element_list.hpp>
 
 namespace iquads {
@@ -36,6 +38,7 @@ namespace chemistry {
 
 using chemistry :: Element;
 using std :: array;
+using std :: string;
 using namespace chemistry :: element;
 
 constexpr size_t N_ELEMENT = 112;
@@ -59,6 +62,18 @@ public:
       }
     )
     { }
+
+public:
+  Element get_element_by_symbol( string symbol ) {
+    for( size_t ielement = 0; ielement < N_ELEMENT; ielement++ ) {
+      Element element_i = this->element_list_[ielement];
+      if( symbol == element_i.chemical_symbol() ) {
+        return element_i;
+      }
+    }
+    std :: cout << "element " << symbol << "not found" << std :: endl;
+    abort();
+  }
 
 private:
   array< Element, N_ELEMENT > element_list_;

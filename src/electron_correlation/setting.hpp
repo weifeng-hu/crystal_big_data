@@ -103,11 +103,14 @@ public:
    */
   Setting( mode_type mode,
            basis_set_name_type basis_set_name,
+           size_t spin,
+           size_t sym,
            external_program_type external_program,
            path_name_type input_path,
            path_name_type scratch_path,
            path_name_type output_path ) :
     mode_ ( mode ), basis_set_name_ ( basis_set_name ), 
+    spin_ ( spin ), sym_ ( sym ),
     external_program_ ( external_program ),
     input_path_   ( input_path ),
     scratch_path_ ( scratch_path ),
@@ -139,6 +142,8 @@ public:
     using std :: endl;
     os << "run mode: "          << setting_obj.mode()              << endl;
     os << "basis set: "         << setting_obj.basis_set_name()    << endl;
+    os << "spin: "              << setting_obj.spin()              << endl;
+    os << "sym: "               << setting_obj.sym()               << endl;
     os << "external program: "  << setting_obj.external_program()  << endl;
     os << "input path: "        << setting_obj.input_path()        << endl;
     os << "scratch path: "      << setting_obj.scratch_path()      << endl;
@@ -153,6 +158,10 @@ public:
     { return this->mode_; }
   basis_set_name_type basis_set_name() const
     { return this->basis_set_name_; }
+  size_t spin() const
+    { return this->spin_; }
+  size_t sym() const
+    { return this->sym_; }
   external_program_type external_program() const 
     { return this->external_program_; }
   path_name_type input_path() const
@@ -171,6 +180,8 @@ public:
 private:
   mode_type              mode_;
   basis_set_name_type    basis_set_name_;
+  size_t                 spin_;
+  size_t                 sym_;
   external_program_type  external_program_;
   path_name_type         input_path_;
   path_name_type         scratch_path_;

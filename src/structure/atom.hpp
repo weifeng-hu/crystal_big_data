@@ -36,6 +36,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <chemistry/periodic_table.hpp>
 #include <geometrical_space/coordinate.hpp>
 #include <geometrical_space/threed_space_function.hpp>
 #include <structure/geometry_unit.hpp>
@@ -93,6 +94,7 @@ using geometrical_space :: Interval3D;
 class Atom {
 public:
   typedef Atom                                          this_type;
+  typedef chemistry :: Element                          element_type;
   typedef coord_value_type                              coordinate_value_type;
   typedef CartesianCoordinate3D                         coordinate_type;
   typedef Interval                                      interval_data_type;
@@ -118,9 +120,7 @@ public:
   Atom()
     {
       this->coordinate_ = make_tuple( 0.0e0, 0.0e0, 0.0e0 );
-      this->element_ = string("not set");
-      this->charge_  = 0;
-      this->mass_    = 0.0e0;
+      this->element_name_ = string("unknown");
       this->translation_vec_.fill(0);
       this->geometry_unit_ = geometry_unit :: UNKNOWN;
     }
@@ -133,16 +133,18 @@ public:
    *  Developers must know what they are doing when using the copy constructor to change a
    *  already initialized atom object.
    */
-  Atom( element_name_type     element_value, 
-        mass_value_type       mass_value,
-        charge_value_type     charge_value, 
+  Atom( element_name_type     element_name_value, 
         coordinate_value_type x_value, 
         coordinate_value_type y_value, 
         coordinate_value_type z_value,
         geometry_unit_name_type unit_name ) :
-    element_(element_value), mass_(mass_value), charge_(charge_value), 
+    element_name_(element_name_value), 
     coordinate_ ( make_tuple(x_value, y_value, z_value) ), geometry_unit_ ( geometry_unit :: return_unit_mask( unit_name ) )
-      { this->translation_vec_.fill(0); }
+      {
+        this->translation_vec_.fill(0);
+        chemistry :: PeriodicTable periodic_table;
+        this->element_ = periodic_table.get_element_by_symbol( element_name_value );
+      }
 
 public:
   /**
@@ -232,16 +234,19 @@ public:
    *
    *     In future we will implement the periodic table so that uses don't have to 
    *     specify nuclear charge and mass.
+   *     ========================================
+   *     Now we have the periodic table, so nuclear charge and mass are no longer required!
+   *     C 0.5 0.3 1.0 angstrom
    */
   friend
   istream& operator>> ( istream& is, this_type& atom_obj ) {
-    element_name_type element;
+    element_name_type element_name;
     mass_value_type mass;
     charge_value_type charge;
     coordinate_value_type x,y,z;
     geometry_unit_name_type geometry_unit_name;
-    is >> element >> x >> y >> z >> charge >> mass >> geometry_unit_name;
-    atom_obj = Atom( element, mass, charge, x, y, z, geometry_unit_name );
+    is >> element_name >> x >> y >> z >> geometry_unit_name;
+    atom_obj = Atom( element_name, x, y, z, geometry_unit_name );
     return is;
   }
 
@@ -256,7 +261,7 @@ public:
     using std::fixed;
     using std::setw;
     using std::setprecision;
-    os << atom_obj.element().c_str() << "  ";
+    os << atom_obj.element_name().c_str() << "  ";
     os << fixed << setw(12) << setprecision(8) << atom_obj.x() << "  ";
     os << fixed << setw(12) << setprecision(8) << atom_obj.y() << "  ";
     os << fixed << setw(12) << setprecision(8) << atom_obj.z() << "  ";
@@ -278,8 +283,8 @@ public:
   /**
    *  Accessors for all class members are allowed
    */
-  element_name_type element() const
-    { return this->element_; }
+  element_name_type element_name() const
+    { return this->element_name_; }
   coordinate_value_type x() const 
     { return get<0>( this->coordinate_ ); }
   coordinate_value_type y() const 
@@ -289,9 +294,9 @@ public:
   coordinate_type coordinate() const
     { return this->coordinate_; }
   charge_value_type charge() const
-    { return this->charge_; }
+    { return this->element_.atomic_number(); }
   mass_value_type mass() const 
-    { return this->mass_; }
+    { return this->element_.atomic_weight(); }
   geometry_unit_type geometry_unit() const
     { return this->geometry_unit_; }
 
@@ -308,7 +313,7 @@ public:
   atom_coordinate_list_type coordinate_list() const
     { 
        atom_coordinate_list_type retval;
-       retval.push_back( make_tuple( this->element_, this->coordinate_ ) ); 
+       retval.push_back( make_tuple( this->element_name_, this->coordinate_ ) ); 
        return retval;
     }
 
@@ -352,9 +357,8 @@ private:
    */
   coordinate_type    coordinate_;
   array<int, 3>      translation_vec_;
-  charge_value_type  charge_;
-  mass_value_type    mass_;
-  element_name_type  element_;
+  element_name_type  element_name_;
+  element_type       element_;
   geometry_unit_type geometry_unit_;
 
 };  // end of class Atom

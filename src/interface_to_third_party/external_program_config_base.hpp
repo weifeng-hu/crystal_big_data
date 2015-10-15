@@ -95,7 +95,7 @@ public:
 public:
   struct MemoryConfig_Base {
     public:
-      typedef typename parent_config_base_type :: size_type memory_amount_type;
+      typedef parent_config_base_type :: size_type memory_amount_type;
       typedef string memory_unit_type;
    /*
     * Design note (for all these SubConfig classes):
@@ -133,7 +133,101 @@ public:
      *  in an overloaded operator<<. A non-const print() will also work with a ref to const in operator<<
      *  but here we emphasize the const behavior of print().
      */
-     virtual void print( ostream& os ) const = 0;
+      virtual void print( ostream& os ) const = 0;
+      virtual void print() const = 0;
+    public:
+      virtual memory_amount_type memory_amount() const = 0;
+      virtual memory_unit_type memory_unit() const = 0;
+      virtual memory_amount_type& set_memory_amount() = 0;
+      virtual memory_unit_type& set_memory_unit() = 0;
+    /**
+     * Design note:
+     *  About user-defined copy assignment operator=
+     *  
+     *  In the end we want to copy assgin the derived class object using 
+     *  mutator with return type derived&, and the mutator is used by 
+     *  a parent base class reference/or derived class reference, which is 
+     *  actually referred to a parent base class object (as what the compiler can
+     *  see):
+     *    base_parent_config_pointer->set_memory_config() = Derived_memory_config( ... );
+     *                                      ^                        ^
+     *                                      |                        |
+     *                compiler sees a base memory config ref  compiler sees a derived memory config object rvalue.
+     *
+     *  In this case, the inheritance works for set_memory_config(), since it return a reference to
+     *  MemoryConfig_Base(or MemoryConfig_Derived). Moreover, we have defined the set_memory_config()
+     *  in the parent config class scope as a virtual pure method, it essentially means in reality use of this
+     *  function will always return a derived class ref, i.e., it will always invokes the derived parent class
+     *  overloaded function set_memory_config(). Note that we set the return value in the derived parent config
+     *  as derived_memory_config&, but this won't affect the actual behavior.
+     *
+     *  The question is then about the assignment operator =, which takes the form
+     *     Class_Type& operator= ( Class );
+     *     Class_Type& operator= ( const Class& class_obj );
+     *  By default, since the base and derived memory classes are assignable, so the compiler will
+     *  generate assignment operator= individually for each of them, and the derived operator= inherits
+     *  the base operator= somehow.
+     *
+     *  But, since the compiler sees a base memory config ref here, in the above demo code,
+     *  the compiler will use the base class assignment operator= in this place. The base 
+     *  memory config class has no information how to "copy and swap" data member since
+     *  it has no idea what data members are, since they are in the derived class.
+     *  In this case, the compiler assigns a default implicit assignment operator,
+     *  is
+     *    Class_Base& operator= ( const Class_Base& class_obj )
+     *  but it won't automatically define the "copy and swap" operations for data members.
+     *  It uses const Class_Base& class_obj, as the second operand, because it detects 
+     *  the right hand side of = is a Class_Derived rvalue, which can be type casted to (using,e.g., static_cast<>), 
+     *  or binded to(without doing anything for developer), a const Class_Base& type. 
+     *  This means, the code is legal, and compiles, but the operator= is dummy for Derived class, 
+     *  when we use a mututator which returns Class_Type& to do the assignment.
+     *
+     *  There are several workarounds still to make it work. 
+     *  1. The direct method is to user-define the operator= body, using pure virtual functions to
+     *  manipulate the data members in derived class. Using non-pure virtual functions will
+     *  fail, because the compiler will take the base class functions, but base class has in-scope
+     *  data members to manipulate. This method should be considered as the cleanest way, to 
+     *  restore the normal functioning of operator=.
+     *
+     *  2. Write a pure virtual mutator in the derived parent class, like:
+     *     void set_memory_config() { ... }
+     *     and in the { } to define detailed manipulation of data members.
+     *     This will work, but it makes the derived parent class a lot of code ( which can be done
+     *     without writing additional codes out of the actual memory config class.
+     *
+     *  3. Directly manipulate the data members in external functions, by double layer mutator
+     *     style:
+     *        base_class_pointer->set_memory_config().set_memory_unit() = ...(some rvalue);
+     *     This is the easiest way. But, it exposes data members, and actual manipulation 
+     *     sequence of memory config, outside the class scope.
+     *
+     *  4. Define additional operator=.
+     *       Class_Base& operator= ( Class_Derived& class_obj ) {...}
+     *     But, looks like this doesn't work in the current design. Because, compiler will always
+     *     take the base class default operator= first(when it sees the current code), because
+     *     it knows how to define it. If we explicit delete the base class operator=, the compiler
+     *     cannot find a valid operator= for this line of code, and will give an error message.
+     *
+     *     If the base class operator= can be deleted, and if the compiler knows to find another 
+     *     operator= to use, then the use of additional operator= above can be done.
+     *     
+     *  5. There are some other issues:
+     *     use keyword using to pull in the additional defined operator= (after deleting default base class 
+     *     operator= ) does not work on g++. The compiler still gives an error of "trying to use 
+     *     deleted operator=".
+     *     
+     *     Forward-declaring the operator= in the class scope then define it in the caller scope
+     *     doesn't work either, same reason.
+     *
+     *     Forward-declaring also implementing operator= outside the class scope is not allowed, 
+     *     because otherwise it will allow adding functions to the class anywhere. The 
+     *     operator= is a non-static function by the C++ standard. So neither this will work.
+     *
+     */
+      MemoryConfig_Base& operator= ( const MemoryConfig_Base& mem_conf_ref ) {
+        this->set_memory_amount() = mem_conf_ref.memory_amount();
+        this->set_memory_unit()   = mem_conf_ref.memory_unit();
+      }
   };
 
   struct BasisSetConfig_Base {
@@ -141,6 +235,10 @@ public:
       typedef string basis_set_name_type;
     public:
       virtual void print( ostream& os ) const = 0;
+      virtual void print() const = 0;
+    public:
+      virtual basis_set_name_type basis_set_name() const = 0;
+      virtual basis_set_name_type& set_basis_set_name() = 0;
   };
 
   struct GeometryConfig_Base {
@@ -153,6 +251,23 @@ public:
       typedef vector< atomic_cartesian_coord_type > atomic_coord_list_type;
     public:
       virtual void print( ostream& os ) const = 0;
+      virtual void print() const = 0;
+    public:
+      virtual atomic_coord_list_type atomic_coord_list() const = 0;
+      virtual geometry_format_type geometry_format() const = 0;
+      virtual geometry_unit_type geometry_unit() const = 0;
+
+      virtual atomic_coord_list_type& set_atomic_coord_list() = 0;
+      virtual geometry_format_type& set_geometry_format() = 0;
+      virtual geometry_unit_type& set_geometry_unit() = 0;
+
+      GeometryConfig_Base& operator= ( const GeometryConfig_Base& base_ref ) {
+        std :: cout  << "using base class assignment " << std :: endl;
+        this->set_atomic_coord_list() = base_ref.atomic_coord_list();
+        this->set_geometry_unit()     = base_ref.geometry_unit();
+        this->set_geometry_format()   = base_ref.geometry_format();
+        return *this;
+      };
   };
 
   struct HartreeFockConfig_Base {
@@ -189,6 +304,13 @@ public:
   virtual hartree_fock_config_base_type& set_hartree_fock_config() = 0;
   virtual mp2_config_base_type& set_mp2_config() = 0;
   virtual casscf_config_base_type& set_casscf_config() = 0;
+  virtual void set_geometry_config( GeometryConfig_Base* obj ) = 0;
+
+public:
+  /**
+   *  Special functionalities
+   */
+  virtual size_t check_spin( size_t spin, size_t nelec ) = 0;
 
 public:
   solution_tag_type solution_tag() const

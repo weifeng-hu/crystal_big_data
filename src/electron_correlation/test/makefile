@@ -5,7 +5,6 @@ CC              = gcc
 CXX             = g++
 COPT		= -g\
 -Wextra -Wcast-align \
--Wcast-qual -Wconversion \
 -Wdisabled-optimization \
 -Wfloat-equal -Wformat=2 \
 -Wformat-nonliteral -Wformat-security  \
@@ -24,10 +23,13 @@ COPT		= -g\
 -Wvariadic-macros \
 -Wwrite-strings -std=c++11
 #-Wunused-parameter
+#-Wconversion
+#-Wcast-qual
 CFLAGS          = -I$(IQUADS_SRC)
 CHEADS          =
 CSRCS           = main.cpp\
 		  client.cpp\
+		  report.cpp\
 		  molpro_agent.cpp
 COBJS           = $(CSRCS:.cpp=.o)
 LIBS            =
@@ -41,6 +43,9 @@ main.o: ../*.hpp ./main.cpp
 
 client.o: ../*.hpp ../client.cpp
 	$(CXX) -c $(CFLAGS) $(COPT) ../client.cpp
+
+report.o: ../*.hpp ../report.cpp
+	$(CXX) -c $(CFLAGS) $(COPT) ../report.cpp
 
 molpro_agent.o: ../../interface_to_third_party/molpro_agent.cpp
 	$(CXX) -c $(CFLAGS) $(COPT) ../../interface_to_third_party/molpro_agent.cpp

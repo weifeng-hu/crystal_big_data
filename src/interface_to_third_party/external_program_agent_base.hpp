@@ -145,8 +145,9 @@ public:
   report_type sequence_local_run( request_type request ) {
     try {
       report_type report;
-      return report;
       base_config_ptr_list base_config_pointer_list = generate_config_list_from_request( request );
+//      std :: cout << base_config_pointer_list.at(0)->set_geometry_config() << std :: endl;
+//      base_config_pointer_list.at(0)->set_geometry_config().print();
       return report;
       for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ) {
          solution_tag_type solution_tag = base_config_pointer_list[istep]->solution_tag();

@@ -33,9 +33,9 @@
 int main( int argc, char* argv[] ) {
 
   // let's create a molecule
-  iquads :: structure :: AtomList atom_list = { iquads :: structure :: Atom( string("H"), 1,  0,  0.5e0, 0.0e0, 0.0e0, "angstrom" ),
-                                                iquads :: structure :: Atom( string("H"), 1,  0, -0.5e0, 0.0e0, 0.0e0, "angstrom" ),
-                                                iquads :: structure :: Atom( string("O"), 16, 0,  0.0e0, 0.0e0, 0.0e0, "angstrom" ) };
+  iquads :: structure :: AtomList atom_list = { iquads :: structure :: Atom( string("H"), 1,  0,  0.5e0, "angstrom" ),
+                                                iquads :: structure :: Atom( string("H"), 1,  0, -0.5e0, "angstrom" ),
+                                                iquads :: structure :: Atom( string("O"), 16, 0,  0.0e0, "angstrom" ) };
   iquads :: structure :: Molecule molecule( atom_list, 0 ); // the second parameter is the charge
   std :: tuple < std :: string, iquads :: structure :: Molecule > molecule_info = std :: make_tuple( string("water"), molecule );
   std :: cout << "Molecule created:" << std :: endl;
@@ -45,10 +45,12 @@ int main( int argc, char* argv[] ) {
   // let's create an electron correlation setting
   iquads :: electron_correlation :: Setting  calculation_setting( iquads :: sequence :: mode :: LOCAL_RUN,
                                                                   "sto-3g",
+                                                                  0,
+                                                                  0,
                                                                   iquads :: interface_to_third_party :: program :: MOLPRO,
                                                                   "./",
                                                                   "./scratch/",
-                                                                  "./result/");
+                                                                  "./result/" );
   std :: cout << calculation_setting << std :: endl;
 
   // let's create a client

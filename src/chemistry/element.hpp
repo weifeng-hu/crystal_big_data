@@ -139,20 +139,19 @@ public:
     atomic_number_   ( atomic_number_value ),
     atomic_weight_   ( atomic_weight_value ),
     group_           ( group_value ),
-    period_          ( period_value )  {/* element_name_ = element_name_value; chemical_symbol_ = chemical_symbol_value; */};
-//  ~Element(){};
+    period_          ( period_value )  { };
 
 public:
   /**
    *  Accessors
    *   ( Mutators are not allowed for an Element )
    */
-  electron_config_type electron_config () const 
+  ElectronConfiguration electron_config () const 
     { return this->electron_config_; }
-  const char* element_name() const
-    { return this->element_name_; }
-  const char* chemical_symbol() const
-    { return this->chemical_symbol_; }
+  string element_name() const
+    { return string( this->element_name_ ); }
+  string chemical_symbol() const
+    { return string( this->chemical_symbol_ ); }
   atomic_number_type atomic_number() const
     { return this->atomic_number_; }
   atomic_weight_value_type atomic_weight() const

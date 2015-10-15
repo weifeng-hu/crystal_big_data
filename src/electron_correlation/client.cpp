@@ -54,6 +54,8 @@ client_type :: file_external_request( molecule_info_type molecule_info, setting_
   external_request_type request ( get<0>( molecule_info ),
                                   get<1>( molecule_info ),
                                   setting.basis_set_name(),
+                                  setting.spin(),
+                                  setting.sym(),
                                   setting.external_program(),
                                   setting.mode(),
                                   iquads :: sequence :: calculation :: SINGLE_POINT_ENERGY,
