@@ -59,7 +59,8 @@ client_type :: file_external_request( molecule_info_type molecule_info, setting_
                                   setting.external_program(),
                                   setting.mode(),
                                   iquads :: sequence :: calculation :: SINGLE_POINT_ENERGY,
-                                  iquads :: electron_correlation :: single_reference :: mean_field :: RHF );
+                                  iquads :: electron_correlation :: single_reference :: mean_field :: RHF,
+                                  setting.input_path(), setting.scratch_path(), setting.output_path() );
   return request;
 
 }; // end of file_external_request

@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string>
 #include <fstream>
+#include <boost/filesystem.hpp>
 #include <iquads/sequence.hpp>
 #include <chemistry/periodic_table.hpp>
 #include <interface_to_third_party/molpro_config.hpp>
@@ -46,12 +47,19 @@ agent_type :: generate_config_list_from_request( request_type request ) {
     config_pointer_list.resize(1);
     config_pointer_list[0] = new this_config_type;
 
+    config_pointer_list[0] -> set_solution_tag() = quantity :: ENERGY;
+    config_pointer_list[0] -> set_correlation_tag() = request.method();
+    config_pointer_list[0] -> set_file_extension() = ".com";
+    config_pointer_list[0] -> set_molecule_name() = request.molecule_name();
+    config_pointer_list[0] -> set_input_path() = request.input_path();
+    config_pointer_list[0] -> set_scratch_path() = request.scratch_path();
+    config_pointer_list[0] -> set_output_path()  = request.output_path();
     config_pointer_list[0] -> set_memory_config() = this_config_type :: MemoryConfig( 400, "m" );
     config_pointer_list[0] -> set_basis_set_config() = this_config_type :: BasisSetConfig( request.basis_set_name() );
     config_pointer_list[0] -> set_geometry_config() = this_config_type :: GeometryConfig( request.molecule_obj().coordinate_list(), coordinate_representation :: CARTESIAN, request.molecule_obj().geometry_unit() );
     size_t nelec = request.molecule_obj().neutral_nelec() - request.molecule_obj().charge();
     size_t spin  = config_pointer_list[0]->check_spin( request.spin(), nelec );
-    config_pointer_list[0] -> set_hartree_fock_config() = this_config_type :: HartreeFockConfig( nelec, spin, request.sym() ); // I need to get the periodic table! 
+    config_pointer_list[0] -> set_hartree_fock_config() = this_config_type :: HartreeFockConfig( nelec, request.sym(), spin ); // I need to get the periodic table! 
     config_pointer_list[0] -> set_mp2_config() = this_config_type :: MP2Config();
     config_pointer_list[0] -> set_casscf_config() = this_config_type :: MultiConfig();
   }
@@ -68,6 +76,19 @@ agent_type :: write_input_hf_energy( base_config_ptr base_config_pointer ) {
   file_name_type input_file_name = base_config_pointer->input_path() + 
                                    base_config_pointer->molecule_name() + 
                                    base_config_pointer->file_extension();
+  size_t count = 0;
+  while( true ) {
+   file_name_type temp_file_name = input_file_name;
+   boost :: filesystem :: path file_path( temp_file_name );
+   if( file_path.exist() == false ) {
+     break;
+   }
+   else {
+     count++;
+     temp_file_name += "." + count;
+   }
+  }
+
   ofstream ofs( input_file_name.c_str(), std::ios::out );
   base_config_pointer->set_memory_config().print( ofs );
   base_config_pointer->set_basis_set_config().print( ofs );
@@ -86,7 +107,6 @@ agent_type :: write_input_mp2_energy( base_config_ptr base_config_pointer ) {
   file_name_type input_file_name = base_config_pointer->input_path() + 
                                    base_config_pointer->molecule_name() + 
                                    base_config_pointer->file_extension();
-
   return input_file_name;
 
 }; // end of function write_input_mp2_energy()
@@ -104,6 +124,11 @@ agent_type :: write_input_casscf_energy( base_config_ptr base_config_pointer ) {
 
 agent_type :: energy_report_type 
 agent_type :: collect_energy_data_from_output( file_name_type output_filename ) {
+
+  ExternalProgramReport :: EnergyReport energy_report;
+  std :: cout << " collect energy data from ouput, but now implemented " << std :: endl;
+
+  return energy_report;
 
 }; // end of function collect_energy_data_from_output()
 

@@ -158,6 +158,7 @@ public:
       ostream& operator<< ( ostream& os, const this_type& object_ref ) {
         try {
           using std::endl;
+          os << "symmetry, nosym" << endl;
           os << object_ref.return_geom_unit_string() << endl;
           geometry_format_type geometry_format = object_ref.geometry_format();
           switch( geometry_format ) {
@@ -282,11 +283,20 @@ public:
         using std::endl;
         os << *this << endl;
       }
+      void print() const {
+        std :: cout << *this << std :: endl;
+      }
       nelec_type nelec() const 
         { return this->nelec_; }
       spin_type spin() const
         { return this-> spin_; }
       sym_type sym() const 
+        { return this->sym_; }
+      nelec_type& set_nelec() 
+        { return this->nelec_; }
+      spin_type& set_spin()
+        { return this->spin_; }
+      sym_type& set_sym() 
         { return this->sym_; }
     private:
       nelec_type nelec_;
@@ -347,13 +357,6 @@ public:
     { return this->mp2_config_; }
   this_casscf_config_type& set_casscf_config()
     { return this->multi_config_; }
-
-  void set_geometry_config( GeometryConfig_Base* obj )
-    {
-      this->set_geometry_config().set_atomic_coord_list() = obj->atomic_coord_list();
-      this->set_geometry_config().set_geometry_format()   = obj->geometry_format();
-      this->set_geometry_config().set_geometry_unit()     = obj->geometry_unit();
-    }
 
 private:
   this_memory_config_type memory_config_;

@@ -412,7 +412,7 @@ public:
    *    We sacrifice a little performance but to ensure the data responsibility and a clean design.
    */
   mass_value_type mass() const {
-    mass_value_type retval;
+    mass_value_type retval = 0.0;
     for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ) {
       retval += this->atom_list_[iatom].mass();
     }
@@ -420,7 +420,7 @@ public:
   }
 
   size_t neutral_nelec() const {
-    size_t retval;
+    size_t retval = 0;
     for( size_t iatom = 0; iatom < this->atom_list_.size(); iatom++ ) {
       retval += this->atom_list_[iatom].charge();
     }

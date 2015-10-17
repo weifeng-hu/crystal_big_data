@@ -33,9 +33,9 @@
 int main( int argc, char* argv[] ) {
 
   // let's create a molecule
-  iquads :: structure :: AtomList atom_list = { iquads :: structure :: Atom( string("H"), 1,  0,  0.5e0, "angstrom" ),
-                                                iquads :: structure :: Atom( string("H"), 1,  0, -0.5e0, "angstrom" ),
-                                                iquads :: structure :: Atom( string("O"), 16, 0,  0.0e0, "angstrom" ) };
+  iquads :: structure :: AtomList atom_list = { iquads :: structure :: Atom( string("H"), 0,  0,  0.5e0, "angstrom" ),
+                                                iquads :: structure :: Atom( string("H"), 0,  0, -0.5e0, "angstrom" ),
+                                                iquads :: structure :: Atom( string("O"), 0,  0,  0.0e0, "angstrom" ) };
   iquads :: structure :: Molecule molecule( atom_list, 0 ); // the second parameter is the charge
   std :: tuple < std :: string, iquads :: structure :: Molecule > molecule_info = std :: make_tuple( string("water"), molecule );
   std :: cout << "Molecule created:" << std :: endl;

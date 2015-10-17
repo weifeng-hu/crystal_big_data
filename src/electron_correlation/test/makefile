@@ -25,14 +25,14 @@ COPT		= -g\
 #-Wunused-parameter
 #-Wconversion
 #-Wcast-qual
-CFLAGS          = -I$(IQUADS_SRC)
+CFLAGS          = -I/usr/include/ -I$(IQUADS_SRC)
 CHEADS          =
 CSRCS           = main.cpp\
 		  client.cpp\
 		  report.cpp\
 		  molpro_agent.cpp
 COBJS           = $(CSRCS:.cpp=.o)
-LIBS            =
+LIBS            = -lboost_filesystem
 PGM             = test_electron_correlation
 
 $(PGM): $(COBJS)

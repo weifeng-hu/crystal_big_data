@@ -87,11 +87,14 @@ public:
                           external_program_type  external_program,
                           mode_type              mode,
                           calculation_type       calculation,
-                          method_type            method ) : 
+                          method_type            method,
+                          string                 input_path, 
+                          string                 scratch_path,
+                          string                 output_path ) : 
     molecule_info_ ( make_tuple( molecule_name, molecule_obj ) ), basis_set_name_ ( basis_set_name ),
     spin_ ( spin_value ), sym_ ( sym_value ),
     external_program_ ( external_program ), mode_ ( mode ), calculation_ ( calculation ),
-    method_ ( method ) { };
+    method_( method ), input_path_(input_path), scratch_path_(scratch_path), output_path_(output_path) { };
 
 public:
   /**
@@ -113,6 +116,12 @@ public:
     { return this->calculation_; }
   method_type method() const
     { return this->method_; }
+  string input_path() const
+    { return this->input_path_; }
+  string scratch_path() const
+    { return this->scratch_path_; }
+  string output_path() const
+    { return this->output_path_; }
 
   /**
    *  Auxiliary accessors
@@ -136,6 +145,9 @@ private:
   mode_type               mode_;
   calculation_type        calculation_;
   method_type             method_;
+  string                  input_path_;
+  string                  scratch_path_;
+  string                  output_path_;
 
 }; // end of struct ExternalProgramRequest
 

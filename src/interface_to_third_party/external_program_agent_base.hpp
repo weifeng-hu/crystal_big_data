@@ -27,9 +27,11 @@
 #ifndef EXTERNAL_PROGRAM_AGENT_BASE_HPP
 #define EXTERNAL_PROGRAM_AGENT_BASE_HPP
 
+#include <stdlib.h>
 #include <vector>
 #include <string>
 #include <memory>
+#include <boost/filesystem.hpp>
 #include <iquads/sequence.hpp>
 #include <electron_correlation/quantity.hpp>
 #include <interface_to_third_party/external_program_request.hpp>
@@ -63,9 +65,8 @@ public:
   typedef report_type :: energy_bare_report_type       energy_report_type;
   typedef report_type :: gradient_bare_report_type     gradient_report_type;
   typedef report_type :: local_run_info_type           local_run_info_type;
-  typedef base_config_type :: solution_tag_type            solution_tag_type;
-  typedef base_config_type :: energy_solution_tag_type     energy_solution_tag_type;
-  typedef base_config_type :: gradient_solution_tag_type   gradient_solution_tag_type;
+  typedef base_config_type :: solution_tag_type        solution_tag_type;
+  typedef base_config_type :: correlation_tag_type     correlation_tag_type;
 
 public:
   ExternalProgramAgent_Base() {
@@ -87,7 +88,7 @@ public:
 public:
   file_name_type write_energy_input( base_config_ptr base_config_pointer ) {
     try {
-      energy_solution_tag_type energy_solution_tag = base_config_pointer->energy_solution_tag();
+      correlation_tag_type energy_solution_tag = base_config_pointer->correlation_tag();
       switch( energy_solution_tag ) {
         case ( single_reference :: mean_field :: RHF ):
           return this->write_input_hf_energy( base_config_pointer );  // call derived class function
@@ -98,7 +99,7 @@ public:
         default:
           throw energy_solution_tag;
       }
-    } catch ( energy_solution_tag_type unknown_energy_solution ) {
+    } catch ( correlation_tag_type unknown_energy_solution ) {
       using std::cout;
       using std::endl;
       cout << "unknown energy calculation type: " << unknown_energy_solution << endl;
@@ -111,11 +112,11 @@ public:
     *  Here we use initialization list type constructor
     */
     local_run_info_type local_run_info( this->program_name_,
-                                        this->write_energy_input( base_config_pointer ), // write energy calculation input and return the input file name
-                                        base_config_pointer->molecule_name() + ".out",
-                                        base_config_pointer->input_path(),
-                                        base_config_pointer->scratch_path(),
-                                        base_config_pointer->output_path() );
+                                        this->make_directory( base_config_pointer->input_path() ),
+                                        this->write_energy_input( base_config_pointer, // write energy calculation input and return the input file name
+                                        this->make_directory( base_config_pointer->scratch_path() ),
+                                        this->make_directory( base_config_pointer->output_path() ),
+                                        base_config_pointer->molecule_name() + ".out" );
     run_external_program( local_run_info.input_filename(), local_run_info.output_filename() ); // call derived class
     energy_report_type energy_report 
       = collect_energy_data_from_output( local_run_info.output_filename() ); // call derived class
@@ -146,9 +147,6 @@ public:
     try {
       report_type report;
       base_config_ptr_list base_config_pointer_list = generate_config_list_from_request( request );
-//      std :: cout << base_config_pointer_list.at(0)->set_geometry_config() << std :: endl;
-//      base_config_pointer_list.at(0)->set_geometry_config().print();
-      return report;
       for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ) {
          solution_tag_type solution_tag = base_config_pointer_list[istep]->solution_tag();
          switch( solution_tag ) {
@@ -214,6 +212,26 @@ public:
       abort();
     }
   } // end of function accept_request_and_process()
+
+public:
+  string make_directory( string directory_name ) {
+    try {
+      boost :: filesystem :: path targeting_path( directory_name );
+      if( boost :: filesystem :: exists( targeting_path ) == true ) {
+        std :: cout << " path " << directory_name << " exists; no need to make such a directory" << std :: endl;
+      }
+      else {
+        string command = "mkdir ";
+        command += directory_name;
+        int retval = system( command.c_str() );
+        if( retval != 0 ) { throw directory_name; }
+      }
+      return directory_name;
+    } catch ( string dir ) {
+      std :: cout << " error in making directory " << dir << std :: endl;
+      abort();
+    }
+  }
 
 protected:
   program_path_type program_path_;

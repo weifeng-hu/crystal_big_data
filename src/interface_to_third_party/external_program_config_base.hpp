@@ -89,8 +89,7 @@ public:
   typedef string         molecule_name_type;
   typedef string         work_path_type;
   typedef quantity ::  quantity_mask_type solution_tag_type;
-  typedef level_mask_type energy_solution_tag_type;
-  typedef level_mask_type gradient_solution_tag_type;
+  typedef level_mask_type  correlation_tag_type;
 
 public:
   struct MemoryConfig_Base {
@@ -239,6 +238,11 @@ public:
     public:
       virtual basis_set_name_type basis_set_name() const = 0;
       virtual basis_set_name_type& set_basis_set_name() = 0;
+    public:
+      BasisSetConfig_Base& operator= ( const BasisSetConfig_Base& basis_conf_ref ) {
+        this->set_basis_set_name() = basis_conf_ref.basis_set_name();
+        return *this;
+      }
   };
 
   struct GeometryConfig_Base {
@@ -262,7 +266,6 @@ public:
       virtual geometry_unit_type& set_geometry_unit() = 0;
 
       GeometryConfig_Base& operator= ( const GeometryConfig_Base& base_ref ) {
-        std :: cout  << "using base class assignment " << std :: endl;
         this->set_atomic_coord_list() = base_ref.atomic_coord_list();
         this->set_geometry_unit()     = base_ref.geometry_unit();
         this->set_geometry_format()   = base_ref.geometry_format();
@@ -277,6 +280,21 @@ public:
       typedef typename parent_config_base_type :: number_type sym_type;
     public:
       virtual void print( ostream& os ) const = 0;
+      virtual void print() const = 0;
+    public:
+      virtual nelec_type nelec() const = 0;
+      virtual spin_type spin() const = 0;
+      virtual sym_type sym() const = 0;
+      virtual nelec_type& set_nelec() = 0;
+      virtual spin_type& set_spin() = 0;
+      virtual sym_type& set_sym() = 0;
+    public:
+      HartreeFockConfig_Base& operator= ( const HartreeFockConfig_Base& hf_conf_ref ) {
+        this->set_nelec() = hf_conf_ref.nelec();
+        this->set_spin()  = hf_conf_ref.spin();
+        this->set_sym()   = hf_conf_ref.sym();
+        return *this;
+      }
   };
 
   struct MP2Config_Base {
@@ -304,7 +322,6 @@ public:
   virtual hartree_fock_config_base_type& set_hartree_fock_config() = 0;
   virtual mp2_config_base_type& set_mp2_config() = 0;
   virtual casscf_config_base_type& set_casscf_config() = 0;
-  virtual void set_geometry_config( GeometryConfig_Base* obj ) = 0;
 
 public:
   /**
@@ -315,10 +332,8 @@ public:
 public:
   solution_tag_type solution_tag() const
     { return this->solution_tag_; }
-  energy_solution_tag_type energy_solution_tag() const 
-    { return this->energy_solution_tag_; }
-  gradient_solution_tag_type gradient_solution_tag() const
-    { return this->gradient_solution_tag_; }
+  correlation_tag_type correlation_tag() const
+    { return this->correlation_tag_; }
   file_extension_type file_extension() const 
     { return this->file_extension_; }
   molecule_name_type molecule_name() const 
@@ -330,10 +345,25 @@ public:
   work_path_type output_path() const
     { return this->output_path_; }
 
+public:
+  solution_tag_type& set_solution_tag()
+    { return this->solution_tag_; }
+  correlation_tag_type& set_correlation_tag()
+    { return this->correlation_tag_; }
+  file_extension_type& set_file_extension()
+    { return this->file_extension_; }
+  molecule_name_type& set_molecule_name()
+    { return this->molecule_name_; }
+  work_path_type& set_input_path()
+    { return this->input_path_; }
+  work_path_type& set_scratch_path()
+    { return this->scratch_path_; }
+  work_path_type& set_output_path()
+    { return this->output_path_; }
+
 private:
   solution_tag_type            solution_tag_;
-  energy_solution_tag_type     energy_solution_tag_;
-  gradient_solution_tag_type   gradient_solution_tag_;
+  correlation_tag_type         correlation_tag_;
   file_extension_type          file_extension_;
   molecule_name_type           molecule_name_;
   work_path_type               input_path_;
