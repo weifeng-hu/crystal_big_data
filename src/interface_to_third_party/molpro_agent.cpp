@@ -25,6 +25,7 @@
  */
 
 #include <stdlib.h>
+#include <sstream>
 #include <string>
 #include <fstream>
 #include <boost/filesystem.hpp>
@@ -77,17 +78,27 @@ agent_type :: write_input_hf_energy( base_config_ptr base_config_pointer ) {
                                    base_config_pointer->molecule_name() + 
                                    base_config_pointer->file_extension();
   size_t count = 0;
+  char buffer[10];
+  file_name_type temp_file_name = input_file_name;
   while( true ) {
-   file_name_type temp_file_name = input_file_name;
-   boost :: filesystem :: path file_path( temp_file_name );
-   if( file_path.exist() == false ) {
-     break;
-   }
-   else {
-     count++;
-     temp_file_name += "." + count;
-   }
+    boost :: filesystem :: path file_path( temp_file_name );
+    if( boost :: filesystem :: exists ( file_path ) == false ) {
+      break;
+    }
+    else {
+      temp_file_name = base_config_pointer->input_path() + 
+                       base_config_pointer->molecule_name() +
+                       + ".";
+      count++;
+      std :: stringstream ss;
+      ss << count;
+      temp_file_name += ss.str();
+      temp_file_name += base_config_pointer->file_extension();
+    }
   }
+  input_file_name = temp_file_name;
+
+  std :: cout << input_file_name << std :: endl;
 
   ofstream ofs( input_file_name.c_str(), std::ios::out );
   base_config_pointer->set_memory_config().print( ofs );

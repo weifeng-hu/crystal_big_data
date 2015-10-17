@@ -76,7 +76,9 @@ public:
   };
 
 public:
-  virtual void run_external_program( file_name_type input_filename, file_name_type output_filename ) = 0;
+  virtual local_run_info_type run_external_program( work_path_type input_path, file_name_type input_filename, 
+                                                    work_path_type scratch_path, 
+                                                    work_path_type output_path ) = 0;
   virtual energy_report_type collect_energy_data_from_output( file_name_type output_filename ) = 0;
   virtual base_config_ptr_list generate_config_list_from_request( request_type request ) = 0;
 
@@ -88,6 +90,7 @@ public:
 public:
   file_name_type write_energy_input( base_config_ptr base_config_pointer ) {
     try {
+      this->make_directory( base_config_pointer->input_path() );
       correlation_tag_type energy_solution_tag = base_config_pointer->correlation_tag();
       switch( energy_solution_tag ) {
         case ( single_reference :: mean_field :: RHF ):
@@ -109,15 +112,12 @@ public:
 
   tuple< energy_report_type, local_run_info_type > run_energy_calculation( base_config_ptr base_config_pointer ) {
    /**
-    *  Here we use initialization list type constructor
+    *  We write it in this way, to assure the chain of responsibility. If a directory/filename is invalid (checked by the 
+    *  actual function in () ), then this parent function won't run either.
     */
-    local_run_info_type local_run_info( this->program_name_,
-                                        this->make_directory( base_config_pointer->input_path() ),
-                                        this->write_energy_input( base_config_pointer, // write energy calculation input and return the input file name
-                                        this->make_directory( base_config_pointer->scratch_path() ),
-                                        this->make_directory( base_config_pointer->output_path() ),
-                                        base_config_pointer->molecule_name() + ".out" );
-    run_external_program( local_run_info.input_filename(), local_run_info.output_filename() ); // call derived class
+    local_run_info_type local_run_info = this->run_external_program( base_config_pointer->input_path(), this->write_energy_input( base_config_pointer ),
+                                                                     this->make_directory( base_config_pointer->scratch_path() ), 
+                                                                     this->make_directory( base_config_pointer->output_path() ) );
     energy_report_type energy_report 
       = collect_energy_data_from_output( local_run_info.output_filename() ); // call derived class
     using std::make_tuple;
@@ -223,6 +223,7 @@ public:
       else {
         string command = "mkdir ";
         command += directory_name;
+        std :: cout << command << std :: endl;
         int retval = system( command.c_str() );
         if( retval != 0 ) { throw directory_name; }
       }

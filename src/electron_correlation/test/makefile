@@ -32,7 +32,7 @@ CSRCS           = main.cpp\
 		  report.cpp\
 		  molpro_agent.cpp
 COBJS           = $(CSRCS:.cpp=.o)
-LIBS            = -lboost_filesystem
+LIBS            = -L/usr/lib64 -lboost_filesystem -lboost_system
 PGM             = test_electron_correlation
 
 $(PGM): $(COBJS)

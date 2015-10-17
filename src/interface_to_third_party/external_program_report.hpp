@@ -110,12 +110,15 @@ public:
                         file_name_type input_filename,
                         path_name_type scratch_directory,
                         path_name_type output_directory,
-                        file_name_type output_filename,
+                        file_name_type output_filename ) :
          program_name_ ( program_name ), input_path_ (input_directory), input_filename_ ( input_filename ),
          scratch_path_ ( scratch_directory ), output_path_ ( output_directory ), output_filename_ ( output_filename ) {}
     public:
       file_name_type input_filename() const { return this->input_filename_; }
       file_name_type output_filename() const { return this->output_filename_; }
+      path_name_type input_path() const { return this->input_path_; }
+      path_name_type scratch_path() const { return this->scratch_path_; }
+      path_name_type output_path() const { return this->output_path_; }
 
     protected:
       program_name_type program_name_;
@@ -131,10 +134,12 @@ public:
                         path_name_type input_directory,
                         file_name_type input_filename,
                         path_name_type scratch_directory,
-                        path_name_type output_directory,
-                        file_name_type output_filename ):
+                        path_name_type output_directory, 
+                        path_name_type output_filename ) :
       RuntimeInfo_Base ( program_name, input_directory, input_filename,
-                         scratch_directory, output_directory, output_filename ) { }
+                         scratch_directory, output_directory, output_filename ) 
+      { }
+        
     private:
   }; // end of struct LocalRunInfo
 

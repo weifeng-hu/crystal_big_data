@@ -68,16 +68,98 @@ public:
 
 public:
   base_config_ptr_list generate_config_list_from_request( request_type request );
-  void run_external_program( file_name_type input_filename, file_name_type output_filename ) {
-    command_line_type command_line 
-      = this->program_path_ + "/" + program_name_ + " " + input_filename;
+  local_run_info_type run_external_program( work_path_type input_path, file_name_type input_filename, work_path_type scratch_path, work_path_type output_path ) {
     try {
-      int res = system( command_line.c_str() );
-      if( res != 0 ){ throw 1; }
+      // check whether input_file exists;
+      if( boost :: filesystem :: exists( boost :: filesystem :: path ( input_filename ) ) == true ) {
+        // copy input file to scratch
+        if( input_path != scratch_path ) {
+          command_line_type command = "cp ";
+                            command += input_filename;
+                            command += " ";
+                            command += scratch_path;
+          int retval = system( command.c_str() );
+          if( retval != 0 ) throw 1;
+        }
+        else {
+          std :: cout << "warning: input file path and scratch path are the same! suggest to have a different scratch path " << std :: endl;
+        }
+
+        // let's get the actual filename of the input file, this filename does not include the path information
+        file_name_type filename = input_filename;
+        size_t len_input_path = input_path.length();
+        filename.erase(0, len_input_path);
+        // now we get the file name + path for scratch run
+        file_name_type scratch_input_file = scratch_path;
+                       scratch_input_file += filename;
+        // almost there, now deduce the output filename, no path info
+        file_name_type output_name = filename;
+        size_t len_filename = filename.length();
+        // we want to erase the ".com" for molpro input extension
+        output_name.erase( len_filename - 4, 4 );
+        output_name += ".out";
+
+        // now we can run the calculation
+        command_line_type command_line 
+          = this->program_path_ + "/" + program_name_ + " " + scratch_input_file;
+        int retval_run = system( command_line.c_str() );
+        if( retval_run != 0 ) { throw 2; }
+
+        // after a successful run we copy the output file from scratch to output path
+        // first to figure out the original output path
+        file_name_type scratch_output_file = scratch_path;
+        scratch_output_file += output_name;
+        // we probably should check whether this output file is there
+        if( boost :: filesystem :: exists( boost :: filesystem :: path( scratch_output_file ) ) == false ) {
+          throw 3;
+        }
+        if( scratch_path != output_path ) {
+          command_line_type command_copy_out = "cp ";
+                            command_copy_out += scratch_output_file;
+                            command_copy_out += " ";
+          // check whether output_path is ok
+          if( input_path == output_path ) {
+            std :: cout << " input path and output path are the same; suggest to have a different output path" << std :: endl;
+          }
+          command_copy_out += output_path;
+          int retval_out = system( command_copy_out.c_str() );
+          if( retval_out != 0 ) { throw 4; }
+        } else {
+          // do nothing;
+          std :: cout << " scratch path and output path are the same; suggest to have a different output path" << std :: endl;
+        }
+        return local_run_info_type( this->program_name_, 
+                                    input_path,
+                                    input_filename,
+                                    scratch_path,
+                                    output_path,
+                                    output_path + output_name );
+
+      }
+      else {
+        throw 0;
+      }
     } catch ( int signal ) {
-      using std::cout;
-      using std::endl;
-      cout << "molpro program returns an error" << endl;
+      switch ( signal ) {
+        case( 0 ):
+          std :: cout << " cannot find input file " << input_filename << std :: endl;
+          break;
+        case( 1 ):
+          std :: cout << " cannot copy input file to the scratch file " << std :: endl;
+          break;
+        case( 2 ):
+          std :: cout << " molpro program returns an error" << std :: endl;
+          break;
+        case( 3 ):
+          std :: cout << " cannot find the output file in scratch" << std :: endl;
+          break;
+        case( 4 ):
+          std :: cout << " cannot copy output file from scratch to output dir" << std :: endl;
+          break;
+        default:
+          std :: cout << " unknown error in run external program" << std :: endl;
+          break;
+      }
       abort();
     }
   }

@@ -48,9 +48,9 @@ int main( int argc, char* argv[] ) {
                                                                   0,
                                                                   0,
                                                                   iquads :: interface_to_third_party :: program :: MOLPRO,
-                                                                  "./",
+                                                                  "./input/",
                                                                   "./scratch/",
-                                                                  "./result/" );
+                                                                  "./input/" );
   std :: cout << calculation_setting << std :: endl;
 
   // let's create a client
