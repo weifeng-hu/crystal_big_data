@@ -68,72 +68,50 @@ public:
 
 public:
   base_config_ptr_list generate_config_list_from_request( request_type request );
-  local_run_info_type run_external_program( work_path_type input_path, file_name_type input_filename, work_path_type scratch_path, work_path_type output_path ) {
+  local_run_info_type run_external_program( filepath_type input_path, directory_type scratch_dir, directory_type output_dir ) {
     try {
       // check whether input_file exists;
-      if( boost :: filesystem :: exists( boost :: filesystem :: path ( input_filename ) ) == true ) {
+      if( input_path.exists() == true ) {
         // copy input file to scratch
-        if( input_path != scratch_path ) {
-          command_line_type command = "cp ";
-                            command += input_filename;
-                            command += " ";
-                            command += scratch_path;
-          int retval = system( command.c_str() );
-          if( retval != 0 ) throw 1;
-        }
-        else {
+        if( input_path.directory() == scratch_dir ) {
           std :: cout << "warning: input file path and scratch path are the same! suggest to have a different scratch path " << std :: endl;
         }
+        else {
+          input_path.copy_to( scratch_dir );
+        }
 
-        // let's get the actual filename of the input file, this filename does not include the path information
-        file_name_type filename = input_filename;
-        size_t len_input_path = input_path.length();
-        filename.erase(0, len_input_path);
-        // now we get the file name + path for scratch run
-        file_name_type scratch_input_file = scratch_path;
-                       scratch_input_file += filename;
-        // almost there, now deduce the output filename, no path info
-        file_name_type output_name = filename;
-        size_t len_filename = filename.length();
-        // we want to erase the ".com" for molpro input extension
-        output_name.erase( len_filename - 4, 4 );
-        output_name += ".out";
+        // get the file name + path for scratch run
+        filepath_type scratch_input_path = filepath_type( scratch_dir, input_path.filename() );
+        filepath_type :: filename_type output_filename( input_path.filename().name() , std :: string( ".out" ) );
+        filepath_type scratch_output_path = filepath_type( scratch_dir, output_filename );
 
-        // now we can run the calculation
+        // RUN, for molpro, we don't need to tell the run-time output filename
         command_line_type command_line 
-          = this->program_path_ + "/" + program_name_ + " " + scratch_input_file;
+          = this->program_path_ + "/" + program_name_ + " " + scratch_input_path.absolute();
         int retval_run = system( command_line.c_str() );
         if( retval_run != 0 ) { throw 2; }
 
         // after a successful run we copy the output file from scratch to output path
-        // first to figure out the original output path
-        file_name_type scratch_output_file = scratch_path;
-        scratch_output_file += output_name;
-        // we probably should check whether this output file is there
-        if( boost :: filesystem :: exists( boost :: filesystem :: path( scratch_output_file ) ) == false ) {
+        // we should check whether this output file is there
+        if( scratch_output_path.exists() == false ) {
           throw 3;
         }
-        if( scratch_path != output_path ) {
-          command_line_type command_copy_out = "cp ";
-                            command_copy_out += scratch_output_file;
-                            command_copy_out += " ";
-          // check whether output_path is ok
-          if( input_path == output_path ) {
-            std :: cout << " input path and output path are the same; suggest to have a different output path" << std :: endl;
-          }
-          command_copy_out += output_path;
-          int retval_out = system( command_copy_out.c_str() );
-          if( retval_out != 0 ) { throw 4; }
-        } else {
+        if( scratch_dir == output_dir ) {
           // do nothing;
           std :: cout << " scratch path and output path are the same; suggest to have a different output path" << std :: endl;
         }
+        else {
+          if( input_path.directory() == output_dir ) {
+            std :: cout << " input path and output path are the same; suggest to have a different output path" << std :: endl;
+          }
+          scratch_output_path.copy_to( output_dir );
+        } 
         return local_run_info_type( this->program_name_, 
-                                    input_path,
-                                    input_filename,
-                                    scratch_path,
-                                    output_path,
-                                    output_path + output_name );
+                                    input_path.directory().absolute(),
+                                    input_path.filename().value(),
+                                    scratch_dir.absolute(),
+                                    output_dir.absolute(),
+                                    output_filename.value() );
 
       }
       else {
@@ -142,7 +120,7 @@ public:
     } catch ( int signal ) {
       switch ( signal ) {
         case( 0 ):
-          std :: cout << " cannot find input file " << input_filename << std :: endl;
+          std :: cout << " cannot find input file " << input_path.absolute() << std :: endl;
           break;
         case( 1 ):
           std :: cout << " cannot copy input file to the scratch file " << std :: endl;
@@ -164,9 +142,9 @@ public:
     }
   }
 
-  file_name_type write_input_hf_energy( base_config_ptr base_config_pointer );
-  file_name_type write_input_mp2_energy( base_config_ptr base_config_pointer );
-  file_name_type write_input_casscf_energy( base_config_ptr base_config_pointer );
+  filepath_type write_input_hf_energy( base_config_ptr base_config_pointer );
+  filepath_type write_input_mp2_energy( base_config_ptr base_config_pointer );
+  filepath_type write_input_casscf_energy( base_config_ptr base_config_pointer );
   energy_report_type collect_energy_data_from_output( file_name_type output_filename );
 
 }; // end of class MolproAgent

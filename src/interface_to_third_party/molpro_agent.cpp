@@ -69,48 +69,27 @@ agent_type :: generate_config_list_from_request( request_type request ) {
 
 }; // end of function generate_config_list_from_request()
 
-agent_type :: file_name_type 
+agent_type :: filepath_type
 agent_type :: write_input_hf_energy( base_config_ptr base_config_pointer ) {
 
   using std::ofstream;
-  using std::endl;
-  file_name_type input_file_name = base_config_pointer->input_path() + 
-                                   base_config_pointer->molecule_name() + 
-                                   base_config_pointer->file_extension();
-  size_t count = 0;
-  char buffer[10];
-  file_name_type temp_file_name = input_file_name;
-  while( true ) {
-    boost :: filesystem :: path file_path( temp_file_name );
-    if( boost :: filesystem :: exists ( file_path ) == false ) {
-      break;
-    }
-    else {
-      temp_file_name = base_config_pointer->input_path() + 
-                       base_config_pointer->molecule_name() +
-                       + ".";
-      count++;
-      std :: stringstream ss;
-      ss << count;
-      temp_file_name += ss.str();
-      temp_file_name += base_config_pointer->file_extension();
-    }
-  }
-  input_file_name = temp_file_name;
+  directory_type input_dir ( base_config_pointer->input_path() );
+  input_dir.create();
+  filepath_type :: filename_type input_name ( base_config_pointer->molecule_name(), base_config_pointer->file_extension() );
+  filepath_type input_filepath( input_dir, input_name );
+  input_filepath.rename_if_exists();
 
-  std :: cout << input_file_name << std :: endl;
-
-  ofstream ofs( input_file_name.c_str(), std::ios::out );
+  ofstream ofs( input_filepath.absolute().c_str(), std::ios::out );
   base_config_pointer->set_memory_config().print( ofs );
   base_config_pointer->set_basis_set_config().print( ofs );
   base_config_pointer->set_geometry_config().print( ofs );
   base_config_pointer->set_hartree_fock_config().print( ofs );
   ofs.close();
-  return input_file_name;
+  return input_filepath;
 
 }; // end of function write_input_hf_energy()
 
-agent_type :: file_name_type
+agent_type :: filepath_type
 agent_type :: write_input_mp2_energy( base_config_ptr base_config_pointer ) {
 
   using std::ofstream;
@@ -118,18 +97,18 @@ agent_type :: write_input_mp2_energy( base_config_ptr base_config_pointer ) {
   file_name_type input_file_name = base_config_pointer->input_path() + 
                                    base_config_pointer->molecule_name() + 
                                    base_config_pointer->file_extension();
-  return input_file_name;
+  //return input_file_name;
 
 }; // end of function write_input_mp2_energy()
 
-agent_type :: file_name_type
+agent_type :: filepath_type
 agent_type :: write_input_casscf_energy( base_config_ptr base_config_pointer ) {
   using std::ofstream;
   using std::endl;
   file_name_type input_filename = base_config_pointer->input_path() + 
                                    base_config_pointer->molecule_name() + 
                                    base_config_pointer->file_extension();
-  return input_filename;
+  //return input_filename;
 
 }; // end of function write_input_casscf_energy()
 

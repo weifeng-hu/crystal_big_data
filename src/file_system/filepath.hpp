@@ -27,6 +27,7 @@
 #ifndef FILEPATH_HPP
 #define FILEPATH_HPP
 
+#include <stdlib.h>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -84,6 +85,24 @@ public:
   std :: ostream& operator<< ( std :: ostream& os, const this_type& obj ) {
     os << obj.absolute() << std :: endl;
     return os;
+  }
+  void copy_to( directory_type to ) {
+    if( to.exists() == false ) { to.create(); }
+    std :: string command = std :: string( "cp " ) + this->absolute() + std :: string( " " ) + to.absolute();
+    int retval = system( command.c_str() );
+    if( retval != 0 ) { 
+      std :: cout << "error in copying file: " << command << std :: endl; abort();
+    }
+   /**
+    *  Currently we cannot use copy_file for most of the boost versions, because --std=c++11 does not fit the actual boost implementation for this function
+    */
+    //boost :: filesystem :: path path_from( this->value() );
+    //boost :: filesystem :: path path_to( std :: string( to.value() + std :: string("/") + this->filename_.value() ) );
+    // boost :: filesystem :: copy_file( path_from, path_to );
+  }
+  friend
+  bool operator== ( const this_type& lhs, const this_type& rhs ) {
+    return lhs.absolute() == rhs.absolute() ? true : false;
   }
 
 public:

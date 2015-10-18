@@ -50,7 +50,7 @@ int main( int argc, char* argv[] ) {
                                                                   iquads :: interface_to_third_party :: program :: MOLPRO,
                                                                   "./input/",
                                                                   "./scratch/",
-                                                                  "./input/" );
+                                                                  "./output/" );
   std :: cout << calculation_setting << std :: endl;
 
   // let's create a client

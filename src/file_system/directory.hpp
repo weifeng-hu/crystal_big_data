@@ -54,11 +54,15 @@ public:
     return this->value_;
   }
   bool exists() 
-    { return boost :: filesystem :: exists( boost :: filesystem :: path( this->value_ ) ); }
+    { return boost :: filesystem :: exists( boost :: filesystem :: absolute ( boost :: filesystem :: path( this->value_ ) ) ); }
   friend
   std :: ostream& operator<< ( std :: ostream& os, const this_type& obj ) { 
     os << obj.absolute() << std :: endl;
     return os;
+  }
+  friend
+  bool operator== ( const this_type& lhs, const this_type& rhs ) {
+    return lhs.absolute() == rhs.absolute() ? true : false;
   }
 
 public:

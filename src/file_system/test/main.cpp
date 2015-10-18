@@ -31,10 +31,13 @@ int main( int argc, char* argv[] ) {
   iquads :: file_system :: Directory dir("/usr/bin/");
   iquads :: file_system :: Directory dir2( "./result/" ); 
   dir2.create();
-  iquads :: file_system :: Filepath filepath( iquads :: file_system :: Directory( "./2" ), iquads :: file_system :: Filename( "main", "cpp" ) );
+  iquads :: file_system :: Filepath filepath( iquads :: file_system :: Directory( "./" ), iquads :: file_system :: Filename( "main", "cpp" ) );
   std :: cout << filepath ;
   std :: cout << filepath.exists() << std :: endl; ;
-  filepath.rename_if_exists();
-  std :: cout << filepath ;
+//  filepath.rename_if_exists();
+//  std :: cout << filepath ;
+  std :: cout <<  ( dir == dir2 ) << std :: endl;
+
+  filepath.copy_to( dir2 );
 
 };

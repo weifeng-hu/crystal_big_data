@@ -31,7 +31,8 @@
 #include <vector>
 #include <string>
 #include <memory>
-#include <boost/filesystem.hpp>
+#include <file_system/directory.hpp>
+#include <file_system/filepath.hpp>
 #include <iquads/sequence.hpp>
 #include <electron_correlation/quantity.hpp>
 #include <interface_to_third_party/external_program_request.hpp>
@@ -60,6 +61,8 @@ public:
   typedef string   program_path_type;
   typedef string   file_extension_type;
   typedef request_type :: mode_type               mode_type;
+  typedef iquads :: file_system :: Directory directory_type;
+  typedef iquads :: file_system :: Filepath filepath_type;
   typedef base_config_type :: work_path_type      work_path_type;
   typedef base_config_type :: file_name_type      file_name_type;
   typedef report_type :: energy_bare_report_type       energy_report_type;
@@ -76,21 +79,20 @@ public:
   };
 
 public:
-  virtual local_run_info_type run_external_program( work_path_type input_path, file_name_type input_filename, 
-                                                    work_path_type scratch_path, 
-                                                    work_path_type output_path ) = 0;
+  virtual local_run_info_type run_external_program( filepath_type input_path, 
+                                                    directory_type scratch_dir, 
+                                                    directory_type output_dir ) = 0;
   virtual energy_report_type collect_energy_data_from_output( file_name_type output_filename ) = 0;
   virtual base_config_ptr_list generate_config_list_from_request( request_type request ) = 0;
 
 public:
-  virtual file_name_type write_input_hf_energy( base_config_ptr base_config_pointer ) = 0;
-  virtual file_name_type write_input_mp2_energy( base_config_ptr base_config_pointer ) = 0;
-  virtual file_name_type write_input_casscf_energy( base_config_ptr base_config_pointer ) = 0;
+  virtual filepath_type write_input_hf_energy( base_config_ptr base_config_pointer ) = 0;
+  virtual filepath_type write_input_mp2_energy( base_config_ptr base_config_pointer ) = 0;
+  virtual filepath_type write_input_casscf_energy( base_config_ptr base_config_pointer ) = 0;
 
 public:
-  file_name_type write_energy_input( base_config_ptr base_config_pointer ) {
+  filepath_type write_energy_input( base_config_ptr base_config_pointer ) {
     try {
-      this->make_directory( base_config_pointer->input_path() );
       correlation_tag_type energy_solution_tag = base_config_pointer->correlation_tag();
       switch( energy_solution_tag ) {
         case ( single_reference :: mean_field :: RHF ):
@@ -115,7 +117,7 @@ public:
     *  We write it in this way, to assure the chain of responsibility. If a directory/filename is invalid (checked by the 
     *  actual function in () ), then this parent function won't run either.
     */
-    local_run_info_type local_run_info = this->run_external_program( base_config_pointer->input_path(), this->write_energy_input( base_config_pointer ),
+    local_run_info_type local_run_info = this->run_external_program( this->write_energy_input( base_config_pointer ),
                                                                      this->make_directory( base_config_pointer->scratch_path() ), 
                                                                      this->make_directory( base_config_pointer->output_path() ) );
     energy_report_type energy_report 
@@ -214,24 +216,10 @@ public:
   } // end of function accept_request_and_process()
 
 public:
-  string make_directory( string directory_name ) {
-    try {
-      boost :: filesystem :: path targeting_path( directory_name );
-      if( boost :: filesystem :: exists( targeting_path ) == true ) {
-        std :: cout << " path " << directory_name << " exists; no need to make such a directory" << std :: endl;
-      }
-      else {
-        string command = "mkdir ";
-        command += directory_name;
-        std :: cout << command << std :: endl;
-        int retval = system( command.c_str() );
-        if( retval != 0 ) { throw directory_name; }
-      }
-      return directory_name;
-    } catch ( string dir ) {
-      std :: cout << " error in making directory " << dir << std :: endl;
-      abort();
-    }
+  directory_type make_directory( string directory_name ) {
+    directory_type directory( directory_name );
+    directory.create();
+    return directory;
   }
 
 protected:
