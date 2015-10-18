@@ -65,6 +65,7 @@ struct ExternalProgramRequest {
 public:
   typedef string                                           basis_set_name_type;
   typedef string                                           molecule_name_type;
+  typedef string                                           dir_name_type;
   typedef Molecule                                         molecule_obj_type;
   typedef tuple< molecule_name_type, molecule_obj_type >   molecule_info_type;
   typedef program :: program_mask_type                     external_program_type;
@@ -88,13 +89,13 @@ public:
                           mode_type              mode,
                           calculation_type       calculation,
                           method_type            method,
-                          string                 input_path, 
-                          string                 scratch_path,
-                          string                 output_path ) : 
+                          dir_name_type          input_directory, 
+                          dir_name_type          scratch_directory,
+                          dir_name_type          output_directory ) : 
     molecule_info_ ( make_tuple( molecule_name, molecule_obj ) ), basis_set_name_ ( basis_set_name ),
     spin_ ( spin_value ), sym_ ( sym_value ),
     external_program_ ( external_program ), mode_ ( mode ), calculation_ ( calculation ),
-    method_( method ), input_path_(input_path), scratch_path_(scratch_path), output_path_(output_path) { };
+    method_( method ), input_dir_(input_directory), scratch_dir_(scratch_directory), output_dir_(output_directory) { };
 
 public:
   /**
@@ -116,12 +117,12 @@ public:
     { return this->calculation_; }
   method_type method() const
     { return this->method_; }
-  string input_path() const
-    { return this->input_path_; }
-  string scratch_path() const
-    { return this->scratch_path_; }
-  string output_path() const
-    { return this->output_path_; }
+  dir_name_type input_dir() const
+    { return this->input_dir_; }
+  dir_name_type scratch_dir() const
+    { return this->scratch_dir_; }
+  dir_name_type output_dir() const
+    { return this->output_dir_; }
 
   /**
    *  Auxiliary accessors
@@ -145,9 +146,9 @@ private:
   mode_type               mode_;
   calculation_type        calculation_;
   method_type             method_;
-  string                  input_path_;
-  string                  scratch_path_;
-  string                  output_path_;
+  dir_name_type           input_dir_;
+  dir_name_type           scratch_dir_;
+  dir_name_type           output_dir_;
 
 }; // end of struct ExternalProgramRequest
 

@@ -30,7 +30,6 @@
 #include <stdlib.h>
 #include <string>
 #include <iostream>
-#include <sstream>
 #include <boost/filesystem.hpp>
 #include <file_system/directory.hpp>
 #include <file_system/filename.hpp>
@@ -69,9 +68,7 @@ public:
       else {
         count++;
         std :: string rename_string = "_rename_";
-        std :: stringstream id_str;
-        id_str << count;
-        rename_string += id_str.str();
+        rename_string += std :: to_string( count );
         filename_type new_filename( this->filename_.name() + rename_string, this->filename_.extension() );
         this_type new_filepath( this->directory_, new_filename );
         filepath_temp = new_filepath;

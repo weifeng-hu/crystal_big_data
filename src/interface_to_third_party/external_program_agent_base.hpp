@@ -60,11 +60,12 @@ public:
   typedef string   program_name_type;
   typedef string   program_path_type;
   typedef string   file_extension_type;
-  typedef request_type :: mode_type               mode_type;
-  typedef iquads :: file_system :: Directory directory_type;
-  typedef iquads :: file_system :: Filepath filepath_type;
-  typedef base_config_type :: work_path_type      work_path_type;
+  typedef base_config_type :: dir_name_type       dir_name_type;
   typedef base_config_type :: file_name_type      file_name_type;
+  typedef base_config_type :: path_name_type      path_name_type;
+  typedef iquads :: file_system :: Directory      directory_type;
+  typedef iquads :: file_system :: Filepath       filepath_type;
+  typedef request_type :: mode_type               mode_type;
   typedef report_type :: energy_bare_report_type       energy_report_type;
   typedef report_type :: gradient_bare_report_type     gradient_report_type;
   typedef report_type :: local_run_info_type           local_run_info_type;
@@ -82,7 +83,7 @@ public:
   virtual local_run_info_type run_external_program( filepath_type input_path, 
                                                     directory_type scratch_dir, 
                                                     directory_type output_dir ) = 0;
-  virtual energy_report_type collect_energy_data_from_output( file_name_type output_filename ) = 0;
+  virtual energy_report_type collect_energy_data_from_output( correlation_tag_type correlation_tag, path_name_type output_filename ) = 0;
   virtual base_config_ptr_list generate_config_list_from_request( request_type request ) = 0;
 
 public:
@@ -118,10 +119,10 @@ public:
     *  actual function in () ), then this parent function won't run either.
     */
     local_run_info_type local_run_info = this->run_external_program( this->write_energy_input( base_config_pointer ),
-                                                                     this->make_directory( base_config_pointer->scratch_path() ), 
-                                                                     this->make_directory( base_config_pointer->output_path() ) );
+                                                                     this->make_directory( base_config_pointer->scratch_dir() ), 
+                                                                     this->make_directory( base_config_pointer->output_dir() ) );
     energy_report_type energy_report 
-      = collect_energy_data_from_output( local_run_info.output_filename() ); // call derived class
+      = collect_energy_data_from_output( local_run_info.output_path() ); // call derived class
     using std::make_tuple;
     return make_tuple( energy_report, local_run_info );
   } // end of function run_energy_calculation()
@@ -216,7 +217,7 @@ public:
   } // end of function accept_request_and_process()
 
 public:
-  directory_type make_directory( string directory_name ) {
+  directory_type make_directory( dir_name_type directory_name ) {
     directory_type directory( directory_name );
     directory.create();
     return directory;

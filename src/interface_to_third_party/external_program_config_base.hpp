@@ -84,10 +84,11 @@ public:
   typedef double         precise_number_type;
   typedef size_t         size_type; // the same backend data type as number_type
   typedef bool           condition_type;
+  typedef string         dir_name_type;
   typedef string         file_extension_type;
   typedef string         file_name_type;
+  typedef string         path_name_type;
   typedef string         molecule_name_type;
-  typedef string         work_path_type;
   typedef quantity ::  quantity_mask_type solution_tag_type;
   typedef level_mask_type  correlation_tag_type;
 
@@ -338,12 +339,12 @@ public:
     { return this->file_extension_; }
   molecule_name_type molecule_name() const 
     { return this->molecule_name_; }
-  work_path_type input_path() const
-    { return this->input_path_; }
-  work_path_type scratch_path() const
-    { return this->scratch_path_; }
-  work_path_type output_path() const
-    { return this->output_path_; }
+  dir_name_type input_dir() const
+    { return this->input_dir_; }
+  dir_name_type scratch_dir() const
+    { return this->scratch_dir_; }
+  dir_name_type output_dir() const
+    { return this->output_dir_; }
 
 public:
   solution_tag_type& set_solution_tag()
@@ -354,21 +355,21 @@ public:
     { return this->file_extension_; }
   molecule_name_type& set_molecule_name()
     { return this->molecule_name_; }
-  work_path_type& set_input_path()
-    { return this->input_path_; }
-  work_path_type& set_scratch_path()
-    { return this->scratch_path_; }
-  work_path_type& set_output_path()
-    { return this->output_path_; }
+  dir_name_type& set_input_dir()
+    { return this->input_dir_; }
+  dir_name_type& set_scratch_dir()
+    { return this->scratch_dir_; }
+  dir_name_type& set_output_dir()
+    { return this->output_dir_; }
 
 private:
   solution_tag_type            solution_tag_;
   correlation_tag_type         correlation_tag_;
   file_extension_type          file_extension_;
   molecule_name_type           molecule_name_;
-  work_path_type               input_path_;
-  work_path_type               scratch_path_;
-  work_path_type               output_path_;
+  dir_name_type                input_dir_;
+  dir_name_type                scratch_dir_;
+  dir_name_type                output_dir_;
 
 }; // end of struct ExternalProgramConfig_Base
 

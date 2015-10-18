@@ -75,16 +75,18 @@ public:
       typedef level_mask_type energy_solution_tag_type;
       typedef correlation_name_type energy_solution_name_type;
     public:
-      atom_list_type& set_atom_list()
-        { return this->atom_list_; }
-      energy_data_type& set_energy()
+      EnergyReport( energy_data_type energy_data_value,
+                    energy_solution_tag_type energy_solution_tag_value ) :
+         energy_( energy_data_value ), 
+         energy_solution_tag_ ( energy_solution_tag_value ) { }
+    public:
+      energy_data_type energy()
         { return this->energy_; }
-      energy_solution_tag_type& set_energy_solution_tag()
+      energy_solution_tag_type energy_solution_tag()
         { return this->energy_solution_tag_; }
       energy_solution_name_type return_energy_solution_name() const 
-        {  }
+        { return iquads :: electron_correlation :: return_level_name( this->energy_solution_tag_ ); }
     private:
-      atom_list_type atom_list_;
       energy_data_type energy_;
       energy_solution_tag_type energy_solution_tag_;
   }; // end of struct ExternalProgramReport :: EnergyReport
@@ -102,40 +104,42 @@ public:
     public:
       typedef string program_name_type;
       typedef string file_name_type;
+      typedef string dir_name_type;
       typedef string path_name_type;
       typedef RuntimeInfo_Base base;
     public:
       RuntimeInfo_Base( program_name_type program_name,
-                        path_name_type input_directory,
-                        file_name_type input_filename,
-                        path_name_type scratch_directory,
-                        path_name_type output_directory,
-                        file_name_type output_filename ) :
-         program_name_ ( program_name ), input_path_ (input_directory), input_filename_ ( input_filename ),
-         scratch_path_ ( scratch_directory ), output_path_ ( output_directory ), output_filename_ ( output_filename ) {}
+                        dir_name_type     input_directory,
+                        file_name_type    input_filename,
+                        dir_name_type     scratch_directory,
+                        dir_name_type     output_directory,
+                        file_name_type    output_filename ) :
+         program_name_ ( program_name ), input_dir_ (input_directory), input_filename_ ( input_filename ),
+         scratch_dir_ ( scratch_directory ), output_dir_ ( output_directory ), output_filename_ ( output_filename ) {}
     public:
-      file_name_type input_filename() const { return this->input_filename_; }
-      file_name_type output_filename() const { return this->output_filename_; }
-      path_name_type input_path() const { return this->input_path_; }
-      path_name_type scratch_path() const { return this->scratch_path_; }
-      path_name_type output_path() const { return this->output_path_; }
-
+      file_name_type  input_filename()   const { return this->input_filename_; }
+      file_name_type  output_filename()  const { return this->output_filename_; }
+      dir_name_type   input_dir()        const { return this->input_dir_; }
+      dir_name_type   scratch_dir()      const { return this->scratch_dir_; }
+      dir_name_type   output_dir()       const { return this->output_dir_; }
+      path_name_type  input_path()       const { return std :: string( this->input_dir_ + std :: string( "/" ) + this->input_filename_ ); }
+      path_name_type  output_path()      const { return std :: string( this->output_dir_ + std :: string( "/" ) + this->output_filename_ ); }
     protected:
       program_name_type program_name_;
-      file_name_type input_filename_;
-      file_name_type output_filename_;
-      path_name_type input_path_;
-      path_name_type scratch_path_;
-      path_name_type output_path_;
+      path_name_type    input_dir_;
+      file_name_type    input_filename_;
+      path_name_type    scratch_dir_;
+      path_name_type    output_dir_;
+      file_name_type    output_filename_;
   }; // end of struct RuntimeInfo_Base
 
   struct LocalRunInfo : public RuntimeInfo_Base {
     LocalRunInfo( program_name_type program_name,
-                        path_name_type input_directory,
+                        dir_name_type input_directory,
                         file_name_type input_filename,
-                        path_name_type scratch_directory,
-                        path_name_type output_directory, 
-                        path_name_type output_filename ) :
+                        dir_name_type scratch_directory,
+                        dir_name_type output_directory, 
+                        dir_name_type output_filename ) :
       RuntimeInfo_Base ( program_name, input_directory, input_filename,
                          scratch_directory, output_directory, output_filename ) 
       { }
