@@ -24,6 +24,7 @@
  *
  */
 
+#include <stdlib.h>
 #include <iostream>
 #include <memory>
 #include <manybody_expansion/client.hpp>
@@ -41,6 +42,10 @@ mbe_client_type :: file_request( command_setting_type command_setting ) {
   switch ( command_setting.request_source() ) {
     case ( command_setting_type :: FROM_FILE ):
       request.read_input_file( command_setting.input_filename() );
+      break;
+    case ( command_setting_type :: UNKNOWN ):
+      std :: cout << "unknown request source" << std :: endl;
+      abort();
       break;
     default:
       break;

@@ -63,9 +63,9 @@ template < template < size_t NS > class SubGroup_Type > struct PolymerSubGroupRe
     typedef SubGroup_Type<2> dimer_report_type;
 
   public:
-    array< monomer_report_type, 3 >& set_monomer_reports() const 
+    array< monomer_report_type, 3 >& set_monomer_reports()
       { return this->monomer_reports_; }
-    array< dimer_report_type, 3 >& set_dimer_reports() const 
+    array< dimer_report_type, 3 >& set_dimer_reports()
       { return this->dimer_reports_; }
 
   protected:

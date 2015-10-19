@@ -27,6 +27,7 @@
 #ifndef COMPUTE_EXPANSION_TERM_PERIODIC_TRAITS_HPP
 #define COMPUTE_EXPANSION_TERM_PERIODIC_TRAITS_HPP
 
+#include <string>
 #include <structure/polymer_template.hpp>
 #include <electron_correlation/setting.hpp>
 #include <manybody_expansion/config.hpp>
@@ -71,7 +72,11 @@ namespace manybody_expansion {
     for( size_t i_R0 = 0; i_R0 < cell_R0.size(); i_R0++ ) {
       Polymer<1>  monomer_i( array< Molecule, 1 > { cell_R0[i_R0] } );
       PolymerOmniReportGeneral<1>  monomer_report;
-      energy_data_type monomer_energy;// = compute_interaction_energy<1>( monomer_i, setting, monomer_report );
+      std :: string monomer_name( "monomer_" );
+                    monomer_name += std :: string( "R_" ) + std :: string( "0_0_0_" );
+                    monomer_name += std :: string( "i_" ) + std :: to_string( i_R0 ) + std :: string( "_" );
+      energy_data_type monomer_energy
+        = compute_interaction_energy<1>( monomer_i, std :: string( monomer_name ) , settings, monomer_report );
       report.attach_new_monomer_report( monomer_report );
       retval += monomer_energy;
     }
@@ -91,18 +96,25 @@ namespace manybody_expansion {
     unit_cell_type cell_R0 = config.lattice().at(0, 0, 0);
     for( size_t i_R0 = 0; i_R0 < cell_R0.size(); i_R0++ ) {
       Polymer<1> monomer_i( array<Molecule, 1> { cell_R0[i_R0] } );
-      for( size_t R_a = config.lattice().a_min(); R_a < config.lattice().a_max(); R_a++ ) {
-        for( size_t R_b = config.lattice().b_min(); R_b < config.lattice().b_max(); R_b++ ) {
-          for( size_t R_c = config.lattice().c_min(); R_c < config.lattice().c_max(); R_c++ ) {
+      for( int R_a = config.lattice().a_min(); R_a < config.lattice().a_max(); R_a++ ) {
+        for( int R_b = config.lattice().b_min(); R_b < config.lattice().b_max(); R_b++ ) {
+          for( int R_c = config.lattice().c_min(); R_c < config.lattice().c_max(); R_c++ ) {
             unit_cell_type cell_R = config.lattice().at( R_a, R_b, R_c );
             for( size_t i_R = 0; i_R < cell_R.size(); i_R++ ) {
 
               if( ( cell_R0 == cell_R ) && ( i_R0 == i_R ) ) continue;
-              Polymer<1> monomer_j( array< Molecule, 1> { cell_R[i_R] } );
+              Polymer<1> monomer_j( array< Molecule, 1 > { cell_R[i_R] } );
               {
                 Polymer<2> dimer_ij = monomer_i + monomer_j;
                 PolymerOmniReportGeneral<2> dimer_report;
-                energy_data_type dimer_interaction_energy;// = compute_interaction_energy<2>( dimer_ij, settings, dimer_report );
+                std :: string dimer_name( "dimer_" );
+                              dimer_name += std :: string( "R_" ) + std :: string( "0_0_0_" );
+                              dimer_name += std :: string( "i_" ) + std :: to_string( i_R0  ) + std :: string( "_" );
+                              dimer_name += std :: string( "R_" ) + std :: to_string( R_a ) + std :: string( "_" ) + 
+                                                                    std :: to_string( R_b ) + std :: string( "_" ) + 
+                                                                    std :: to_string( R_c ) + std :: string( "_" );
+                              dimer_name += std :: string( "j_" ) + std :: to_string( i_R ) + std :: string( "_" );
+                energy_data_type dimer_interaction_energy = compute_interaction_energy<2> ( dimer_ij, std :: string( dimer_name ), settings, dimer_report );
                 report.attach_new_dimer_report( dimer_report );
                 retval += dimer_interaction_energy;
               }
@@ -125,15 +137,15 @@ namespace manybody_expansion {
     unit_cell_type cell_R0 = config.lattice().at(0, 0, 0);
     for( size_t i_R0 = 0; i_R0 < cell_R0.size(); i_R0++ ) {
       Polymer<1> monomer_i( array< Molecule, 1 > { cell_R0[ i_R0 ] } );
-      for( size_t R_j_a = config.lattice().a_min(); R_j_a < config.lattice().a_max(); R_j_a++ ) {
-        for( size_t R_j_b = config.lattice().b_min(); R_j_b < config.lattice().b_max(); R_j_b++ ) {
-          for( size_t R_j_c = config.lattice().c_min(); R_j_c < config.lattice().c_max(); R_j_c++ ) {
+      for( int R_j_a = config.lattice().a_min(); R_j_a < config.lattice().a_max(); R_j_a++ ) {
+        for( int R_j_b = config.lattice().b_min(); R_j_b < config.lattice().b_max(); R_j_b++ ) {
+          for( int R_j_c = config.lattice().c_min(); R_j_c < config.lattice().c_max(); R_j_c++ ) {
             unit_cell_type cell_Rj = config.lattice().at( R_j_a, R_j_b, R_j_c );
             for( size_t i_Rj = 0; i_Rj < cell_Rj.size(); i_Rj++ ) {
               Polymer<1> monomer_j( array< Molecule, 1 > { cell_Rj[i_Rj] } );
-              for( size_t R_k_a = config.lattice().a_min(); R_k_a < config.lattice().a_max(); R_k_a++ ) {
-                for( size_t R_k_b = config.lattice().b_min(); R_k_b < config.lattice().b_max(); R_k_b++ ) {
-                  for( size_t R_k_c = config.lattice().c_min(); R_k_c < config.lattice().c_max(); R_k_c++ ) {
+              for( int R_k_a = config.lattice().a_min(); R_k_a < config.lattice().a_max(); R_k_a++ ) {
+                for( int R_k_b = config.lattice().b_min(); R_k_b < config.lattice().b_max(); R_k_b++ ) {
+                  for( int R_k_c = config.lattice().c_min(); R_k_c < config.lattice().c_max(); R_k_c++ ) {
                     unit_cell_type cell_Rk = config.lattice().at( R_k_a, R_k_b, R_k_c );
                     for( size_t i_Rk = 0; i_Rk < cell_Rk.size(); i_Rk++ ){
 
@@ -146,7 +158,18 @@ namespace manybody_expansion {
                       {
                         Polymer<3> trimer_ijk = monomer_i + monomer_j + monomer_k;
                         PolymerOmniReportGeneral<3> trimer_report;
-                        energy_data_type trimer_interaction_energy;// = compute_interaction_energy<3> ( trimer_ijk, settings, trimer_report );
+                        std :: string trimer_name( "trimer_" );
+                                      trimer_name += std :: string( "R_" ) + std :: string( "0_0_0_" );
+                                      trimer_name += std :: string( "i_" ) + std :: to_string( i_R0 ) + std :: string( "_" );
+                                      trimer_name += std :: string( "R_" ) + std :: to_string( R_j_a ) + std :: string( "_" ) + 
+                                                                             std :: to_string( R_j_b ) + std :: string( "_" ) + 
+                                                                             std :: to_string( R_j_c ) + std :: string( "_" );
+                                      trimer_name += std :: string( "j_" ) + std :: to_string( i_Rj ) + std :: string( "_" );
+                                      trimer_name += std :: string( "R_" ) + std :: to_string( R_k_a ) + std :: string( "_" ) + 
+                                                                             std :: to_string( R_k_b ) + std :: string( "_" ) + 
+                                                                             std :: to_string( R_k_c ) + std :: string( "_" );
+                                      trimer_name += std :: string( "k_" ) + std :: to_string( i_Rk ) + std :: string( "_" );
+                        energy_data_type trimer_interaction_energy = compute_interaction_energy<3> ( trimer_ijk, std :: string( trimer_name ), settings, trimer_report );
                         report.attach_new_trimer_report( trimer_report );
                         retval += trimer_interaction_energy;
                       }
@@ -171,21 +194,21 @@ namespace manybody_expansion {
     unit_cell_type cell_R0 = config.lattice().at(0, 0, 0);
     for( size_t i_R0 = 0; i_R0 < cell_R0.size(); i_R0++ ) {
       Polymer<1> monomer_i( array< Molecule, 1 > { cell_R0[ i_R0 ] } );
-      for( size_t R_j_a = config.lattice().a_min(); R_j_a < config.lattice().a_max(); R_j_a++ ) {
-        for( size_t R_j_b = config.lattice().b_min(); R_j_b < config.lattice().b_max(); R_j_b++ ) {
-          for( size_t R_j_c = config.lattice().c_min(); R_j_c < config.lattice().c_max(); R_j_c++ ) {
+      for( int R_j_a = config.lattice().a_min(); R_j_a < config.lattice().a_max(); R_j_a++ ) {
+        for( int R_j_b = config.lattice().b_min(); R_j_b < config.lattice().b_max(); R_j_b++ ) {
+          for( int R_j_c = config.lattice().c_min(); R_j_c < config.lattice().c_max(); R_j_c++ ) {
             unit_cell_type cell_Rj = config.lattice().at( R_j_a, R_j_b, R_j_c );
             for( size_t i_Rj = 0; i_Rj < cell_Rj.size(); i_Rj++ ) {
               Polymer<1> monomer_j( array< Molecule, 1 > { cell_Rj[ i_Rj ] } );
-              for( size_t R_k_a = config.lattice().a_min(); R_k_a < config.lattice().a_max(); R_k_a++ ) {
-                for( size_t R_k_b = config.lattice().b_min(); R_k_b < config.lattice().b_max(); R_k_b++ ) {
-                  for( size_t R_k_c = config.lattice().c_min(); R_k_c < config.lattice().c_max(); R_k_c++ ) {
+              for( int R_k_a = config.lattice().a_min(); R_k_a < config.lattice().a_max(); R_k_a++ ) {
+                for( int R_k_b = config.lattice().b_min(); R_k_b < config.lattice().b_max(); R_k_b++ ) {
+                  for( int R_k_c = config.lattice().c_min(); R_k_c < config.lattice().c_max(); R_k_c++ ) {
                     unit_cell_type cell_Rk = config.lattice().at( R_k_a, R_k_b, R_k_c );
                     for( size_t i_Rk = 0; i_Rk < cell_Rk.size(); i_Rk++ ){
                       Polymer<1> monomer_k( array< Molecule, 1 > { cell_Rk[ i_Rk ] } );
-                        for( size_t R_l_a = config.lattice().a_min(); R_l_a < config.lattice().a_max(); R_l_a++ ){
-                          for( size_t R_l_b = config.lattice().b_min(); R_l_b < config.lattice().b_max(); R_l_b++ ){
-                            for( size_t R_l_c = config.lattice().c_min(); R_l_c < config.lattice().c_max(); R_l_c++ ){
+                        for( int R_l_a = config.lattice().a_min(); R_l_a < config.lattice().a_max(); R_l_a++ ){
+                          for( int R_l_b = config.lattice().b_min(); R_l_b < config.lattice().b_max(); R_l_b++ ){
+                            for( int R_l_c = config.lattice().c_min(); R_l_c < config.lattice().c_max(); R_l_c++ ){
                               unit_cell_type cell_Rl = config.lattice().at( R_l_a, R_l_b, R_l_c );
                               for( size_t i_Rl = 0; i_Rl < cell_Rl.size(); i_Rl++ ){
                                 Polymer<1> monomer_l( array< Molecule, 1 > { cell_Rl[ i_Rl ] } );
@@ -200,7 +223,22 @@ namespace manybody_expansion {
                                 {
                                   Polymer<4> tetramer_ijkl = monomer_i + monomer_j + monomer_k + monomer_l;
                                   PolymerOmniReportGeneral<4> tetramer_report;
-                                  energy_data_type tetramer_interaction_energy;// = compute_interaction_energy<4> ( tetramer_ijkl, settings, tetramer_report );
+                                  std :: string tetramer_name;
+                                                tetramer_name += std :: string( "R_" ) + std :: string( "0_0_0_" );
+                                                tetramer_name += std :: string( "i_" ) + std :: to_string( i_R0 ) + std :: string( "_" );
+                                                tetramer_name += std :: string( "R_" ) + std :: to_string( R_j_a ) + std :: string( "_" ) + 
+                                                                                         std :: to_string( R_j_b ) + std :: string( "_" ) + 
+                                                                                         std :: to_string( R_j_c ) + std :: string( "_" );
+                                                tetramer_name += std :: string( "j_" ) + std :: to_string( i_Rj ) + std :: string( "_" );
+                                                tetramer_name += std :: string( "R_" ) + std :: to_string( R_k_a ) + std :: string( "_" ) + 
+                                                                                         std :: to_string( R_k_b ) + std :: string( "_" ) + 
+                                                                                         std :: to_string( R_k_c ) + std :: string( "_" );
+                                                tetramer_name += std :: string( "k_" ) + std :: to_string( i_Rk ) + std :: string( "_" );
+                                                tetramer_name += std :: string( "R_" ) + std :: to_string( R_l_a ) + std :: string( "_" ) + 
+                                                                                         std :: to_string( R_l_b ) + std :: string( "_" ) + 
+                                                                                         std :: to_string( R_l_c ) + std :: string( "_" );
+                                                tetramer_name += std :: string( "l_" ) + std :: to_string( i_Rl ) + std :: string( "_" );
+                                  energy_data_type tetramer_interaction_energy = compute_interaction_energy<4> ( tetramer_ijkl, std :: string( tetramer_name ), settings, tetramer_report );
                                   report.attach_new_tetramer_report( tetramer_report );
                                   retval += tetramer_interaction_energy;
                                 }

@@ -28,6 +28,7 @@ CFLAGS          = -I/usr/include/ -I$(IQUADS_SRC)
 CHEADS          =
 CSRCS           = main.cpp\
 		  client.cpp\
+		  setting.cpp\
 		  report.cpp\
 		  molpro_agent.cpp
 COBJS           = $(CSRCS:.cpp=.o)
@@ -39,6 +40,9 @@ $(PGM): $(COBJS)
 
 main.o: ../*.hpp ./main.cpp
 	$(CXX) -c $(CFLAGS) $(COPT) ./main.cpp
+
+setting.o: ../*.hpp
+	$(CXX) -c $(CFLAGS) $(COPT) ../setting.cpp
 
 client.o: ../*.hpp ../client.cpp
 	$(CXX) -c $(CFLAGS) $(COPT) ../client.cpp

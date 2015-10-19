@@ -4,14 +4,14 @@ IQUADS_BIN      = $(IQUADS_ROOT)/bin/
 CC              = gcc
 CXX             = g++
 COPT		= -g -std=c++11
-CFLAGS          = -I$(IQUADS_SRC)
+CFLAGS          = -I/usr/include -I$(IQUADS_SRC)
 CHEADS          =
 CSRCS           =\
 		request.cpp\
 		setting.cpp\
 		main.cpp
 COBJS           = $(CSRCS:.cpp=.o)
-LIBS            = -lboost_date_time
+LIBS            = -L/usr/lib64 -lboost_date_time -lboost_system
 PGM             = test
 
 $(PGM): $(COBJS)

@@ -41,13 +41,6 @@ int main( int argc, char* argv[] ) {
   using iquads :: manybody_expansion :: Agent;
   using iquads :: manybody_expansion :: PolymerReport;
   using iquads :: manybody_expansion :: PolymerOmniReportGeneral;
-  PolymerReport<1> monomer_report;
-  PolymerOmniReportGeneral<1> report_x;
-  
-
-  using std :: cout;
-  using std :: endl;
-//  cout << trimer_report.composition_list().size() << endl;
 
   Request request;
   Config config;
