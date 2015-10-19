@@ -65,8 +65,8 @@ template < size_t NUM  > struct PolymerReport {
 public:
   typedef AtomList atom_list_type;
   typedef array< int, NUM > composition_list_type;
-  typedef geometry_unit :: unit_mask_type geometry_unit_type;
-  typedef geometry_unit :: unit_literal_type geometry_unit_name_type;
+  typedef unit_mask_type geometry_unit_type;
+  typedef unit_literal_type geometry_unit_name_type;
   typedef double energy_data_type;
   typedef level_mask_type correlation_level_type;
   typedef electron_correlation :: Report electron_correlation_report_type;

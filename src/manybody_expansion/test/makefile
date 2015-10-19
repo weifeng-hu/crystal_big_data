@@ -1,40 +1,28 @@
-IQUADS_ROOT     = /home/wh288/Development/iquads/
-IQUADS_SRC      = $(IQUADS_ROOT)/src/
-IQUADS_BIN      = $(IQUADS_ROOT)/bin/
+iquads_root     = $(DEV_ROOT)/iquads/
+iquads_src      = $(iquads_root)/src/
+iquads_bin      = $(iquads_root)/bin/
 CC              = gcc
-CXX             = g++
-COPT		= -g -std=c++11
-CFLAGS          = -I/usr/include -I$(IQUADS_SRC)
+CPP             = g++
+CPPOPT		= -g -O0 -std=c++11
+CPPFLAGS        = -I/usr/include -I$(iquads_src)
 CHEADS          =
-CSRCS           =\
+CPPSRCS         =\
 		request.cpp\
 		setting.cpp\
 		main.cpp
-COBJS           = $(CSRCS:.cpp=.o)
-LIBS            = -L/usr/lib64 -lboost_date_time -lboost_system
-PGM             = test
+CPPOBJS         = $(CPPSRCS:.cpp=.o)
+LIBS            = $(iquads_src)/manybody_expansion/libiquads_manybody_expansion.a\
+		  $(iquads_src)/electron_correlation/libiquads_electron_correlation.a\
+		  $(iquads_src)/interface_to_third_party/libiquads_third_party.a\
+		  -L/usr/lib64 -lboost_filesystem -lboost_date_time -lboost_system
+executable      = test
 
-$(PGM): $(COBJS)
-	$(CXX) -o $(PGM) $(CFLAGS) $(COPT) $(COBJS) $(LIBS)
-	cp $(PGM) $(IQUADS_BIN)
+$(executable): $(CPPOBJS)
+	$(CPP) -o $(executable) $(CPPFLAGS) $(CPPOPT) $(CPPOBJS) $(LIBS)
+	cp $(executable) $(iquads_bin)
 
 main.o: ../*.hpp
-	$(CXX) -c $(CFLAGS) $(COPT) main.cpp
-
-request.o: ../*.hpp
-	$(CXX) -c $(CFLAGS) $(COPT) ../request.cpp
-
-report.o: ../*.hpp
-	$(CXX) -c $(CFLAGS) $(COPT) ../report.cpp
-
-agent.o: ../*.hpp
-	$(CXX) -c $(CFLAGS) $(COPT) ../agent.cpp
-
-client.o: ../*.hpp
-	$(CXX) -c $(CFLAGS) $(COPT) ../client.cpp
-
-setting.o: ../../electron_correlation/setting.hpp
-	$(CXX) -c $(CFLAGS) $(COPT) ../../electron_correlation/setting.cpp
+	$(CPP) -o main.o -c $(CPPFLAGS) $(CPPOPT) main.cpp
 
 clean:
-	rm *.o; rm $(PGM); rm $(IQUADS_BIN)/$(PGM)
+	rm *.o; rm $(PGM); rm $(iquads_bin)/$(executable)

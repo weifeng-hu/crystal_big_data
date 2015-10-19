@@ -1,28 +1,16 @@
-IQUADS_ROOT	= /home/wh288/Development/iquads/
-IQUADS_SRC	= $(IQUADS_ROOT)/src/
-IQUADS_BIN	= $(IQUADS_ROOT)/bin/
+iquads_root	= $(DEV_ROOT)/iquads/
+iquads_src	= $(iquads_root)/src/
+iquads_bin	= $(iquads_root)/bin/
+
 CC		= gcc
-CXX		= g++
-CFLAGS		= -g\
-		  -Wextra -Wcast-align \
-		  -Wdisabled-optimization \
-		  -Wfloat-equal -Wformat=2 \
-		  -Wformat-nonliteral -Wformat-security  \
-		  -Wformat-y2k \
-		  -Wimport  -Winit-self  -Winline \
-		  -Winvalid-pch   \
-		  -Wmissing-field-initializers -Wmissing-format-attribute   \
-		  -Wmissing-include-dirs -Wmissing-noreturn \
-		  -Wpacked  -Wpointer-arith \
-		  -Wredundant-decls \
-		  -Wstack-protector \
-		  -Wstrict-aliasing=2 -Wswitch-default \
-		  -Wswitch-enum \
-		  -Wunreachable-code \
-		  -Wvariadic-macros \
-		  -Wwrite-strings\
-		  -std=c++11 -I/usr/include -I$(IQUADS_SRC)
-CHEADS		= client.hpp\
+CPP		= g++
+AR		= ar -r
+
+CFLAGS		= -I$(iquads_src) -I/usr/include
+CPPFLAGS	= -std=c++11 -I$(iquads_src) -I/usr/include
+CPPOPT		= 
+
+CPPHEADS	= client.hpp\
 		  agent.hpp\
 		  command_setting.hpp\
 		  request.hpp\
@@ -34,46 +22,93 @@ CHEADS		= client.hpp\
 		  compute_interaction_energy_traits.hpp\
 		  order_mask.hpp\
 		  lattice.hpp
-CSRCS		= \
-		  main.cpp\
+
+
+CPPSRCS		= \
 		  request.cpp\
 		  config.cpp\
+		  report.cpp\
 		  client.cpp\
 		  agent.cpp
-COBJS		= $(CSRCS:.cpp=.o)\
-		 ../electron_correlation/test/client.o\
-		 ../electron_correlation/test/report.o\
-		 ../electron_correlation/test/setting.o\
-		 ../electron_correlation/test/molpro_agent.o
-LIBS		= -L/usr/lib64 -lboost_filesystem -lboost_date_time -lboost_system 
-PGM		= mbe
+CPPOBJS		= $(CPPSRCS:.cpp=.o)
+LIBS		= $(iquads_src)/electron_correlation/libiquads_electron_correlation.a $(iquads_src)/interface_to_third_party/libiquads_third_party.a -L/usr/lib64 -lboost_filesystem -lboost_date_time -lboost_system 
 
-$(PGM):	$(COBJS)
-	$(CXX) -o $(PGM) $(CFLAGS) $(COPT) $(COBJS) $(LIBS)
-	cp $(PGM) $(IQUADS_BIN)
+executable	= iquads_manybody_expansion
+library		= libiquads_manybody_expansion.a
 
-main.o: ./../iquads/command_parser.hpp ./client.hpp ./client.cpp
-	$(CXX) -c $(CFLAGS) main.cpp
+debug: 	CPPOPT += -g -O3\
+		  -Wextra -Wcast-align \
+		  -Wdisabled-optimization \
+		  -Wfloat-equal -Wformat=2 \
+		  -Wformat-nonliteral -Wformat-security  \
+		  -Wformat-y2k \
+		  -Wimport  -Winit-self -Winline\
+		  -Winvalid-pch   \
+		  -Wmissing-field-initializers -Wmissing-format-attribute   \
+		  -Wmissing-include-dirs -Wmissing-noreturn \
+		  -Wpacked  -Wpointer-arith \
+		  -Wredundant-decls \
+		  -Wstack-protector \
+		  -Wstrict-aliasing=2 -Wswitch-default \
+		  -Wswitch-enum \
+		  -Wunreachable-code \
+		  -Wvariadic-macros \
+		  -Wwrite-strings
 
-request.o: ./request.hpp ./request.cpp
-	$(CXX) -c $(CFLAGS) request.cpp
+all: release
 
-config.o: ./../interface_to_third_party/program_mask.hpp\
-	 ./config.hpp
-	$(CXX) -c $(CFLAGS) config.cpp
+debug: executable
 
-client.o: ./../iquads/command_parser.hpp\
-	 ./command_setting.hpp\
-	 ./config.hpp\
-	 ./report.hpp
-	$(CXX) -c $(CFLAGS) client.cpp
+release: CPPOPT +=  -O3 
+release: executable
+release: library
 
-agent.o: ./../interface_to_third_party/external_program_agent_base.hpp\
-	 ./compute_interaction_energy_traits.hpp\
-	 ./agent.hpp\
-	 ./order_mask.hpp
-	$(CXX) -c $(CFLAGS) agent.cpp
+standalone: CPPOPT += -static
+#standalone: we don't have static libary of boost ...
+standalone: library
+standalone: executable
 
 clean:
-	rm *.o; rm $(PGM); rm $(IQUADS_BIN)/$(PGM)
+	rm *.o; rm $(executable) $(library); rm $(iquads_bin)/$(executable)
+
+executable:	main.o $(CPPOBJS)
+	$(CPP) -o $(executable) $(CPPFLAGS) $(CPPOPT) main.o $(CPPOBJS) $(LIBS)
+	cp $(executable) $(iquads_bin)
+
+library:	$(CPPOBJS)
+	$(AR) $(library)  $(CPPOBJS)
+
+main.o: $(iquads_src)/iquads/command_parser.hpp\
+	$(iquads_src)/manybody_expansion/client.hpp\
+	$(iquads_src)/manybody_expansion/client.cpp
+	$(CPP) -o main.o -c $(CPPOPT) $(CPPFLAGS) main.cpp
+
+request.o: $(iquads_src)/manybody_expansion/request.hpp\
+	   $(iquads_src)/manybody_expansion/request.cpp
+	$(CPP) -o request.o -c $(CPPOPT) $(CPPFLAGS) request.cpp
+
+config.o: $(iquads_src)/interface_to_third_party/program_mask.hpp\
+	  $(iquads_src)/manybody_expansion/config.hpp\
+	  $(iquads_src)/manybody_expansion/config.cpp
+	$(CPP) -o config.o -c $(CPPOPT) $(CPPFLAGS) config.cpp
+
+report.o: $(iquads_src)/manybody_expansion/report.hpp\
+	  $(iquads_src)/manybody_expansion/report.cpp
+	$(CPP) -o report.o -c $(CPPOPT) $(CPPFLAGS) report.cpp
+
+client.o: $(iquads_src)/iquads/command_parser.hpp\
+	  $(iquads_src)/manybody_expansion/command_setting.hpp\
+	  $(iquads_src)/manybody_expansion/config.hpp\
+	  $(iquads_src)/manybody_expansion/report.hpp\
+	  $(iquads_src)/manybody_expansion/client.cpp
+	$(CPP) -o client.o -c $(CPPOPT) $(CPPFLAGS) client.cpp
+
+agent.o: $(iquads_src)/interface_to_third_party/external_program_agent_base.hpp\
+	 $(iquads_src)/manybody_expansion/order_mask.hpp\
+	 $(iquads_src)/manybody_expansion/request.hpp\
+	 $(iquads_src)/manybody_expansion/config.hpp\
+	 $(iquads_src)/manybody_expansion/manybody_expansion_template.hpp\
+	 $(iquads_src)/manybody_expansion/agent.hpp\
+	 $(iquads_src)/manybody_expansion/agent.cpp
+	$(CPP) -o agent.o -c $(CPPOPT) $(CPPFLAGS) agent.cpp
 

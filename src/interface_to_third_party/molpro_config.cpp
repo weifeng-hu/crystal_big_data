@@ -24,7 +24,7 @@
  *
  */
 
-#include <interface_to_third_party/molpro_config.h>
+#include <interface_to_third_party/molpro_config.hpp>
 
 namespace iquads { 
 

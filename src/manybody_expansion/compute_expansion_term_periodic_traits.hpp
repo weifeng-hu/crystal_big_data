@@ -188,7 +188,7 @@ namespace manybody_expansion {
    */
   template <> inline energy_data_type compute_expansion_term_periodic<4> ( config_type config, report_ref report ) {
  
-    energy_data_type retval;
+    energy_data_type retval = 0.0e0;
     external_setting_type settings; settings.generate_from( config );
  
     unit_cell_type cell_R0 = config.lattice().at(0, 0, 0);

@@ -152,7 +152,7 @@ public:
         this->geometry_format_ = base_ref.set_geometry_format();
         this->geometry_unit_ = base_ref.set_geometry_unit();
       }
-      GeometryConfig_Base& operator= ( GeometryConfig x );
+
     public:
       friend 
       ostream& operator<< ( ostream& os, const this_type& object_ref ) {
@@ -190,8 +190,9 @@ public:
             using std::endl;
             cout << "unknown geometry type" << unknown_geometry_format << endl;
             abort();
-          }
-        } // end of GeometryConfig :: operator<< 
+        }
+        return os;  
+      } // end of GeometryConfig :: operator<< 
       void print( ostream& os ) const {
         using std::endl;
         os << *this << endl;
@@ -278,6 +279,7 @@ public:
          os << "{hf;" << endl;
          os << "wf," << object.nelec() << "," << object.sym() << "," << object.spin() << endl;
          os << "}" << endl;
+         return os;
       } // end of operator<<
       void print( ostream& os ) const {
         using std::endl;
@@ -320,7 +322,7 @@ public:
       MultiConfig(){};
      /* to be implemented */
     public:
-      void print( ostream& os ) const {}
+      void print( ostream& os ) const { }
     private:
   }; // end of struct MolproConfig :: MultiConfig
 
