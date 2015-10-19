@@ -85,7 +85,7 @@ public:
       energy_solution_tag_type energy_solution_tag()
         { return this->energy_solution_tag_; }
       energy_solution_name_type return_energy_solution_name() const 
-        { return iquads :: electron_correlation :: return_level_name( this->energy_solution_tag_ ); }
+        { return iquads :: electron_correlation :: return_level_name_aka_list( this->energy_solution_tag_ ).at(0); }
     private:
       energy_data_type energy_;
       energy_solution_tag_type energy_solution_tag_;

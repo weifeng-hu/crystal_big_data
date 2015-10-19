@@ -26,28 +26,16 @@ COPT		= -g\
 #-Wcast-qual
 CFLAGS          = -I/usr/include/ -I$(IQUADS_SRC)
 CHEADS          =
-CSRCS           = main.cpp\
-		  client.cpp\
-		  report.cpp\
-		  molpro_agent.cpp
+CSRCS           = main.cpp
 COBJS           = $(CSRCS:.cpp=.o)
-LIBS            = -L/usr/lib64 -lboost_filesystem -lboost_system
-PGM             = test_electron_correlation
+LIBS            = -L/usr/lib64 
+PGM             = test_utility
 
 $(PGM): $(COBJS)
 	$(CXX) -o $(PGM) $(CFLAGS) $(COPT) $(COBJS) $(LIBS); cp $(PGM) $(IQUADS_BIN)
 
 main.o: ../*.hpp ./main.cpp
 	$(CXX) -c $(CFLAGS) $(COPT) ./main.cpp
-
-client.o: ../*.hpp ../client.cpp
-	$(CXX) -c $(CFLAGS) $(COPT) ../client.cpp
-
-report.o: ../*.hpp ../report.cpp
-	$(CXX) -c $(CFLAGS) $(COPT) ../report.cpp
-
-molpro_agent.o: ../../interface_to_third_party/molpro_agent.cpp
-	$(CXX) -c $(CFLAGS) $(COPT) ../../interface_to_third_party/molpro_agent.cpp
 
 clean:
 	rm *.o; rm $(PGM); rm $(IQUADS_BIN)/$(PGM)

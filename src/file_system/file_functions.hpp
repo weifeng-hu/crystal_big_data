@@ -27,45 +27,40 @@
 #ifndef FILE_FUNCTIONS_H
 #define FILE_FUNCTIONS_H
 
+#include <tuple>
 #include <string>
 #include <vector>
 #include <fstream>
 #include <sstream>
 #include <boost/algorithm/string.hpp>
+#include <utility/vector_of_string_functions.hpp>
 
 namespace iquads {
 
 namespace file_system {
 
-template < typename DataType > DataType return_last_value_of_strings ( std :: vector< std :: string > strings ) {
-
-  DataType retval = convert_string_to <DataType> ( *( strings.rbegin() ) );
-  return retval;
-
-} // end of template function return_last_value_of_strings
-
-std :: vector< std :: string > return_split_strings_if_line_contains_all_keywords( std :: vector< std :: string> keywords, std :: string filepath ) {
+inline std :: vector< std :: string > return_split_strings_if_line_contains_all_keywords( std :: vector< std :: string> keywords, std :: string filepath ) {
 
   try {
     std :: ifstream ifs( filepath.c_str(), std :: ios :: in );
     while( ifs.eof() == false ) {
-      char[1024] line_buffer;
-      ifs.getline( line_buffer );
+      char line_buffer[1024];
+      ifs.getline( line_buffer, 1024 );
       std :: string line_string( line_buffer );
       std :: vector< std :: string > line_details;
       boost :: split( line_details, line_string, boost :: is_any_of( " " ) );
-      if( stringsA_has_stringsB( line_details, keywords ) == true ) {
+      if( iquads :: utility :: string_tool :: stringsA_has_stringsB( line_details, keywords ) == true ) {
         return line_details;
       }
     }
-    throw make_tuple( keywords, filepath );
-  } catch ( tuple< std :: vector< std :: string>, std :: string>   error_info ) {
+    throw std :: make_tuple( keywords, filepath );
+  } catch ( std :: tuple< std :: vector< std :: string>, std :: string >   error_info ) {
     std :: cout << "error: cannot find a line contains all the keywords in file " << std :: get<1> ( error_info ) << std :: endl;
     std :: cout << "       requested keywords are: " << std :: endl;
     for( size_t i = 0; i < ( std :: get<0>( error_info ) ).size(); i++ ) {
       std :: cout << ( std :: get<0>( error_info )[i] ) << ";";
     }
-    std :: endl;
+    std :: cout << std :: endl;
     abort();
   }
 

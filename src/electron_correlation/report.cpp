@@ -32,8 +32,7 @@ namespace electron_correlation {
 
 typedef Report  report_type;
 
-void report_type :: collect_data_from_external_report( external_report_type external_report )
-{
+void report_type :: collect_data_from_external_report( external_report_type external_report ) {
 
 }; // end of function collect_data_from_external_report()
 

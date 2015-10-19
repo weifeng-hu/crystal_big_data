@@ -27,6 +27,7 @@
 #ifndef ELECTRON_CORRELATION_LEVEL_HPP
 #define ELECTRON_CORRELATION_LEVEL_HPP
 
+#include <vector>
 #include <string>
 
 namespace iquads {
@@ -81,7 +82,7 @@ namespace iquads {
    */
 
     typedef unsigned long int level_mask_type;
-    typedef string correlation_name_type;
+    typedef std :: string correlation_name_type;
 
     namespace single_reference {
 
@@ -198,6 +199,108 @@ namespace iquads {
       if( correlation_name == "fci" ) return fci :: FCI;
 
     }
+
+    inline std :: vector < correlation_name_type > return_level_name_aka_list( level_mask_type level_mask ) {
+      std :: vector< correlation_name_type > retval;
+      retval.resize(0);
+      if( level_mask == single_reference :: mean_field :: RHF ) {
+        retval.push_back( correlation_name_type( "RHF") );
+        retval.push_back( correlation_name_type( "rhf") );
+      }
+      else if( level_mask == single_reference :: mean_field :: UHF ) {
+        retval.push_back( correlation_name_type( "UHF" ) );
+        retval.push_back( correlation_name_type( "uhf" ) );
+      }
+      else if( level_mask == single_reference :: mean_field :: DFT ) {
+        retval.push_back( correlation_name_type( "KS-DFT" ) );
+        retval.push_back( correlation_name_type( "dft" ) );
+      }
+      else if( level_mask == single_reference :: mollet_plesset :: MP2 ) {
+        retval.push_back( correlation_name_type( "MP2" ) );
+        retval.push_back( correlation_name_type( "mp2" ) );
+      }
+      else if( level_mask == single_reference :: mollet_plesset :: MP3 ) {
+        retval.push_back( correlation_name_type( "MP3" ) );
+        retval.push_back( correlation_name_type( "mp3" ) );
+      }
+      else if( level_mask == single_reference :: mollet_plesset :: MP4 ) {
+        retval.push_back( correlation_name_type( "MP4" ) );
+        retval.push_back( correlation_name_type( "mp4" ) );
+      }
+      else if( level_mask == single_reference :: ci :: CIS ) {
+        retval.push_back( correlation_name_type( "CIS" ) );
+        retval.push_back( correlation_name_type( "cis" ) );
+      }
+      else if( level_mask == single_reference :: ci :: CISD ) {
+        retval.push_back( correlation_name_type( "CISD" ) );
+        retval.push_back( correlation_name_type( "cisd" ) );
+      }
+      else if( level_mask == single_reference :: ci :: CISDT ) {
+        retval.push_back( correlation_name_type( "CISDT" ) );
+        retval.push_back( correlation_name_type( "cisdt" ) );
+      }
+      else if( level_mask == single_reference :: ci :: CISDTQ ) {
+        retval.push_back( correlation_name_type( "CISDTQ" ) );
+        retval.push_back( correlation_name_type( "cisdtq" ) );
+      }
+      else if( level_mask == single_reference :: coupled_cluster :: CCSD ) {
+        retval.push_back( correlation_name_type( "CCSD" ) );
+        retval.push_back( correlation_name_type( "ccsd" ) );
+      }
+      else if( level_mask == single_reference :: coupled_cluster :: CCSD_T ) {
+        retval.push_back( correlation_name_type( "CCSD(T)" ) );
+        retval.push_back( correlation_name_type( "ccsd(t)" ) );
+      }
+      else if( level_mask == single_reference :: coupled_cluster :: CCSDT ) {
+        retval.push_back( correlation_name_type( "CCSDT" ) );
+        retval.push_back( correlation_name_type( "ccsdt" ) );
+      }
+      else if( level_mask == single_reference :: coupled_cluster :: CCSDT_Q ) {
+        retval.push_back( correlation_name_type( "CCSDT(Q)" ) );
+        retval.push_back( correlation_name_type( "ccsdt(q)" ) );
+      }
+      else if( level_mask == single_reference :: coupled_cluster :: CCSDTQ ) {
+        retval.push_back( correlation_name_type( "CCSDTQ" ) );
+        retval.push_back( correlation_name_type( "ccsdtq" ) );
+      }
+      else if( level_mask == multi_reference :: ci :: CASCI ) {
+        retval.push_back( correlation_name_type( "CASCI" ) );
+        retval.push_back( correlation_name_type( "casci" ) );
+      }
+      else if( level_mask == multi_reference :: ci :: MRCI ) {
+        retval.push_back( correlation_name_type( "MRCI" ) );
+        retval.push_back( correlation_name_type( "mrci" ) );
+      }
+      else if( level_mask == multi_reference :: scf :: CASSCF ) {
+        retval.push_back( correlation_name_type( "MCSCF" ) );
+        retval.push_back( correlation_name_type( "mcscf" ) );
+        retval.push_back( correlation_name_type( "CASSCF" ) );
+        retval.push_back( correlation_name_type( "casscf" ) );
+      }
+      else if( level_mask == multi_reference :: coupled_cluster :: MRCC_SD ) {
+        retval.push_back( correlation_name_type( "MRCCSD" ) );
+      }
+      else if( level_mask == multi_reference :: coupled_cluster :: MRCC_SDT ) {
+        retval.push_back( correlation_name_type( "MRCCSDT" ) );
+      }
+      else if( level_mask == multi_reference :: dmrg :: DMRG_CI ) {
+        retval.push_back( correlation_name_type( "DMRG-CI" ) );
+        retval.push_back( correlation_name_type( "dmrg-ci" ) );
+      }
+      else if( level_mask == multi_reference :: dmrg :: DMRG_SCF ) {
+        retval.push_back( correlation_name_type( "DMRG-SCF" ) );
+        retval.push_back( correlation_name_type( "dmrg-scf" ) );
+      }
+      else if( level_mask == fci :: FCI ) {
+        retval.push_back( correlation_name_type( "FCI" ) );
+        retval.push_back( correlation_name_type( "fci" ) );
+      }
+      else {
+        retval.push_back( correlation_name_type( "UNKNOWN" ) );
+      }
+
+      return retval;
+    } // end of function return_level_name_aka_list
 
   } // end of namespace electron_correlation
 

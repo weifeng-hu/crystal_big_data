@@ -30,6 +30,8 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
 #include <iquads/sequence.hpp>
+#include <utility/convert_string_to.hpp>
+#include <file_system/file_functions.hpp>
 #include <chemistry/periodic_table.hpp>
 #include <interface_to_third_party/molpro_config.hpp>
 #include <interface_to_third_party/molpro_agent.hpp>
@@ -46,7 +48,7 @@ agent_type :: generate_config_list_from_request( request_type request ) {
   base_config_ptr_list config_pointer_list;
   if( request.calculation() == iquads :: sequence :: calculation :: SINGLE_POINT_ENERGY ) {
     config_pointer_list.resize(1);
-    config_pointer_list[0] = new this_config_type
+    config_pointer_list[0] = new this_config_type;
 
     config_pointer_list[0] -> set_solution_tag() = quantity :: ENERGY;
     config_pointer_list[0] -> set_correlation_tag() = request.method();
@@ -191,11 +193,19 @@ agent_type :: energy_report_type
 agent_type :: collect_energy_data_from_output( correlation_tag_type correlation_tag, path_name_type output_filename ) {
 
   typedef ExternalProgramReport :: EnergyReport :: energy_data_type energy_data_type;
-  std :: vector< std :: string > correlation_name_set = iquads :: electron_correlation :: return_level_name_set( correlation_tag );
-  std :: vector< std :: string > keywords = correlation_name_set;
+  std :: vector< std :: string > correlation_name_aka_list = iquads :: electron_correlation :: return_level_name_aka_list( correlation_tag );
+  for( size_t i = 0; i < correlation_name_aka_list.size(); i++ ) {
+    correlation_name_aka_list[i].insert( 0, std :: string( "!" ) );
+  }
+  // I have to confess that this part is not that black box, because developer needs to know that molpro uses upper case
+  // keywords to label correlation method, with "!". And the developers also need to know that the first element of the AKA list
+  // is for molpro use.
+  std :: vector< std :: string > keywords;
+  keywords.push_back( correlation_name_aka_list[0] );
   keywords.push_back( std :: string( "Energy" ) );
-  energy_data_type energy_data = iquads :: file_system :: return_last_string_if_line_contains_keywords < energy_data_type > ( keywords, output_filename );
-  return ExternalProgramReport :: EnergyReport( energy_data_type, correlation_tag );
+  energy_data_type energy_data 
+    = iquads :: utility :: string_tool :: return_last_value_of_strings< energy_data_type > ( iquads :: file_system :: return_split_strings_if_line_contains_all_keywords( keywords, output_filename ) );
+  return ExternalProgramReport :: EnergyReport( energy_data, correlation_tag );
 
 }; // end of function collect_energy_data_from_output()
 

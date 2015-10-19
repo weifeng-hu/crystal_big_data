@@ -122,7 +122,7 @@ public:
                                                                      this->make_directory( base_config_pointer->scratch_dir() ), 
                                                                      this->make_directory( base_config_pointer->output_dir() ) );
     energy_report_type energy_report 
-      = collect_energy_data_from_output( local_run_info.output_path() ); // call derived class
+      = collect_energy_data_from_output( base_config_pointer->correlation_tag(), local_run_info.output_path() ); // call derived class
     using std::make_tuple;
     return make_tuple( energy_report, local_run_info );
   } // end of function run_energy_calculation()
