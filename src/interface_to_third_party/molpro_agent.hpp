@@ -33,6 +33,7 @@
 #include <string>
 #include <cstdlib>
 #include <fstream>
+#include <structure/atom_list.hpp>
 #include <interface_to_third_party/molpro_config.hpp>
 #include <interface_to_third_party/external_program_report.hpp>
 #include <interface_to_third_party/external_program_agent_base.hpp>
@@ -72,7 +73,10 @@ public:
   filepath_type write_input_hf_energy( base_config_ptr base_config_pointer );
   filepath_type write_input_mp2_energy( base_config_ptr base_config_pointer );
   filepath_type write_input_casscf_energy( base_config_ptr base_config_pointer );
-  energy_report_type collect_energy_data_from_output( correlation_tag_type correlation_tag, path_name_type output_path );
+  energy_report_type collect_energy_data_from_output( correlation_tag_type correlation_tag, filepath_type output_path );
+  iquads :: structure :: AtomList read_coordinate( filepath_type output_path );
+  int    read_charge( filepath_type output_path );
+  double read_energy( correlation_tag_type correlation_tag, filepath_type output_path );
 
 }; // end of class MolproAgent
 

@@ -30,6 +30,8 @@
 #include <memory>
 #include <tuple>
 #include <vector>
+#include <structure/molecule.hpp>
+#include <file_system/filepath.hpp>
 #include <electron_correlation/quantity.hpp>
 #include <electron_correlation/correlation_level.hpp>
 #include <interface_to_third_party/external_program_config_base.hpp>
@@ -66,6 +68,9 @@ struct ExternalProgramReport {
 public:
   typedef ExternalProgramReport parent_report_type;
   typedef ExternalProgramConfig_Base :: GeometryConfig_Base :: atomic_coord_list_type  atom_list_type;
+  typedef iquads :: structure :: Molecule molecule_obj_type;
+  typedef std :: string molecule_name_type;
+  typedef std :: tuple < molecule_name_type, molecule_obj_type >  molecule_info_type;
 
 public:
   struct EnergyReport {
@@ -75,18 +80,27 @@ public:
       typedef level_mask_type energy_solution_tag_type;
       typedef correlation_name_type energy_solution_name_type;
     public:
-      EnergyReport( energy_data_type energy_data_value,
+      EnergyReport( molecule_info_type molecule_info_obj,
+                    energy_data_type energy_data_value,
                     energy_solution_tag_type energy_solution_tag_value ) :
+         molecule_info_( molecule_info_obj ),
          energy_( energy_data_value ), 
          energy_solution_tag_ ( energy_solution_tag_value ) { }
     public:
-      energy_data_type energy()
+      molecule_info_type molecule_info() const
+        { return this->molecule_info_; }
+      molecule_obj_type molecule_obj() const 
+        { return std :: get<1> ( this->molecule_info_ ); }
+      molecule_name_type molecule_name() const
+        { return std :: get<0> ( this->molecule_info_ ); }
+      energy_data_type energy() const
         { return this->energy_; }
-      energy_solution_tag_type energy_solution_tag()
+      energy_solution_tag_type energy_solution_tag() const
         { return this->energy_solution_tag_; }
       energy_solution_name_type return_energy_solution_name() const 
         { return iquads :: electron_correlation :: return_level_name_aka_list( this->energy_solution_tag_ ).at(0); }
     private:
+      molecule_info_type molecule_info_;
       energy_data_type energy_;
       energy_solution_tag_type energy_solution_tag_;
   }; // end of struct ExternalProgramReport :: EnergyReport
@@ -97,15 +111,13 @@ public:
   typedef GradientReport  gradient_bare_report_type;
 
 public:
-  struct ReportInterface { };
-
-public:
   struct RuntimeInfo_Base {
     public:
       typedef string program_name_type;
       typedef string file_name_type;
       typedef string dir_name_type;
       typedef string path_name_type;
+      typedef iquads :: file_system :: Filepath file_path_type;
       typedef RuntimeInfo_Base base;
     public:
       RuntimeInfo_Base( program_name_type program_name,
@@ -122,8 +134,10 @@ public:
       dir_name_type   input_dir()        const { return this->input_dir_; }
       dir_name_type   scratch_dir()      const { return this->scratch_dir_; }
       dir_name_type   output_dir()       const { return this->output_dir_; }
-      path_name_type  input_path()       const { return std :: string( this->input_dir_ + std :: string( "/" ) + this->input_filename_ ); }
-      path_name_type  output_path()      const { return std :: string( this->output_dir_ + std :: string( "/" ) + this->output_filename_ ); }
+      path_name_type  input_path_name()  const { return std :: string( this->input_dir_ + std :: string( "/" ) + this->input_filename_ ); }
+      path_name_type  output_path_name() const { return std :: string( this->output_dir_ + std :: string( "/" ) + this->output_filename_ ); }
+      file_path_type  input_path()       const { return file_path_type( this->input_dir_, this->input_filename_ ); }
+      file_path_type  output_path()      const { return file_path_type( this->output_dir_, this->output_filename_ ); }
     protected:
       program_name_type program_name_;
       path_name_type    input_dir_;
@@ -186,9 +200,10 @@ public:
     { this->energy_local_run_report_list_.push_back( report ); }
   void accept_new_step_data( gradient_local_run_report_type report )
     { this->gradient_local_run_report_list_.push_back( report ); }
+  energy_local_run_report_list_type energy_local_run_report_list() const
+    { return this->energy_local_run_report_list_; }
 
 private:
-  vector< shared_ptr< ReportInterface > > interface_to_step_reports_;
   energy_local_run_report_list_type energy_local_run_report_list_;
   vector< gradient_local_run_report_type > gradient_local_run_report_list_;
 

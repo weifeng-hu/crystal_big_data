@@ -27,8 +27,11 @@
 #ifndef VECTOR_OF_STRING_FUNCTIONS_HPP
 #define VECTOR_OF_STRING_FUNCTIONS_HPP
 
+#include <stdlib.h>
+#include <iostream>
 #include <string>
 #include <vector>
+#include <boost/algorithm/string.hpp>
 #include <utility/convert_string_to.hpp>
 
 namespace iquads {
@@ -36,6 +39,20 @@ namespace iquads {
 namespace utility {
 
 namespace string_tool {
+
+std :: vector< std :: string > split_string( std :: string string_line, std :: string spliters ) {
+
+  try {
+    std :: vector< std :: string > retval;
+    boost :: split( retval, string_line, boost :: is_any_of( spliters.c_str() ) );
+    if( retval.size() == 0 ) { throw 1; }
+    return retval;
+  } catch ( int signal ) {
+    std :: cout << "error: string " << string_line << " is not splitable by any of " << spliters << std :: endl;
+    abort();
+  }
+
+}
 
 template < typename DataType > inline DataType return_last_value_of_strings ( std :: vector< std :: string > strings ) {
 

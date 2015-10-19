@@ -39,6 +39,56 @@ namespace iquads {
 
 namespace file_system {
 
+inline std :: vector< std :: string > read_block_between_lineA_and_lineB( std :: string lineA, std :: string lineB, std :: string filepath ) {
+
+  try {
+    std :: vector< std :: string > retval;
+    retval.resize(0);
+    std :: ifstream ifs( filepath.c_str(), std :: ios :: in );
+    bool lineA_is_found = false;
+    bool lineB_is_found = false;
+    while( ifs.eof() == false ) {
+      char line_buffer[1024];
+      ifs.getline( line_buffer, 1024 );
+      std :: string line_string( line_buffer );
+      boost :: trim_right( line_string );
+      if( line_string == lineA ) {
+        lineA_is_found = true;
+        break;
+      }
+    }
+
+    while( ifs.eof() == false ) {
+      char line_buffer[1024];
+      ifs.getline( line_buffer, 1024 );
+      std :: string line_string( line_buffer );
+      boost :: trim_right( line_string );
+      if( line_string == lineB ) {
+        lineB_is_found = true;
+        break;
+      }
+      if( ( line_string != std :: string ( "" ) ) )  {
+        retval.push_back( line_string );
+      }
+    }
+    ifs.close();
+    if( retval.size() == 0 ) { throw std :: make_tuple( lineA, lineB, filepath ); }
+    if( lineA_is_found == false ) { throw std :: make_tuple( lineA, filepath ); }
+    if( lineB_is_found == false ) { throw std :: make_tuple( lineB, filepath ); }
+    return retval;
+  } catch ( std :: tuple < std :: string, std :: string, std :: string> error_info ) {
+    std :: cout << "error: cannot find any non while space block in file " << std :: get<2> ( error_info ) << " between lines " << std :: endl;
+    std :: cout << "line A: " << std :: get<0> ( error_info ) << std :: endl;
+    std :: cout << "line B: " << std :: get<1> ( error_info ) << std :: endl;
+    abort();
+  } catch ( std :: tuple < std :: string, std :: string > error_info ) {
+    std :: cout << "error: cannot find a line in file " << std :: get<1> ( error_info ) << std :: endl;
+    std :: cout << "line not found: " << std :: get<0> ( error_info ) << std :: endl;
+    abort();
+  }
+
+}
+
 inline std :: vector< std :: string > return_split_strings_if_line_contains_all_keywords( std :: vector< std :: string> keywords, std :: string filepath ) {
 
   try {
@@ -48,11 +98,13 @@ inline std :: vector< std :: string > return_split_strings_if_line_contains_all_
       ifs.getline( line_buffer, 1024 );
       std :: string line_string( line_buffer );
       std :: vector< std :: string > line_details;
-      boost :: split( line_details, line_string, boost :: is_any_of( " " ) );
+      boost :: trim( line_string );
+      boost :: split( line_details, line_string, boost :: is_any_of( " " ), boost :: token_compress_on  );
       if( iquads :: utility :: string_tool :: stringsA_has_stringsB( line_details, keywords ) == true ) {
         return line_details;
       }
     }
+    ifs.close();
     throw std :: make_tuple( keywords, filepath );
   } catch ( std :: tuple< std :: vector< std :: string>, std :: string >   error_info ) {
     std :: cout << "error: cannot find a line contains all the keywords in file " << std :: get<1> ( error_info ) << std :: endl;

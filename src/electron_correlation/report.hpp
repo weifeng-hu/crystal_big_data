@@ -144,7 +144,19 @@ public:
 
     energy_data_type& set_correlated_energy_of( correlation_level_type correlation_level ) {
       list_iterator_type list_iterator = this->correlated_energy_list_.find( correlation_level );
+      
       return list_iterator->second;
+    }
+
+    energy_data_type lowest_energy() {
+      energy_data_type retval = 0.0e0;
+      for( list_iterator_type it = this->correlated_energy_list_.begin();
+                              it != this->correlated_energy_list_.end(); ++it ) {
+        if( retval > it->second ) {
+          retval = it->second;
+        }
+      }
+      return retval;
     }
 
     private:
@@ -171,8 +183,8 @@ public:
     { return this->external_report_; }
   molecule_info_type molecule_info() const 
     { return this->molecule_info_; }
-  energy_data_type energy() const 
-    { return this->energy_; }
+  energy_data_type energy() 
+    { return this->correlated_energy_report_.lowest_energy(); }
 
   /**
    *  Auxiliary accessors 
@@ -187,10 +199,9 @@ public:
     { return this->molecule_obj().geometry_unit(); }
 
 private:
-  molecule_info_type   molecule_info_;
-  external_report_type external_report_;
-  correlated_energy_report_type correlated_energy_report_;
-  energy_data_type     energy_;
+  external_report_type           external_report_;
+  molecule_info_type             molecule_info_;
+  correlated_energy_report_type  correlated_energy_report_;
 
 }; // end of struct Report
 

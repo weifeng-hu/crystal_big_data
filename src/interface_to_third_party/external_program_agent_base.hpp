@@ -83,7 +83,7 @@ public:
   virtual local_run_info_type run_external_program( filepath_type input_path, 
                                                     directory_type scratch_dir, 
                                                     directory_type output_dir ) = 0;
-  virtual energy_report_type collect_energy_data_from_output( correlation_tag_type correlation_tag, path_name_type output_filename ) = 0;
+  virtual energy_report_type collect_energy_data_from_output( correlation_tag_type correlation_tag, filepath_type output_path ) = 0;
   virtual base_config_ptr_list generate_config_list_from_request( request_type request ) = 0;
 
 public:

@@ -24,6 +24,7 @@
  *
  */
 
+#include <tuple>
 #include <electron_correlation/report.hpp>
 
 namespace iquads {
@@ -33,6 +34,14 @@ namespace electron_correlation {
 typedef Report  report_type;
 
 void report_type :: collect_data_from_external_report( external_report_type external_report ) {
+
+  this->external_report_ = external_report;
+  for( size_t i = 0; i < this->external_report_.energy_local_run_report_list().size(); i++ ) {
+    this->correlated_energy_report_.set_correlated_energy_of( std :: get<0>( this->external_report_.energy_local_run_report_list()[i] ).energy_solution_tag() )
+      = std :: get<0>( this->external_report_.energy_local_run_report_list()[i] ).energy();
+  }
+  this->molecule_info_ = std :: make_tuple( std :: get<0> ( this->external_report_.energy_local_run_report_list()[0] ).molecule_name(),
+                                            std :: get<0> ( this->external_report_.energy_local_run_report_list()[0] ).molecule_obj()   );
 
 }; // end of function collect_data_from_external_report()
 

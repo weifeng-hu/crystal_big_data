@@ -189,8 +189,54 @@ agent_type :: run_external_program( filepath_type input_path, directory_type scr
   }
 } // end of function run_external_program()
 
-agent_type :: energy_report_type 
-agent_type :: collect_energy_data_from_output( correlation_tag_type correlation_tag, path_name_type output_filename ) {
+iquads :: structure :: AtomList 
+agent_type :: read_coordinate( filepath_type output_path ) {
+
+  iquads :: structure :: AtomList retval;
+  retval.resize(0);
+
+  std :: string lineA( " NR  ATOM    CHARGE       X              Y              Z" );
+  std :: string lineB( " Bond lengths in Bohr (Angstrom)" );
+  std :: vector< std :: string > coordinate_block = iquads :: file_system :: read_block_between_lineA_and_lineB( lineA, lineB, output_path.absolute() );
+
+  for( size_t i = 0; i < coordinate_block.size(); i++ ) {
+    std :: string line = coordinate_block[i];
+    std :: vector< std :: string > vector_of_string;
+    boost :: trim( line );
+    boost :: split( vector_of_string, line, boost :: is_any_of( " " ), boost :: token_compress_on );
+    retval.push_back ( iquads :: structure :: Atom( vector_of_string.at(1), 
+                                                    iquads :: utility :: string_tool :: convert_string_to<double> ( vector_of_string.at(3) ), 
+                                                    iquads :: utility :: string_tool :: convert_string_to<double> ( vector_of_string.at(4) ), 
+                                                    iquads :: utility :: string_tool :: convert_string_to<double> ( vector_of_string.at(5) ), 
+                                                    std :: string( "bohr" ) ) );
+  }
+
+  return retval;
+
+} // end of function read_coordinate()
+
+int agent_type :: read_charge( filepath_type output_path ) {
+
+  std :: vector< std :: string > keywords;
+  keywords.push_back( std :: string( "NUMBER" ) );
+  keywords.push_back( std :: string( "OF" ) );
+  keywords.push_back( std :: string( "ELECTRONS:" ) );
+  keywords.push_back( std :: string( "SPACE" ) );
+  keywords.push_back( std :: string( "SPIN" ) );
+  std :: vector< std :: string > line = iquads :: file_system :: return_split_strings_if_line_contains_all_keywords( keywords, output_path.absolute() );
+  int na = iquads :: utility :: string_tool :: convert_string_to<int> ( line.at(3) );
+  int nb = iquads :: utility :: string_tool :: convert_string_to<int> ( line.at(4) );
+
+  std :: vector< std :: string > keywords_charge;
+  keywords_charge.push_back( "NUCLEAR" );
+  keywords_charge.push_back( "CHARGE:" );
+  int nuclear_charge = iquads :: utility :: string_tool :: return_last_value_of_strings< int > ( iquads :: file_system :: return_split_strings_if_line_contains_all_keywords( keywords_charge, output_path.absolute() ) );
+
+  return nuclear_charge - na - nb ;
+
+}
+
+double agent_type :: read_energy( correlation_tag_type correlation_tag, filepath_type output_path ) {
 
   typedef ExternalProgramReport :: EnergyReport :: energy_data_type energy_data_type;
   std :: vector< std :: string > correlation_name_aka_list = iquads :: electron_correlation :: return_level_name_aka_list( correlation_tag );
@@ -204,8 +250,26 @@ agent_type :: collect_energy_data_from_output( correlation_tag_type correlation_
   keywords.push_back( correlation_name_aka_list[0] );
   keywords.push_back( std :: string( "Energy" ) );
   energy_data_type energy_data 
-    = iquads :: utility :: string_tool :: return_last_value_of_strings< energy_data_type > ( iquads :: file_system :: return_split_strings_if_line_contains_all_keywords( keywords, output_filename ) );
-  return ExternalProgramReport :: EnergyReport( energy_data, correlation_tag );
+    = iquads :: utility :: string_tool :: return_last_value_of_strings< energy_data_type > ( iquads :: file_system :: return_split_strings_if_line_contains_all_keywords( keywords, output_path.absolute() ) );
+
+  return energy_data;
+}
+
+agent_type :: energy_report_type 
+agent_type :: collect_energy_data_from_output( correlation_tag_type correlation_tag, filepath_type output_path ) {
+
+  // get the energy value to a correlation
+  double energy_data = this->read_energy( correlation_tag, output_path );
+
+  // also get the atom list and molecule name
+  // molecule name is the filename, but without extension
+  std :: string molecule_name = output_path.filename().name();
+
+  // find out the molecule atom list
+  iquads :: structure :: AtomList atom_list = this->read_coordinate( output_path );
+  int charge = this->read_charge( output_path );
+  // find out the molecule charge
+  return ExternalProgramReport :: EnergyReport( std :: make_tuple( molecule_name, iquads :: structure :: Molecule( atom_list, charge ) ), energy_data, correlation_tag );
 
 }; // end of function collect_energy_data_from_output()
 

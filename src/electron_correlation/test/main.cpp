@@ -57,5 +57,9 @@ int main( int argc, char* argv[] ) {
   iquads :: electron_correlation :: Client client;
   // and run application
   client.driver( molecule_info, calculation_setting );
+  iquads :: structure :: Molecule x = client.report().molecule_obj();
+  std :: cout << x << std :: endl;
+  std :: cout << client.report().molecule_name() << std :: endl;
+  std :: cout << client.report().energy() << std :: endl;
 
 }  // end of main()
