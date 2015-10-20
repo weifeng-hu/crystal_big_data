@@ -34,6 +34,7 @@
 //#include <electron_correlation/config.hpp>
 #include <manybody_expansion/config.hpp>
 #include <interface_to_third_party/program_mask.hpp>
+#include <electron_correlation/correlation_level.hpp>
 
 namespace iquads {
 
@@ -77,7 +78,6 @@ public:
   typedef string                         path_name_type;
   typedef program :: program_mask_type   external_program_type;
   typedef mode :: mode_mask_type         mode_type;
-//  typedef electron_correlation :: Config config_type;
   typedef manybody_expansion :: Config   mbe_config_type;
   typedef bool condition_type;
 
@@ -93,28 +93,31 @@ public:
        *  We don't have UNKNOWN for program
        *  since IQUADS solvers should always be ready.
        */
+      this->correlation_level_ = iquads :: electron_correlation :: single_reference :: mean_field :: RHF;
       this->external_program_ = program :: IQUADS;
-      this->input_path_ = "not set";
-      this->scratch_path_ = "not set";
-      this->output_path_ = "not set";
+      this->input_dir_ = "not set";
+      this->scratch_dir_ = "not set";
+      this->output_dir_ = "not set";
     }
   /**
    *  Initialize list constructor
    */
   Setting( mode_type mode,
            basis_set_name_type basis_set_name,
-           size_t spin,
-           size_t sym,
+           int spin,
+           int sym,
+           level_mask_type correlation_level_value,
            external_program_type external_program,
-           path_name_type input_path,
-           path_name_type scratch_path,
-           path_name_type output_path ) :
+           path_name_type input_dir,
+           path_name_type scratch_dir,
+           path_name_type output_dir ) :
     mode_ ( mode ), basis_set_name_ ( basis_set_name ), 
     spin_ ( spin ), sym_ ( sym ),
+    correlation_level_ ( correlation_level_value ),
     external_program_ ( external_program ),
-    input_path_   ( input_path ),
-    scratch_path_ ( scratch_path ),
-    output_path_  ( output_path ) { }
+    input_dir_   ( input_dir ),
+    scratch_dir_ ( scratch_dir ),
+    output_dir_  ( output_dir ) { }
 
 public:
   /**
@@ -144,10 +147,12 @@ public:
     os << "basis set: "         << setting_obj.basis_set_name()    << endl;
     os << "spin: "              << setting_obj.spin()              << endl;
     os << "sym: "               << setting_obj.sym()               << endl;
+    os << "correlation: "       << 
+          return_level_name_aka_list( setting_obj.correlation_level() )[0] << endl;
     os << "external program: "  << setting_obj.external_program()  << endl;
-    os << "input path: "        << setting_obj.input_path()        << endl;
-    os << "scratch path: "      << setting_obj.scratch_path()      << endl;
-    os << "output path: "       << setting_obj.output_path()       << endl;
+    os << "input dir: "         << setting_obj.input_dir()         << endl;
+    os << "scratch dir: "       << setting_obj.scratch_dir()       << endl;
+    os << "output dir: "        << setting_obj.output_dir()        << endl;
     return os;
   } // end of operator<<
 
@@ -158,18 +163,20 @@ public:
     { return this->mode_; }
   basis_set_name_type basis_set_name() const
     { return this->basis_set_name_; }
-  size_t spin() const
+  int spin() const
     { return this->spin_; }
-  size_t sym() const
+  int sym() const
     { return this->sym_; }
+  level_mask_type correlation_level() const
+    { return this->correlation_level_; }
   external_program_type external_program() const 
     { return this->external_program_; }
-  path_name_type input_path() const
-    { return this->input_path_; }
-  path_name_type scratch_path() const
-    { return this->scratch_path_; }
-  path_name_type output_path() const
-    { return this->output_path_; }
+  path_name_type input_dir() const
+    { return this->input_dir_; }
+  path_name_type scratch_dir() const
+    { return this->scratch_dir_; }
+  path_name_type output_dir() const
+    { return this->output_dir_; }
 
   /**
    *  Auxiliary accessors
@@ -180,12 +187,13 @@ public:
 private:
   mode_type              mode_;
   basis_set_name_type    basis_set_name_;
-  size_t                 spin_;
-  size_t                 sym_;
+  int                    spin_;
+  int                    sym_;
+  level_mask_type        correlation_level_;
   external_program_type  external_program_;
-  path_name_type         input_path_;
-  path_name_type         scratch_path_;
-  path_name_type         output_path_;
+  path_name_type         input_dir_;
+  path_name_type         scratch_dir_;
+  path_name_type         output_dir_;
 
 }; // end of struct Setting
 

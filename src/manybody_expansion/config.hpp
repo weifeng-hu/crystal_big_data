@@ -98,7 +98,7 @@ public:
   typedef MolecularLattice                           lattice_type;
   typedef tuple< lattice_name_type, lattice_type >   lattice_info_type;
   typedef string                                     bulk_name_type;
-  typedef MolecularLattice                           bulk_type;
+  typedef MolecularBulk                              bulk_type;
   typedef tuple< bulk_name_type, bulk_type >         bulk_info_type;
   typedef electron_correlation :: level_mask_type    correlation_method_type;
   typedef order :: order_mask_type                   expansion_order_type;
@@ -139,8 +139,8 @@ public:
     { return this->basis_set_name_; }
   job_name_type job_name() const
     { return this->job_name_; }
-  path_name_type scratch_name() const
-    { return this->scratch_name_; }
+  path_name_type scratch_dir() const
+    { return this->scratch_dir_; }
   correlation_method_type correlation_method() const
     { return this->correlation_method_; }
   run_mode_type run_mode() const
@@ -175,7 +175,7 @@ public:
   job_name_ref set_job_name() 
    { return this->job_name_; }
   path_name_ref set_scratch_name() 
-   { return this->scratch_name_; }
+   { return this->scratch_dir_; }
   correlation_method_ref set_correlation_method()
    { return this->correlation_method_; }
   run_mode_ref set_run_mode()
@@ -190,7 +190,7 @@ private:
   correlation_method_type  correlation_method_;
   basis_set_name_type      basis_set_name_;
   job_name_type            job_name_;
-  path_name_type           scratch_name_;
+  path_name_type           scratch_dir_;
   run_mode_type            run_mode_;
 
 }; // end of class Config

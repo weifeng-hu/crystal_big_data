@@ -7,8 +7,6 @@ CPPOPT		= -g -O0 -std=c++11
 CPPFLAGS        = -I/usr/include -I$(iquads_src)
 CHEADS          =
 CPPSRCS         =\
-		request.cpp\
-		setting.cpp\
 		main.cpp
 CPPOBJS         = $(CPPSRCS:.cpp=.o)
 LIBS            = $(iquads_src)/manybody_expansion/libiquads_manybody_expansion.a\
@@ -19,10 +17,9 @@ executable      = test
 
 $(executable): $(CPPOBJS)
 	$(CPP) -o $(executable) $(CPPFLAGS) $(CPPOPT) $(CPPOBJS) $(LIBS)
-	cp $(executable) $(iquads_bin)
 
-main.o: ../*.hpp
+main.o: ../*.hpp main.cpp
 	$(CPP) -o main.o -c $(CPPFLAGS) $(CPPOPT) main.cpp
 
 clean:
-	rm *.o; rm $(PGM); rm $(iquads_bin)/$(executable)
+	rm *.o; rm $(executable);

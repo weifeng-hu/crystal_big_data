@@ -63,16 +63,19 @@ target:	$(CPPOBJS)
 setting.o: $(iquads_src)/iquads/sequence.hpp\
 	   $(iquads_src)/structure/molecule.hpp\
 	   $(iquads_src)/manybody_expansion/config.hpp\
-	   $(iquads_src)interface_to_third_party/program_mask.hpp
+	   $(iquads_src)/interface_to_third_party/program_mask.hpp\
+	   $(iquads_src)/electron_correlation/setting.cpp
 	$(CPP) -o setting.o -c $(CPPOPT) $(CPPFLAGS) setting.cpp
 
 report.o: $(iquads_src)/structure/molecule.hpp\
 	  $(iquads_src)/electron_correlation/correlation_level.hpp\
-	  $(iquads_src)/interface_to_third_party/external_program_report.hpp
+	  $(iquads_src)/interface_to_third_party/external_program_report.hpp\
+	  $(iquads_src)/electron_correlation/report.cpp
 	$(CPP) -o report.o -c $(CPPOPT) $(CPPFLAGS) report.cpp
 
 client.o: $(iquads_src)/iquads/sequence.hpp\
 	  $(iquads_src)/electron_correlation/correlation_level.hpp\
-	  $(iquads_src)/electron_correlation/client.hpp
+	  $(iquads_src)/electron_correlation/client.hpp\
+	  $(iquads_src)/electron_correlation/client.cpp
 	$(CPP) -o client.o -c $(CPPOPT) $(CPPFLAGS) client.cpp
 

@@ -64,7 +64,7 @@ namespace manybody_expansion {
    *  Explicit instantiation for order 1, to calculate total monomer energy
    */
   template <> inline energy_data_type compute_expansion_term_periodic<1>( config_type config, report_ref report ) {
- 
+
     energy_data_type retval = 0.0e0;
     external_setting_type settings; settings.generate_from( config );
  

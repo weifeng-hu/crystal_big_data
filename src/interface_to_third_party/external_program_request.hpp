@@ -83,8 +83,8 @@ public:
   ExternalProgramRequest( molecule_name_type     molecule_name,
                           molecule_obj_type      molecule_obj,
                           basis_set_name_type    basis_set_name,
-                          size_t                 spin_value,
-                          size_t                 sym_value,
+                          int                    spin_value,
+                          int                    sym_value,
                           external_program_type  external_program,
                           mode_type              mode,
                           calculation_type       calculation,
@@ -107,9 +107,9 @@ public:
     { return this->basis_set_name_; }
   external_program_type external_program() const
     { return this->external_program_; }
-  size_t spin() const
+  int spin() const
     { return this->spin_; }
-  size_t sym() const 
+  int sym() const 
     { return this->sym_; }
   mode_type mode() const
     { return this->mode_; }
@@ -139,8 +139,8 @@ public:
 
 private:
   molecule_info_type      molecule_info_;
-  size_t                  spin_;
-  size_t                  sym_;
+  int                     spin_;
+  int                     sym_;
   basis_set_name_type     basis_set_name_;
   external_program_type   external_program_;
   mode_type               mode_;

@@ -55,6 +55,7 @@ mbe_agent_type :: setup_config_from_request( request_type request ) {
    *  + lattice info/bulk info
    *  + check whether periodic system has been requested
    */
+
   if( get<1> ( request.lattice_info() ).is_filled() == true ) {
     config.set_is_periodic() = true;
     config.set_lattice_info() = request.lattice_info();
@@ -63,6 +64,7 @@ mbe_agent_type :: setup_config_from_request( request_type request ) {
     config.set_is_periodic() = false;
     config.set_bulk_info() = request.bulk_info();
   }
+
 
   /**
    *  Step 2
@@ -129,6 +131,9 @@ mbe_agent_type :: setup_config_from_request( request_type request ) {
 
   using iquads :: sequence :: mode :: return_mode_mask;
   config.set_run_mode() = return_mode_mask( request.run_mode_name() );
+  std :: cout << config.run_mode() << std :: endl;
+
+  return config;
 
 } // end of function setup_config_from_request()
 

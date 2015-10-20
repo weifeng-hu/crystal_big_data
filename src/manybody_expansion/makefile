@@ -36,6 +36,8 @@ LIBS		= $(iquads_src)/electron_correlation/libiquads_electron_correlation.a $(iq
 executable	= iquads_manybody_expansion
 library		= libiquads_manybody_expansion.a
 
+all: release
+
 debug: 	CPPOPT += -g -O3\
 		  -Wextra -Wcast-align \
 		  -Wdisabled-optimization \
@@ -54,10 +56,8 @@ debug: 	CPPOPT += -g -O3\
 		  -Wunreachable-code \
 		  -Wvariadic-macros \
 		  -Wwrite-strings
-
-all: release
-
 debug: executable
+debug: library
 
 release: CPPOPT +=  -O3 
 release: executable

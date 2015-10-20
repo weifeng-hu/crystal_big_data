@@ -83,11 +83,26 @@ using structure :: MolecularBulk;
 
 struct Request {
 public:
+  typedef string                                     lattice_name_type;
+  typedef MolecularLattice                           lattice_type;
+  typedef tuple< lattice_name_type, lattice_type >   lattice_info_type;
+  typedef string                                     bulk_name_type;
+  typedef MolecularBulk                              bulk_type;
+  typedef tuple< bulk_name_type, bulk_type >         bulk_info_type;
+  typedef order :: expansion_order_type              expansion_order_type;
+  typedef string    correlation_name_type;
+  typedef string    external_program_name_type;
+  typedef string    file_name_type;
+  typedef string    path_name_type;
+  typedef string    job_name_type;
+  typedef string    basis_set_name_type;
+  typedef string    run_mode_name_type;
+  typedef bool      condition_type;
+
+public:
   /**
    *  Default constructor
    *  --- make everything undefined
-   *  There is no other user-defined constructor so sanity check is 
-   *  essential for this struct. See member function check_sanity()
    */
   Request()
     {
@@ -103,23 +118,30 @@ public:
       this->scratch_name_ = "not set";
       this->output_name_ = "not set";
     }
-
-public:
-  typedef string                                     lattice_name_type;
-  typedef MolecularLattice                           lattice_type;
-  typedef tuple< lattice_name_type, lattice_type >   lattice_info_type;
-  typedef string                                     bulk_name_type;
-  typedef MolecularLattice                           bulk_type;
-  typedef tuple< bulk_name_type, bulk_type >         bulk_info_type;
-  typedef order :: expansion_order_type              expansion_order_type;
-  typedef string    correlation_name_type;
-  typedef string    external_program_name_type;
-  typedef string    file_name_type;
-  typedef string    path_name_type;
-  typedef string    job_name_type;
-  typedef string    basis_set_name_type;
-  typedef string    run_mode_name_type;
-  typedef bool      condition_type;
+  /**
+   *  We allow an initialize list constructor if user wants to initiate a calculation directly from code
+   */
+  Request( lattice_info_type lattice_info_obj,
+           bulk_info_type    bulk_info_obj,
+           expansion_order_type expansion_order_value,
+           correlation_name_type correlation_name_value,
+           external_program_name_type external_program_name_value,
+           basis_set_name_type basis_set_name_value,
+           run_mode_name_type run_mode_name_value,
+           job_name_type job_name_value,
+           path_name_type input_path,
+           path_name_type scratch_path,
+           path_name_type output_path ) :
+     lattice_info_ ( lattice_info_obj ), bulk_info_ ( bulk_info_obj ),
+     expansion_order_ ( expansion_order_value ),
+     correlation_name_ ( correlation_name_value ),
+     external_program_name_ ( external_program_name_value ),
+     basis_set_name_ ( basis_set_name_value ),
+     run_mode_name_ ( run_mode_name_value ),
+     job_name_ ( job_name_value ),
+     input_name_ ( input_path ),
+     scratch_name_ ( scratch_path ),
+     output_name_ ( output_path ) { }
 
 public:
   /**

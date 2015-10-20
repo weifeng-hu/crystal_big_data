@@ -29,6 +29,7 @@
 
 #include <string>
 #include <iostream>
+#include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 
 namespace iquads {
@@ -49,8 +50,16 @@ public:
 
 public:
   value_type create() {
-    boost :: filesystem :: path current_path( this->value_ );
-    boost :: filesystem :: create_directory( boost :: filesystem :: absolute( current_path ) );
+    std :: string absolute_path = this->absolute();
+    std :: vector < std :: string > subpaths;
+    boost :: split ( subpaths, absolute_path, boost :: is_any_of("/") );
+    std :: string loop_path("/");
+    for( size_t i = 0; i < subpaths.size(); i++ ) {
+      loop_path += subpaths[i];
+      loop_path += std :: string( "/" );
+      boost :: filesystem :: path current_path( loop_path );
+      boost :: filesystem :: create_directory( boost :: filesystem :: absolute( current_path ) );
+    }
     return this->value_;
   }
   bool exists() 

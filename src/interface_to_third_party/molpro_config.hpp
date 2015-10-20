@@ -263,9 +263,9 @@ public:
   struct HartreeFockConfig : public hartree_fock_config_base_type {
     public:
       typedef HartreeFockConfig this_type;
-      typedef typename parent_config_type :: number_type nelec_type;
-      typedef typename parent_config_type :: number_type spin_type;
-      typedef typename parent_config_type :: number_type sym_type;
+      typedef int nelec_type;
+      typedef int spin_type;
+      typedef int sym_type;
     public:
       HartreeFockConfig(){};
       HartreeFockConfig( nelec_type nelec_value,
@@ -276,9 +276,14 @@ public:
       friend 
       ostream& operator<< ( ostream& os, const this_type& object ) {
          using std::endl;
-         os << "{hf;" << endl;
-         os << "wf," << object.nelec() << "," << object.sym() << "," << object.spin() << endl;
-         os << "}" << endl;
+         if( object.spin() != -1 ) {
+           os << "{hf;" << endl;
+           os << "wf," << object.nelec() << "," << object.sym() << "," << object.spin() << endl;
+           os << "}" << endl;
+         }
+         else {
+           os << "hf" << endl;
+         }
          return os;
       } // end of operator<<
       void print( ostream& os ) const {
@@ -335,7 +340,7 @@ public:
   typedef MultiConfig       this_casscf_config_type;
 
 public:
-  size_t check_spin( size_t spin, size_t nelec ) 
+  size_t check_spin( int spin, int nelec ) 
     {
       try {
         if( (spin + nelec)% 2  == 0 ) return spin;

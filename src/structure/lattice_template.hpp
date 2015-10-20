@@ -202,7 +202,8 @@ public:
     for( int index_a = lattice_obj.a_min(); index_a <= lattice_obj.a_max(); index_a++ ) {
       for( int index_b = lattice_obj.b_min(); index_b <= lattice_obj.b_max(); index_b++ ) {
         for( int index_c = lattice_obj.c_min(); index_c <= lattice_obj.c_max(); index_c++ ) {
-          os << lattice_obj( index_a, index_b, index_c ) << endl;
+          unit_cell_type unit_cell = lattice_obj( index_a, index_b, index_c );
+          os << unit_cell << endl;
         }
       }
     }

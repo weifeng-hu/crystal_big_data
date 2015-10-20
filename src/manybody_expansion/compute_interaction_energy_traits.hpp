@@ -63,7 +63,9 @@ template <> inline energy_data_type compute_interaction_energy <1> ( polymer_typ
   energy_data_type energy_monomer_0;
   molecule_obj_type molecule = convert_polymer_to_molecule<1>( x );
   molecular_energy_client_type client;
-  client.driver( std :: make_tuple ( std :: string ( polymer_name + std :: string( "_moleculeA" ) ), molecule ), settings );
+  std :: string molecule_name = std :: string ( polymer_name + std :: string( "_moleculeA" ) );
+  std :: cout << molecule_name;
+  client.driver( std :: make_tuple ( molecule_name , molecule ), settings );
   energy_monomer_0 = client.report().energy();
   PolymerReport<1> report_local( client.report().molecule_name(), 
                                      client.report().atom_list(),
@@ -73,6 +75,7 @@ template <> inline energy_data_type compute_interaction_energy <1> ( polymer_typ
                                      0.0e0,
                                      client.report().raw(),
                                      client.report().raw_external());
+  std :: cout << std :: endl;
   report.set_report_cover( report_local );
   return energy_monomer_0;
 
@@ -83,11 +86,16 @@ template <> inline energy_data_type compute_interaction_energy<2>( polymer_type<
   energy_data_type energy_dimer_01;
   molecule_obj_type molecule_01 = convert_polymer_to_molecule<2> ( x );
   molecular_energy_client_type client;
-  client.driver( std :: make_tuple ( std :: string ( polymer_name + std :: string( "_moleculeAB" ) ), molecule_01 ), settings );
+  std :: string dimer_name = std :: string ( polymer_name + std :: string( "_moleculeAB" ) );
+  std :: cout << dimer_name;
+  client.driver( std :: make_tuple ( dimer_name, molecule_01 ), settings );
+  std :: cout << std :: endl;
   energy_dimer_01 = client.report().energy();
 
-  energy_data_type energy_monomer_0 = compute_interaction_energy<1> ( x(0), std :: string( polymer_name + std :: string( "_moleculeA" ) ), settings, report.set_monomer_reports().at(0) );
-  energy_data_type energy_monomer_1 = compute_interaction_energy<1> ( x(1), std :: string( polymer_name + std :: string( "_moleculeB" ) ), settings, report.set_monomer_reports().at(1) );
+  std :: string monomer_name_1 = std :: string( polymer_name + std :: string( "_moleculeA" ) );
+  std :: string monomer_name_2 = std :: string( polymer_name + std :: string( "_moleculeB" ) );
+  energy_data_type energy_monomer_0 = compute_interaction_energy<1> ( x(0), monomer_name_1, settings, report.set_monomer_reports().at(0) );
+  energy_data_type energy_monomer_1 = compute_interaction_energy<1> ( x(1), monomer_name_2, settings, report.set_monomer_reports().at(1) );
 
   PolymerReport<2> report_local( client.report().molecule_name(),
                                      client.report().atom_list(),

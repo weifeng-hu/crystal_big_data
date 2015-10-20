@@ -42,13 +42,15 @@ typedef Setting setting_type;
    */
 void setting_type :: generate_from( mbe_config_type config ){
 
-  this->mode_ = config.run_mode();
+  this->mode_             = config.run_mode();
+  this->basis_set_name_   = config.basis_set_name();
+  this->spin_             = -1; // always unknown and let the external program choose the lowest state 
+  this->sym_              = 0; // from many body expansion, we always set symmetry to 0
+  this->correlation_level_  = config.correlation_method();
   this->external_program_ = config.program();
-  this->basis_set_name_ = config.basis_set_name();
-//  this->method_ = config.correlation_method();
-//  this->input_path_   = config.input_path();
-  this->scratch_path_ = config.scratch_name();
-//  this->output_path_  = config.output_path();
+  this->input_dir_        = std :: string("./") + config.job_name() + std :: string( "/input/" ); // as default
+  this->scratch_dir_      = config.scratch_dir() + std :: string( "/" );
+  this->output_dir_       = std :: string("./") + config.job_name() + std :: string( "/output/" ); // as default
 
 } // end of function generate_from_config()
 

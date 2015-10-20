@@ -29,7 +29,7 @@
 int main( int argc, char* argv[] ) {
 
   iquads :: file_system :: Directory dir("/usr/bin/");
-  iquads :: file_system :: Directory dir2( "./result/" ); 
+  iquads :: file_system :: Directory dir2( "./result/sub/sub/sub" ); 
   dir2.create();
   iquads :: file_system :: Filepath filepath( iquads :: file_system :: Directory( "./" ), iquads :: file_system :: Filename( "main", "cpp" ) );
   std :: cout << filepath ;

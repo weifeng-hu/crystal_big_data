@@ -276,9 +276,9 @@ public:
 
   struct HartreeFockConfig_Base {
     public:
-      typedef typename parent_config_base_type :: number_type nelec_type;
-      typedef typename parent_config_base_type :: number_type spin_type;
-      typedef typename parent_config_base_type :: number_type sym_type;
+      typedef int nelec_type;
+      typedef int spin_type;
+      typedef int sym_type;
     public:
       virtual void print( ostream& os ) const = 0;
       virtual void print() const = 0;
@@ -328,7 +328,7 @@ public:
   /**
    *  Special functionalities
    */
-  virtual size_t check_spin( size_t spin, size_t nelec ) = 0;
+  virtual size_t check_spin( int spin, int nelec ) = 0;
 
 public:
   solution_tag_type solution_tag() const

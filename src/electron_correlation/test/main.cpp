@@ -47,6 +47,7 @@ int main( int argc, char* argv[] ) {
                                                                   "sto-3g",
                                                                   0,
                                                                   0,
+								  iquads :: electron_correlation :: single_reference :: mean_field :: RHF,
                                                                   iquads :: interface_to_third_party :: program :: MOLPRO,
                                                                   "./input/",
                                                                   "./scratch/",

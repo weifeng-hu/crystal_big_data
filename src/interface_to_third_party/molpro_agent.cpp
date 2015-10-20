@@ -61,8 +61,8 @@ agent_type :: generate_config_list_from_request( request_type request ) {
     config_pointer_list[0] -> set_basis_set_config() = this_config_type :: BasisSetConfig( request.basis_set_name() );
     config_pointer_list[0] -> set_geometry_config() = this_config_type :: GeometryConfig( request.molecule_obj().coordinate_list(), coordinate_representation :: CARTESIAN, request.molecule_obj().geometry_unit() );
     size_t nelec = request.molecule_obj().neutral_nelec() - request.molecule_obj().charge();
-    size_t spin  = config_pointer_list[0]->check_spin( request.spin(), nelec );
-    config_pointer_list[0] -> set_hartree_fock_config() = this_config_type :: HartreeFockConfig( nelec, request.sym(), spin ); // I need to get the periodic table! 
+    size_t spin  = request.spin() == -1 ? request.spin() : config_pointer_list[0]->check_spin( request.spin(), nelec );
+    config_pointer_list[0] -> set_hartree_fock_config() = this_config_type :: HartreeFockConfig( nelec, request.sym(), spin );
     config_pointer_list[0] -> set_mp2_config() = this_config_type :: MP2Config();
     config_pointer_list[0] -> set_casscf_config() = this_config_type :: MultiConfig();
   }
@@ -260,6 +260,8 @@ agent_type :: collect_energy_data_from_output( correlation_tag_type correlation_
 
   // get the energy value to a correlation
   double energy_data = this->read_energy( correlation_tag, output_path );
+
+  std :: cout << energy_data;
 
   // also get the atom list and molecule name
   // molecule name is the filename, but without extension

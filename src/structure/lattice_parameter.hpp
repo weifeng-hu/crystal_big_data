@@ -109,7 +109,7 @@ public:
     length_set_ (length_set_obj), angle_set_ (angle_set_obj) { }
   LatticeParameter( length_data_type a, length_data_type b, length_data_type c,
                     angle_data_type alpha, angle_data_type beta, angle_data_type gamma ):
-    length_set_ ( make_tuple( a, b, c ) ), angle_set_ ( make_tuple( alpha, beta, gamma ) ) { }
+    length_set_ ( make_tuple( a, b, c ) ), angle_set_ ( make_tuple( alpha*pi/180.0, beta*pi/180.0, gamma*pi/180.0 ) ) { }
 
 public:
   /**

@@ -78,6 +78,7 @@ molpro_agent.o: $(iquads_src)/iquads/sequence.hpp\
 		$(iquads_src)/interface_to_third_party/external_program_config_base.hpp\
 		$(iquads_src)/interface_to_third_party/external_program_report.hpp\
 		$(iquads_src)/interface_to_third_party/molpro_config.hpp\
-		$(iquads_src)/interface_to_third_party/molpro_agent.hpp
+		$(iquads_src)/interface_to_third_party/molpro_agent.hpp\
+		$(iquads_src)/interface_to_third_party/molpro_agent.cpp
 	$(CPP) -o molpro_agent.o -c $(CPPOPT) $(CPPFLAGS) molpro_agent.cpp
 
