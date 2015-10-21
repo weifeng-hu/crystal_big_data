@@ -61,7 +61,7 @@ int main( int argc, char* argv[] ) {
 
   iquads :: structure :: UnitCell< iquads :: structure :: Molecule > unit_cell( node_list, lattice_parameter );
 
-  iquads :: structure :: Lattice< iquads :: structure :: UnitCell< iquads :: structure :: Molecule > > lattice( unit_cell, 1, 1, 1 );
+  iquads :: structure :: Lattice< iquads :: structure :: UnitCell< iquads :: structure :: Molecule > > lattice( unit_cell, 6, 6, 6 );
 
   iquads :: structure :: Bulk< iquads :: structure :: Molecule > bulk;
   //std :: cout << lattice.is_filled() << std :: endl;
@@ -76,9 +76,10 @@ int main( int argc, char* argv[] ) {
                                                   "local",
                                                   "try",
                                                   "unknown", "/scratch/wh288/lattice_x/", "unknown" ) );
-  std :: cout << report.return_one_body_energy_per_unit_cell() << std :: endl;
-  std :: cout << report.return_two_body_interaction_energy_per_unit_cell() << std :: endl;
-  std :: cout << report.return_three_body_interaction_energy_per_unit_cell() << std :: endl;
+  std :: cout << "monomer energy per unit cell: "  << report.return_one_body_energy_per_unit_cell() << std :: endl;
+  std :: cout << "dimer interaction energy per unit cell: " << report.return_two_body_interaction_energy_per_unit_cell() << std :: endl;
+  std :: cout << "trimer interaction energy per unit cell: " << report.return_three_body_interaction_energy_per_unit_cell() << std :: endl;
+  std :: cout << "tetramer interaction energy per unit cell: " << report.return_four_body_interaction_energy_per_unit_cell() << std :: endl;
   return 0;
 
 } 

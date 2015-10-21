@@ -61,10 +61,10 @@ template <> inline float convert_string_to< float > ( std :: string string_value
   { return std :: stof( string_value ); }
 
 template <> inline double convert_string_to< double > ( std :: string string_value )
-  { return std :: stof( string_value ); }
+  { return std :: stod( string_value ); }
 
 template <> inline long double convert_string_to< long double > ( std :: string string_value )
-  { return std :: stof( string_value ); }
+  { return std :: stold( string_value ); }
 
 template <> inline std :: string convert_string_to < std :: string > ( std :: string string_value )
   { return string_value; }

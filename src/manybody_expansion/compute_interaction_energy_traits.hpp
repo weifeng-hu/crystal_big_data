@@ -63,9 +63,10 @@ template <> inline energy_data_type compute_interaction_energy <1> ( polymer_typ
   energy_data_type energy_monomer_0;
   molecule_obj_type molecule = convert_polymer_to_molecule<1>( x );
   molecular_energy_client_type client;
-  std :: string molecule_name = std :: string ( polymer_name + std :: string( "_moleculeA" ) );
-  std :: cout << molecule_name;
+  std :: string molecule_name = std :: string ( polymer_name + std :: string( "_molecule" ) );
+  std :: cout << "monomer:\t" << molecule_name << "\tenergy:\t";
   client.driver( std :: make_tuple ( molecule_name , molecule ), settings );
+  std :: cout << std :: endl;
   energy_monomer_0 = client.report().energy();
   PolymerReport<1> report_local( client.report().molecule_name(), 
                                      client.report().atom_list(),
@@ -75,7 +76,6 @@ template <> inline energy_data_type compute_interaction_energy <1> ( polymer_typ
                                      0.0e0,
                                      client.report().raw(),
                                      client.report().raw_external());
-  std :: cout << std :: endl;
   report.set_report_cover( report_local );
   return energy_monomer_0;
 
@@ -87,14 +87,16 @@ template <> inline energy_data_type compute_interaction_energy<2>( polymer_type<
   molecule_obj_type molecule_01 = convert_polymer_to_molecule<2> ( x );
   molecular_energy_client_type client;
   std :: string dimer_name = std :: string ( polymer_name + std :: string( "_moleculeAB" ) );
-  std :: cout << dimer_name;
+  std :: cout << "dimer:\t" << dimer_name << "\tenergy:\t";
   client.driver( std :: make_tuple ( dimer_name, molecule_01 ), settings );
   std :: cout << std :: endl;
   energy_dimer_01 = client.report().energy();
 
   std :: string monomer_name_1 = std :: string( polymer_name + std :: string( "_moleculeA" ) );
   std :: string monomer_name_2 = std :: string( polymer_name + std :: string( "_moleculeB" ) );
+  std :: cout << "\t";
   energy_data_type energy_monomer_0 = compute_interaction_energy<1> ( x(0), monomer_name_1, settings, report.set_monomer_reports().at(0) );
+  std :: cout << "\t";
   energy_data_type energy_monomer_1 = compute_interaction_energy<1> ( x(1), monomer_name_2, settings, report.set_monomer_reports().at(1) );
 
   PolymerReport<2> report_local( client.report().molecule_name(),
@@ -106,6 +108,8 @@ template <> inline energy_data_type compute_interaction_energy<2>( polymer_type<
                                      client.report().raw(),
                                      client.report().raw_external() );
   report.set_report_cover( report_local );
+
+  std :: cout << "\tinteraction energy:\t" << energy_dimer_01 - energy_monomer_0 - energy_monomer_1 << std :: endl;
   return energy_dimer_01 - energy_monomer_0 - energy_monomer_1;
 
 }; // end of function compute_interaction_energy<2>
@@ -115,16 +119,33 @@ template <> inline energy_data_type compute_interaction_energy<3>( polymer_type<
   energy_data_type energy_trimer_012;
   molecule_obj_type molecule_012 = convert_polymer_to_molecule<3> ( x );
   molecular_energy_client_type client;
-  client.driver( std :: make_tuple( std :: string( polymer_name + std :: string( "_moleculeABC" ) ), molecule_012 ), settings );
+
+  std :: string trimer_name = std :: string( polymer_name + std :: string( "_moleculeABC" ) );
+  std :: cout << "trimer:\t" << trimer_name << "\tenergy:\t";
+  client.driver( std :: make_tuple( trimer_name, molecule_012 ), settings );
+  std :: cout << std :: endl;
   energy_trimer_012 = client.report().energy();
 
-  energy_data_type energy_monomer_0 = compute_interaction_energy<1> ( x(0), std :: string( polymer_name + std :: string( "_moleculeA" ) ), settings, report.set_monomer_reports().at(0) );
-  energy_data_type energy_monomer_1 = compute_interaction_energy<1> ( x(1), std :: string( polymer_name + std :: string( "_moleculeB" ) ), settings, report.set_monomer_reports().at(1) );
-  energy_data_type energy_monomer_2 = compute_interaction_energy<1> ( x(2), std :: string( polymer_name + std :: string( "_moleculeC" ) ), settings, report.set_monomer_reports().at(2) );
+  std :: string monomer_name_1 = std :: string( polymer_name + std :: string( "_moleculeA" ) );
+  std :: string monomer_name_2 = std :: string( polymer_name + std :: string( "_moleculeB" ) );
+  std :: string monomer_name_3 = std :: string( polymer_name + std :: string( "_moleculeC" ) );
 
-  energy_data_type interaction_energy_dimer_01 = compute_interaction_energy<2>( x(0) + x(1), std :: string( polymer_name + std :: string( "_moleculeAB" ) ), settings, report.set_dimer_reports().at(0) );
-  energy_data_type interaction_energy_dimer_02 = compute_interaction_energy<2>( x(0) + x(2), std :: string( polymer_name + std :: string( "_moleculeAC" ) ), settings, report.set_dimer_reports().at(1) );
-  energy_data_type interaction_energy_dimer_12 = compute_interaction_energy<2>( x(1) + x(2), std :: string( polymer_name + std :: string( "_moleculeBC" ) ), settings, report.set_dimer_reports().at(2) );
+  std :: cout << "\t";
+  energy_data_type energy_monomer_0 = compute_interaction_energy<1> ( x(0), monomer_name_1, settings, report.set_monomer_reports().at(0) );
+  std :: cout << "\t";
+  energy_data_type energy_monomer_1 = compute_interaction_energy<1> ( x(1), monomer_name_2, settings, report.set_monomer_reports().at(1) );
+  std :: cout << "\t";
+  energy_data_type energy_monomer_2 = compute_interaction_energy<1> ( x(2), monomer_name_3, settings, report.set_monomer_reports().at(2) );
+
+  std :: string dimer_name_1 = std :: string( polymer_name + std :: string( "_moleculeAB" ) );
+  std :: string dimer_name_2 = std :: string( polymer_name + std :: string( "_moleculeAC" ) );
+  std :: string dimer_name_3 = std :: string( polymer_name + std :: string( "_moleculeBC" ) );
+  std :: cout << "\t";
+  energy_data_type interaction_energy_dimer_01 = compute_interaction_energy<2>( x(0) + x(1), dimer_name_1, settings, report.set_dimer_reports().at(0) );
+  std :: cout << "\t";
+  energy_data_type interaction_energy_dimer_02 = compute_interaction_energy<2>( x(0) + x(2), dimer_name_2, settings, report.set_dimer_reports().at(1) );
+  std :: cout << "\t";
+  energy_data_type interaction_energy_dimer_12 = compute_interaction_energy<2>( x(1) + x(2), dimer_name_3, settings, report.set_dimer_reports().at(2) );
 
   energy_data_type interaction_energy = energy_trimer_012 - 
                                         energy_monomer_0 - energy_monomer_1 - energy_monomer_2 - 
@@ -139,6 +160,9 @@ template <> inline energy_data_type compute_interaction_energy<3>( polymer_type<
                                      client.report().raw(),
                                      client.report().raw_external() );
   report.set_report_cover( report_local );
+
+  std :: cout << "\tinteraction energy:\t" << interaction_energy << std :: endl;
+
   return interaction_energy;
 
 }; // end of function compute_interaction_energy<3>

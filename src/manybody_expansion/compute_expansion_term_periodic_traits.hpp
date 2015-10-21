@@ -96,9 +96,9 @@ namespace manybody_expansion {
     unit_cell_type cell_R0 = config.lattice().at(0, 0, 0);
     for( size_t i_R0 = 0; i_R0 < cell_R0.size(); i_R0++ ) {
       Polymer<1> monomer_i( array<Molecule, 1> { cell_R0[i_R0] } );
-      for( int R_a = config.lattice().a_min(); R_a < config.lattice().a_max(); R_a++ ) {
-        for( int R_b = config.lattice().b_min(); R_b < config.lattice().b_max(); R_b++ ) {
-          for( int R_c = config.lattice().c_min(); R_c < config.lattice().c_max(); R_c++ ) {
+      for( int R_a = config.lattice().a_min(); R_a <= config.lattice().a_max(); R_a++ ) {
+        for( int R_b = config.lattice().b_min(); R_b <= config.lattice().b_max(); R_b++ ) {
+          for( int R_c = config.lattice().c_min(); R_c <= config.lattice().c_max(); R_c++ ) {
             unit_cell_type cell_R = config.lattice().at( R_a, R_b, R_c );
             for( size_t i_R = 0; i_R < cell_R.size(); i_R++ ) {
 
@@ -137,15 +137,15 @@ namespace manybody_expansion {
     unit_cell_type cell_R0 = config.lattice().at(0, 0, 0);
     for( size_t i_R0 = 0; i_R0 < cell_R0.size(); i_R0++ ) {
       Polymer<1> monomer_i( array< Molecule, 1 > { cell_R0[ i_R0 ] } );
-      for( int R_j_a = config.lattice().a_min(); R_j_a < config.lattice().a_max(); R_j_a++ ) {
-        for( int R_j_b = config.lattice().b_min(); R_j_b < config.lattice().b_max(); R_j_b++ ) {
-          for( int R_j_c = config.lattice().c_min(); R_j_c < config.lattice().c_max(); R_j_c++ ) {
+      for( int R_j_a = config.lattice().a_min(); R_j_a <= config.lattice().a_max(); R_j_a++ ) {
+        for( int R_j_b = config.lattice().b_min(); R_j_b <= config.lattice().b_max(); R_j_b++ ) {
+          for( int R_j_c = config.lattice().c_min(); R_j_c <= config.lattice().c_max(); R_j_c++ ) {
             unit_cell_type cell_Rj = config.lattice().at( R_j_a, R_j_b, R_j_c );
             for( size_t i_Rj = 0; i_Rj < cell_Rj.size(); i_Rj++ ) {
               Polymer<1> monomer_j( array< Molecule, 1 > { cell_Rj[i_Rj] } );
-              for( int R_k_a = config.lattice().a_min(); R_k_a < config.lattice().a_max(); R_k_a++ ) {
-                for( int R_k_b = config.lattice().b_min(); R_k_b < config.lattice().b_max(); R_k_b++ ) {
-                  for( int R_k_c = config.lattice().c_min(); R_k_c < config.lattice().c_max(); R_k_c++ ) {
+              for( int R_k_a = config.lattice().a_min(); R_k_a <= config.lattice().a_max(); R_k_a++ ) {
+                for( int R_k_b = config.lattice().b_min(); R_k_b <= config.lattice().b_max(); R_k_b++ ) {
+                  for( int R_k_c = config.lattice().c_min(); R_k_c <= config.lattice().c_max(); R_k_c++ ) {
                     unit_cell_type cell_Rk = config.lattice().at( R_k_a, R_k_b, R_k_c );
                     for( size_t i_Rk = 0; i_Rk < cell_Rk.size(); i_Rk++ ){
 
@@ -194,21 +194,21 @@ namespace manybody_expansion {
     unit_cell_type cell_R0 = config.lattice().at(0, 0, 0);
     for( size_t i_R0 = 0; i_R0 < cell_R0.size(); i_R0++ ) {
       Polymer<1> monomer_i( array< Molecule, 1 > { cell_R0[ i_R0 ] } );
-      for( int R_j_a = config.lattice().a_min(); R_j_a < config.lattice().a_max(); R_j_a++ ) {
-        for( int R_j_b = config.lattice().b_min(); R_j_b < config.lattice().b_max(); R_j_b++ ) {
-          for( int R_j_c = config.lattice().c_min(); R_j_c < config.lattice().c_max(); R_j_c++ ) {
+      for( int R_j_a = config.lattice().a_min(); R_j_a <= config.lattice().a_max(); R_j_a++ ) {
+        for( int R_j_b = config.lattice().b_min(); R_j_b <= config.lattice().b_max(); R_j_b++ ) {
+          for( int R_j_c = config.lattice().c_min(); R_j_c <= config.lattice().c_max(); R_j_c++ ) {
             unit_cell_type cell_Rj = config.lattice().at( R_j_a, R_j_b, R_j_c );
             for( size_t i_Rj = 0; i_Rj < cell_Rj.size(); i_Rj++ ) {
               Polymer<1> monomer_j( array< Molecule, 1 > { cell_Rj[ i_Rj ] } );
-              for( int R_k_a = config.lattice().a_min(); R_k_a < config.lattice().a_max(); R_k_a++ ) {
-                for( int R_k_b = config.lattice().b_min(); R_k_b < config.lattice().b_max(); R_k_b++ ) {
-                  for( int R_k_c = config.lattice().c_min(); R_k_c < config.lattice().c_max(); R_k_c++ ) {
+              for( int R_k_a = config.lattice().a_min(); R_k_a <= config.lattice().a_max(); R_k_a++ ) {
+                for( int R_k_b = config.lattice().b_min(); R_k_b <= config.lattice().b_max(); R_k_b++ ) {
+                  for( int R_k_c = config.lattice().c_min(); R_k_c <= config.lattice().c_max(); R_k_c++ ) {
                     unit_cell_type cell_Rk = config.lattice().at( R_k_a, R_k_b, R_k_c );
                     for( size_t i_Rk = 0; i_Rk < cell_Rk.size(); i_Rk++ ){
                       Polymer<1> monomer_k( array< Molecule, 1 > { cell_Rk[ i_Rk ] } );
-                        for( int R_l_a = config.lattice().a_min(); R_l_a < config.lattice().a_max(); R_l_a++ ){
-                          for( int R_l_b = config.lattice().b_min(); R_l_b < config.lattice().b_max(); R_l_b++ ){
-                            for( int R_l_c = config.lattice().c_min(); R_l_c < config.lattice().c_max(); R_l_c++ ){
+                        for( int R_l_a = config.lattice().a_min(); R_l_a <= config.lattice().a_max(); R_l_a++ ){
+                          for( int R_l_b = config.lattice().b_min(); R_l_b <= config.lattice().b_max(); R_l_b++ ){
+                            for( int R_l_c = config.lattice().c_min(); R_l_c <= config.lattice().c_max(); R_l_c++ ){
                               unit_cell_type cell_Rl = config.lattice().at( R_l_a, R_l_b, R_l_c );
                               for( size_t i_Rl = 0; i_Rl < cell_Rl.size(); i_Rl++ ){
                                 Polymer<1> monomer_l( array< Molecule, 1 > { cell_Rl[ i_Rl ] } );
