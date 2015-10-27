@@ -74,9 +74,13 @@ public:
   filepath_type write_input_mp2_energy( base_config_ptr base_config_pointer );
   filepath_type write_input_casscf_energy( base_config_ptr base_config_pointer );
   energy_report_type collect_energy_data_from_output( correlation_tag_type correlation_tag, filepath_type output_path );
-  iquads :: structure :: AtomList read_coordinate( filepath_type output_path );
-  int    read_charge( filepath_type output_path );
-  double read_energy( correlation_tag_type correlation_tag, filepath_type output_path );
+
+  atom_list_type read_atom_list( filepath_type output_path );
+  charge_value_type read_nuclear_charge( filepath_type output_path );
+  std :: tuple< number_value_type, number_value_type > read_na_nb( filepath_type output_path );
+  number_value_type read_nelec( filepath_type output_path );
+  spin_value_type read_spin( filepath_type output_path );
+  energy_value_type read_energy( correlation_tag_type correlation_tag, filepath_type output_path );
 
 }; // end of class MolproAgent
 

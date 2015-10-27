@@ -129,7 +129,7 @@ namespace manybody_expansion {
   /**
    *  Explicit instantiation for order 3, to calculate total trimer interaction energy
    */
-  template <> inline energy_data_type compute_expansion_term_periodic<3>( config_type config, report_ref report ) { 
+  template <> inline energy_data_type compute_expansion_term_periodic<3>( config_type config, report_ref report ) {
  
     energy_data_type retval = 0.0e0;
     external_setting_type settings; settings.generate_from(config);

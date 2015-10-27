@@ -189,8 +189,8 @@ agent_type :: run_external_program( filepath_type input_path, directory_type scr
   }
 } // end of function run_external_program()
 
-iquads :: structure :: AtomList 
-agent_type :: read_coordinate( filepath_type output_path ) {
+agent_type :: atom_list_type 
+agent_type :: read_atom_list( filepath_type output_path ) {
 
   iquads :: structure :: AtomList retval;
   retval.resize(0);
@@ -213,9 +213,10 @@ agent_type :: read_coordinate( filepath_type output_path ) {
 
   return retval;
 
-} // end of function read_coordinate()
+} // end of function read_atom_list()
 
-int agent_type :: read_charge( filepath_type output_path ) {
+std :: tuple< agent_type :: number_value_type, agent_type :: number_value_type > 
+agent_type :: read_na_nb( filepath_type output_path ) {
 
   std :: vector< std :: string > keywords;
   keywords.push_back( std :: string( "NUMBER" ) );
@@ -224,19 +225,43 @@ int agent_type :: read_charge( filepath_type output_path ) {
   keywords.push_back( std :: string( "SPACE" ) );
   keywords.push_back( std :: string( "SPIN" ) );
   std :: vector< std :: string > line = iquads :: file_system :: return_split_strings_if_line_contains_all_keywords( keywords, output_path.absolute() );
-  int na = iquads :: utility :: string_tool :: convert_string_to<int> ( line.at(3) );
-  int nb = iquads :: utility :: string_tool :: convert_string_to<int> ( line.at(4) );
+  agent_type :: number_value_type na = iquads :: utility :: string_tool :: convert_string_to< agent_type :: number_value_type > ( line.at(3) );
+  agent_type :: number_value_type nb = iquads :: utility :: string_tool :: convert_string_to< agent_type :: number_value_type > ( line.at(4) );
+
+  return make_tuple( na, nb );
+
+}
+
+agent_type :: number_value_type 
+agent_type :: read_nelec( filepath_type output_path ) {
+
+  std :: tuple<int, int> na_nb = this->read_na_nb( output_path );
+  return std :: get<0> ( na_nb ) + std :: get<1> ( na_nb );
+
+}
+
+agent_type :: spin_value_type
+agent_type :: read_spin( filepath_type output_path ) {
+
+  std :: tuple<int, int> na_nb = this->read_na_nb( output_path );
+  return ( agent_type :: spin_value_type ) ( ( std :: get<0> ( na_nb ) - std :: get<1> ( na_nb ) ) / 2.0e0 );
+
+}
+
+agent_type :: charge_value_type 
+agent_type :: read_nuclear_charge( filepath_type output_path ) {
 
   std :: vector< std :: string > keywords_charge;
   keywords_charge.push_back( "NUCLEAR" );
   keywords_charge.push_back( "CHARGE:" );
   int nuclear_charge = iquads :: utility :: string_tool :: return_last_value_of_strings< int > ( iquads :: file_system :: return_split_strings_if_line_contains_all_keywords( keywords_charge, output_path.absolute() ) );
 
-  return nuclear_charge - na - nb ;
+  return nuclear_charge;
 
 }
 
-double agent_type :: read_energy( correlation_tag_type correlation_tag, filepath_type output_path ) {
+agent_type :: energy_value_type 
+agent_type :: read_energy( correlation_tag_type correlation_tag, filepath_type output_path ) {
 
   typedef ExternalProgramReport :: EnergyReport :: energy_data_type energy_data_type;
   std :: vector< std :: string > correlation_name_aka_list = iquads :: electron_correlation :: return_level_name_aka_list( correlation_tag );
@@ -268,8 +293,8 @@ agent_type :: collect_energy_data_from_output( correlation_tag_type correlation_
   std :: string molecule_name = output_path.filename().name();
 
   // find out the molecule atom list
-  iquads :: structure :: AtomList atom_list = this->read_coordinate( output_path );
-  int charge = this->read_charge( output_path );
+  agent_type :: atom_list_type atom_list = this->read_atom_list( output_path );
+  int charge = this->read_nuclear_charge( output_path ) - this->read_nelec( output_path );
   // find out the molecule charge
   return ExternalProgramReport :: EnergyReport( std :: make_tuple( molecule_name, iquads :: structure :: Molecule( atom_list, charge ) ), energy_data, correlation_tag );
 

@@ -206,16 +206,18 @@ public:
   energy_data_type return_three_body_interaction_energy_per_unit_cell()
     {
       energy_data_type retval = 0.0e0;
-      for( size_t i = 0; i < this->periodic_trimer_report_list_.size(); i++ ){
-        retval += this->periodic_trimer_report_list_[i].interaction_energy();
+      std :: cout << this->non_periodic_trimer_report_list_.size() << std :: endl;
+      for( size_t i = 0; i < this->non_periodic_trimer_report_list_.size(); i++ ) {
+        retval += this->non_periodic_trimer_report_list_[i].interaction_energy();
       }
       return retval;
     }
   energy_data_type return_four_body_interaction_energy_per_unit_cell()
     {
       energy_data_type retval = 0.0e0;
-      for( size_t i = 0; i < this->periodic_tetramer_report_list_.size(); i++ ){
-        retval += this->periodic_tetramer_report_list_[i].interaction_energy();
+      std :: cout << this->non_periodic_tetramer_report_list_.size() << std :: endl;
+      for( size_t i = 0; i < this->non_periodic_tetramer_report_list_.size(); i++ ) {
+        retval += this->non_periodic_tetramer_report_list_[i].interaction_energy();
       }
       return retval;
     }

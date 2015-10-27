@@ -56,16 +56,21 @@ public:
   typedef base_config_type*            base_config_ptr;
   typedef vector<base_config_ptr>      base_config_ptr_list;
   typedef bool     condition_type;
-  typedef string   command_line_type;
-  typedef string   program_name_type;
-  typedef string   program_path_type;
-  typedef string   file_extension_type;
+  typedef int      charge_value_type;
+  typedef int      number_value_type;
+  typedef float    spin_value_type;
+  typedef double   energy_value_type;
+  typedef std :: string   command_line_type;
+  typedef std :: string   program_name_type;
+  typedef std :: string   program_path_type;
+  typedef std :: string   file_extension_type;
   typedef base_config_type :: dir_name_type       dir_name_type;
   typedef base_config_type :: file_name_type      file_name_type;
   typedef base_config_type :: path_name_type      path_name_type;
   typedef iquads :: file_system :: Directory      directory_type;
   typedef iquads :: file_system :: Filepath       filepath_type;
   typedef request_type :: mode_type               mode_type;
+  typedef iquads :: structure :: AtomList atom_list_type;
   typedef report_type :: energy_bare_report_type       energy_report_type;
   typedef report_type :: gradient_bare_report_type     gradient_report_type;
   typedef report_type :: local_run_info_type           local_run_info_type;
@@ -80,6 +85,14 @@ public:
   };
 
 public:
+  virtual atom_list_type read_atom_list( filepath_type output_path ) = 0;
+  virtual charge_value_type read_nuclear_charge( filepath_type output_path ) = 0;
+  virtual std :: tuple< number_value_type, number_value_type > read_na_nb( filepath_type output_path ) = 0;
+  virtual number_value_type read_nelec( filepath_type output_path ) = 0;
+  virtual spin_value_type read_spin( filepath_type output_path ) = 0;
+  virtual energy_value_type read_energy( correlation_tag_type correlation_tag, filepath_type output_path ) = 0;
+
+public:
   virtual local_run_info_type run_external_program( filepath_type input_path, 
                                                     directory_type scratch_dir, 
                                                     directory_type output_dir ) = 0;
@@ -90,8 +103,6 @@ public:
   virtual filepath_type write_input_hf_energy( base_config_ptr base_config_pointer ) = 0;
   virtual filepath_type write_input_mp2_energy( base_config_ptr base_config_pointer ) = 0;
   virtual filepath_type write_input_casscf_energy( base_config_ptr base_config_pointer ) = 0;
-
-public:
   filepath_type write_energy_input( base_config_ptr base_config_pointer ) {
     try {
       correlation_tag_type energy_solution_tag = base_config_pointer->correlation_tag();

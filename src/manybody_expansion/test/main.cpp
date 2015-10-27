@@ -61,7 +61,7 @@ int main( int argc, char* argv[] ) {
 
   iquads :: structure :: UnitCell< iquads :: structure :: Molecule > unit_cell( node_list, lattice_parameter );
 
-  iquads :: structure :: Lattice< iquads :: structure :: UnitCell< iquads :: structure :: Molecule > > lattice( unit_cell, 6, 6, 6 );
+  iquads :: structure :: Lattice< iquads :: structure :: UnitCell< iquads :: structure :: Molecule > > lattice( unit_cell, 1, 0, 0 );
 
   iquads :: structure :: Bulk< iquads :: structure :: Molecule > bulk;
   //std :: cout << lattice.is_filled() << std :: endl;
@@ -72,7 +72,7 @@ int main( int argc, char* argv[] ) {
   iquads :: manybody_expansion :: Report report = agent.accept_request_and_process
       ( iquads :: manybody_expansion :: Request ( std :: make_tuple ( "lattic_x", lattice ), 
                                                   std :: make_tuple ( "unknown_bulk", bulk ),
-                                                  2, "hf", "molpro", "sto-3g",
+                                                  4, "hf", "molpro", "sto-3g",
                                                   "local",
                                                   "try",
                                                   "unknown", "/scratch/wh288/lattice_x/", "unknown" ) );
