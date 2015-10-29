@@ -31,6 +31,7 @@
 #include <manybody_expansion/report.hpp>
 #include <manybody_expansion/expansion_formula_general_traits.hpp>
 #include <manybody_expansion/expansion_formula_periodic_traits.hpp>
+#include <manybody_expansion/expansion_formula_periodic_with_fragment_identification_traits.hpp>
 
 namespace iquads {
 
@@ -105,11 +106,13 @@ private:
    */
 template < size_t Order >  class ManyBodyExpansionPeriodic {
 public:
+  typedef FragmentSignatureDataBase<Order> fragment_signature_database_type;
   typedef ExpansionFormulaPeriodic<Order>  expansion_formula_type;
+  typedef ExpansionFormulaPeriodicWithFragmentIdentification<Order>  expansion_with_fragment_identif_formula_type;
   typedef Config                           config_type;
   typedef Report                           report_type;
-  typedef double   energy_data_type;
-  typedef bool     condition_type;
+  typedef double                           energy_data_type;
+  typedef bool                             condition_type;
 
   typedef report_type& report_ref;
 
@@ -118,8 +121,20 @@ public:
   compute_lattice_energy_per_unit_cell( config_type config, report_ref report )
     { return this->expansion_formula_.compute( config, report ); }
 
+  energy_data_type
+  compute_lattice_energy_per_unit_cell_with_identical_fragment_detection( config_type, report_ref report ) {
+    this->fragment_signature_database_.build( config_type.lattice_info() );
+    return this->expansion_formula_with_fragment_identification_.compute( config, this->fragment_signature_database_, report );
+  }
+
+public:
+  fragment_signature_database_type fragment_sigature_database() const 
+    { return this->fragment_signature_database_; }
+
 private:
   expansion_formula_type expansion_formula_;
+  expansion_with_fragment_identif_formula_type expansion_formula_with_fragment_identification_;
+  fragment_signature_database_type fragment_signature_database_;
 
 };// end of template class ManyBodyExpansionPeriodic
 
