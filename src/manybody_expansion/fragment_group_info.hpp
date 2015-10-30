@@ -35,6 +35,7 @@
 #include <map>
 #include <structure/lattice_instant.hpp>
 #include <structure/bulk_instant.hpp>
+#include <manybody_expansion/polymer_group.hpp>
 #include <manybody_expansion/fragment_info.hpp>
 
 namespace iquads {
@@ -43,6 +44,7 @@ namespace manybody_expansion {
 
 template < size_t Order > struct FragmentGroupInfo {
 public:
+  typedef double distance_data_type;
   typedef std :: string lattice_name_type;
   typedef std :: string bulk_name_type;
   typedef iquads :: structure :: MolecularLattice lattice_type;
@@ -58,11 +60,15 @@ public:
   }
 
 public:
-  void build( lattice_info_type lattice_info ) {
-
+  void build( lattice_info_type lattice_info, distance_data_type radius ) {
+    PolymerGroup< NUM > polymer_group;
+    polymer_group.initial_from_lattice( std :: get<1>( lattice_info ), radius );
+    polymer_group.evaluate_subgroups( this->fragment_info_list_ );
   }
-  void build( bulk_info_type bulk_info ) {
-
+  void build( bulk_info_type bulk_info, distance_data_type radius ) {
+    PolymerGroup< NUM > polymer_group;
+    polymer_group.initial_from_bulk( std :: get<1>( bulk_info ), radius );
+    polymer_group.evaluate_subgroups( this->fragment_info_list_ );
   }
 
 public:
