@@ -19,37 +19,57 @@
  *
  */
 
-#ifndef FRAGMENT_INFO_HPP
-#define FRAGMENT_INFO_HPP
+#ifndef FRAGMENT_INFO_TEMPLATE_HPP
+#define FRAGMENT_INFO_TEMPLATE_HPP
 
+#include <array>
 #include <vector>
 #include <tuple>
 #include <string>
 #include <iostream>
 #include <algorithm>
-#include <memory>
 #include <structure/molecule.hpp>
-#include <structure/molecule_bulk.hpp>
-
-using namespace std;
+#include <structure/polymer_template.hpp>
+#include <structure/lattice_instant.hpp>
+#include <structure/bulk_instant.hpp>
 
 namespace iquads {
 
-namespace crystal {
+namespace manybody_expansion {
 
-struct fragment_info {
+template < size_t NUM > struct FragmentInfo {
 public:
-  fragment_info(){
-   this->reset();
+  typedef DVectorHeap eigenvalue_container_type;
+  typedef iquads :: structure :: Polymer polymer_template;
+  typedef double distance_data_type;
+  typedef std :: tuple< polymer_template<NUM>, eigenvalue_container_type, distance_data_type >  signature_data_type;
+  typedef std :: tuple< int, int, int >                      unit_cell_index_type;
+  typedef std :: tuple< unit_cell_index_type, int >          lattice_node_index_type;
+  typedef std :: array< lattice_node_index_type, NUM >       lattice_fragment_composition_type;
+  typedef std :: vector< lattice_fragment_composition_type > lattice_identical_fragment_list_type;
+  typedef std :: array< int, NUM >                           bulk_fragment_composition_type;
+  typedef std :: vector< bulk_fragment_composition_type >    bulk_identical_fragment_list_type;
+
+public:
+  FragmentInfo() {
+    this->lattice_identical_fragment_list_.resize(0);
+    this->bulk_identical_fragment_list_.resize(0);
   }
 
-public:
-  void reset(){
-   this->identical_fragment_list.resize(0);
-   this->bulk_ptr.reset();
-   this->n_molecule_per_fragment_ = 0;
-  } // end of reset()
+  FragmentInfo( signature_data_type signature_data, 
+                const lattice_identical_fragment_list_type& lattice_identical_fragment_list_obj ) 
+    signature_ ( signature_data ), 
+    lattice_identical_fragment_list_ ( lattice_identical_fragment_list_obj )
+    { this->bulk_identical_fragment_list_.resize(0); }
 
+  FragmentInfo( signature_data_type signature_data, 
+                const bulk_identical_fragment_list_type& bulk_identical_fragment_list_obj ) 
+    signature_ ( signature_data ), 
+    bulk_identical_fragment_list_ ( bulk_identical_fragment_list_obj )
+    { this->lattice_identical_fragment_list_.resize(0); }
+
+  /*  we will let some external module to treat these printing methods
+public:
   void print_info(){
    cout << "Number of symmetry-equivalent fragments: "
         << this->identical_fragment_list.size() << endl;
@@ -107,15 +127,15 @@ public:
 
   friend 
   ostream& operator<< ( ostream& os, fragment_info& frag ){
-//   {
-     /*
-     MoleculeList mole_list_local = get<0>( frag.set_primitive_info() );
-     const size_t n_mole_local = mole_list_local.size();
-     for( size_t imole = 0; imole < n_mole_local; imole++ ){
-      molecule mole_i = mole_list_local.at(imole);
-      os << mole_i << endl;
-     }
-     */
+   {
+   //
+  //   MoleculeList mole_list_local = get<0>( frag.set_primitive_info() );
+  //   const size_t n_mole_local = mole_list_local.size();
+  //   for( size_t imole = 0; imole < n_mole_local; imole++ ){
+  //    molecule mole_i = mole_list_local.at(imole);
+  //    os << mole_i << endl;
+  //   }
+  //
 
      for( size_t iset = 0; iset < frag.set_fragment_list().size(); iset++ ){
       vector<int> mole_list_local = get<0>( frag.set_fragment_list().at(iset) );
@@ -207,26 +227,29 @@ public:
 
    cout << endl;
   }
+  */
 
 public:
-  size_t  get_n_mole_per_frag() const
-   { return this->n_molecule_per_fragment_; }
-  size_t& set_n_mole_per_frag()
-   { return this->n_molecule_per_fragment_; }
-
-  tuple< MoleculeList, DMatrixHeap, double >& set_primitive_info() 
-   { return this->primitive_info; }
-  vector< tuple< vector<int>, int > >& set_fragment_list()
-   { return this->identical_fragment_list; }
-  shared_ptr<molecule_bulk>& set_bulk_ptr()
-   { return this->bulk_ptr; }
-
-  double get_avg_intm_dist() const 
-   { return get<2>( this->primitive_info ); }
+  signature_data_type signature()
+    { return this->signature_; }
+  polymer_template<NUM> prototype_polymer()
+    { return std :: get<0>( this->signature_ ); }
+  eigenvalue_container_type eigenvalues()
+    { return std :: get<1>( this->signature_ ); }
+  distance_data_type average_intermolecular_distance()
+    { return std :: get<2>( this->signature_ ); }
+  bulk_fragment_composition_type prototype_bulk_fragment_composition() const 
+    { return this->bulk_identical_fragment_list_.begin(); }
+  bulk_identical_fragment_list_type bulk_identical_fragment_list()
+    { return this->bulk_identical_fragment_list_; }
+  lattice_fragment_composition_type prototype_lattice_fragment_composition() const
+    { return this->lattice_identical_fragment_list_.begin(); }
+  lattice_identical_fragment_list_type lattice_identical_fragment_list()
+    { return this->lattice_identical_fragment_list_; }
 
 private:
-  // stores a primitive fragment ( consisting of multiple molecules )
-  tuple< MoleculeList, DMatrixHeap, double > primitive_info;
+  // stores a primitive fragment signature ( consisting of multiple molecules )
+  signature_data_type signature_;
 
   // NEED TO REWRITE THE COMMENT
   // stores the list of molecule indices of this type of fragment
@@ -235,17 +258,14 @@ private:
   //         or a hetergenours fragment type
   //  identical_fragment_list = [ [ 1 5 ] [ 2 6 ] ...  ]
   //  where 1, 5, 2, 6 are individual molecule index in the molecule bulk
-  vector< tuple< vector<int>, int > > identical_fragment_list;
+  bulk_identical_fragment_list_type   bulk_identical_fragment_list_;
 
-  size_t n_molecule_per_fragment_;
+  // also for the molecular lattice case
+  lattice_identical_fragment_list_type  lattice_identical_fragment_list_;
 
-  // stores a printer to the molecule bulk, pointing to the one in 
-  // an interaction object
-  shared_ptr<molecule_bulk> bulk_ptr;
+}; // end of template struct FragmentInfo
 
-}; // end of struct fragment_info
-
-}  // end of namespace crystal
+}  // end of namespace manybody_expansion
 
 }  // end of namespace iquads
 
