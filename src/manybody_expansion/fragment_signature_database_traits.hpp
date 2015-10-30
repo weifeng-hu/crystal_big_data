@@ -40,7 +40,7 @@ namespace manybody_expansion {
     public:
       std :: tuple < std :: string, iquads :: structure :: MolecularLattice > lattice_info_type;
     public:
-      void bulid( lattice_info_type lattice_info ){}
+      void bulid( lattice_info_type lattice_info, double radius ){}
   };
 
   template <> struct FragmentSignatureDataBase<1> {
@@ -48,7 +48,7 @@ namespace manybody_expansion {
       typedef FragmentGroupInfo<1> monomer_signature_database_type;
       std :: tuple < std :: string, iquads :: structure :: MolecularLattice > lattice_info_type;
     public:
-      void build( lattice_info_type lattice_info ) {
+      void build( lattice_info_type lattice_info, double radius ) {
         this->monomer_signature_database_.build( lattice_info );
       }
     private:
@@ -61,7 +61,7 @@ namespace manybody_expansion {
       typedef FragmentGroupInfo<2> dimer_signature_database_type;
       std :: tuple < std :: string, iquads :: structure :: MolecularLattice > lattice_info_type;
     public:
-      void build( lattice_info_type lattice_info ) {
+      void build( lattice_info_type lattice_info, double radius ) {
         this->monomer_signature_database_.build( lattice_info );
         this->dimer_signature_database_.build( lattice_info );
       }
@@ -77,7 +77,7 @@ namespace manybody_expansion {
       typedef FragmentGroupInfo<3> trimer_signature_database_type;
       std :: tuple < std :: string, iquads :: structure :: MolecularLattice > lattice_info_type;
     public:
-      void build( lattice_info_type lattice_info ) {
+      void build( lattice_info_type lattice_info, double radius ) {
         this->monomer_signature_database_.build( lattice_info );
         this->dimer_signature_database_.build( lattice_info );
         this->trimer_signature_database_.build( lattice_info );
@@ -96,7 +96,7 @@ namespace manybody_expansion {
       typedef FragmentGroupInfo<4> tetramer_signature_database_type;
       std :: tuple < std :: string, iquads :: structure :: MolecularLattice > lattice_info_type;
     public:
-      void build( lattice_info_type lattice_info ) {
+      void build( lattice_info_type lattice_info, double radius ) {
         this->monomer_signature_database_.build( lattice_info );
         this->dimer_signature_database_.build( lattice_info );
         this->trimer_signature_database_.build( lattice_info );

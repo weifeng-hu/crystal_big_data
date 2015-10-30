@@ -19,8 +19,8 @@
  *
  */
 
-#ifndef POLYMER_GROUP_BASE_HPP
-#define POLYMER_GROUP_BASE_HPP
+#ifndef POLYMER_GROUP_TEMPLATE_HPP
+#define POLYMER_GROUP_TEMPLATE_HPP
 
 #include <stdlib.h>
 #include <array>
@@ -42,8 +42,7 @@ using namespace iquads :: basic;
 
 namespace crystal {
 
-template< size_t NUM >
-struct polymer_group_base{
+template< size_t NUM > struct FragmentSignatureIdentifier{
 public:
   polymer_group_base(){
    this->group_storage.resize(0);
