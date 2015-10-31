@@ -114,8 +114,8 @@ public:
 
   /**
    *  + within_mean_distance_by_center_of_mass()
-   *    Judges whether all molecule pairs are within the mean distance among 
-   *    all molecules in the polymer, and a distance is compute by centers of mass.
+   *    Judges whether the mean distance, calculated by center of mass, 
+   *    is within a distance threshold
    */
   condition_type within_mean_distance_by_center_of_mass( double distance ) {
     return ( this->mean_distance_by_center_of_mass() <= distance ? true : false );
@@ -123,8 +123,8 @@ public:
 
   /**
    *  + within_mean_distance_by_center()
-   *    Judge whether all molecule pairs are within the mean distance among all molecules 
-   *    in the polymer, and a distance is compute by geometrical centers.
+   *    Judges whether the mean distance, calculated by geometrical centers , 
+   *    is within a distance threshold
    */
   condition_type within_mean_distance_by_center( double distance ) {
     return ( this->mean_distance_by_center() <= distance ? true : false );

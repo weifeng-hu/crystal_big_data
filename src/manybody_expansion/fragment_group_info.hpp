@@ -63,12 +63,12 @@ public:
   void build( lattice_info_type lattice_info, distance_data_type radius ) {
     iquads :: manybody_expansion :: FragmentSignatureIdentifier< NUM > identifier;
     identifier.initialize( std :: get<1>( lattice_info ), radius );
-    polymer_group.evaluate_subgroups( this->fragment_info_list_ );
+    identifier.evaluate_subgroups( this->fragment_info_list_ );
   }
   void build( bulk_info_type bulk_info, distance_data_type radius ) {
     iquads :: manybody_expansion :: FragmentSignatureIdentifier< NUM > identifier;
     identifier.initialize( std :: get<1>( bulk_info ), radius );
-    polymer_group.evaluate_subgroups( this->fragment_info_list_ );
+    identifier.evaluate_subgroups( this->fragment_info_list_ );
   }
 
 public:

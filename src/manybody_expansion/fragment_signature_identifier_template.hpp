@@ -40,125 +40,132 @@ using namespace iquads :: math;
 using namespace iquads :: matrix;
 using namespace iquads :: basic;
 
-namespace crystal {
+namespace manybody_expansion {
 
-template< size_t NUM > struct FragmentSignatureIdentifier{
+template< size_t NUM > struct FragmentSignatureIdentifier {
 public:
-  polymer_group_base(){
-   this->group_storage.resize(0);
-   this->polymer_combination.resize(0);
-   this->frag_group.reset();
-   this->n_molecule_per_unit_ = NUM;
-   this->bulk_ptr.reset();
-   this->is_initialized_ = false;
+  typedef double distance_data_type;
+  typedef iquads :: structure :: MolecularLattice lattice_type;
+  typedef iquads :: structure :: MolecularBulk    bulk_type;
+  typedef iquads :: structure :: Polymer<NUM>     polymer_type;
+  typedef std :: array< Molecule >                molecule_list_type;
+  typedef std :: vector< polymer_type >           polymer_list_type;
+
+  typedef std :: array< int, NUM >                polymer_bulk_index_combination_type;
+  typedef std :: vector< polymer_bulk_index_combination_type >   polymer_bulk_index_list_type;
+  typedef std :: tuple< std :: tuple< int, int, int >, int >     lattice_node_index_type;
+  typedef std :: array< lattice_node_index_type, NUM >  polymer_lattice_index_combination_type;
+  typedef std :: vector< polymer_lattice_index_combination_type >  polymer_lattice_index_list_type;
+
+  typedef iquads :: manybody_expansion :: FragmentInfo fragment_info_type;
+  typedef std :: vector< fragment_info_type > fragment_info_list_type;
+
+public:
+  FragmentSignatureIdentifier() {
+    this->polymer_list_.resize(0);
+    this->polymer_bulk_index_list_.resize(0);
+    this->polymer_lattice_index_list_.resize(0);
+    this->is_initialized_ = false;
   }
 
 public:
-  void init_from_bulk( shared_ptr< molecule_bulk > new_bulk, double Radius )
-  {
-   cout << "Initializing polymer group ... " << endl;
-   size_t n_mole_local = new_bulk->get_nmolecule();
-   // set the local bulk pointer
-   this->bulk_ptr = new_bulk;
-   // get a list of combination
-   vector<array<int, NUM> > polymer_combination_orig = get_combination<NUM>( n_mole_local );
-   size_t n_comb = polymer_combination_orig.size();
-   cout << "Found " << n_comb << " unique polymers of " << NUM << " in the molecule bulk " << endl;
-   for( size_t icomb = 0; icomb < n_comb; icomb++ ){
-    // get the molecule list to construct a polymer
-    array<int, NUM> list_local = polymer_combination_orig.at(icomb);
-    vector<int> list_vec( list_local.begin(), list_local.end() );
-    MoleculeList molecule_list = new_bulk->get_molelist_from_list( list_vec );
-    // initialize the polymer from molecule_list
-    polymer_base<NUM> polymer_x;
-    polymer_x.init_from( molecule_list );
-    // if the center of mass in the polymer are within a radius of Radius from
-    // each other, then to add the polymer to the group storage
-    if( polymer_x.within_mean_radius_by_center_of_mass( Radius ) == true ){
-     this->group_storage.push_back( polymer_x );
-     this->polymer_combination.push_back(list_local);
-    }
-   } // end of loop icomb, all polymers
+  void initialize( const lattice_type& lattice_obj, distance_data_type radius ) {
+    // cout << "Initializing polymer group from bulk... " << endl;
+    // get a list of combination
+    polymer_bulk_index_list_type polymer_combination_list_orig; 
+      = iquads :: math :: get_combination<NUM>( lattice_obj.size() );
+    // cout << "Found " << n_comb << " unique polymers of " << NUM << " in the molecule bulk " << endl;
+    for( size_t icomb = 0; icomb < polymer_combination_list_orig.size(); icomb++ ) {
+      // get the molecule list to construct a polymer
+      molecule_list_type molecule_list 
+        = this->get_molecule_list_from_lattice( polymer_combination_list_orig[icomb], lattice_obj );
+      polymer_lattice_index_combination_type polymer_lattice_index_combination 
+        = this->get_polymer_index_list_from_lattice( polymer_combination_list_orig[icomb], lattice_obj );
+      // initialize the polymer from molecule_list
+      polymer_type polymer( molecule_list );
+      // if the center of mass in the polymer are within a radius of Radius from
+      // each other, then to add the polymer to the group storage
+      if( polymer.within_mean_radius_by_center_of_mass( Radius ) == true ){
+        this->polymer_list_.push_back( polymer );
+        this->polymer_lattice_index_list_.push_back( polymer_lattice_index_combination );
+      }
+    } // end of loop icomb, all polymers
+    //cout << "Obtained " 
+    //     << this->group_storage.size() 
+    //     << " unique polymers of " << NUM 
+    //     << " within the averaged intermolecular distance of " << Radius << " Angstrom " << endl;
+    this->is_initialized_ = true;
+  }
 
-   cout << "Obtained " 
-        << this->group_storage.size() 
-        << " unique polymers of " << NUM 
-        << " within the averaged intermolecular distance of " << Radius << " Angstrom " << endl;
-
-   this->is_initialized_ = true;
+  void initialize( const bulk_type& bulk_obj, distance_data_type radius ) {
+    // cout << "Initializing polymer group from bulk... " << endl;
+    // get a list of combination
+    polymer_bulk_index_list_type polymer_combination_list_orig;
+      = iquads :: math :: get_combination<NUM>( bulk_obj.size() );
+    // cout << "Found " << n_comb << " unique polymers of " << NUM << " in the molecule bulk " << endl;
+    for( size_t icomb = 0; icomb < polymer_combination_list_orig.size(); icomb++ ) {
+      // get the molecule list to construct a polymer
+      molecule_list_type molecule_list 
+        = this->get_molecule_list_from_bulk( polymer_combination_list_orig[icomb], bulk_obj );
+      // initialize the polymer from molecule_list
+      polymer_type polymer( molecule_list );
+      // if the center of mass in the polymer are within a radius of Radius from
+      // each other, then to add the polymer to the group storage
+      if( polymer.within_mean_radius_by_center_of_mass( Radius ) == true ) {
+        this->polymer_list_.push_back( polymer );
+        this->polymer_bulk_index_list_.push_back( polymer_combination_list_orig[icomb] );
+      }
+    } // end of loop icomb, all polymers
+    //cout << "Obtained " 
+    //     << this->group_storage.size() 
+    //     << " unique polymers of " << NUM 
+    //     << " within the averaged intermolecular distance of " << Radius << " Angstrom " << endl;
+    this->is_initialized_ = true;
   } // end of init_from_bulk()
 
-  void evaluate_subgroups()
-  {
-    cout << "Dividing subgroups by euclidean distance matrix ..." << endl;
-    if( this->is_initialized_ == false ){
-     cout << " error: polymer_group object is not initialized " << endl;
-     abort();
-    }
+  void evaluate_subgroups( fragment_info_list_type& fragment_info_list_ref ) {
+    // cout << "Dividing subgroups by euclidean distance matrix ..." << endl;
+    try {
+      if( this->is_initialized_ == false ) { throw 1; }
 
-    vector< vector<int> > group_indices;
-    group_indices.resize(0);
-    {
-     // compute euclidean distance matrix eigenvalues
-     vector< DMatrixHeap > eigval_vectors = compute_dist_eigval();
-     // get the ''eigenvalue boolean matrix''
-     IMatrixHeap eigpair_boolean_mat = compute_boolean_mat( &eigval_vectors );
-     // get the degeneracy structure of the boolean matrix
-     group_indices = get_groups( &eigpair_boolean_mat );
+      vector< vector<int> > group_indices;
+      group_indices.resize(0);
+      {
+        // compute euclidean distance matrix eigenvalues
+        vector< DMatrixHeap > eigval_vectors = this->compute_dist_eigval();
+        // get the ''eigenvalue boolean matrix''
+        IMatrixHeap eigpair_boolean_mat = iquads :: math :: compute_boolean_mat( &eigval_vectors );
+        // get the degeneracy structure of the boolean matrix
+        group_indices = get_groups( &eigpair_boolean_mat );
+      }
+      this->fill_frag_group( group_indices );
+    } catch( int signal ) {
+      std :: cout << " error: polymer_group object is not initialized " << std :: endl;
+      abort();
     }
-    this->fill_frag_group( group_indices );
   }
 
 public:
   fragment_group_info get_fragment_group_info() const 
-   { return this->frag_group; }
+    { return this->frag_group; }
 
 private:
-  vector< DMatrixHeap > compute_all_edm()
-  {
-   vector< DMatrixHeap > retval;
-   size_t n_polymer_local = this->group_storage.size();
-   for( size_t ipolymer = 0; ipolymer < n_polymer_local; ipolymer++ ){
-    polymer_base<NUM> polymer_i = group_storage.at(ipolymer);
-    euclidean_distance_matrix edm_local;
-    {
-     AtomList atomlist_i = polymer_i.get_atom_list();
-     edm_local.compose_from_atomlist( atomlist_i );
-    }
-    retval.push_back( edm_local.get_dist_mat() );
-   }
-   return retval;
-  }
-
-  vector< DMatrixHeap > compute_dist_eigval()
-  {
-   cout << "Computing eigenvalues of euclidean distance matrices ... " << endl;
-   vector< DMatrixHeap > retval;
-   size_t n_polymer_local = this->group_storage.size();
-
-   size_t count_interval = n_polymer_local/5;
-
-   for( size_t ipolymer = 0; ipolymer < n_polymer_local; ipolymer++ ){
-    polymer_base<NUM> polymer_i = group_storage.at(ipolymer);
-    // construct a local euclidean distance matrix for the polymer
-    euclidean_distance_matrix edm_local;
-    {
-     // get the atom list for the polymer
-     AtomList atomlist_i = polymer_i.get_atom_list();
-     // construct a local euclidean distance matrix for the polymer
-     edm_local.compose_from_atomlist( atomlist_i );
-    }
-    // diagonalise and get the eigenvalues
-    edm_local.diagonalise();
-    // return the eigval vector for this polymer
-    retval.push_back( edm_local.get_eigval() );
-
-//    if( (ipolymer+1) % count_interval == 0 ){
-//     cout << (ipolymer*100/n_polymer_local + 1) << "%\tcompleted " << endl;
-//    }
-
-   } // end of loop ipolymer
-   return retval;
+  vector< DMatrixHeap > compute_dist_eigval() {
+    // cout << "Computing eigenvalues of euclidean distance matrices ... " << endl;
+    // size_t count_interval = n_polymer_local/5;
+    vector< DMatrixHeap > retval;
+    retval.resize( this->polymer_list_.size() );
+    // vector parallizible
+    for( size_t ipolymer = 0; ipolymer < this->polymer_list_.size(); ipolymer++ ) {
+      euclidean_distance_matrix edm_local;
+      edm_local.compose_from_atomlist( this->polymer_list_[ipolymer].atom_list() ); // construct a local euclidean distance matrix for the polymer
+      edm_local.diagonalise();                                                      // diagonalise and get the eigenvalues
+      retval[ipolymer] = edm_local.get_eigval();                                    // return the eigval vector for this polymer
+      // if( (ipolymer+1) % count_interval == 0 ) {
+      //   cout << (ipolymer*100/n_polymer_local + 1) << "%\tcompleted " << endl;
+      // }
+    } // end of loop ipolymer
+    return retval;
   }
 
   tuple<MoleculeList, DMatrixHeap, double> get_primitive_info_for_groupset( vector<int> group_set ){
@@ -217,30 +224,18 @@ private:
 private:
   // storage of all the molecular groups with the 
   // same number of molecule within each group
-  vector< polymer_base<NUM> > group_storage;
+  polymer_list_type polymer_list_;
 
   // storage of molecule lists for all polymers
-  vector< array<int, NUM> > polymer_combination;
-
-  // Group of fragment info object
-  // to be evaluated by evaluate_subgroup()
-  // Each fragment info stores the fragment information
-  // for each type of unique fragment
-  fragment_group_info frag_group;
-
-  // a copy of the number of molecules in each polymer
-  size_t n_molecule_per_unit_;
-
-  // pointer to the molecule bulk, which is stored in
-  // an interaction object
-  shared_ptr<molecule_bulk> bulk_ptr;
+  polymer_bulk_index_list_type     polymer_bulk_index_list_;
+  polymer_lattice_index_list_type  polymer_lattice_index_list_;
 
   // whether the object is initialized from the bulk
   bool is_initialized_;
 
 }; // end of struct polymer_group_base
 
-} // end of namespace crystal
+} // end of namespace manybody_expansion
 
 } // end of namespace iquads
 

@@ -1,40 +1,26 @@
-#include <vector>
+#ifndef MATRIX_H
+#define MATRIX_H
 
-namespace iquads{
+#include "utilities/solid_gen/vector_matrix.h"
+#include "utilities/solid_gen/array_matrix.h"
 
-namespace matrix{
-
-struct dmatrix{
 using namespace std;
-public:
-  matrix( size_t i, size_t j ){
-   assert( i > 0 );
-   assert( j > 0 );
-   this->dim1 = i;
-   this->dim2 = j;
-   this->length = i * j;
-   store.resize( length );
-  }
 
-public:
- double& operator() ( int i, int j ) { 
-  assert( i >= 0 && i < dim1 );
-  assert( j >= 0 && j < dim2 );
-  return this->set_element( i, j ); 
- }
+namespace iquads {
 
-private:
- double& set_element( int i, int j ){
-  return store.at( i * dim2 + j );
- }
+namespace matrix {
 
-private:
- vector<double> store;
- size_t dim1, dim2;
- size_t length;
+  // typedef declaration
+  typedef vector_matrix_base<int>     IMatrixHeap;
+  typedef vector_matrix_base<float>   FMatrixHeap;
+  typedef vector_matrix_base<double>  DMatrixHeap;
 
-};
+  typedef array_matrix_base<int>      IMatrixStack;
+  typedef array_matrix_base<float>    FMatrixStack;
+  typedef array_matrix_base<double>   DMatrixStack;
 
-}
+} // end of namespace matrix
 
-}
+} // end of namespace iquads
+
+#endif
