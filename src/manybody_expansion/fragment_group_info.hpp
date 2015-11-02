@@ -35,23 +35,27 @@
 #include <map>
 #include <structure/lattice_instant.hpp>
 #include <structure/bulk_instant.hpp>
-#include <manybody_expansion/fragment_signature_identifier.hpp>
+#include <electron_correlation/setting.hpp>
+#include <manybody_expansion/polymer_report_template.hpp>
 #include <manybody_expansion/fragment_info.hpp>
+#include <manybody_expansion/fragment_signature_identifier.hpp>
 
 namespace iquads {
 
 namespace manybody_expansion {
 
-template < size_t Order > struct FragmentGroupInfo {
+template < size_t NUM > struct FragmentGroupInfo {
 public:
   typedef double distance_data_type;
+  typedef std :: tuple< std :: tuple< int, int, int >, int >  lattice_index_type;
   typedef std :: string lattice_name_type;
   typedef std :: string bulk_name_type;
   typedef iquads :: structure :: MolecularLattice lattice_type;
   typedef iquads :: structure :: MolecularBulk    bulk_type;
   typedef std :: tuple < lattice_name_type, lattice_type > lattice_info_type;
   typedef std :: tuple < bulk_name_type, bulk_type > bulk_info_type;
-  typedef iquads :: manybody_expansion :: FragmentInfo< Order > fragment_info_type;
+  typedef iquads :: electron_correlation :: Setting electron_calc_setting_type;
+  typedef iquads :: manybody_expansion :: FragmentInfo< NUM > fragment_info_type;
   typedef std :: vector < fragment_info_type > fragment_info_list_type;
 
 public:
@@ -60,15 +64,26 @@ public:
   }
 
 public:
-  void build( lattice_info_type lattice_info, distance_data_type radius ) {
+  void build( const lattice_info_type& lattice_info, distance_data_type radius, electron_calc_setting_type setting ) {
     iquads :: manybody_expansion :: FragmentSignatureIdentifier< NUM > identifier;
     identifier.initialize( std :: get<1>( lattice_info ), radius );
-    identifier.evaluate_subgroups( this->fragment_info_list_ );
+    identifier.evaluate_subgroups( this->fragment_info_list_, setting );
   }
-  void build( bulk_info_type bulk_info, distance_data_type radius ) {
+  void build( const bulk_info_type& bulk_info, distance_data_type radius, electron_calc_setting_type setting ) {
     iquads :: manybody_expansion :: FragmentSignatureIdentifier< NUM > identifier;
     identifier.initialize( std :: get<1>( bulk_info ), radius );
-    identifier.evaluate_subgroups( this->fragment_info_list_ );
+    identifier.evaluate_subgroups( this->fragment_info_list_, setting );
+  }
+
+public:
+  PolymerReport<NUM> get_report_by_lattice_index( std :: array< lattice_index_type, NUM > lattice_indices ) {
+    for( size_t ifragment_info = 0; ifragment_info < this->fragment_info_list_.size(); ifragment_info++ ) {
+      const fragment_info_type fragment_info_local = fragment_info_list_[ifragment_info];
+      if( fragment_info_local.has_fragment_with_lattice_indices( lattice_indices ) == true ) {
+        PolymerReport<NUM> retobj = fragment_info_local.polymer_report();
+        return retobj;
+      }
+    }
   }
 
 public:

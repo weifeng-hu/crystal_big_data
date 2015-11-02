@@ -128,6 +128,8 @@ public:
     { return this->fragment_list_; }
   weight_factor_type weight_factor() const
     { return this->weight_factor_; }
+  weight_factor_type& set_weight_factor()
+    { return this->weight_factor_; }
 
 protected:
   fragment_list_type fragment_list_;

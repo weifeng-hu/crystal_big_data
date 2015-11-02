@@ -29,6 +29,7 @@
 
 #include <manybody_expansion/config.hpp>
 #include <manybody_expansion/report.hpp>
+#include <manybody_expansion/fragment_signature_database.hpp>
 #include <manybody_expansion/compute_expansion_term_periodic_with_fragment_identification_traits.hpp>
 
 namespace iquads {
@@ -47,7 +48,7 @@ namespace manybody_expansion {
   typedef Config config_type;
   typedef Report report_type;
   typedef report_type& report_ref;
-  typedef FragmentSignatureDataBase database_template;
+  typedef FragmentSignatureDataBase database_type;
   using manybody_expansion :: compute_expansion_term_periodic_with_fragment_identification;
 
   /**
@@ -55,7 +56,7 @@ namespace manybody_expansion {
    */
   template < size_t Order > class ExpansionFormulaPeriodicWithFragmentIdentification {
     public:
-      energy_data_type compute( config_type config, const database_template<Order>& database, report_ref report )
+      energy_data_type compute( config_type config, const database_type& database, report_ref report )
         { return compute_expansion_term_periodic_with_fragment_identification<0>( config, database, report ); }
   }; // end of class ExpansionFormulaPeriodicWithFragmentIdentification< Order >
 
@@ -66,7 +67,7 @@ namespace manybody_expansion {
    */
   template <> class ExpansionFormulaPeriodicWithFragmentIdentification<1> {
     public:
-      energy_data_type compute( config_type config, const database_template<1>& database, report_ref report ) 
+      energy_data_type compute( config_type config, const database_type& database, report_ref report ) 
         { return compute_expansion_term_periodic_with_fragment_identification<1>( config, database, report ); }
   }; // end of class ExpansionFormulaPeriodicWithFragmentIdentification<1>
 
@@ -78,7 +79,7 @@ namespace manybody_expansion {
    */
   template <> class ExpansionFormulaPeriodicWithFragmentIdentification<2> {
     public:
-      energy_data_type compute( config_type config, const database_template<2>& database, report_ref report ) {
+      energy_data_type compute( config_type config, const database_type& database, report_ref report ) {
         return compute_expansion_term_periodic_with_fragment_identification<1>( config, database, report ) +
                compute_expansion_term_periodic_with_fragment_identification<2>( config, database, report );
       }
@@ -93,7 +94,7 @@ namespace manybody_expansion {
    */
   template <> class ExpansionFormulaPeriodicWithFragmentIdentification<3> {
     public:
-      energy_data_type compute( config_type config, const database_template<3>& database, report_ref report ) {
+      energy_data_type compute( config_type config, const database_type& database, report_ref report ) {
         return compute_expansion_term_periodic_with_fragment_identification<1>( config, database, report ) +
                compute_expansion_term_periodic_with_fragment_identification<2>( config, database, report ) +
                compute_expansion_term_periodic_with_fragment_identification<3>( config, database, report );
@@ -110,7 +111,7 @@ namespace manybody_expansion {
    */
   template <> class ExpansionFormulaPeriodicWithFragmentIdentification<4> {
     public:
-      energy_data_type compute( config_type config, const database_template<4>& database, report_ref report ) {
+      energy_data_type compute( config_type config, const database_type& database, report_ref report ) {
         return compute_expansion_term_periodic_with_fragment_identification<1>( config, database, report ) +
                compute_expansion_term_periodic_with_fragment_identification<2>( config, database, report ) +
                compute_expansion_term_periodic_with_fragment_identification<3>( config, database, report ) +

@@ -32,7 +32,7 @@
 #include <electron_correlation/setting.hpp>
 #include <manybody_expansion/config.hpp>
 #include <manybody_expansion/report.hpp>
-#include <manybody_expansion/fragment_signature_database_template.hpp>
+#include <manybody_expansion/fragment_signature_database.hpp>
 #include <manybody_expansion/compute_interaction_energy_with_fragment_identification_traits.hpp>
 
 namespace iquads {
@@ -51,37 +51,36 @@ namespace manybody_expansion {
   typedef Config config_type;
   typedef Report report_type;
   typedef report_type& report_ref;
-  typedef FragmentSignatureDataBase database_template;
-  typedef electron_correlation :: Setting  external_setting_type;
+  typedef FragmentSignatureDataBase database_type;
   typedef config_type :: lattice_type :: unit_cell_type unit_cell_type;
 
   /**
    *  Default instantiation
    *  returns zero for energy, since no method can be defined.
    */
-  template < size_t Order > inline energy_data_type compute_expansion_term_periodic_with_fragment_identification( config_type config, const database_template<Order>& database, report_ref report )
+  template < size_t Order > inline energy_data_type compute_expansion_term_periodic_with_fragment_identification( config_type config, const database_type& database, report_ref report )
     { return 0.0e0; }
 
   /**
    *  Explicit instantiation for order 1, to calculate total monomer energy
    */
-  template <> inline energy_data_type compute_expansion_term_periodic_with_fragment_identification<1>( config_type config, const database_template<1>& database, report_ref report ) {
+  template <> inline energy_data_type compute_expansion_term_periodic_with_fragment_identification<1>( config_type config, const database_type& database, report_ref report ) {
 
     energy_data_type retval = 0.0e0;
-    external_setting_type settings; settings.generate_from( config );
- 
     unit_cell_type cell_R0 = config.lattice().at(0, 0, 0);
     for( size_t i_R0 = 0; i_R0 < cell_R0.size(); i_R0++ ) {
+      
       Polymer<1>  monomer_i( array< Molecule, 1 > { cell_R0[i_R0] } );
       {
-        double weight_factor = mbe_system_pointer->retrieve_weight_factor_for( monomer_i );
-        double weight_factor = mbe_system_pointer->retrieve_identical_polymer_list_for( monomer_i );
-        PolymerOmniReportPeriodic<1>  monomer_report;
+        PolymerOmniReportGeneral<1>  monomer_report;
+        double weight_factor = database.retrieve_weight_factor_for( std :: make_tuple( std :: make_tuple( 0, 0, 0 ), i_R0 ) );
+        monomer_report.set_weight_factor() = weight_factor;
         std :: string monomer_name( "monomer_" );
                       monomer_name += std :: string( "R_" ) + std :: string( "0_0_0_" );
                       monomer_name += std :: string( "i_" ) + std :: to_string( i_R0 ) + std :: string( "_" );
+        std :: array< lattice_index_type, 1 > index = { std :: make_tuple( std :: make_tuple( 0, 0, 0 ), i_R0 ) };
         energy_data_type monomer_energy
-          = compute_interaction_energy<1>( monomer_i, std :: string( monomer_name ) , settings, monomer_report );
+          = compute_interaction_energy_with_fragment_identification<1>( index, std :: string( monomer_name ), database, monomer_report );
         report.attach_new_monomer_report( monomer_report );
         retval += monomer_energy * weight_factor;
       }
@@ -94,10 +93,9 @@ namespace manybody_expansion {
   /**
    *  Explicit instantiation for order 2, to calculate total dimer interaction energy
    */
-  template <> inline energy_data_type compute_expansion_term_periodic_with_fragment_identification<2>( config_type config, const database_template<2>& database, report_ref report ) {
+  template <> inline energy_data_type compute_expansion_term_periodic_with_fragment_identification<2>( config_type config, const database_type& database, report_ref report ) {
  
     energy_data_type retval = 0.0e0;
-    external_setting_type settings; settings.generate_from( config );
  
     unit_cell_type cell_R0 = config.lattice().at(0, 0, 0);
     for( size_t i_R0 = 0; i_R0 < cell_R0.size(); i_R0++ ) {
@@ -110,6 +108,7 @@ namespace manybody_expansion {
 
               if( ( cell_R0 == cell_R ) && ( i_R0 == i_R ) ) continue;
               Polymer<1> monomer_j( array< Molecule, 1 > { cell_R[i_R] } );
+
               {
                 Polymer<2> dimer_ij = monomer_i + monomer_j;
                 PolymerOmniReportGeneral<2> dimer_report;
@@ -120,7 +119,9 @@ namespace manybody_expansion {
                                                                     std :: to_string( R_b ) + std :: string( "_" ) + 
                                                                     std :: to_string( R_c ) + std :: string( "_" );
                               dimer_name += std :: string( "j_" ) + std :: to_string( i_R ) + std :: string( "_" );
-                energy_data_type dimer_interaction_energy = compute_interaction_energy<2> ( dimer_ij, std :: string( dimer_name ), settings, dimer_report );
+                std :: array< lattice_index_type, 2 > index = { std :: make_tuple( std :: make_tuple( 0, 0, 0 ), i_R0 ), 
+                                                                std :: make_tuple( std :: make_tuple( R_a, R_b, R_c ), i_R ) };
+                energy_data_type dimer_interaction_energy = compute_interaction_energy_with_fragment_identification<2> ( index, std :: string( dimer_name ), database, dimer_report );
                 report.attach_new_dimer_report( dimer_report );
                 retval += dimer_interaction_energy;
               }
@@ -135,10 +136,9 @@ namespace manybody_expansion {
   /**
    *  Explicit instantiation for order 3, to calculate total trimer interaction energy
    */
-  template <> inline energy_data_type compute_expansion_term_periodic_with_fragment_identification<3>( config_type config, const database_template<3>& database, report_ref report ) {
+  template <> inline energy_data_type compute_expansion_term_periodic_with_fragment_identification<3>( config_type config, const database_type& database, report_ref report ) {
  
     energy_data_type retval = 0.0e0;
-    external_setting_type settings; settings.generate_from(config);
   
     unit_cell_type cell_R0 = config.lattice().at(0, 0, 0);
     for( size_t i_R0 = 0; i_R0 < cell_R0.size(); i_R0++ ) {
@@ -175,7 +175,11 @@ namespace manybody_expansion {
                                                                              std :: to_string( R_k_b ) + std :: string( "_" ) + 
                                                                              std :: to_string( R_k_c ) + std :: string( "_" );
                                       trimer_name += std :: string( "k_" ) + std :: to_string( i_Rk ) + std :: string( "_" );
-                        energy_data_type trimer_interaction_energy = compute_interaction_energy<3> ( trimer_ijk, std :: string( trimer_name ), settings, trimer_report );
+                        std :: array< lattice_index_type, 3 > index 
+                          = { std :: make_tuple( std :: make_tuple( 0, 0, 0 ), i_R0 ), 
+                              std :: make_tuple( std :: make_tuple( R_j_a, R_j_b, R_j_c ), i_Rj ), 
+                              std :: make_tuple( std :: make_tuple( R_l_a, R_i_b, R_i_c ), i_Rl ) };
+                        energy_data_type trimer_interaction_energy = compute_interaction_energy_with_fragment_identification<3> ( index, std :: string( trimer_name ), database, trimer_report );
                         report.attach_new_trimer_report( trimer_report );
                         retval += trimer_interaction_energy;
                       }
@@ -192,10 +196,9 @@ namespace manybody_expansion {
   /**
    *  Explicit instantiation for order 4, to calculate total tetramer interaction energy
    */
-  template <> inline energy_data_type compute_expansion_term_periodic_with_fragment_identification<4> ( config_type config, const database_template<4>& database, report_ref report ) {
+  template <> inline energy_data_type compute_expansion_term_periodic_with_fragment_identification<4> ( config_type config, const database_type& database, report_ref report ) {
  
     energy_data_type retval = 0.0e0;
-    external_setting_type settings; settings.generate_from( config );
  
     unit_cell_type cell_R0 = config.lattice().at(0, 0, 0);
     for( size_t i_R0 = 0; i_R0 < cell_R0.size(); i_R0++ ) {
@@ -212,9 +215,9 @@ namespace manybody_expansion {
                     unit_cell_type cell_Rk = config.lattice().at( R_k_a, R_k_b, R_k_c );
                     for( size_t i_Rk = 0; i_Rk < cell_Rk.size(); i_Rk++ ){
                       Polymer<1> monomer_k( array< Molecule, 1 > { cell_Rk[ i_Rk ] } );
-                        for( int R_l_a = config.lattice().a_min(); R_l_a <= config.lattice().a_max(); R_l_a++ ){
-                          for( int R_l_b = config.lattice().b_min(); R_l_b <= config.lattice().b_max(); R_l_b++ ){
-                            for( int R_l_c = config.lattice().c_min(); R_l_c <= config.lattice().c_max(); R_l_c++ ){
+                        for( int R_l_a = config.lattice().a_min(); R_l_a <= config.lattice().a_max(); R_l_a++ ) {
+                          for( int R_l_b = config.lattice().b_min(); R_l_b <= config.lattice().b_max(); R_l_b++ ) {
+                            for( int R_l_c = config.lattice().c_min(); R_l_c <= config.lattice().c_max(); R_l_c++ ) {
                               unit_cell_type cell_Rl = config.lattice().at( R_l_a, R_l_b, R_l_c );
                               for( size_t i_Rl = 0; i_Rl < cell_Rl.size(); i_Rl++ ){
                                 Polymer<1> monomer_l( array< Molecule, 1 > { cell_Rl[ i_Rl ] } );
@@ -244,7 +247,12 @@ namespace manybody_expansion {
                                                                                          std :: to_string( R_l_b ) + std :: string( "_" ) + 
                                                                                          std :: to_string( R_l_c ) + std :: string( "_" );
                                                 tetramer_name += std :: string( "l_" ) + std :: to_string( i_Rl ) + std :: string( "_" );
-                                  energy_data_type tetramer_interaction_energy = compute_interaction_energy<4> ( tetramer_ijkl, std :: string( tetramer_name ), settings, tetramer_report );
+                                  std :: array< lattice_index_type, 4 > index 
+                                    = { std :: make_tuple( std :: make_tuple( 0, 0, 0 ), i_R0 ), 
+                                        std :: make_tuple( std :: make_tuple( R_j_a, R_j_b, R_j_c ), i_Rj ),
+                                        std :: make_tuple( std :: make_tuple( R_k_a, R_k_b, R_k_c ), i_Rk ),
+                                        std :: make_tuple( std :: make_tuple( R_l_a, R_l_b, R_l_c ), i_Rl ) };
+                                  energy_data_type tetramer_interaction_energy = compute_interaction_energy_with_fragment_identification<4> ( index, std :: string( tetramer_name ), database, tetramer_report );
                                   report.attach_new_tetramer_report( tetramer_report );
                                   retval += tetramer_interaction_energy;
                                 }

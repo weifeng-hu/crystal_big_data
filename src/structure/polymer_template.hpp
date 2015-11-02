@@ -139,9 +139,10 @@ public:
    *    Invokes the operator<< of molecule objects
    */  
   friend 
-  ostream& operator<< ( ostream& os, this_type& polymer_obj ) {
+  ostream& operator<< ( ostream& os, const this_type& polymer_obj ) {
     for( size_t imolecule = 0; imolecule < NUM; imolecule++ ) {
-      os << polymer_obj[imolecule] << endl;
+      molecule_type molecule = polymer_obj[imolecule];
+      os << molecule << endl;
     }
     return os;
   }

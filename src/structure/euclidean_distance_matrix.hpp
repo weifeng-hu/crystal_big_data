@@ -1,141 +1,129 @@
-/*
- *  This source code applies all the terms in 
- *  GNU GENERAL PUBLIC LICENSE (GPL), Version3, 29 June 2007.
+/**
+ * @file
+ * @author Weifeng Hu
  *
- *  Copyright (C) 2013-2015 Weifeng Hu, all rights reserved.
- *  
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *  
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *  
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * @section LICENSE
+ *
+ * Copyright (C) 2013, 2014, 2015  Weifeng Hu
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @section DESCRIPTION
+ *
  *
  */
 
 #ifndef EUCLIDEAN_DISTANCE_MATRIX_HPP
 #define EUCLIDEAN_DISTANCE_MATRIX_HPP
 
-/*
-###################################################
-
-    Euclidean distance matrix class
-
-###################################################
-*/
-
 #include <stdlib.h>
 #include <math.h>
 #include <string>
 #include <tuple>
 #include <iostream>
-#include "utilities/solid_gen/threed_space.h"
-#include "utilities/solid_gen/atom.h"
-#include "utilities/solid_gen/coordinate.h"
-#include "utilities/solid_gen/matrix.h"
-#include "utilities/solid_gen/matrix_function.h"
-#include "blas/blas_interface.h"
-
-using namespace std;
+#include <geometrical/threed_space_function.hpp>
+#include <structure/atom.hpp>
+#include <blas/blas_interface.h>
+#include <matrix/matrix_typedef.hpp>
+#include <matrix/matrix_function.hpp>
 
 namespace iquads {
 
-using namespace matrix;
-using namespace threed_space;
-using namespace basic;
-
-namespace crystal {
+namespace structure {
 
 // Euclidean distance matrix class
-struct euclidean_distance_matrix
-{
+struct EuclideanDistanceMatrix {
 public:
-  euclidean_distance_matrix(){
-   this->n_element_ = 0;
-   this->element_list.resize(0);
-   this->is_diagonalized_ = false;
+  typedef matrix :: DMatrixHeap matrix_type;
+  typedef std :: vector< std :: string > element_name_list_type;
+
+public:
+  EuclideanDistanceMatrix() {
+    this->element_name_list_.resize(0);
+    this->is_diagonalized_ = false;
   }
-  euclidean_distance_matrix( size_t n_element ){
-   this->init( n_element );
+  EuclideanDistanceMatrix( size_t n_element ) {
+    this->distance_matrix_.resize( n_element, n_element );
+    this->eigvec_.resize( n_element, n_element );
+    this->eigval_.resize( n_element, 1 );
+    this->element_name_list_.resize( n_element );
+    this->is_diagonalized_ = false;
   }
 
 public:
-  void init( size_t n_element ){
-   this->n_element_ = n_element;
-   this->distance_matrix.init( n_element, n_element );
-   this->eigvec.init( n_element, n_element );
-   this->eigval.init( n_element, 1 );
-   this->element_list.resize( n_element );
-   this->is_diagonalized_ = false;
-  }
-  void compose_from_atomlist( AtomList new_atom_list ){
-   const size_t natom = new_atom_list.size();
-   this->init( natom );
-   for( size_t iatom = 0; iatom < natom; iatom++ ){
-    this->set_element(iatom) = new_atom_list[iatom].get_element();
-   }
-   for( size_t iatom = 0; iatom < natom; iatom++ ){
-    Coord coord_i = new_atom_list[iatom].get_coordinate_set();
-    const int charge_i = new_atom_list[iatom].get_charge();
-    for( size_t jatom = 0; jatom < natom; jatom++ ){
-     Coord coord_j = new_atom_list[jatom].get_coordinate_set();
-     const int charge_j = new_atom_list[jatom].get_charge();
-     this->set_matrix_element( iatom, jatom ) 
-        = compute_distance( coord_i, coord_j );
-//     this->set_matrix_element( iatom, jatom ) 
-//        = compute_charge_weighted_distance( coord_i, coord_j, charge_i, charge_j );
+  void compose_from_atomlist( const AtomList& atom_list_obj ) {
+    const size_t natom = atom_list_obj.size();
+    this->resize( natom );
+    for( size_t iatom = 0; iatom < natom; iatom++ ) {
+      this->set_element_name(iatom) = atom_list_obj[iatom].element_name();
     }
-   }
+    for( size_t iatom = 0; iatom < natom; iatom++ ) {
+      iquads :: geometrical_space :: Coord coord_i = new_atom_list[iatom].coordinate();
+      const int charge_i = new_atom_list[iatom].charge();
+      for( size_t jatom = 0; jatom < natom; jatom++ ) {
+        iquads :: geometrical_space :: Coord coord_j = new_atom_list[jatom].coordinate();
+        const int charge_j = new_atom_list[jatom].charge();
+        this->at( iatom, jatom ) = iquads :: geometrical_space :: compute_distance( coord_i, coord_j );
+        // this->at( iatom, jatom ) 
+        //  = compute_charge_weighted_distance( coord_i, coord_j, charge_i, charge_j );
+      }
+    }
   }
-  void diagonalise(){
-   symmetric_diag( &(this->distance_matrix), &(this->eigvec), &(this->eigval) );
-   this->is_diagonalized_ = true;
+  void diagonalise() {
+    iquads :: matrix :: symmetric_diag( this->distance_matrix_, this->eigvec_, this->eigval_ );
+    this->is_diagonalized_ = true;
   }
-
-  void print_eigen_pairs(){
-   if( this->is_diagonalized_ == false ){
-   }
-  }
-  void print_eigval(){
-   for( size_t i = 0; i < this->eigval.get_nrow(); i++ ){
-    cout << this->eigval(i,0) << " ";
-   }
-   cout << endl;
+  void print_eigval() {
+    for( size_t i = 0; i < this->eigval_.nrow(); i++ ) {
+      double value = this->eigval_(i, 0);
+      std :: cout << value << " ";
+    }
+    std :: cout << std :: endl;
   }
 
 public:
-  DMatrixHeap get_dist_mat() const { return this->distance_matrix; }
-  DMatrixHeap get_eigval() const { return this->eigval; }
-
-public:
-  double& operator() ( int i, int j ) 
-   { return this->set_matrix_element( i, j ); }
-  string& set_element( int i  ) 
-   { return this->element_list.at(i); }
+  matrix_type distance_matrix() const
+    { return this->distance_matrix_; }
+  matrix_type eigval() const
+    { return this->eigval_; }
+  matrix_type eigvec() const
+    { return this->eigvec_; }
+  element_name_list_type element_name_list() const
+    { return this->element_name_list_; }
+  void resize( size_t i ) {
+    this->distance_matrix_.resize( i, i );
+    this->eigvec_.resize( i, i );
+    this->eigval_.resize( i, 1 );
+    this->element_name_list_.resize( i );
+    this->is_diagonalized_ = false;
+  }
+  std :: string& set_element_name( int i  )
+    { return this->element_list.at(i); }
+  double& at( size_t i, size_t j ) 
+    { return this->distance_matrix_( i , j ); }
 
 private:
-  // element access
-  double& set_matrix_element( size_t i, size_t j ) 
-   { return this->distance_matrix( i , j ); }
-
-private:
-  DMatrixHeap distance_matrix;   // 2-d array to store distance
-  DMatrixHeap eigvec;
-  DMatrixHeap eigval;
-  vector<string> element_list;      // 1-d array to store elements
-  size_t n_element_;        // length of this->element_list
+  matrix_type distance_matrix_;               // 2-d array to store distance
+  matrix_type eigvec_;
+  matrix_type eigval_;
+  element_name_list_type element_name_list_;  // 1-d array to store elements
   bool is_diagonalized_;
 
-}; // end of struct euclidean distance matrix
+}; // end of struct EuclideanDistanceMatrix
 
-} // end of crystal
+} // end of namespace crystal
 
-} // end of iquads
+} // end of namespace iquads
 
 #endif

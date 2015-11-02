@@ -27,7 +27,9 @@
 #include <tuple>
 #include <string>
 #include <iostream>
+#include <iterator>
 #include <algorithm>
+#include <matrix/matrix_instant.hpp>
 #include <structure/molecule.hpp>
 #include <structure/polymer_template.hpp>
 #include <structure/lattice_instant.hpp>
@@ -39,16 +41,17 @@ namespace manybody_expansion {
 
 template < size_t NUM > struct FragmentInfo {
 public:
-  typedef DVectorHeap eigenvalue_container_type;
-  typedef iquads :: structure :: Polymer polymer_template;
+  typedef iquads :: matrix :: DMatrixHeap  eigenvalue_container_type;
+  typedef iquads :: structure :: Polymer   polymer_template;
   typedef double distance_data_type;
-  typedef std :: tuple< polymer_template<NUM>, eigenvalue_container_type, distance_data_type >  signature_data_type;
-  typedef std :: tuple< int, int, int >                      unit_cell_index_type;
-  typedef std :: tuple< unit_cell_index_type, int >          lattice_node_index_type;
-  typedef std :: array< lattice_node_index_type, NUM >       lattice_fragment_composition_type;
-  typedef std :: vector< lattice_fragment_composition_type > lattice_identical_fragment_list_type;
-  typedef std :: array< int, NUM >                           bulk_fragment_composition_type;
-  typedef std :: vector< bulk_fragment_composition_type >    bulk_identical_fragment_list_type;
+  typedef iquads :: manybody_expansion :: PolymerReport<NUM>  polymer_report_type;
+  typedef std :: tuple< polymer_template<NUM>, eigenvalue_container_type, distance_data_type, polymer_report_type >  signature_data_type;
+  typedef std :: tuple< int, int, int >                       unit_cell_index_type;
+  typedef std :: tuple< unit_cell_index_type, int >           lattice_node_index_type;
+  typedef std :: array< lattice_node_index_type, NUM >        lattice_fragment_composition_type;
+  typedef std :: vector< lattice_fragment_composition_type >  lattice_identical_fragment_list_type;
+  typedef std :: array< int, NUM >                            bulk_fragment_composition_type;
+  typedef std :: vector< bulk_fragment_composition_type >     bulk_identical_fragment_list_type;
 
 public:
   FragmentInfo() {
@@ -58,12 +61,12 @@ public:
 
   FragmentInfo( signature_data_type signature_data, 
                 const lattice_identical_fragment_list_type& lattice_identical_fragment_list_obj ) 
-    signature_ ( signature_data ), 
+    signature_ ( signature_data ),
     lattice_identical_fragment_list_ ( lattice_identical_fragment_list_obj )
     { this->bulk_identical_fragment_list_.resize(0); }
 
   FragmentInfo( signature_data_type signature_data, 
-                const bulk_identical_fragment_list_type& bulk_identical_fragment_list_obj ) 
+                const bulk_identical_fragment_list_type& bulk_identical_fragment_list_obj )
     signature_ ( signature_data ), 
     bulk_identical_fragment_list_ ( bulk_identical_fragment_list_obj )
     { this->lattice_identical_fragment_list_.resize(0); }
@@ -230,14 +233,28 @@ public:
   */
 
 public:
-  signature_data_type signature()
+  bool has_fragment_with_lattice_indices( lattice_fragment_composition_type lattice_index ) {
+    for( size_t i = 0; i < this->lattice_identical_fragment_list_.size(); i++ ) {
+      const lattice_node_index_type lattice_node_index = this->lattice_identical_fragment_list_[i];
+      for( size_t j = 0; j < NUM; j++ ) {
+        if( std :: find( std :: begin( lattice_node_index ), 
+                         std :: end( lattice_node_index ),
+                         lattice_index[j] ) == std :: end( lattice_node_index ) ) return false;
+      }
+    }
+  }
+
+public:
+  signature_data_type signature() const
     { return this->signature_; }
-  polymer_template<NUM> prototype_polymer()
+  polymer_template<NUM> prototype_polymer() const
     { return std :: get<0>( this->signature_ ); }
-  eigenvalue_container_type eigenvalues()
+  eigenvalue_container_type eigenvalues() const
     { return std :: get<1>( this->signature_ ); }
-  distance_data_type average_intermolecular_distance()
+  distance_data_type average_intermolecular_distance() const
     { return std :: get<2>( this->signature_ ); }
+  polymer_report_type polymer_report() const
+    { return std :: get<3>( this->signature_ ); }
   bulk_fragment_composition_type prototype_bulk_fragment_composition() const 
     { return this->bulk_identical_fragment_list_.begin(); }
   bulk_identical_fragment_list_type bulk_identical_fragment_list()
