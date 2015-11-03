@@ -46,6 +46,13 @@ public:
     this->n_tic_ = 50;
     std :: cout << "|----|----|----|----|----|----|----|----|----|----|" << std :: endl;
   };
+  ProgressDisplay( std :: string event_name, size_t total_step ) {
+    this->current_step_ = 0;
+    this->total_step_   = total_step;
+    this->n_tic_ = 50;
+    std :: cout << event_name << std :: endl;
+    std :: cout << "|----|----|----|----|----|----|----|----|----|----|" << std :: endl;
+  };
 
 public:
   this_type& operator++() {
