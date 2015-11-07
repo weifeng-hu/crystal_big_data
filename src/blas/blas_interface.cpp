@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
-#include "blas_interface.h"
+#include <blas/blas_interface.h>
 
 void ax_b( const double* a, const double* b, const double* x, const int dimen )
 {
@@ -19,14 +19,16 @@ void mat_x_mat( const double* a, const double* b, double* c, const double coeff,
 
 }
 
-void diag( const double* mat, double* eigvec,  double* eigval, const int n ){
+void diag( const double* mat, double* eigvec,  double* eigval, int n ){
 
   const int n2 = n*n;
   for( int i = 0; i < n2; i++ ){
    eigvec[i] = mat[i];
   } 
 
-  symdiag_( eigvec, eigval, &n );
+  int dimension = n;
+
+  symdiag_( eigvec, eigval, &dimension );
 //  for( int i = 0; i < n2; i++ ){
 //   printf("%d %20.16f\n", i, eigvec[i] );
 //  } 

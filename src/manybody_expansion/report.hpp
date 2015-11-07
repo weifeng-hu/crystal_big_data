@@ -184,6 +184,20 @@ public:
   typedef vector< periodic_tetramer_report_type >   periodic_tetramer_report_list_type;
 
 public:
+  Report() {
+    this->non_periodic_monomer_report_list_.resize(0);
+    this->non_periodic_dimer_report_list_.resize(0);
+    this->non_periodic_trimer_report_list_.resize(0);
+    this->non_periodic_tetramer_report_list_.resize(0);
+
+    this->non_periodic_monomer_report_list_.resize(0);
+    this->non_periodic_dimer_report_list_.resize(0);
+    this->non_periodic_trimer_report_list_.resize(0);
+    this->non_periodic_tetramer_report_list_.resize(0);
+    this->mbe_order_ = 0;
+  }
+
+public:
   void print() const;
 
 public:

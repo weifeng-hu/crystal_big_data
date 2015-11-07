@@ -130,11 +130,11 @@ public:
       config_type config = this->setup_config_from_request( request );
 
       if( config.is_periodic() == true ) {
-        cout << " PERIODIC flag detected; " << endl;
+        cout << "PERIODIC flag detected; " << endl;
         this->execute_periodic( config, report );
       }
       else {
-        cout << " no PERIODIC flag detected; " << endl;
+        cout << "no PERIODIC flag detected; " << endl;
         this->execute_general( config, report );
       }
 

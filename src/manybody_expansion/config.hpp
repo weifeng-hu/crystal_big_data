@@ -145,6 +145,10 @@ public:
     { return this->correlation_method_; }
   run_mode_type run_mode() const
     { return this->run_mode_; }
+  double radius() const
+    { return this->radius_; }
+  bool use_fragment_identifier() const
+    { return this->use_fragment_identifier_; }
 
   /**
    *  Auxiliary accessors
@@ -161,25 +165,29 @@ public:
    *  reflect the change in the report!
    */
   lattice_info_ref set_lattice_info() 
-   { return this->lattice_info_; }
+    { return this->lattice_info_; }
   bulk_info_ref set_bulk_info() 
-   { return this->bulk_info_; }
+    { return this->bulk_info_; }
   expansion_order_ref set_expansion_order() 
-   { return this->expansion_order_; }
+    { return this->expansion_order_; }
   condition_ref set_is_periodic() 
-   { return this->is_periodic_; }
+    { return this->is_periodic_; }
   program_ref set_program() 
-   { return this->program_; }
+    { return this->program_; }
   basis_set_name_ref set_basis_set_name() 
-   { return this->basis_set_name_; }
+    { return this->basis_set_name_; }
   job_name_ref set_job_name() 
-   { return this->job_name_; }
+    { return this->job_name_; }
   path_name_ref set_scratch_name() 
-   { return this->scratch_dir_; }
+    { return this->scratch_dir_; }
   correlation_method_ref set_correlation_method()
-   { return this->correlation_method_; }
+    { return this->correlation_method_; }
   run_mode_ref set_run_mode()
-   { return this->run_mode_; }
+    { return this->run_mode_; }
+  double& set_radius() 
+    { return this->radius_; }
+  bool& set_use_fragment_identifier()
+    { return this->use_fragment_identifier_; }
 
 private:
   lattice_info_type        lattice_info_;
@@ -192,6 +200,8 @@ private:
   job_name_type            job_name_;
   path_name_type           scratch_dir_;
   run_mode_type            run_mode_;
+  double                   radius_;
+  bool                     use_fragment_identifier_;
 
 }; // end of class Config
 

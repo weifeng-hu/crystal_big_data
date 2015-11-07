@@ -27,6 +27,7 @@
 #ifndef MANYBODY_EXPANSION_POLYMER_REPORT_TEMPLATE_HPP
 #define MANYBODY_EXPANSION_POLYMER_REPORT_TEMPLATE_HPP
 
+#include <iostream>
 #include <string>
 #include <array>
 #include <structure/atom_list.hpp>

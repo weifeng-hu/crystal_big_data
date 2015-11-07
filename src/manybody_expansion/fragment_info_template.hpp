@@ -29,7 +29,7 @@
 #include <iostream>
 #include <iterator>
 #include <algorithm>
-#include <matrix/matrix_instant.hpp>
+#include <matrix/matrix_typedef.hpp>
 #include <structure/molecule.hpp>
 #include <structure/polymer_template.hpp>
 #include <structure/lattice_instant.hpp>
@@ -42,10 +42,10 @@ namespace manybody_expansion {
 template < size_t NUM > struct FragmentInfo {
 public:
   typedef iquads :: matrix :: DMatrixHeap  eigenvalue_container_type;
-  typedef iquads :: structure :: Polymer   polymer_template;
+  typedef iquads :: structure :: Polymer<NUM>   polymer_type;
   typedef double distance_data_type;
   typedef iquads :: manybody_expansion :: PolymerReport<NUM>  polymer_report_type;
-  typedef std :: tuple< polymer_template<NUM>, eigenvalue_container_type, distance_data_type, polymer_report_type >  signature_data_type;
+  typedef std :: tuple< polymer_type, eigenvalue_container_type, distance_data_type, polymer_report_type >  signature_data_type;
   typedef std :: tuple< int, int, int >                       unit_cell_index_type;
   typedef std :: tuple< unit_cell_index_type, int >           lattice_node_index_type;
   typedef std :: array< lattice_node_index_type, NUM >        lattice_fragment_composition_type;
@@ -60,13 +60,13 @@ public:
   }
 
   FragmentInfo( signature_data_type signature_data, 
-                const lattice_identical_fragment_list_type& lattice_identical_fragment_list_obj ) 
+                const lattice_identical_fragment_list_type& lattice_identical_fragment_list_obj ) :
     signature_ ( signature_data ),
     lattice_identical_fragment_list_ ( lattice_identical_fragment_list_obj )
     { this->bulk_identical_fragment_list_.resize(0); }
 
   FragmentInfo( signature_data_type signature_data, 
-                const bulk_identical_fragment_list_type& bulk_identical_fragment_list_obj )
+                const bulk_identical_fragment_list_type& bulk_identical_fragment_list_obj ) :
     signature_ ( signature_data ), 
     bulk_identical_fragment_list_ ( bulk_identical_fragment_list_obj )
     { this->lattice_identical_fragment_list_.resize(0); }
@@ -235,19 +235,39 @@ public:
 public:
   bool has_fragment_with_lattice_indices( lattice_fragment_composition_type lattice_index ) {
     for( size_t i = 0; i < this->lattice_identical_fragment_list_.size(); i++ ) {
-      const lattice_node_index_type lattice_node_index = this->lattice_identical_fragment_list_[i];
-      for( size_t j = 0; j < NUM; j++ ) {
-        if( std :: find( std :: begin( lattice_node_index ), 
-                         std :: end( lattice_node_index ),
-                         lattice_index[j] ) == std :: end( lattice_node_index ) ) return false;
+      lattice_fragment_composition_type lattice_composition = this->lattice_identical_fragment_list_[i];
+      if( this->lattice_index_are_the_same( lattice_composition, lattice_index ) == true ) { 
+//        for( size_t j = 0; j < NUM; j++ ) {
+//         std :: cout << std :: get<0> ( std :: get<0>( lattice_composition[j] ) );
+//         std :: cout << std :: get<1> ( std :: get<0>( lattice_composition[j] ) );
+//         std :: cout << std :: get<2> ( std :: get<0>( lattice_composition[j] ) );
+//         std :: cout << std :: get<1> ( lattice_composition[j] );
+//        }
+//         std :: cout << " ------ ";
+//        for( size_t j = 0; j < NUM; j++ ) {
+//         std :: cout << std :: get<0> ( std :: get<0>( lattice_index[j] ) );
+//         std :: cout << std :: get<1> ( std :: get<0>( lattice_index[j] ) );
+//         std :: cout << std :: get<2> ( std :: get<0>( lattice_index[j] ) );
+//         std :: cout << std :: get<1> ( lattice_index[j] );
+//        }
+//         std :: cout << std :: endl;
+         return true;
       }
     }
+    return false;
+  }
+
+  bool lattice_index_are_the_same( lattice_fragment_composition_type a, lattice_fragment_composition_type b ) {
+    for( size_t j = 0; j < NUM; j++ ) {
+      if( std :: find( a.begin(), a.end(), b[j] ) == a.end() ) return false;
+    }
+    return true;
   }
 
 public:
   signature_data_type signature() const
     { return this->signature_; }
-  polymer_template<NUM> prototype_polymer() const
+  polymer_type prototype_polymer() const
     { return std :: get<0>( this->signature_ ); }
   eigenvalue_container_type eigenvalues() const
     { return std :: get<1>( this->signature_ ); }

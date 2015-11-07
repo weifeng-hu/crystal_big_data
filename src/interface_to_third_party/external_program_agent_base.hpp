@@ -160,6 +160,7 @@ public:
   report_type sequence_local_run( request_type request ) {
     try {
       report_type report;
+      report.initialize();
       base_config_ptr_list base_config_pointer_list = generate_config_list_from_request( request );
       for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ) {
          solution_tag_type solution_tag = base_config_pointer_list[istep]->solution_tag();

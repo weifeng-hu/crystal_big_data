@@ -29,6 +29,7 @@
 
 #include <vector>
 #include <tuple>
+#include <map>
 #include <matrix/matrix_typedef.hpp>
 
 namespace iquads {
@@ -39,19 +40,25 @@ namespace matrix {
 
   void symmetric_diag_big( DMatrixHeap& a, DMatrixHeap& eigvec, DMatrixHeap& eigval );
 
+  double distance_of_two_matrices( DMatrixStack& mat_a, DMatrixStack& mat_b );
   double distance_of_two_matrices( const DMatrixHeap& mat_a, const DMatrixHeap& mat_b );
 
+  bool is_the_same( DMatrixStack& eigval_a, DMatrixStack& eigval_b );
   bool is_the_same( const DMatrixHeap& eigval_a, const DMatrixHeap& eigval_b );
 
   IMatrixHeap compute_boolean_mat( const std :: vector<DMatrixHeap>& eigvals, double tol );
 
-  IMatrixHeap compute_boolean_mat( const std :: vector<DMatrixHeap>& all_matrices );
+  IMatrixHeap compute_boolean_mat( std :: vector<DMatrixHeap>& all_matrices );
+
+  std :: vector< std :: map< int, int > > compute_boolean_map( std :: vector<DMatrixHeap>& all_matrices );
 
   std :: vector< std :: tuple< double, int, int> > get_degeneracy_groups( const DMatrixHeap& eigval );
 
   std :: vector< std :: vector<int> > get_degeneracy_group( const DMatrixHeap& mat );
 
-  std :: vector< std :: vector<int> > get_groups( const IMatrixHeap& boolean_mat );
+  std :: vector< std :: vector<int> > get_groups( IMatrixHeap& boolean_mat );
+
+  std :: vector< std :: vector<int> > get_groups( std :: vector< std :: map< int, int > >& boolean_map );
 
 } // end of namespace matrix
 

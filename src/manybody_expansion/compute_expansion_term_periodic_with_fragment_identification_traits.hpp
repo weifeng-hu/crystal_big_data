@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef COMPUTE_EXPANSION_TERM_PERIODIC_TRAITS_HPP
-#define COMPUTE_EXPANSION_TERM_PERIODIC_TRAITS_HPP
+#ifndef COMPUTE_EXPANSION_TERM_PERIODIC_WITH_FRAGMENT_IDENTIFICATION_TRAITS_HPP
+#define COMPUTE_EXPANSION_TERM_PERIODIC_WITH_FRAGMENT_IDENTIFICATION_TRAITS_HPP
 
 #include <string>
 #include <structure/polymer_template.hpp>
@@ -73,8 +73,6 @@ namespace manybody_expansion {
       Polymer<1>  monomer_i( array< Molecule, 1 > { cell_R0[i_R0] } );
       {
         PolymerOmniReportGeneral<1>  monomer_report;
-        double weight_factor = database.retrieve_weight_factor_for( std :: make_tuple( std :: make_tuple( 0, 0, 0 ), i_R0 ) );
-        monomer_report.set_weight_factor() = weight_factor;
         std :: string monomer_name( "monomer_" );
                       monomer_name += std :: string( "R_" ) + std :: string( "0_0_0_" );
                       monomer_name += std :: string( "i_" ) + std :: to_string( i_R0 ) + std :: string( "_" );
@@ -82,7 +80,7 @@ namespace manybody_expansion {
         energy_data_type monomer_energy
           = compute_interaction_energy_with_fragment_identification<1>( index, std :: string( monomer_name ), database, monomer_report );
         report.attach_new_monomer_report( monomer_report );
-        retval += monomer_energy * weight_factor;
+        retval += monomer_energy;
       }
     }
  
@@ -178,7 +176,7 @@ namespace manybody_expansion {
                         std :: array< lattice_index_type, 3 > index 
                           = { std :: make_tuple( std :: make_tuple( 0, 0, 0 ), i_R0 ), 
                               std :: make_tuple( std :: make_tuple( R_j_a, R_j_b, R_j_c ), i_Rj ), 
-                              std :: make_tuple( std :: make_tuple( R_l_a, R_i_b, R_i_c ), i_Rl ) };
+                              std :: make_tuple( std :: make_tuple( R_k_a, R_k_b, R_k_c ), i_Rk ) };
                         energy_data_type trimer_interaction_energy = compute_interaction_energy_with_fragment_identification<3> ( index, std :: string( trimer_name ), database, trimer_report );
                         report.attach_new_trimer_report( trimer_report );
                         retval += trimer_interaction_energy;

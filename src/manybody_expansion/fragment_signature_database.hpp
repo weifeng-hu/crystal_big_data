@@ -29,6 +29,7 @@
 
 #include <tuple>
 #include <string>
+#include <memory>
 #include <structure/lattice_instant.hpp>
 #include <electron_correlation/setting.hpp>
 #include <manybody_expansion/polymer_report_template.hpp>
@@ -38,6 +39,20 @@ namespace iquads {
 
 namespace manybody_expansion {
 
+template < class T_Parent, class T_Child, size_t X > struct Interface {
+public:
+  Interface( const T_Parent* input_pointer ) : parent_ptr_ ( input_pointer ) {}
+public:
+  const T_Child& return_child_ref( size_t i ) const {
+  }
+private:
+  const T_Parent* parent_ptr_;
+};
+
+//template < > const FragmentGroupInfo<1>& Interface< FragmentSignatureDataBase, FragmentGroupInfo<1>, 1> :: return_child_ref( size_t i ) const {
+// if( i == 1 ) return parent_ptr_->set_child_one_ref();
+//}
+
 struct FragmentSignatureDataBase {
 public:
   typedef iquads :: electron_correlation :: Setting electron_calc_setting_type;
@@ -46,40 +61,41 @@ public:
   typedef FragmentGroupInfo<2> dimer_signature_database_type;
   typedef FragmentGroupInfo<3> trimer_signature_database_type;
   typedef FragmentGroupInfo<4> tetramer_signature_database_type;
-  std :: tuple < std :: string, iquads :: structure :: MolecularLattice > lattice_info_type;
+  typedef std :: tuple < monomer_signature_database_type, dimer_signature_database_type, trimer_signature_database_type, tetramer_signature_database_type > database_set_type;
+  typedef std :: tuple < std :: string, iquads :: structure :: MolecularLattice > lattice_info_type;
 
 public:
   void build( lattice_info_type lattice_info, double radius, electron_calc_setting_type setting ) {
-    this->monomer_signature_database_.build( lattice_info, radius, setting );
-    this->dimer_signature_database_.build( lattice_info, radius, setting );
-    this->trimer_signature_database_.build( lattice_info, radius, setting );
-    this->tetramer_signature_database_.build( lattice_info, radius, setting );
+    std :: get<0> ( this->database_set_ ).build( lattice_info, radius, setting );
+    std :: get<1> ( this->database_set_ ).build( lattice_info, radius, setting );
+//    std :: get<2> ( this->database_set_ ).build( lattice_info, radius, setting );
+//    std :: get<3> ( this->database_set_ ).build( lattice_info, radius, setting );
   }
-  template < size_t NUM > PolymerReport<NUM> get_report_by_lattice_index( std :: array< lattice_index_type, NUM > lattice_index ) {
-    const FragmentGroupInfo<NUM>& data_ref = this->fetch_database_reference<NUM>();
+  template < size_t NUM > PolymerReport<NUM> get_report_by_lattice_index( std :: array< lattice_index_type, NUM > lattice_index ) const {
+
+    //Interface< FragmentSignatureDataBase, FragmentGroupInfo<NUM>, NUM > interface_class(this);
+    // Interesting! no matter how I tried, there is no way to use this template to call individual database using different function names;
+    // One way is to use storage-address-to-type conversion, such as tuple
+    // The other way is to use out-of-class-scope explicit specialization, static and non-static both work, but pay attention to the c-v qualifier for this function
+    const FragmentGroupInfo<NUM>& data_ref = std :: get<NUM-1> ( this->database_set_ );
     PolymerReport<NUM> report = data_ref.get_report_by_lattice_index( lattice_index );
+    return report;
   }
 
-private:
-  template < size_t NUM > const FragmentGroupInfo<NUM>& fetch_database_reference() {
-    return 0;
-  }
-  template <> const FragmentGroupInfo<1>& fetch_database_reference<1>() 
-    { return this->monomer_signature_database_; }
-  template <> const FragmentGroupInfo<2>& fetch_database_reference<2>() 
-    { return this->dimer_signature_database_; }
-  template <> const FragmentGroupInfo<3>& fetch_database_reference<3>() 
-    { return this->trimer_signature_database_; }
-  template <> const FragmentGroupInfo<4>& fetch_database_reference<4>() 
-    { return this->tetramer_signature_database_; }
+public:
+  database_set_type& set_database_set()
+    { return this->database_set_; }
+  const database_set_type& set_database_set() const
+    { return this->database_set_; }
 
 private:
-  monomer_signature_database_type monomer_signature_database_;
-  dimer_signature_database_type dimer_signature_database_;
-  trimer_signature_database_type trimer_signature_database_;
-  tetramer_signature_database_type tetramer_signature_database_;
+  database_set_type database_set_;
 
-};
+}; // end of struct FragmentSignatureDataBase
+
+// just a test
+// template <> PolymerReport<1> FragmentSignatureDataBase :: get_report_by_lattice_index( std :: array< lattice_index_type, 1 > lattice_index ) const {
+// }
 
 } // end of namespace manybody_expansion
 

@@ -29,8 +29,8 @@
 
 namespace iquads {
 
-  #define STACK_DOUBLE_DIM     512
-  #define STACK_DOUBLE_LIMIT   262144
+  #define STACK_DOUBLE_DIM     32
+  #define STACK_DOUBLE_LIMIT   1024
 
 }
 

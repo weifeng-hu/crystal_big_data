@@ -86,10 +86,9 @@ public:
   typedef ExpansionFormulaGeneral<Order>  expansion_formula_type;
   typedef Config                          config_type;
   typedef Report                          report_type;
-  typedef double   energy_data_type;
-  typedef bool     condition_type;
-
-  typedef report_type& report_ref;
+  typedef double                          energy_data_type;
+  typedef bool                            condition_type;
+  typedef report_type&                    report_ref;
 
 public:
   energy_data_type
@@ -101,23 +100,21 @@ private:
 
 }; // end of template class manybody_expansion_general
 
-
   /**
    *  Templated class ManyBodyExpansionPeriodic
    *  for periodic calculations
    */
-template < size_t Order >  class ManyBodyExpansionPeriodic {
+template < size_t Order > class ManyBodyExpansionPeriodic {
 public:
-  typedef FragmentSignatureDataBase        fragment_signature_database_type;
-  typedef ExpansionFormulaPeriodic<Order>  expansion_formula_type;
+  typedef FragmentSignatureDataBase                                  fragment_signature_database_type;
+  typedef ExpansionFormulaPeriodic<Order>                            expansion_formula_type;
   typedef ExpansionFormulaPeriodicWithFragmentIdentification<Order>  expansion_with_fragment_identif_formula_type;
-  typedef Config                           config_type;
-  typedef iquads :: electron_correlation :: Setting electron_calc_setting_type;
-  typedef Report                           report_type;
-  typedef double                           energy_data_type;
-  typedef bool                             condition_type;
-
-  typedef report_type& report_ref;
+  typedef Config                                                     config_type;
+  typedef iquads :: electron_correlation :: Setting                  electron_calc_setting_type;
+  typedef Report                                                     report_type;
+  typedef double                                                     energy_data_type;
+  typedef bool                                                       condition_type;
+  typedef report_type&                                               report_ref;
 
 public:
   energy_data_type 
@@ -125,11 +122,10 @@ public:
     { return this->expansion_formula_.compute( config, report ); }
 
   energy_data_type
-  compute_lattice_energy_per_unit_cell_with_identical_fragment_detection( config_type config, report_ref report ) {
-    double radius = 999;
+  compute_lattice_energy_per_unit_cell_with_fragment_identification( config_type config, report_ref report ) {
     electron_calc_setting_type setting;
     setting.generate_from( config );
-    this->fragment_signature_database_.build( config_type.lattice_info(), radius, setting );
+    this->fragment_signature_database_.build( config.lattice_info(), config.radius(), setting );
     return this->expansion_formula_with_fragment_identification_.compute( config, this->fragment_signature_database_, report );
   }
 
@@ -138,9 +134,9 @@ public:
     { return this->fragment_signature_database_; }
 
 private:
-  expansion_formula_type expansion_formula_;
-  expansion_with_fragment_identif_formula_type expansion_formula_with_fragment_identification_;
-  fragment_signature_database_type fragment_signature_database_;
+  expansion_formula_type                        expansion_formula_;
+  expansion_with_fragment_identif_formula_type  expansion_formula_with_fragment_identification_;
+  fragment_signature_database_type              fragment_signature_database_;
 
 };// end of template class ManyBodyExpansionPeriodic
 

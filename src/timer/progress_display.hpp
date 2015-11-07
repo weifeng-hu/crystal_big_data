@@ -30,6 +30,7 @@
 #include <vector>
 #include <array>
 #include <iostream>
+#include <algorithm>
 
 namespace iquads {
 
@@ -40,24 +41,24 @@ public:
   typedef ProgressDisplay this_type;
 
 public:
-  ProgressDisplay( size_t total_step ) {
+  ProgressDisplay( size_t total_step ) : n_tic_ ( 50 ) {
     this->current_step_ = 0;
     this->total_step_   = total_step;
-    this->n_tic_ = 50;
-    std :: cout << "|----|----|----|----|----|----|----|----|----|----|" << std :: endl;
+    //std :: cout << "|----|----|----|----|----|----|----|----|----|----|" << std :: endl << std :: flush;
+    this->setup_roadstone();
   };
-  ProgressDisplay( std :: string event_name, size_t total_step ) {
+  ProgressDisplay( std :: string event_name, size_t total_step ) : n_tic_( 50 ) {
     this->current_step_ = 0;
     this->total_step_   = total_step;
-    this->n_tic_ = 50;
     std :: cout << event_name << std :: endl;
-    std :: cout << "|----|----|----|----|----|----|----|----|----|----|" << std :: endl;
+    //std :: cout << "|----|----|----|----|----|----|----|----|----|----|" << std :: endl << std :: flush;
+    this->setup_roadstone();
   };
 
 public:
   this_type& operator++() {
     this->current_step_ += 1;
-    this->update_progress_bar();
+    if( std :: find( this->roadstone_.begin(), this->roadstone_.end(), this->current_step_ ) != this->roadstone_.end() ) { this->update_progress_bar(); }
     return *this;
   }
   this_type operator++( int ) {
@@ -67,18 +68,29 @@ public:
   }
 
 private:
-  void update_progress_bar() {
-    int number_of_tics_to_show = (int) ( ( double )( current_step_/total_step_ ) * 50.0e0 );
-    std :: cout << "\r";
-    for( int i = 0; i < number_of_tics_to_show; i++ ) {
-      std :: cout << "*";
+  void setup_roadstone() {
+    this->roadstone_.resize( this->n_tic_ );
+    for( size_t i = 0; i < this->n_tic_; i++ ) {
+      this->roadstone_.at(i) = (int) ( (double)( this->total_step_ ) * (double)( i + 1 ) / (double)( this->n_tic_ ) );
     }
+  }
+  void update_progress_bar() {
+    int number_of_tics_to_show = (int) ( ( double )( this->current_step_ )/ (double) ( this->total_step_ ) * (double)(this->n_tic_) );
+    std :: cout << "\r" << std :: flush;
+    for( int i = 0; i < number_of_tics_to_show; i++ ) {
+      std :: cout << ">" << std :: flush;
+    }
+    for( int i = number_of_tics_to_show; i < this->n_tic_; i++ ) {
+      std :: cout << " " << std :: flush;
+    }
+    std :: cout << "  " << (int)( (double)( this->current_step_ )/ (double)(this->total_step_ ) * 100.0e0 ) << "%" << std :: flush;
     if( current_step_ == this->total_step_ ) {
-      std :: cout << "*" << std :: endl;
+      std :: cout << " " << std :: endl << std :: flush;
     }
   }
 
 private:
+  std :: vector< int > roadstone_;
   size_t current_step_;
   size_t total_step_;
   const size_t n_tic_;

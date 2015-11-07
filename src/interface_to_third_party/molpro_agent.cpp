@@ -286,7 +286,7 @@ agent_type :: collect_energy_data_from_output( correlation_tag_type correlation_
   // get the energy value to a correlation
   double energy_data = this->read_energy( correlation_tag, output_path );
 
-  std :: cout << "\t" << std :: setw(16) << std :: setprecision(12) << energy_data;
+  //std :: cout << "\t" << std :: setw(16) << std :: setprecision(12) << energy_data;
 
   // also get the atom list and molecule name
   // molecule name is the filename, but without extension

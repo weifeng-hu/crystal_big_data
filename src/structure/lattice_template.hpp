@@ -256,6 +256,8 @@ public:
     }
   }
 
+  
+
   /**
    *  + operator()
    *    Returns a duplicate of the unit cell
@@ -328,6 +330,32 @@ public:
     { return this->interval_b_; }
   cell_interval_ref set_interval_c()
     { return this->interval_c_; }
+
+  std :: tuple< std :: tuple< int, int, int >, int > translate_index_to_lattice_node_index( int index_to_detect ) {
+    int index = 0;
+    for( int a = this->a_min(); a <= this->a_max(); a++ ) {
+      for( int b = this->b_min(); b <= this->b_max(); b++ ) {
+        for( int c = this->c_min(); c <= this->c_max(); c++ ) {
+          for( int i = 0; i < this->unit_cell_.size(); i++ ) {
+            if( index == index_to_detect ) {
+              return std :: make_tuple( std :: make_tuple( a, b, c), i );
+            } else {
+              index++;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  int translate_lattice_node_index_to_index( std :: tuple< std :: tuple< int, int, int >, int> lattice_index ) const {
+    int retval = 0;
+        retval += std :: get<1> ( lattice_index );
+        retval += std :: get<0> ( std :: get<0> ( lattice_index) ) * unit_cell_.size();
+        retval += std :: get<1> ( std :: get<0> ( lattice_index) ) * unit_cell_.size() * nc();
+        retval += std :: get<2> ( std :: get<0> ( lattice_index) ) * unit_cell_.size() * nc() * nb();
+    return retval;
+  }
 
 private:
   UnitCell_Type unit_cell_;

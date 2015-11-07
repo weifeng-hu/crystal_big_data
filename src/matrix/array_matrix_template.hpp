@@ -61,6 +61,10 @@ namespace matrix {
 
 template< class T > struct ArrayMatrix {
 public:
+  typedef std :: array< T, STACK_DOUBLE_LIMIT >  store_type;
+  typedef typename store_type :: iterator                 iterator_type;
+
+public:
   ArrayMatrix() {
     this->nrow_ = 0;
     this->ncol_ = 0;
@@ -68,18 +72,26 @@ public:
   ArrayMatrix( const VectorMatrix<T>& vector_matrix_obj ) {
     this->copy_from( vector_matrix_obj );
   }
+  ArrayMatrix( size_t nrow, size_t ncol ) {
+    if( nrow * ncol > STACK_DOUBLE_LIMIT ) {
+      std :: cout << "cannot initialize array matrix by nrow = " << nrow << " and ncol = " << ncol << ". too big!" << std :: endl;
+      abort();
+    }
+    this->nrow_ = nrow;
+    this->ncol_ = ncol;
+  }
 
 public:
   void copy_from( const VectorMatrix<T>& vector_matrix_obj ) {
     try {
-      const size_t obj_size = vector_matrix_obj.get_nelement();
+      const size_t obj_size = vector_matrix_obj.size();
       if( ( obj_size < STACK_DOUBLE_LIMIT ) == false ) {
         throw obj_size;
       }
       this->nrow_ = vector_matrix_obj.nrow();
       this->ncol_ = vector_matrix_obj.ncol();
-      std :: vector<T> temp_store = vector_matrix_obj.get_store();
-      std :: copy_n( temp_store.begin(), obj_size, this->store.begin() );
+      std :: vector<T> temp_store = vector_matrix_obj.store();
+      std :: copy_n( temp_store.begin(), obj_size, this->store_.begin() );
     }
     catch( size_t n ) {
       std :: cout << " array load exception: " << n << " >= " << STACK_DOUBLE_LIMIT << std :: endl;
@@ -92,7 +104,7 @@ public:
     const size_t length = this->nrow_ * this->ncol_;
     std :: vector<T> temp_store;
     temp_store.resize(length);
-    std :: copy_n( this->store.begin(), length, temp_store.begin() );
+    std :: copy_n( this->store_.begin(), length, temp_store.begin() );
     vector_matrix_obj.set_store() = std :: move( temp_store );
   }
  
@@ -116,7 +128,7 @@ public:
     { return this->store_; } 
 
   friend 
-  ostream& operator<< ( ostream& os, const array_matrix_base<T>& matrix_obj ) {
+  std :: ostream& operator<< ( std :: ostream& os, const ArrayMatrix<T>& matrix_obj ) {
     for( size_t irow = 0; irow < matrix_obj.nrow(); irow++ ) {
       for( size_t icol = 0; icol < matrix_obj.ncol(); icol++ ) {
         const T element = matrix_obj( irow, icol );
@@ -127,7 +139,7 @@ public:
   }
 
 private:
-  array< T, STACK_DOUBLE_LIMIT > store_;
+  std :: array< T, STACK_DOUBLE_LIMIT > store_;
   size_t nrow_, ncol_;
 
 }; // end of template struct ArrayMatrix

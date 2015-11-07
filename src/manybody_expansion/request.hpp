@@ -81,6 +81,8 @@ using std :: get;
 using structure :: MolecularLattice;
 using structure :: MolecularBulk;
 
+enum ProductionMode { TEST, PRODUCTION };
+
 struct Request {
 public:
   typedef string                                     lattice_name_type;
@@ -117,6 +119,8 @@ public:
       this->input_name_ = "not set";
       this->scratch_name_ = "not set";
       this->output_name_ = "not set";
+      this->radius_ = 1.0e4;
+      this->production_mode_ = TEST;
     }
   /**
    *  We allow an initialize list constructor if user wants to initiate a calculation directly from code
@@ -131,7 +135,9 @@ public:
            job_name_type job_name_value,
            path_name_type input_path,
            path_name_type scratch_path,
-           path_name_type output_path ) :
+           path_name_type output_path,
+           double radius,
+           ProductionMode production_mode ) :
      lattice_info_ ( lattice_info_obj ), bulk_info_ ( bulk_info_obj ),
      expansion_order_ ( expansion_order_value ),
      correlation_name_ ( correlation_name_value ),
@@ -141,7 +147,9 @@ public:
      job_name_ ( job_name_value ),
      input_name_ ( input_path ),
      scratch_name_ ( scratch_path ),
-     output_name_ ( output_path ) { }
+     output_name_ ( output_path ),
+     radius_ ( radius ),
+     production_mode_ ( production_mode ) { }
 
 public:
   /**
@@ -177,6 +185,10 @@ public:
     { return this->scratch_name_; }
   run_mode_name_type run_mode_name() const
     { return this->run_mode_name_; }
+  double radius() const 
+    { return this->radius_; }
+  ProductionMode production_mode() const
+    { return this->production_mode_; }
 
   /**
    *  Mutators - none
@@ -195,6 +207,8 @@ private:
   path_name_type               input_name_;
   path_name_type               scratch_name_;
   path_name_type               output_name_;
+  double                       radius_;
+  ProductionMode               production_mode_;
 
 }; // end of struct Request
 

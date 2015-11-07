@@ -1,26 +1,75 @@
-SHELL	= /bin/sh
-CXX	= g++
-FC	= gfortran
-CXXFLAGS= -O3
-FCFLAGS = -O3
-CSRCS	= blas_interface.cpp
-COBJS	= $(CSRCS:.cpp=.o)
-FSRCS	= mat_x_mat.f symdiag.f ax_b.f
-FOBJS	= $(FSRCS:.f=.o)
-HEAD	= blas_interface.h
-INCLUDE = -I./ 
-AR	= lib_blas_interface.a
+iquads_root	= $(DEV_ROOT)/iquads/
+iquads_src	= $(iquads_root)/src/
+iquads_bin	= $(iquads_root)/bin/
 
-$(AR):	$(COBJS) $(FOBJS)
-	ar -r $(AR) $(COBJS) $(FOBJS)
+cc_blas		= gcc
+cpp_blas	= g++
+fc_blas		= gfortran -m64
+ar_blas		= ar -r 
 
-.SUFFIXES: .cpp .f .o
+cflags_blas	= -I$(iquads_src) -I/usr/include
+cppflags_blas	= -std=c++11 -I$(iquads_src) -I/usr/include
+cppopt_blas	= 
+fopt_blas	=
 
-.cpp.o:
-	$(CXX) -c $(CXXFLAGS) $<
+cppheads_blas	= $(iquads_src)/blas/blas_interface.h
 
-.f.o:
-	$(FC) -c $(FCFLAGS) $<
+cppsrcs_blas	= $(iquads_src)/blas/blas_interface.cpp
 
-clean:
-	rm *.o; rm lib_blas_interface.a
+fsrcs_blas	= $(iquads_src)/blas/ax_b.f\
+		  $(iquads_src)/blas/mat_x_mat.f\
+		  $(iquads_src)/blas/symdiag.f
+		  
+cppobjs_blas	= $(cppsrcs_blas:.cpp=.o)
+fobjs_blas	= $(fsrcs_blas:.f=.o)
+
+target_blas	= $(iquads_src)/blas/libiquads_blas_interface.a
+
+#all_blas: release_blas
+
+debug_blas:   cppopt_blas += -g -O0\
+	  -Wextra -Wcast-align \
+	  -Wdisabled-optimization \
+	  -Wfloat-equal -Wformat=2 \
+	  -Wformat-nonliteral -Wformat-security  \
+	  -Wformat-y2k \
+	  -Wimport  -Winit-self  -Winline \
+	  -Winvalid-pch   \
+	  -Wmissing-field-initializers -Wmissing-format-attribute   \
+	  -Wmissing-include-dirs -Wmissing-noreturn \
+	  -Wpacked  -Wpointer-arith \
+	  -Wredundant-decls \
+	  -Wstack-protector \
+	  -Wstrict-aliasing=2 -Wswitch-default \
+	  -Wswitch-enum \
+	  -Wunreachable-code \
+	  -Wvariadic-macros \
+	  -Wwrite-strings
+debug_blas: fc_blas += -g -O0
+debug_blas: target_blas
+
+clean_blas:
+	rm $(iquads_src)/blas/*.o; rm $(target_blas)
+
+release_blas: cppopt_blas +=  -O3 
+release_blas: fopt_blas   +=  -O3
+release_blas: target_blas
+
+standalone_blas: cppopt_blas += -static 
+#standalone: we don't have static libary of boost ...
+standalone_blas: target
+
+target_blas:	$(cppobjs_blas) $(fobjs_blas)
+	$(ar_blas) $(target_blas) $(cppobjs_blas) $(fobjs_blas)
+
+$(iquads_src)/blas/blas_interface.o: $(iquads_src)/blas/blas_interface.cpp
+	$(cpp_blas) -o $(iquads_src)/blas/blas_interface.o -c $(cppopt_blas) $(cppflags_blas) $(iquads_src)/blas/blas_interface.cpp
+
+$(iquads_src)/blas/ax_b.o: $(iquads_src)/blas/ax_b.f
+	$(fc_blas) -o $(iquads_src)/blas/ax_b.o -c $(fopt_blas) $(iquads_src)/blas/ax_b.f
+
+$(iquads_src)/blas/mat_x_mat.o: $(iquads_src)/blas/mat_x_mat.f
+	$(fc_blas) -o $(iquads_src)/blas/mat_x_mat.o -c $(fopt_blas) $(iquads_src)/blas/mat_x_mat.f
+
+$(iquads_src)/blas/symdiag.o: $(iquads_src)/blas/symdiag.f
+	$(fc_blas) -o $(iquads_src)/blas/symdiag.o -c $(fopt_blas) $(iquads_src)/blas/symdiag.f

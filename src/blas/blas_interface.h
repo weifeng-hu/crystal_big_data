@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef BLAS_INTERFACE
-#define BLAS_INTERFACE
+#ifndef BLAS_INTERFACE_H
+#define BLAS_INTERFACE_H
 
 void ax_b( const double* a, const double* b, const double* x, const int dimen );
 void mat_x_mat( const double* a, const double* b, double* c, const double coeff, const int nrow_a, const int ncol_a, const int nrow_b, const int ncol_b, const bool transa, const bool transb );

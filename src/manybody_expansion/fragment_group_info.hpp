@@ -37,8 +37,8 @@
 #include <structure/bulk_instant.hpp>
 #include <electron_correlation/setting.hpp>
 #include <manybody_expansion/polymer_report_template.hpp>
-#include <manybody_expansion/fragment_info.hpp>
-#include <manybody_expansion/fragment_signature_identifier.hpp>
+#include <manybody_expansion/fragment_info_template.hpp>
+#include <manybody_expansion/fragment_signature_identifier_template.hpp>
 
 namespace iquads {
 
@@ -76,14 +76,16 @@ public:
   }
 
 public:
-  PolymerReport<NUM> get_report_by_lattice_index( std :: array< lattice_index_type, NUM > lattice_indices ) {
+  PolymerReport<NUM> get_report_by_lattice_index( std :: array< lattice_index_type, NUM > lattice_indices ) const {
     for( size_t ifragment_info = 0; ifragment_info < this->fragment_info_list_.size(); ifragment_info++ ) {
-      const fragment_info_type fragment_info_local = fragment_info_list_[ifragment_info];
+      fragment_info_type fragment_info_local = fragment_info_list_[ifragment_info];
       if( fragment_info_local.has_fragment_with_lattice_indices( lattice_indices ) == true ) {
         PolymerReport<NUM> retobj = fragment_info_local.polymer_report();
         return retobj;
       }
     }
+    std :: cout << " polymer not found " << std :: endl;
+    abort();
   }
 
 public:
@@ -120,9 +122,9 @@ public:
 
 public:
   friend 
-  std :: ostream& operator<< ( std :: ostream& os, const fragment_group_info& fragment_group_obj ) {
-    std :: ostream << "Number of fragment types: " << this->size() << std :: endl;
-    for( size_t itype = 0; itype < this->size(); itype++ ) {
+  std :: ostream& operator<< ( std :: ostream& os, const fragment_info_list_type& fragment_group_obj ) {
+    os << "Number of fragment types: " << fragment_group_obj.size() << std :: endl;
+    for( size_t itype = 0; itype < fragment_group_obj.size(); itype++ ) {
       fragment_info_type fragment_info_local = fragment_group_obj[itype];
       os << fragment_info_local << std :: endl;
     }

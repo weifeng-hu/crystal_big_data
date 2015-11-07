@@ -73,6 +73,12 @@ public:
   typedef std :: tuple < molecule_name_type, molecule_obj_type >  molecule_info_type;
 
 public:
+  ExternalProgramReport() {
+    this->energy_local_run_report_list_.resize(0);
+    this->gradient_local_run_report_list_.resize(0);
+  }
+
+public:
   struct EnergyReport {
     public:
       typedef EnergyReport this_type;
@@ -80,6 +86,12 @@ public:
       typedef level_mask_type energy_solution_tag_type;
       typedef correlation_name_type energy_solution_name_type;
     public:
+      EnergyReport() {
+        molecule_obj_type molecule;
+        this->molecule_info_ = std :: make_tuple( std :: string(""), molecule );
+        this->energy_ = 0.0e0;
+        this->energy_solution_tag_ = 0;
+      }
       EnergyReport( molecule_info_type molecule_info_obj,
                     energy_data_type energy_data_value,
                     energy_solution_tag_type energy_solution_tag_value ) :
@@ -120,6 +132,14 @@ public:
       typedef iquads :: file_system :: Filepath file_path_type;
       typedef RuntimeInfo_Base base;
     public:
+      RuntimeInfo_Base() {
+        this->program_name_ = "";
+        this->input_dir_ = "";
+        this->input_filename_ = "";
+        this->scratch_dir_ = "";
+        this->output_dir_ = "";
+        this->output_filename_ = "";
+      }
       RuntimeInfo_Base( program_name_type program_name,
                         dir_name_type     input_directory,
                         file_name_type    input_filename,
@@ -148,6 +168,7 @@ public:
   }; // end of struct RuntimeInfo_Base
 
   struct LocalRunInfo : public RuntimeInfo_Base {
+    LocalRunInfo( ) : RuntimeInfo_Base() {}
     LocalRunInfo( program_name_type program_name,
                         dir_name_type input_directory,
                         file_name_type input_filename,
@@ -196,6 +217,10 @@ public:
   typedef tuple< gradient_bare_report_type, local_run_info_type > gradient_local_run_report_type;
 
 public:
+  void initialize() {
+    this->energy_local_run_report_list_.resize(0);
+    this->gradient_local_run_report_list_.resize(0);
+  }
   void accept_new_step_data( energy_local_run_report_type report )
     { this->energy_local_run_report_list_.push_back( report ); }
   void accept_new_step_data( gradient_local_run_report_type report )

@@ -61,13 +61,13 @@ template <> inline energy_data_type compute_interaction_energy_with_fragment_ide
   energy_data_type energy_monomer_0;
   std :: string molecule_name = std :: string ( polymer_name + std :: string( "_molecule" ) );
   PolymerReport<1> report_from_database = database.get_report_by_lattice_index<1>( x );
-  energy_monomer_0 = report_from_database.energy();
+  energy_monomer_0 = report_from_database.fragment_energy();
 
   PolymerReport<1> report_local( molecule_name, 
                                  report_from_database.atom_list(),
                                  report_from_database.geometry_unit(),
                                  report_from_database.composition_list(),
-                                 report_from_database.energy(),
+                                 report_from_database.fragment_energy(),
                                  0.0e0,
                                  report_from_database.electron_correlation_report(),
                                  report_from_database.external_program_report());
@@ -81,7 +81,7 @@ template <> inline energy_data_type compute_interaction_energy_with_fragment_ide
   energy_data_type energy_dimer_01;
   std :: string dimer_name = std :: string ( polymer_name + std :: string( "_moleculeAB" ) );
   PolymerReport<2> report_from_database = database.get_report_by_lattice_index<2>( x );
-  energy_dimer_01 = report_from_database.energy();
+  energy_dimer_01 = report_from_database.fragment_energy();
 
   std :: string monomer_name_1 = std :: string( polymer_name + std :: string( "_moleculeA" ) );
   std :: string monomer_name_2 = std :: string( polymer_name + std :: string( "_moleculeB" ) );
@@ -92,7 +92,7 @@ template <> inline energy_data_type compute_interaction_energy_with_fragment_ide
                                  report_from_database.atom_list(),
                                  report_from_database.geometry_unit(),
                                  report_from_database.composition_list(),
-                                 report_from_database.energy(),
+                                 report_from_database.fragment_energy(),
                                  energy_dimer_01 - energy_monomer_0 - energy_monomer_1,
                                  report_from_database.electron_correlation_report(),
                                  report_from_database.external_program_report() );
@@ -108,7 +108,7 @@ template <> inline energy_data_type compute_interaction_energy_with_fragment_ide
   energy_data_type energy_trimer_012;
   std :: string trimer_name = std :: string( polymer_name + std :: string( "_moleculeABC" ) );
   PolymerReport<3> report_from_database = database.get_report_by_lattice_index<3>( x );
-  energy_trimer_012 = report_from_database.energy();
+  energy_trimer_012 = report_from_database.fragment_energy();
 
   std :: string monomer_name_1 = std :: string( polymer_name + std :: string( "_moleculeA" ) );
   std :: string monomer_name_2 = std :: string( polymer_name + std :: string( "_moleculeB" ) );
@@ -132,7 +132,7 @@ template <> inline energy_data_type compute_interaction_energy_with_fragment_ide
                                  report_from_database.atom_list(),
                                  report_from_database.geometry_unit(),
                                  report_from_database.composition_list(),
-                                 report_from_database.energy(),
+                                 report_from_database.fragment_energy(),
                                  interaction_energy,
                                  report_from_database.electron_correlation_report(),
                                  report_from_database.external_program_report() );
@@ -149,7 +149,7 @@ template <> inline energy_data_type compute_interaction_energy_with_fragment_ide
   energy_data_type energy_tetramer_0123;
   std :: string tetramer_name = std :: string( polymer_name + std :: string( "_moleculeABCD" ) );
   PolymerReport<4> report_from_database = database.get_report_by_lattice_index<4>( x );
-  energy_tetramer_0123 = report_from_database.energy();
+  energy_tetramer_0123 = report_from_database.fragment_energy();
   
   std :: string monomer_name_1 = std :: string( polymer_name + std :: string( "_moleculeA" ) );
   std :: string monomer_name_2 = std :: string( polymer_name + std :: string( "_moleculeB" ) );
@@ -177,10 +177,10 @@ template <> inline energy_data_type compute_interaction_energy_with_fragment_ide
   std :: string trimer_name_2 = std :: string( polymer_name + std :: string( "_moleculeABD" ) );
   std :: string trimer_name_3 = std :: string( polymer_name + std :: string( "_moleculeACD" ) );
   std :: string trimer_name_4 = std :: string( polymer_name + std :: string( "_moleculeBCD" ) );
-  energy_data_type interaction_energy_trimer_012 = compute_interaction_energy_with_fragment_identification<3>( std :: array< lattice_index_type, 3 > { x[0] , x[1] , x[2] }, trimer_name_1, report.set_trimer_reports().at(0) );
-  energy_data_type interaction_energy_trimer_013 = compute_interaction_energy_with_fragment_identification<3>( std :: array< lattice_index_type, 3 > { x[0] , x[1] , x[3] }, trimer_name_2, report.set_trimer_reports().at(1) );
-  energy_data_type interaction_energy_trimer_023 = compute_interaction_energy_with_fragment_identification<3>( std :: array< lattice_index_type, 3 > { x[0] , x[2] , x[3] }, trimer_name_3, report.set_trimer_reports().at(2) );
-  energy_data_type interaction_energy_trimer_123 = compute_interaction_energy_with_fragment_identification<3>( std :: array< lattice_index_type, 3 > { x[1] , x[2] , x[3] }, trimer_name_4, report.set_trimer_reports().at(3) );
+  energy_data_type interaction_energy_trimer_012 = compute_interaction_energy_with_fragment_identification<3>( std :: array< lattice_index_type, 3 > { x[0] , x[1] , x[2] }, trimer_name_1, database, report.set_trimer_reports().at(0) );
+  energy_data_type interaction_energy_trimer_013 = compute_interaction_energy_with_fragment_identification<3>( std :: array< lattice_index_type, 3 > { x[0] , x[1] , x[3] }, trimer_name_2, database, report.set_trimer_reports().at(1) );
+  energy_data_type interaction_energy_trimer_023 = compute_interaction_energy_with_fragment_identification<3>( std :: array< lattice_index_type, 3 > { x[0] , x[2] , x[3] }, trimer_name_3, database, report.set_trimer_reports().at(2) );
+  energy_data_type interaction_energy_trimer_123 = compute_interaction_energy_with_fragment_identification<3>( std :: array< lattice_index_type, 3 > { x[1] , x[2] , x[3] }, trimer_name_4, database, report.set_trimer_reports().at(3) );
 
   energy_data_type interaction_energy =  energy_tetramer_0123 -
                                          energy_monomer_0 - energy_monomer_1 - energy_monomer_2 - energy_monomer_3 -
@@ -194,7 +194,7 @@ template <> inline energy_data_type compute_interaction_energy_with_fragment_ide
                                  report_from_database.atom_list(),
                                  report_from_database.geometry_unit(),
                                  report_from_database.composition_list(),
-                                 report_from_database.energy(),
+                                 report_from_database.fragment_energy(),
                                  interaction_energy,
                                  report_from_database.electron_correlation_report() ,
                                  report_from_database.external_program_report() );

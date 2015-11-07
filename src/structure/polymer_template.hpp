@@ -258,6 +258,7 @@ public:
    */
   double mean_distance_by_center() {
     double retval = 0.0e0;
+    if( NUM == 1 ) return 0.0e0;
     int count = 0;
     for( size_t imolecule = 0; imolecule < NUM; imolecule++ ) {
       coordinate_type coord_i = this->molecule_list_[imolecule].center();
@@ -267,7 +268,7 @@ public:
         count = count + 1;
       }
     }
-    retval = retval/count;
+    retval = retval/(double)( count );
     return retval;
   }
 
@@ -277,16 +278,17 @@ public:
    */
   double mean_distance_by_center_of_mass() {
     double retval = 0.0e0;
+    if( NUM == 1 ) return 0.0e0;
     int count = 0;
     for( size_t imolecule = 0; imolecule < NUM; imolecule++ ){
       coordinate_type coord_i = this->molecule_list_[imolecule].center_of_mass();
-      for( size_t jmolecule = imolecule+1; jmolecule < this->NUM; jmolecule++ ){
-        coordinate_type coord_j = this->molecule_list_[imolecule].center_of_mass();
+      for( size_t jmolecule = imolecule+1; jmolecule < NUM; jmolecule++ ){
+        coordinate_type coord_j = this->molecule_list_[jmolecule].center_of_mass();
         retval += compute_distance( coord_i, coord_j );
         count = count + 1;
       }
     }
-    retval = retval/count;
+    retval = retval/(double)( count );
     return retval;
   }
 
@@ -300,7 +302,6 @@ private:
   molecule_list_type molecule_list_;
 
 }; // end of template class Polymer
-
 
 /**
  *  These are auxiliary functions 

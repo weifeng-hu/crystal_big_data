@@ -69,9 +69,13 @@ mbe_agent_type :: setup_config_from_request( request_type request ) {
   /**
    *  Step 2
    *  + set expansion order 
+   *  + and cut off radius
    */
   using order :: return_order_mask;
   config.set_expansion_order() = return_order_mask( request.expansion_order() );
+  config.set_radius() = request.radius();
+  if( request.production_mode() == TEST ) { config.set_use_fragment_identifier() = false; }
+  if( request.production_mode() == PRODUCTION ) { config.set_use_fragment_identifier() = true; }
 
   /**
    *  Step 2
@@ -131,7 +135,7 @@ mbe_agent_type :: setup_config_from_request( request_type request ) {
 
   using iquads :: sequence :: mode :: return_mode_mask;
   config.set_run_mode() = return_mode_mask( request.run_mode_name() );
-  std :: cout << config.run_mode() << std :: endl;
+  //std :: cout << config.run_mode() << std :: endl;
 
   return config;
 
@@ -142,42 +146,80 @@ void mbe_agent_type :: execute_periodic( config_type config, report_ref report )
 
   using std :: cout;
   using std :: endl;
-  cout << " Compute lattice energy using the periodic MBE formula" << endl;
+  cout << "Compute lattice energy using the periodic MBE formula" << endl;
 
   try {
-    switch ( config.expansion_order() ) {
-      /**
-       *  The runtime choice of different orders of many body expansion
-       *  relies on explicit instantiation of different orders of actual
-       *  many body expansion formulism.
-       */
-      case ( order :: FIRST_ORDER ):
-        {
-          ManyBodyExpansionPeriodic<1> manybody_expansion_periodic;
-          manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( config, report );
-        }
-        break;
-      case ( order :: SECOND_ORDER ):
-        {
-          ManyBodyExpansionPeriodic<2> manybody_expansion_periodic;
-          manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( config, report );
-        }
-        break;
-      case ( order :: THIRD_ORDER ):
-        {
-          ManyBodyExpansionPeriodic<3> manybody_expansion_periodic;
-          manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( config, report );
-        }
-        break;
-      case ( order :: FOURTH_ORDER ):
-        {
-          ManyBodyExpansionPeriodic<4> manybody_expansion_periodic;
-          manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( config, report );
-        }
-        break;
-      default:
-        throw( config.expansion_order() );
-        break;
+    if( config.use_fragment_identifier() == false ) {
+      switch ( config.expansion_order() ) {
+        /**
+         *  The runtime choice of different orders of many body expansion
+         *  relies on explicit instantiation of different orders of actual
+         *  many body expansion formulism.
+         */
+        case ( order :: FIRST_ORDER ):
+          {
+            ManyBodyExpansionPeriodic<1> manybody_expansion_periodic;
+            manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( config, report );
+          }
+          break;
+        case ( order :: SECOND_ORDER ):
+          {
+            ManyBodyExpansionPeriodic<2> manybody_expansion_periodic;
+            manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( config, report );
+          }
+          break;
+        case ( order :: THIRD_ORDER ):
+          {
+            ManyBodyExpansionPeriodic<3> manybody_expansion_periodic;
+            manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( config, report );
+          }
+          break;
+        case ( order :: FOURTH_ORDER ):
+          {
+            ManyBodyExpansionPeriodic<4> manybody_expansion_periodic;
+            manybody_expansion_periodic.compute_lattice_energy_per_unit_cell( config, report );
+          }
+          break;
+        default:
+          throw( config.expansion_order() );
+          break;
+      }
+    }
+    else {
+      switch ( config.expansion_order() ) {
+        /**
+         *  The runtime choice of different orders of many body expansion
+         *  relies on explicit instantiation of different orders of actual
+         *  many body expansion formulism.
+         */
+        case ( order :: FIRST_ORDER ):
+          {
+            ManyBodyExpansionPeriodic<1> manybody_expansion_periodic;
+            manybody_expansion_periodic.compute_lattice_energy_per_unit_cell_with_fragment_identification( config, report );
+          }
+          break;
+        case ( order :: SECOND_ORDER ):
+          {
+            ManyBodyExpansionPeriodic<2> manybody_expansion_periodic;
+            manybody_expansion_periodic.compute_lattice_energy_per_unit_cell_with_fragment_identification( config, report );
+          }
+          break;
+        case ( order :: THIRD_ORDER ):
+          {
+            ManyBodyExpansionPeriodic<3> manybody_expansion_periodic;
+            manybody_expansion_periodic.compute_lattice_energy_per_unit_cell_with_fragment_identification( config, report );
+          }
+          break;
+        case ( order :: FOURTH_ORDER ):
+          {
+            ManyBodyExpansionPeriodic<4> manybody_expansion_periodic;
+            manybody_expansion_periodic.compute_lattice_energy_per_unit_cell_with_fragment_identification( config, report );
+          }
+          break;
+        default:
+          throw( config.expansion_order() );
+          break;
+      }
     }
   }
   catch ( config_type :: expansion_order_type order ) {

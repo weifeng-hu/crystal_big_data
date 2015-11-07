@@ -1,58 +1,66 @@
-DEBUG := YES
+iquads_root	= $(DEV_ROOT)/iquads/
+iquads_src	= $(iquads_root)/src/
+iquads_bin	= $(iquads_root)/bin/
 
-CXX	= g++ 
-FC	= gfortran -g
-HEADS	= square_matrix.h general_matrix.h functions.h mo_coeff.h one_electron_integral.h\
-	  compressed_matrix.h
-CSRCS	= general_matrix.cpp square_matrix.cpp transform.cpp \
-	  compressed_matrix.cpp
-FSRCS	= OEI_TRANSFORM.f EIGTQL2.f TEI_TRANSFORM.f
-COBJS	= $(CSRCS:.cpp=.o)
-FOBJS	= $(FSRCS:.f=.o)
-INCLUDE	= -I../ -I./ 
-AR	= libmatrix.a
-#LIBS	= -L/home/intel/composerxe/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core
-#LIBS	= -lapack -lblas
+cc_matrix	= gcc
+cpp_matrix	= g++
+ar_matrix	= ar -r 
 
-ifeq ($(DEBUG), YES)
-  CFLAG =	-g  -DUSE_DBG
-else
-  CFLAG =
-endif
+cflags_matrix	= -I$(iquads_src) -I/usr/include
+cppflags_matrix	= -std=c++11 -I$(iquads_src) -I/usr/include
+cppopt_matrix	= 
 
+cppheads_matrix	= $(iquads_src)/matrix/array_matrix_template.hpp\
+		  $(iquads_src)/matrix/array_matrix_instant.hpp\
+		  $(iquads_src)/matrix/vector_matrix_template.hpp\
+		  $(iquads_src)/matrix/vector_matrix_instant.hpp\
+		  $(iquads_src)/matrix/matrix_typedef.hpp\
+		  $(iquads_src)/matrix/matrix_function.hpp
 
-$(AR):	$(COBJS) $(FOBJS)
-	ar -r  $(AR) $(COBJS) $(FOBJS)
+cppsrcs_matrix	= $(iquads_src)/matrix/matrix_function.cpp
+		  
+cppobjs_matrix	= $(cppsrcs_matrix:.cpp=.o)\
 
-compressed_matrix.o:	compressed_matrix.cpp compressed_matrix.h
-	$(CXX) -c $(CFLAG) $(INCLUDE) compressed_matrix.cpp
+target_matrix	= $(iquads_src)/matrix/libiquads_matrix.a
 
-general_matrix.o:	general_matrix.h general_matrix.cpp
-	$(CXX) -c $(CFLAG) $(INCLUDE) general_matrix.cpp
+all_matrix: release_matrix
 
-square_matrix.o:	square_matrix.h	square_matrix.cpp
-	$(CXX) -c $(CFLAG) $(INCLUDE) square_matrix.cpp
+debug_matrix: 	cppopt_matrix += -g -O0\
+		  -Wextra -Wcast-align \
+		  -Wdisabled-optimization \
+		  -Wfloat-equal -Wformat=2 \
+		  -Wformat-nonliteral -Wformat-security  \
+		  -Wformat-y2k \
+		  -Wimport  -Winit-self  -Winline \
+		  -Winvalid-pch   \
+		  -Wmissing-field-initializers -Wmissing-format-attribute   \
+		  -Wmissing-include-dirs -Wmissing-noreturn \
+		  -Wpacked  -Wpointer-arith \
+		  -Wredundant-decls \
+		  -Wstack-protector \
+		  -Wstrict-aliasing=2 -Wswitch-default \
+		  -Wswitch-enum \
+		  -Wunreachable-code \
+		  -Wvariadic-macros \
+		  -Wwrite-strings
+debug_matrix: target_matrix
 
-functions.o:		general_matrix.h functions.h functions.cpp
-	$(CXX) -c $(CFLAG) $(INCLUDE) functions.cpp
+ass:
+	$(cpp_matrix)  -c -O3 $(cppopt_matrix) -g -Wa,-ahl $(cppflags_matrix) $(iquads_src)/matrix/matrix_function.cpp > $(iquads_src)/matrix/matrix_function.s
 
-#two_electron_integral.o: two_electron_integral.cpp
-#	$(CXX) -c $(CFLAG) $(INCLUDE) two_electron_integral.cpp
+release_matrix: cppopt_matrix +=  -O3
+release_matrix: target_matrix
 
-#read_integral.o:	two_electron_integral.h read_integral.cpp
-#	$(CXX) -c $(CFLAG) $(INCLUDE) read_integral.cpp
+standalone_matrix: cppopt_matrix += -static
+#standalone: we don't have static libary of boost ...
+standalone_matrix: target_matrix
 
-OEI_TRANSFORM.o:	OEI_TRANSFORM.f
-	$(FC) -c OEI_TRANSFORM.f
+clean_matrix:
+	rm $(iquads_src)/matrix/*.o; rm $(target_matrix)
 
-TEI_TRANSFORM.o:	TEI_TRANSFORM.f
-	$(FC) -c TEI_TRANSFORM.f
+target_matrix:	$(cppobjs_matrix)
+	$(ar_matrix) $(target_matrix) $(cppobjs_matrix)
 
-EIGTQL2.o:	EIGTQL2.f
-	$(FC) -c EIGTQL2.f
+$(iquads_src)/matrix/matrix_function.o: $(iquads_src)/matrix/matrix_function.cpp
+	$(cpp_matrix) -o $(iquads_src)/matrix/matrix_function.o -c $(cppopt_matrix) $(cppflags_matrix) $(iquads_src)/matrix/matrix_function.cpp
 
-transform.o:	square_matrix.h	transform.cpp
-	$(CXX) -c $(CFLAG) $(INCLUDE) transform.cpp
-
-clean:
-	rm *.o; rm libmatrix.a

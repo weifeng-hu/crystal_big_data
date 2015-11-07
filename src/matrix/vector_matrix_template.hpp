@@ -55,7 +55,7 @@ public:
     this->ncol_ = 0;
   }
   VectorMatrix( size_t nrow, size_t ncol ) {
-    this->resize( new_nrow, new_ncol );
+    this->resize( nrow, ncol );
     std :: fill( this->store_.begin(), this->store_.end(), 0.0 );
   }
 
@@ -81,7 +81,7 @@ public:
     return this->at( i, j );
   }
   friend 
-  ostream& operator<< ( ostream& os, const VectorMatrix<T>& matrix_obj ){
+  std :: ostream& operator<< ( std :: ostream& os, const VectorMatrix<T>& matrix_obj ){
     for( size_t irow = 0; irow < matrix_obj.nrow(); irow++ ) {
       for( size_t icol = 0; icol < matrix_obj.ncol(); icol++ ) {
         const T element = matrix_obj( irow, icol );
@@ -90,9 +90,11 @@ public:
     }
     return os;
   }
+  std :: vector<T> store() const 
+    { return this->store_; }
 
 private:
-  vector<T> store_;
+  std :: vector<T> store_;
   size_t nrow_, ncol_;
 
 }; // end of template struct VectorMatrix

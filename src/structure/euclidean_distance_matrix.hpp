@@ -32,7 +32,7 @@
 #include <string>
 #include <tuple>
 #include <iostream>
-#include <geometrical/threed_space_function.hpp>
+#include <geometrical_space/threed_space_function.hpp>
 #include <structure/atom.hpp>
 #include <blas/blas_interface.h>
 #include <matrix/matrix_typedef.hpp>
@@ -65,23 +65,24 @@ public:
   void compose_from_atomlist( const AtomList& atom_list_obj ) {
     const size_t natom = atom_list_obj.size();
     this->resize( natom );
+   // std :: cout << "natom " << natom << std :: endl;
     for( size_t iatom = 0; iatom < natom; iatom++ ) {
       this->set_element_name(iatom) = atom_list_obj[iatom].element_name();
     }
     for( size_t iatom = 0; iatom < natom; iatom++ ) {
-      iquads :: geometrical_space :: Coord coord_i = new_atom_list[iatom].coordinate();
-      const int charge_i = new_atom_list[iatom].charge();
+      iquads :: geometrical_space :: threed_space :: Coord coord_i = atom_list_obj[iatom].coordinate();
+      const int charge_i = atom_list_obj[iatom].charge();
       for( size_t jatom = 0; jatom < natom; jatom++ ) {
-        iquads :: geometrical_space :: Coord coord_j = new_atom_list[jatom].coordinate();
-        const int charge_j = new_atom_list[jatom].charge();
-        this->at( iatom, jatom ) = iquads :: geometrical_space :: compute_distance( coord_i, coord_j );
+        iquads :: geometrical_space :: threed_space :: Coord coord_j = atom_list_obj[jatom].coordinate();
+        const int charge_j = atom_list_obj[jatom].charge();
+        this->at( iatom, jatom ) = iquads :: geometrical_space :: threed_space :: compute_distance( coord_i, coord_j );
         // this->at( iatom, jatom ) 
         //  = compute_charge_weighted_distance( coord_i, coord_j, charge_i, charge_j );
       }
     }
   }
   void diagonalise() {
-    iquads :: matrix :: symmetric_diag( this->distance_matrix_, this->eigvec_, this->eigval_ );
+    iquads :: matrix :: symmetric_diag_big( this->distance_matrix_, this->eigvec_, this->eigval_ );
     this->is_diagonalized_ = true;
   }
   void print_eigval() {
@@ -109,7 +110,7 @@ public:
     this->is_diagonalized_ = false;
   }
   std :: string& set_element_name( int i  )
-    { return this->element_list.at(i); }
+    { return this->element_name_list_.at(i); }
   double& at( size_t i, size_t j ) 
     { return this->distance_matrix_( i , j ); }
 
