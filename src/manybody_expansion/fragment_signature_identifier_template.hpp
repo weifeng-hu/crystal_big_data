@@ -114,7 +114,10 @@ public:
       = iquads :: math :: get_combination<NUM>( lattice_obj.size() * lattice_obj.unit_cell().size() );
     // cout << "Found " << n_comb << " unique polymers of " << NUM << " in the molecule bulk " << endl;
     // std :: cout << polymer_combination_list_orig.size() << std :: endl;
-    progress_display_type progress_display( std :: string( "Initializing the identifier for fragment with #node " ) + std :: string( std :: to_string( NUM ) ) + std :: string( "..." ), polymer_combination_list_orig.size() );
+    std :: string initialize_message = std :: string( "Initializing the identifier for fragment with #node " ) + 
+                                                      std :: string( std :: to_string( NUM ) ) + 
+                                                      std :: string( " with total " + std :: to_string( polymer_combination_list_orig.size() ) + " fragments to examine ..." ); 
+    progress_display_type progress_display( initialize_message, polymer_combination_list_orig.size() );
     for( size_t icomb = 0; icomb < polymer_combination_list_orig.size(); icomb++ ) {
       polymer_lattice_index_combination_type polymer_lattice_index_combination 
         = this->translate_index_to_lattice_node_index( polymer_combination_list_orig[icomb], lattice_obj );

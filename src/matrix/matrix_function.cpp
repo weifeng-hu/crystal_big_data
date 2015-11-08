@@ -157,7 +157,7 @@ bool is_the_same( DMatrixStack& eigval_a, DMatrixStack& eigval_b ) {
 
   bool retval = true;
   try{
-    retval = distance_of_two_matrices( eigval_a, eigval_b ) <= 1.0e-3 ? true : false;
+    retval = distance_of_two_matrices( eigval_a, eigval_b ) <= 1.0e-4 ? true : false;
 //   const size_t nrow_a = eigval_a.nrow();
 //   const size_t nrow_b = eigval_b.nrow();
 
@@ -191,7 +191,7 @@ bool is_the_same( const DMatrixHeap& eigval_a, const DMatrixHeap& eigval_b ) {
 
   bool retval = true;
   try{
-    retval = distance_of_two_matrices( eigval_a, eigval_b ) <= 1.0e-3 ? true : false;
+    retval = distance_of_two_matrices( eigval_a, eigval_b ) <= 1.0e-4 ? true : false;
 //   const size_t nrow_a = eigval_a.nrow();
 //   const size_t nrow_b = eigval_b.nrow();
 
@@ -251,16 +251,16 @@ IMatrixHeap compute_boolean_mat( std :: vector<DMatrixHeap>& eigvals ) {
   size_t n_vector_every_time = n_element_cache_size / n_element_per_vector;
   size_t n_normal      = n_matrix / n_vector_every_time;
   size_t n_vector_tail = n_matrix % n_vector_every_time;
-  std :: cout << n_vector_every_time << std :: endl;
-  std :: cout << n_vector_tail << std :: endl;
+  // std :: cout << n_vector_every_time << std :: endl;
+  // std :: cout << n_vector_tail << std :: endl;
 
   size_t n_block_main = n_normal;
   size_t n_block_tail = ( n_vector_tail == 0 ) ? 0 : 1;
   size_t n_block = n_block_main + n_block_tail;
   size_t n_element_main_every_time = n_vector_every_time * n_element_per_vector;
   size_t n_element_tail_every_time = n_vector_tail       * n_element_per_vector;
-  std :: cout << "n_block_main " << n_block_main << std :: endl;
-  std :: cout << "n_block_tail " << n_block_tail << std :: endl;
+  // std :: cout << "n_block_main " << n_block_main << std :: endl;
+  // std :: cout << "n_block_tail " << n_block_tail << std :: endl;
 
   IMatrixHeap retval( n_matrix, n_matrix );
 
@@ -271,7 +271,7 @@ IMatrixHeap compute_boolean_mat( std :: vector<DMatrixHeap>& eigvals ) {
     it_big += n_element_per_vector;
   }
 
-  iquads :: timer :: ProgressDisplay progress_display_x( "Comparing eivenvalue to get a boolean matrix[ procedure hierached ]...", ( n_block_main * n_block_main + 2 * n_block_main * n_block_tail + n_block_tail * n_block_tail ) );
+  iquads :: timer :: ProgressDisplay progress_display_x( "Comparing eivenvalue to get a boolean matrix [ cache hierached ]...", ( n_block_main * n_block_main + 2 * n_block_main * n_block_tail + n_block_tail * n_block_tail ) );
   for( size_t iblock = 0; iblock < n_block_main; iblock++ ) {
     DMatrixStack iblock_matrix( n_vector_every_time, n_element_per_vector );
     std :: vector< double > :: iterator iterator_big_iblock =  big_matrix.set_store().begin();
@@ -448,16 +448,16 @@ std :: vector< std :: map< int, int > > compute_boolean_map( std :: vector<DMatr
   size_t n_vector_every_time = n_element_cache_size / n_element_per_vector;
   size_t n_normal      = n_matrix / n_vector_every_time;
   size_t n_vector_tail = n_matrix % n_vector_every_time;
-  std :: cout << n_vector_every_time << std :: endl;
-  std :: cout << n_vector_tail << std :: endl;
+//  std :: cout << n_vector_every_time << std :: endl;
+//  std :: cout << n_vector_tail << std :: endl;
 
   size_t n_block_main = n_normal;
   size_t n_block_tail = ( n_vector_tail == 0 ) ? 0 : 1;
   size_t n_block = n_block_main + n_block_tail;
   size_t n_element_main_every_time = n_vector_every_time * n_element_per_vector;
   size_t n_element_tail_every_time = n_vector_tail       * n_element_per_vector;
-  std :: cout << "n_block_main " << n_block_main << std :: endl;
-  std :: cout << "n_block_tail " << n_block_tail << std :: endl;
+//  std :: cout << "n_block_main " << n_block_main << std :: endl;
+//  std :: cout << "n_block_tail " << n_block_tail << std :: endl;
 
   std :: vector< std :: map< int, int > > retval;
   retval.resize( n_matrix );
@@ -469,7 +469,7 @@ std :: vector< std :: map< int, int > > compute_boolean_map( std :: vector<DMatr
     it_big += n_element_per_vector;
   }
 
-  iquads :: timer :: ProgressDisplay progress_display( "Comparing eivenvalue to get a boolean matrix[ procedure hierached, compressed ]...", ( n_matrix ) );
+  iquads :: timer :: ProgressDisplay progress_display( "Comparing eivenvalue to get a boolean matrix [ cache hierached, compressed ]...", ( n_matrix ) );
   for( size_t iblock = 0; iblock < n_block_main; iblock++ ) {
     DMatrixStack iblock_matrix( n_vector_every_time, n_element_per_vector );
     std :: vector< double > :: iterator iterator_big_iblock =  big_matrix.set_store().begin();
@@ -586,9 +586,9 @@ std :: vector< std :: map< int, int > > compute_boolean_map( std :: vector<DMatr
 
 std :: vector< std :: vector< int > > get_groups( std :: vector< std :: map< int, int > >& bond_maps ) {
 
-  std :: cout << "Analyzing subgroups from boolean matrix ...";
   std :: vector< std :: vector< int > > bond_vecs;
   size_t nvec = bond_maps.size();
+  iquads :: timer :: ProgressDisplay progress_display_a( "Initializing bond map ...", nvec );
   for( size_t ivec = 0; ivec < nvec; ivec++ ) {
     std :: map<int, int> bond_map = bond_maps.at(ivec);
     std :: vector<int> vec_local;
@@ -597,8 +597,10 @@ std :: vector< std :: vector< int > > get_groups( std :: vector< std :: map< int
       vec_local.push_back(value);
     }
     bond_vecs.push_back(vec_local);
+    progress_display_a++;
   }
 
+  iquads :: timer :: ProgressDisplay progress_display_b( "Analyzing subgroups from bond map ...", nvec );
   for( size_t ivec = 0; ivec < bond_vecs.size(); ivec++ ) {
     std :: vector<int> vec_i = bond_vecs.at(ivec);
     const size_t size_i = vec_i.size();
@@ -628,8 +630,10 @@ std :: vector< std :: vector< int > > get_groups( std :: vector< std :: map< int
         }
       }
     }
+    progress_display_b++;
   }
 
+  iquads :: timer :: ProgressDisplay progress_display_c( "Finalizing subgroup analysis ...", nvec );
   for( std :: vector< std :: vector<int> > :: iterator ivec = bond_vecs.begin(); ivec != bond_vecs.end(); ) {
     if( ivec->size() == 0 ) {
       bond_vecs.erase(ivec);
@@ -637,9 +641,10 @@ std :: vector< std :: vector< int > > get_groups( std :: vector< std :: map< int
     else {
       ivec++;
     }
+    progress_display_c++;
   }
 
-  std :: cout << " done" << std :: endl;
+  // std :: cout << " done" << std :: endl;
   return bond_vecs;
 
 

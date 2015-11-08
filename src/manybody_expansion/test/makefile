@@ -26,7 +26,7 @@ remove:
 	rm -rf ./try/; rm -rf /scratch/wh288/lattice_x/
 
 $(executable): $(CPPOBJS)
-	rm -rf ./try/; rm -rf /scratch/wh288/lattice_x/; cd ../; make distclean; make release; cd $(iquads_src)/manybody_expansion/test/; $(CPP) -o $(executable) $(CPPFLAGS) $(CPPOPT) $(CPPOBJS) $(LIBS)
+	rm -rf ./try/; rm -rf /scratch/wh288/lattice_x/; cd ../; make distclean; make all; cd $(iquads_src)/manybody_expansion/test/; $(CPP) -o $(executable) $(CPPFLAGS) $(CPPOPT) $(CPPOBJS) $(LIBS)
 
 tiny: $(CPPOBJS)
 	rm -rf ./try/; rm -rf /scratch/wh288/lattice_x/; $(CPP) -o $(executable) $(CPPFLAGS) $(CPPOPT) $(CPPOBJS) $(LIBS)

@@ -215,7 +215,7 @@ public:
       for( size_t i = 0; i < this->non_periodic_dimer_report_list_.size(); i++ ) {
         retval += this->non_periodic_dimer_report_list_[i].interaction_energy();
       }
-      return retval;
+      return retval/2.0e0;
     }
   energy_data_type return_three_body_interaction_energy_per_unit_cell()
     {
@@ -223,7 +223,7 @@ public:
       for( size_t i = 0; i < this->non_periodic_trimer_report_list_.size(); i++ ) {
         retval += this->non_periodic_trimer_report_list_[i].interaction_energy();
       }
-      return retval;
+      return retval/6.0e0;
     }
   energy_data_type return_four_body_interaction_energy_per_unit_cell()
     {
@@ -231,7 +231,7 @@ public:
       for( size_t i = 0; i < this->non_periodic_tetramer_report_list_.size(); i++ ) {
         retval += this->non_periodic_tetramer_report_list_[i].interaction_energy();
       }
-      return retval;
+      return retval/24.0e0;
     }
   energy_data_type return_total_energy_per_unit_cell()
     {

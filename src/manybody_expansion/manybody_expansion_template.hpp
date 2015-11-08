@@ -121,11 +121,11 @@ public:
   compute_lattice_energy_per_unit_cell( config_type config, report_ref report )
     { return this->expansion_formula_.compute( config, report ); }
 
-  energy_data_type
+  energy_data_type 
   compute_lattice_energy_per_unit_cell_with_fragment_identification( config_type config, report_ref report ) {
     electron_calc_setting_type setting;
     setting.generate_from( config );
-    this->fragment_signature_database_.build( config.lattice_info(), config.radius(), setting );
+    this->fragment_signature_database_.build( config.expansion_order(), config.lattice_info(), config.radius(), setting );
     return this->expansion_formula_with_fragment_identification_.compute( config, this->fragment_signature_database_, report );
   }
 

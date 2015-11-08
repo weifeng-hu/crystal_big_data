@@ -72,11 +72,11 @@ int main( int argc, char* argv[] ) {
   iquads :: manybody_expansion :: Report report = agent.accept_request_and_process
       ( iquads :: manybody_expansion :: Request ( std :: make_tuple ( "lattic_x", lattice ), 
                                                   std :: make_tuple ( "unknown_bulk", bulk ),
-                                                  2, "hf", "molpro", "sto-3g",
+                                                  3, "hf", "molpro", "sto-3g",
                                                   "local",
                                                   "try",
                                                   "unknown", "/scratch/wh288/lattice_x/", "unknown",
-                                                  300.0e0, iquads :: manybody_expansion :: PRODUCTION ) );
+                                                  3.0e0, iquads :: manybody_expansion :: PRODUCTION ) );
   std :: cout << std :: setprecision(12) << std :: setw(16) << "monomer energy per unit cell: "  << report.return_one_body_energy_per_unit_cell() << std :: endl;
   std :: cout << std :: setprecision(12) << std :: setw(16) << "dimer interaction energy per unit cell: " << report.return_two_body_interaction_energy_per_unit_cell() << std :: endl;
   std :: cout << std :: setprecision(12) << std :: setw(16) << "trimer interaction energy per unit cell: " << report.return_three_body_interaction_energy_per_unit_cell() << std :: endl;
