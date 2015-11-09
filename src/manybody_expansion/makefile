@@ -79,7 +79,7 @@ debug_manybody_expansion: 	cppopt_manybody_expansion += -g -O0\
 debug_manybody_expansion: library_manybody_expansion
 debug_manybody_expansion: executable_manybody_expansion
 
-release_manybody_expansion: cppopt_manybody_expansion +=  -O3 
+release_manybody_expansion: cppopt_manybody_expansion +=  -O3 -fopenmp
 release_manybody_expansion: cppopt_manybody_expansion += 
 release_manybody_expansion: library_manybody_expansion
 release_manybody_expansion: executable_manybody_expansion
@@ -151,11 +151,7 @@ $(iquads_src)/manybody_expansion/client.o: $(iquads_src)/iquads/command_parser.h
 	$(cpp_manybody_expansion) -o $(iquads_src)/manybody_expansion/client.o -c $(cppopt_manybody_expansion) $(cppflags_manybody_expansion) $(iquads_src)/manybody_expansion/client.cpp
 
 $(iquads_src)/manybody_expansion/agent.o: $(iquads_src)/interface_to_third_party/external_program_agent_base.hpp\
-					 $(iquads_src)/manybody_expansion/order_mask.hpp\
-					 $(iquads_src)/manybody_expansion/request.hpp\
-					 $(iquads_src)/manybody_expansion/config.hpp\
-					 $(iquads_src)/manybody_expansion/manybody_expansion_template.hpp\
-					 $(iquads_src)/manybody_expansion/agent.hpp\
+					 $(cppheads_manybody_expansion)\
 					 $(iquads_src)/manybody_expansion/agent.cpp
 	$(cpp_manybody_expansion) -o $(iquads_src)/manybody_expansion/agent.o -c $(cppopt_manybody_expansion) $(cppflags_manybody_expansion) $(iquads_src)/manybody_expansion/agent.cpp
 

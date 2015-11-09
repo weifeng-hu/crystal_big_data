@@ -25,6 +25,7 @@
  */
 
 #include <emmintrin.h>
+#include <omp.h>
 #include <stdlib.h>
 #include <math.h>
 #include <vector>
@@ -469,59 +470,77 @@ std :: vector< std :: map< int, int > > compute_boolean_map( std :: vector<DMatr
     it_big += n_element_per_vector;
   }
 
-  iquads :: timer :: ProgressDisplay progress_display( "Comparing eivenvalue to get a boolean matrix [ cache hierached, compressed ]...", ( n_matrix ) );
-  for( size_t iblock = 0; iblock < n_block_main; iblock++ ) {
-    DMatrixStack iblock_matrix( n_vector_every_time, n_element_per_vector );
-    std :: vector< double > :: iterator iterator_big_iblock =  big_matrix.set_store().begin();
-                                        iterator_big_iblock += iblock * n_element_main_every_time;
-    std :: copy_n( iterator_big_iblock, n_element_main_every_time, iblock_matrix.set_store().begin() );
+  omp_set_dynamic(0);
+  const size_t num_thread = omp_get_num_procs();
+  omp_set_num_threads( num_thread );
 
-    for( size_t ivector = 0; ivector < n_vector_every_time; ivector++ ) {
-      std :: map< int, int > map_local;
+  std :: string display_message = std :: string( "Comparing eivenvalue to get a boolean matrix [ cache hierached, compressed, openmp, automatic, num_thread = " ) +
+                                  std :: to_string( num_thread ) + 
+                                  std :: string( " ], step 1 ...");
 
-      DMatrixStack matrix_i( 1, n_element_per_vector );
-      DMatrixStack :: iterator_type ismall =  iblock_matrix.set_store().begin();
-                                    ismall += ivector * n_element_per_vector; 
-      std :: copy_n( ismall, n_element_per_vector, matrix_i.set_store().begin() );
+  iquads :: timer :: ProgressDisplay progress_display_step_1( display_message, n_block_main/num_thread );
 
-      for( size_t jblock = 0; jblock < n_block_main; jblock++ ) {
-        DMatrixStack jblock_matrix( n_vector_every_time,  n_element_per_vector );
-        std :: vector< double > :: iterator iterator_big_jblock =  big_matrix.set_store().begin();
-                                            iterator_big_jblock += jblock * n_element_main_every_time;
-        std :: copy_n( iterator_big_jblock, n_element_main_every_time, jblock_matrix.set_store().begin() );
+  #pragma omp parallel
+  {
+    const int thread_id = omp_get_thread_num();
 
-        for( size_t jvector = 0; jvector < n_vector_every_time; jvector++ ) {
-          DMatrixStack matrix_j( 1, n_element_per_vector );
-          DMatrixStack :: iterator_type jsmall =  jblock_matrix.set_store().begin();
-                                        jsmall += jvector * n_element_per_vector;
-          std :: copy_n( jsmall, n_element_per_vector, matrix_j.set_store().begin() );
-          if( is_the_same( matrix_i, matrix_j ) == true ) {
-            map_local.insert( std :: pair< int, int > ( jblock * n_vector_every_time + jvector, 1 ) );
+    #pragma omp for
+    for( size_t iblock = 0; iblock < n_block_main; iblock++ ) {
+     // std :: cout << iblock << std :: endl << std :: flush;
+      DMatrixStack iblock_matrix( n_vector_every_time, n_element_per_vector );
+      std :: vector< double > :: iterator iterator_big_iblock =  big_matrix.set_store().begin();
+                                          iterator_big_iblock += iblock * n_element_main_every_time;
+      std :: copy_n( iterator_big_iblock, n_element_main_every_time, iblock_matrix.set_store().begin() );
+  
+      for( size_t ivector = 0; ivector < n_vector_every_time; ivector++ ) {
+        std :: map< int, int > map_local;
+  
+        DMatrixStack matrix_i( 1, n_element_per_vector );
+        DMatrixStack :: iterator_type ismall =  iblock_matrix.set_store().begin();
+                                      ismall += ivector * n_element_per_vector; 
+        std :: copy_n( ismall, n_element_per_vector, matrix_i.set_store().begin() );
+  
+        for( size_t jblock = 0; jblock < n_block_main; jblock++ ) {
+          DMatrixStack jblock_matrix( n_vector_every_time,  n_element_per_vector );
+          std :: vector< double > :: iterator iterator_big_jblock =  big_matrix.set_store().begin();
+                                              iterator_big_jblock += jblock * n_element_main_every_time;
+          std :: copy_n( iterator_big_jblock, n_element_main_every_time, jblock_matrix.set_store().begin() );
+  
+          for( size_t jvector = 0; jvector < n_vector_every_time; jvector++ ) {
+            DMatrixStack matrix_j( 1, n_element_per_vector );
+            DMatrixStack :: iterator_type jsmall =  jblock_matrix.set_store().begin();
+                                          jsmall += jvector * n_element_per_vector;
+            std :: copy_n( jsmall, n_element_per_vector, matrix_j.set_store().begin() );
+            if( is_the_same( matrix_i, matrix_j ) == true ) {
+              map_local.insert( std :: pair< int, int > ( jblock * n_vector_every_time + jvector, 1 ) );
+            }
+            // retval( iblock * n_vector_every_time + ivector, jblock * n_vector_every_time + jvector ) = is_the_same( matrix_i, matrix_j ) ? 1 : 0;
           }
-          // retval( iblock * n_vector_every_time + ivector, jblock * n_vector_every_time + jvector ) = is_the_same( matrix_i, matrix_j ) ? 1 : 0;
         }
-      }
-
-      for( size_t jblock = n_block_main; jblock < n_block_main + n_block_tail; jblock++ ) {
-        DMatrixStack jblock_matrix( n_vector_tail,  n_element_per_vector );
-        std :: vector< double > :: iterator iterator_big_jblock =  big_matrix.set_store().begin();
-                                            iterator_big_jblock += n_block_main * n_element_main_every_time + ( jblock - n_block_main ) * n_element_tail_every_time;
-        std :: copy_n( iterator_big_jblock, n_element_tail_every_time, jblock_matrix.set_store().begin() );
-      
-        for( size_t jvector = 0; jvector < n_vector_tail; jvector++ ) {
-          DMatrixStack matrix_j( 1, n_element_per_vector );
-          DMatrixStack :: iterator_type jsmall =  jblock_matrix.set_store().begin();
-                                        jsmall += jvector * n_element_per_vector;
-          std :: copy_n( jsmall, n_element_per_vector, matrix_j.set_store().begin() );
-          if( is_the_same( matrix_i, matrix_j ) == true ) {
-            map_local.insert( std :: pair< int, int > ( n_block_main * n_vector_every_time + ( jblock - n_block_main ) * n_vector_tail + jvector, 1 ) );
+  
+        for( size_t jblock = n_block_main; jblock < n_block_main + n_block_tail; jblock++ ) {
+          DMatrixStack jblock_matrix( n_vector_tail,  n_element_per_vector );
+          std :: vector< double > :: iterator iterator_big_jblock =  big_matrix.set_store().begin();
+                                              iterator_big_jblock += n_block_main * n_element_main_every_time + ( jblock - n_block_main ) * n_element_tail_every_time;
+          std :: copy_n( iterator_big_jblock, n_element_tail_every_time, jblock_matrix.set_store().begin() );
+        
+          for( size_t jvector = 0; jvector < n_vector_tail; jvector++ ) {
+            DMatrixStack matrix_j( 1, n_element_per_vector );
+            DMatrixStack :: iterator_type jsmall =  jblock_matrix.set_store().begin();
+                                          jsmall += jvector * n_element_per_vector;
+            std :: copy_n( jsmall, n_element_per_vector, matrix_j.set_store().begin() );
+            if( is_the_same( matrix_i, matrix_j ) == true ) {
+              map_local.insert( std :: pair< int, int > ( n_block_main * n_vector_every_time + ( jblock - n_block_main ) * n_vector_tail + jvector, 1 ) );
+            }
+            //retval( iblock * n_vector_every_time + ivector, n_block_main * n_vector_every_time + ( jblock - n_block_main) * n_vector_tail + jvector ) = is_the_same( matrix_i, matrix_j ) ? 1 : 0;
           }
-          //retval( iblock * n_vector_every_time + ivector, n_block_main * n_vector_every_time + ( jblock - n_block_main) * n_vector_tail + jvector ) = is_the_same( matrix_i, matrix_j ) ? 1 : 0;
         }
+        retval[ iblock * n_vector_every_time + ivector ] = map_local;
+        // progress_display++;
       }
-      retval[ iblock * n_vector_every_time + ivector ] = map_local;
-      progress_display++;
+      if( thread_id == 0 ) { progress_display_step_1++; }
     }
+    #pragma omp barrier
   }
 
   for( size_t iblock = n_block_main; iblock < n_block_main + n_block_tail; iblock++ ) {
@@ -530,52 +549,67 @@ std :: vector< std :: map< int, int > > compute_boolean_map( std :: vector<DMatr
                                         iterator_big_iblock += n_block_main * n_element_main_every_time + ( iblock - n_block_main ) * n_element_tail_every_time;
     std :: copy_n( iterator_big_iblock, n_element_tail_every_time, iblock_matrix.set_store().begin() );
 
-    for( size_t ivector = 0; ivector < n_vector_tail; ivector++ ) {
+    std :: string display_message = std :: string( "Comparing eivenvalue to get a boolean matrix [ cache hierached, compressed, openmp, automatic, num_thread = " ) +
+                                    std :: to_string( num_thread ) + 
+                                    std :: string( " ], step 2,  phase ") +
+                                    std :: to_string( iblock - n_block_main ) +
+                                    std :: string( " ... " );
+    iquads :: timer :: ProgressDisplay progress_display_step_2( display_message, n_vector_tail/num_thread );
+    
+    #pragma omp parallel
+    {
+      const int thread_id = omp_get_thread_num();
 
-      std :: map< int, int > map_local;
-
-      DMatrixStack matrix_i( 1, n_element_per_vector );
-      DMatrixStack :: iterator_type ismall =  iblock_matrix.set_store().begin();
-                                    ismall += ivector * n_element_per_vector; 
-      std :: copy_n( ismall, n_element_per_vector, matrix_i.set_store().begin() );
-
-      for( size_t jblock = 0; jblock < n_block_main; jblock++ ) {
-        DMatrixStack jblock_matrix( n_vector_every_time,  n_element_per_vector );
-        std :: vector< double > :: iterator iterator_big_jblock =  big_matrix.set_store().begin();
-                                            iterator_big_jblock += jblock * n_element_main_every_time;
-        std :: copy_n( iterator_big_jblock, n_element_main_every_time, jblock_matrix.set_store().begin() );
-
-        for( size_t jvector = 0; jvector < n_vector_every_time; jvector++ ) {
-          DMatrixStack matrix_j( 1, n_element_per_vector );
-          DMatrixStack :: iterator_type jsmall =  jblock_matrix.set_store().begin();
-                                        jsmall += jvector * n_element_per_vector;
-          std :: copy_n( jsmall, n_element_per_vector, matrix_j.set_store().begin() );
-          if( is_the_same( matrix_i, matrix_j ) == true ) {
-            map_local.insert( std :: pair< int, int > ( jblock * n_vector_every_time + jvector, 1 ) );
+      #pragma omp for
+      for( size_t ivector = 0; ivector < n_vector_tail; ivector++ ) {
+  
+        std :: map< int, int > map_local;
+  
+        DMatrixStack matrix_i( 1, n_element_per_vector );
+        DMatrixStack :: iterator_type ismall =  iblock_matrix.set_store().begin();
+                                      ismall += ivector * n_element_per_vector; 
+        std :: copy_n( ismall, n_element_per_vector, matrix_i.set_store().begin() );
+  
+        for( size_t jblock = 0; jblock < n_block_main; jblock++ ) {
+          DMatrixStack jblock_matrix( n_vector_every_time,  n_element_per_vector );
+          std :: vector< double > :: iterator iterator_big_jblock =  big_matrix.set_store().begin();
+                                              iterator_big_jblock += jblock * n_element_main_every_time;
+          std :: copy_n( iterator_big_jblock, n_element_main_every_time, jblock_matrix.set_store().begin() );
+  
+          for( size_t jvector = 0; jvector < n_vector_every_time; jvector++ ) {
+            DMatrixStack matrix_j( 1, n_element_per_vector );
+            DMatrixStack :: iterator_type jsmall =  jblock_matrix.set_store().begin();
+                                          jsmall += jvector * n_element_per_vector;
+            std :: copy_n( jsmall, n_element_per_vector, matrix_j.set_store().begin() );
+            if( is_the_same( matrix_i, matrix_j ) == true ) {
+              map_local.insert( std :: pair< int, int > ( jblock * n_vector_every_time + jvector, 1 ) );
+            }
+            //retval( n_block_main * n_vector_every_time + ( iblock - n_block_main ) * n_vector_tail + ivector, jblock * n_vector_every_time + jvector ) = is_the_same( matrix_i, matrix_j ) ? 1 : 0;
           }
-          //retval( n_block_main * n_vector_every_time + ( iblock - n_block_main ) * n_vector_tail + ivector, jblock * n_vector_every_time + jvector ) = is_the_same( matrix_i, matrix_j ) ? 1 : 0;
         }
-      }
-
-      for( size_t jblock = n_block_main; jblock < n_block_main + n_block_tail; jblock++ ) {
-        DMatrixStack jblock_matrix( n_vector_every_time,  n_element_per_vector );
-        std :: vector< double > :: iterator iterator_big_jblock =  big_matrix.set_store().begin();
-                                            iterator_big_jblock += n_block_main * n_element_main_every_time + ( jblock - n_block_main ) * n_element_tail_every_time;
-        std :: copy_n( iterator_big_jblock, n_element_tail_every_time, jblock_matrix.set_store().begin() );
-
-        for( size_t jvector = 0; jvector < n_vector_tail; jvector++ ) {
-          DMatrixStack matrix_j( 1, n_element_per_vector );
-          DMatrixStack :: iterator_type jsmall =  jblock_matrix.set_store().begin();
-                                        jsmall += jvector * n_element_per_vector;
-          std :: copy_n( jsmall, n_element_per_vector, matrix_j.set_store().begin() );
-          if( is_the_same( matrix_i, matrix_j ) == true ) {
-            map_local.insert( std :: pair< int, int > ( n_block_main * n_vector_every_time + ( jblock - n_block_main ) * n_vector_tail + jvector, 1 ) );
+  
+        for( size_t jblock = n_block_main; jblock < n_block_main + n_block_tail; jblock++ ) {
+          DMatrixStack jblock_matrix( n_vector_every_time,  n_element_per_vector );
+          std :: vector< double > :: iterator iterator_big_jblock =  big_matrix.set_store().begin();
+                                              iterator_big_jblock += n_block_main * n_element_main_every_time + ( jblock - n_block_main ) * n_element_tail_every_time;
+          std :: copy_n( iterator_big_jblock, n_element_tail_every_time, jblock_matrix.set_store().begin() );
+  
+          for( size_t jvector = 0; jvector < n_vector_tail; jvector++ ) {
+            DMatrixStack matrix_j( 1, n_element_per_vector );
+            DMatrixStack :: iterator_type jsmall =  jblock_matrix.set_store().begin();
+                                          jsmall += jvector * n_element_per_vector;
+            std :: copy_n( jsmall, n_element_per_vector, matrix_j.set_store().begin() );
+            if( is_the_same( matrix_i, matrix_j ) == true ) {
+              map_local.insert( std :: pair< int, int > ( n_block_main * n_vector_every_time + ( jblock - n_block_main ) * n_vector_tail + jvector, 1 ) );
+            }
+            // retval( n_block_main * n_vector_every_time + ( iblock - n_block_main ) * n_vector_tail + ivector, n_block_main * n_vector_every_time + ( jblock - n_block_main ) * n_vector_tail + jvector ) = is_the_same( matrix_i, matrix_j ) ? 1 : 0;
           }
-          // retval( n_block_main * n_vector_every_time + ( iblock - n_block_main ) * n_vector_tail + ivector, n_block_main * n_vector_every_time + ( jblock - n_block_main ) * n_vector_tail + jvector ) = is_the_same( matrix_i, matrix_j ) ? 1 : 0;
         }
+        retval[ n_block_main * n_vector_every_time + ( iblock - n_block_main ) * n_vector_tail + ivector ] = map_local;
+        // progress_display++;
+        if( thread_id == 0 ) { progress_display_step_2++ ; }
       }
-      retval[ n_block_main * n_vector_every_time + ( iblock - n_block_main ) * n_vector_tail + ivector ] = map_local;
-      progress_display++;
+      #pragma omp barrier
     }
   }
 
@@ -624,6 +658,8 @@ std :: vector< std :: vector< int > > get_groups( std :: vector< std :: map< int
             }
             if( the_same == true ) {
               bond_vecs.at(jvec).resize(0);
+              bond_vecs.at(jvec).clear();
+              bond_vecs.at(jvec).shrink_to_fit();
             }
           } // end of else
  
@@ -700,6 +736,8 @@ std :: vector< std :: vector< int > > get_groups( IMatrixHeap& boolean_mat ){
             }
             if( the_same == true ) {
               bond_vecs.at(jvec).resize(0);
+              bond_vecs.at(jvec).clear();
+              bond_vecs.at(jvec).shrink_to_fit();
             }
           } // end of else
  

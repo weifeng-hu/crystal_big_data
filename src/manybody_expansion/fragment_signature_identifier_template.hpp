@@ -112,26 +112,64 @@ public:
     // get a list of combination
     polymer_bulk_index_list_type polymer_combination_list_orig
       = iquads :: math :: get_combination<NUM>( lattice_obj.size() * lattice_obj.unit_cell().size() );
+
+    omp_set_dynamic(0);
+    const size_t num_thread = omp_get_num_procs();
+    omp_set_num_threads( num_thread );
+    const size_t total_num  = polymer_combination_list_orig.size();
+    std :: vector< polymer_list_type* > sub_polymer_list_addresses;
+    sub_polymer_list_addresses.resize( num_thread );
+    std :: vector< polymer_lattice_index_list_type* > sub_polymer_lattice_index_list_addresses;
+    sub_polymer_lattice_index_list_addresses.resize( num_thread );
+
     // cout << "Found " << n_comb << " unique polymers of " << NUM << " in the molecule bulk " << endl;
     // std :: cout << polymer_combination_list_orig.size() << std :: endl;
-    std :: string initialize_message = std :: string( "Initializing the identifier for fragment with #node " ) + 
-                                                      std :: string( std :: to_string( NUM ) ) + 
-                                                      std :: string( " with total " + std :: to_string( polymer_combination_list_orig.size() ) + " fragments to examine ..." ); 
-    progress_display_type progress_display( initialize_message, polymer_combination_list_orig.size() );
-    for( size_t icomb = 0; icomb < polymer_combination_list_orig.size(); icomb++ ) {
-      polymer_lattice_index_combination_type polymer_lattice_index_combination 
-        = this->translate_index_to_lattice_node_index( polymer_combination_list_orig[icomb], lattice_obj );
-      molecule_list_type molecule_list 
-        = this->get_molecule_list_from_lattice( polymer_lattice_index_combination, lattice_obj );  // get the molecule list to construct a polymer
-      polymer_type polymer( molecule_list );                                                       // initialize the polymer from molecule_list
-      // if the center of mass in the polymer are within a radius of Radius from
-      // each other, then to add the polymer to the group storage
-      if( polymer.within_mean_distance_by_center_of_mass( radius ) == true ) {
-        this->polymer_list_.push_back( polymer );
-        this->polymer_lattice_index_list_.push_back( polymer_lattice_index_combination );
+    std :: string initialize_message = std :: string( "Initializing the identifier [ openmp, automatic, num_thread = " ) +
+                                                                               std :: to_string( num_thread ) +
+                                                                         std :: string( " ] for fragment [ polymer - " ) +
+                                                                                                 std :: to_string( NUM ) +
+                                       std :: string( " ] with total " + std :: to_string( total_num ) + " fragments to examine ..." );
+    progress_display_type progress_display( initialize_message, total_num/num_thread );
+ 
+    #pragma omp parallel 
+    {
+      const int thread_id = omp_get_thread_num();
+                    polymer_list_type sub_polymer_list;
+                                      sub_polymer_list.resize(0);
+      polymer_lattice_index_list_type sub_polymer_lattice_index_list;
+                                      sub_polymer_lattice_index_list.resize(0);
+      #pragma omp for
+      for( size_t icomb = 0; icomb < total_num; icomb++ ) {
+        polymer_lattice_index_combination_type polymer_lattice_index_combination 
+          = this->translate_index_to_lattice_node_index( polymer_combination_list_orig[icomb], lattice_obj );
+        molecule_list_type molecule_list 
+          = this->get_molecule_list_from_lattice( polymer_lattice_index_combination, lattice_obj );  // get the molecule list to construct a polymer
+        polymer_type polymer( molecule_list );                                                       // initialize the polymer from molecule_list
+        // if the center of mass in the polymer are within a radius of Radius from
+        // each other, then to add the polymer to the group storage
+        if( polymer.within_mean_distance_by_center_of_mass( radius ) == true ) {
+          //this->polymer_list_.push_back( polymer );
+          //this->polymer_lattice_index_list_.push_back( polymer_lattice_index_combination );
+          sub_polymer_list.push_back( polymer );
+          sub_polymer_lattice_index_list.push_back( polymer_lattice_index_combination );
+        }
+        if( thread_id == 0 ) { progress_display++; }
+      } // end of loop icomb, all polymers
+
+      sub_polymer_list_addresses[ thread_id ]               = &( sub_polymer_list );
+      sub_polymer_lattice_index_list_addresses[ thread_id ] = &( sub_polymer_lattice_index_list );
+      #pragma omp barrier
+
+      #pragma omp single
+      for( size_t i = 0; i < num_thread; i++ ) {
+        this->polymer_list_.insert( this->polymer_list_.end(), sub_polymer_list_addresses[i]->begin(), sub_polymer_list_addresses[i]->end() );
+        sub_polymer_list_addresses[i]->clear();
+        sub_polymer_list_addresses[i]->shrink_to_fit();
+        this->polymer_lattice_index_list_.insert( this->polymer_lattice_index_list_.end(), sub_polymer_lattice_index_list_addresses[i]->begin(), sub_polymer_lattice_index_list_addresses[i]->end() );
+        sub_polymer_lattice_index_list_addresses[i]->clear();
+        sub_polymer_lattice_index_list_addresses[i]->shrink_to_fit();
       }
-      progress_display++;
-    } // end of loop icomb, all polymers
+    }
     //cout << "Obtained " 
     //     << this->group_storage.size() 
     //     << " unique polymers of " << NUM 
@@ -195,22 +233,35 @@ private:
   std :: vector< matrix_type > compute_dist_eigval() {
     // cout << "Computing eigenvalues of euclidean distance matrices ... " << endl;
     // size_t count_interval = n_polymer_local/5;
+
+    omp_set_dynamic(0);
+    const size_t num_thread = omp_get_num_procs();
+    omp_set_num_threads( num_thread );
+    const size_t total_num = this->polymer_list_.size();
     std :: vector< matrix_type > retval;
-    retval.resize( this->polymer_list_.size() );
+    retval.resize( total_num );
     // vector parallizable
-    //#pragma omp parallel for 
-    progress_display_type progress_display( "Computing eigenvalues of all distance matrix...", this->polymer_list_.size() );
-    for( size_t ipolymer = 0; ipolymer < this->polymer_list_.size(); ipolymer++ ) {
-      euclidean_distance_matrix_type edm_local;
-      edm_local.compose_from_atomlist( this->polymer_list_[ipolymer].atom_list() ); // construct a local euclidean distance matrix for the polymer
-      //edm_local.print_eigval();
-      edm_local.diagonalise();                                                      // diagonalise and get the eigenvalues
-      retval[ipolymer] = edm_local.eigval();                                        // return the eigval vector for this polymer
-      // if( (ipolymer+1) % count_interval == 0 ) {
-      //   cout << (ipolymer*100/n_polymer_local + 1) << "%\tcompleted " << endl;
-      // }
-      progress_display++;
-    } // end of loop ipolymer
+    std :: string display_message = std :: string( "Computing eigenvalues of all distance matrix [ openmp, automatic, num_thread = " ) +
+                                    std :: to_string( num_thread ) + 
+                                    std :: string( " ] ..." );
+    progress_display_type progress_display( display_message, total_num/num_thread );
+    #pragma omp parallel
+    {
+      const int thread_id = omp_get_thread_num();
+      #pragma omp for
+      for( size_t ipolymer = 0; ipolymer < total_num; ipolymer++ ) {
+        euclidean_distance_matrix_type edm_local;
+        edm_local.compose_from_atomlist( this->polymer_list_[ipolymer].atom_list() ); // construct a local euclidean distance matrix for the polymer
+        //edm_local.print_eigval();
+        edm_local.diagonalise();                                                      // diagonalise and get the eigenvalues
+        retval[ipolymer] = edm_local.eigval();                                        // return the eigval vector for this polymer
+        // if( (ipolymer+1) % count_interval == 0 ) {
+        //   cout << (ipolymer*100/n_polymer_local + 1) << "%\tcompleted " << endl;
+        // }
+        if( thread_id == 0 ) { progress_display++; }
+      } // end of loop ipolymer
+      #pragma omp barrier
+    }
     return retval;
   }
 
@@ -221,26 +272,40 @@ private:
     switch( this->system_type_ ) {
       case( BULK ): {
         progress_display_type progress_display( "Filling fragment group info...", n_group );
-          for( size_t igroup = 0; igroup < n_group; igroup++ ) {
-            std :: vector<int> polymer_indices_i = group_indices.at(igroup);
-            fragment_info_type fragment_info_obj( this->get_signature_of_group_bulk( polymer_indices_i, setting ),
-                                                  this->extract_molecule_indices_for_group_set_bulk( polymer_indices_i ) );
-            fragment_info_list_obj[igroup] = fragment_info_obj;
-            progress_display++;
-          }
-          break;
+        for( size_t igroup = 0; igroup < n_group; igroup++ ) {
+          std :: vector<int> polymer_indices_i = group_indices.at(igroup);
+          fragment_info_type fragment_info_obj( this->get_signature_of_group_bulk( polymer_indices_i, setting ),
+                                                this->extract_molecule_indices_for_group_set_bulk( polymer_indices_i ) );
+          fragment_info_list_obj[igroup] = fragment_info_obj;
+          progress_display++;
         }
+        break;
+      }
       case( LATTICE ): {
-        progress_display_type progress_display( "Filling fragment group info...", n_group );
+        omp_set_dynamic(0);
+        const size_t num_thread = omp_get_num_procs();
+        omp_set_num_threads( num_thread );
+        std :: string display_message = std :: string( "Filling fragment group info [ openmp, automatic, num_thread = " ) + 
+                                        std :: to_string( num_thread ) + 
+                                        std :: string( " ]  for " ) + 
+                                        std :: to_string( n_group ) + 
+                                        std :: string( " prototype fragments ... " );
+        progress_display_type progress_display( display_message, n_group/num_thread );
+        #pragma omp parallel 
+        {
+          const int thread_id = omp_get_thread_num();
+          #pragma omp for
           for( size_t igroup = 0; igroup < n_group; igroup++ ) {
             std :: vector<int> polymer_indices_i = group_indices.at(igroup);
             fragment_info_type fragment_info_obj( this->get_signature_of_group_lattice( polymer_indices_i, setting ),
                                                   this->extract_molecule_indices_for_group_set_lattice( polymer_indices_i ) );
             fragment_info_list_obj[igroup] = fragment_info_obj;
-            progress_display++;
+            if( thread_id == 0 ) progress_display++;
           }
-          break;
+          #pragma omp barrier
         }
+        break;
+      }
       default:
         break;
     }

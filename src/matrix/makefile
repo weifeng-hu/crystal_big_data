@@ -48,7 +48,7 @@ debug_matrix: target_matrix
 ass:
 	$(cpp_matrix)  -c -O3 $(cppopt_matrix) -g -Wa,-ahl $(cppflags_matrix) $(iquads_src)/matrix/matrix_function.cpp > $(iquads_src)/matrix/matrix_function.s
 
-release_matrix: cppopt_matrix +=  -O3
+release_matrix: cppopt_matrix +=  -O3  -fopenmp
 release_matrix: target_matrix
 
 standalone_matrix: cppopt_matrix += -static

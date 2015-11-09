@@ -3,7 +3,7 @@ iquads_src      = $(iquads_root)/src/
 iquads_bin      = $(iquads_root)/bin/
 CC              = gcc
 CPP             = g++
-CPPOPT		= -O3 -std=c++11
+CPPOPT		= -O3 -std=c++11 -fopenmp
 CPPFLAGS        = -I/usr/include -I$(iquads_src)
 CHEADS          =
 CPPSRCS         =\

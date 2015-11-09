@@ -63,6 +63,7 @@ template <> inline energy_data_type compute_interaction_energy_with_fragment_ide
   PolymerReport<1> report_from_database = database.get_report_by_lattice_index<1>( x );
   energy_monomer_0 = report_from_database.fragment_energy();
 
+  /*
   PolymerReport<1> report_local( molecule_name, 
                                  report_from_database.atom_list(),
                                  report_from_database.geometry_unit(),
@@ -72,6 +73,7 @@ template <> inline energy_data_type compute_interaction_energy_with_fragment_ide
                                  report_from_database.electron_correlation_report(),
                                  report_from_database.external_program_report());
   report.set_report_cover( report_local );
+  */
   return energy_monomer_0;
 
 }; // end of function compute_interaction_energy_with_fragment_identification<1>
@@ -88,6 +90,7 @@ template <> inline energy_data_type compute_interaction_energy_with_fragment_ide
   energy_data_type energy_monomer_0 = compute_interaction_energy_with_fragment_identification<1> ( std :: array< lattice_index_type, 1 > { x[0] }, monomer_name_1, database, report.set_monomer_reports().at(0) );
   energy_data_type energy_monomer_1 = compute_interaction_energy_with_fragment_identification<1> ( std :: array< lattice_index_type, 1 > { x[1] }, monomer_name_2, database, report.set_monomer_reports().at(1) );
 
+  /*
   PolymerReport<2> report_local( dimer_name,
                                  report_from_database.atom_list(),
                                  report_from_database.geometry_unit(),
@@ -97,6 +100,7 @@ template <> inline energy_data_type compute_interaction_energy_with_fragment_ide
                                  report_from_database.electron_correlation_report(),
                                  report_from_database.external_program_report() );
   report.set_report_cover( report_local );
+  */
 
   // std :: cout << "\tinteraction energy:\t" << energy_dimer_01 - energy_monomer_0 - energy_monomer_1 << std :: endl;
   return energy_dimer_01 - energy_monomer_0 - energy_monomer_1;
@@ -127,7 +131,7 @@ template <> inline energy_data_type compute_interaction_energy_with_fragment_ide
   energy_data_type interaction_energy = energy_trimer_012 - 
                                         energy_monomer_0 - energy_monomer_1 - energy_monomer_2 - 
                                         interaction_energy_dimer_01 - interaction_energy_dimer_02 - interaction_energy_dimer_12;
-
+  /*
   PolymerReport<3> report_local( trimer_name,
                                  report_from_database.atom_list(),
                                  report_from_database.geometry_unit(),
@@ -137,7 +141,7 @@ template <> inline energy_data_type compute_interaction_energy_with_fragment_ide
                                  report_from_database.electron_correlation_report(),
                                  report_from_database.external_program_report() );
   report.set_report_cover( report_local );
-
+  */
   // std :: cout << "\tinteraction energy:\t" << interaction_energy << std :: endl;
 
   return interaction_energy;
@@ -189,7 +193,7 @@ template <> inline energy_data_type compute_interaction_energy_with_fragment_ide
                                          interaction_energy_dimer_23 -
                                          interaction_energy_trimer_012 - interaction_energy_trimer_013 - 
                                          interaction_energy_trimer_023 - interaction_energy_trimer_123;
-
+  /*
   PolymerReport<4> report_local( tetramer_name,
                                  report_from_database.atom_list(),
                                  report_from_database.geometry_unit(),
@@ -199,6 +203,7 @@ template <> inline energy_data_type compute_interaction_energy_with_fragment_ide
                                  report_from_database.electron_correlation_report() ,
                                  report_from_database.external_program_report() );
   report.set_report_cover( report_local );
+  */
 
   //std :: cout << "\tinteraction energy:\t" << interaction_energy << std :: endl;
 
