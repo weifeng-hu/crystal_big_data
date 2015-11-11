@@ -51,7 +51,7 @@ namespace iquads {
 
         if( mode_name == "local"   ) return LOCAL_RUN;
         if( mode_name == "pbs"     ) return WRITE_PBS_INPUT;
-        if( mode_name == "scratch" ) return WRITE_SBATCH_INPUT;
+        if( mode_name == "sbatch"  ) return WRITE_SBATCH_INPUT;
         if( mode_name == "harvest" ) return COLLECT_LOCAL_OUTPUT;
         if( mode_name == "dryrun"  ) return WRITE_LOCAL_INPUT;
 

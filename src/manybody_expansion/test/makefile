@@ -31,6 +31,9 @@ $(executable): $(CPPOBJS)
 tiny: $(CPPOBJS)
 	rm -rf ./try/; rm -rf /scratch/wh288/lattice_x/; $(CPP) -o $(executable) $(CPPFLAGS) $(CPPOPT) $(CPPOBJS) $(LIBS)
 
+retry: $(CPPOBJS)
+	$(CPP) -o $(executable) $(CPPFLAGS) $(CPPOPT) $(CPPOBJS) $(LIBS)
+
 $(iquads_src)/manybody_expansion/test/main.o: $(iquads_src)/manybody_expansion/test/main.cpp
 	$(CPP) -o $(iquads_src)/manybody_expansion/test/main.o -c $(CPPFLAGS) $(CPPOPT) $(iquads_src)/manybody_expansion/test/main.cpp
 

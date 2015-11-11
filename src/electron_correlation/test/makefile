@@ -3,7 +3,7 @@ IQUADS_SRC      = $(IQUADS_ROOT)/src/
 IQUADS_BIN      = $(IQUADS_ROOT)/bin/
 CC              = gcc
 CXX             = g++ 
-COPT		= -O3 -std=c++11
+COPT		= -O0 -g -std=c++11
 #-Wextra -Wcast-align \
 #-Wdisabled-optimization \
 #-Wfloat-equal -Wformat=2 \
@@ -51,6 +51,9 @@ report.o: ../*.hpp ../report.cpp
 
 molpro_agent.o: ../../interface_to_third_party/molpro_agent.cpp
 	$(CXX) -c $(COPT) $(CFLAGS) ../../interface_to_third_party/molpro_agent.cpp
+
+remove:
+	rm -rf ./input/; rm -rf ./output/; rm -rf ./scratch/
 
 clean:
 	rm *.o; rm $(PGM); rm $(IQUADS_BIN)/$(PGM)

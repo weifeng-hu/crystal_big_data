@@ -84,6 +84,8 @@ namespace iquads {
     typedef unsigned long int level_mask_type;
     typedef std :: string correlation_name_type;
 
+    constexpr level_mask_type UNKNOWN = 0x00;
+
     namespace single_reference {
 
       constexpr level_mask_type SINGLE_REFERENCE = 0x01 << 0; 

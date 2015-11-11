@@ -74,6 +74,10 @@ public:
   typedef report_type :: energy_bare_report_type       energy_report_type;
   typedef report_type :: gradient_bare_report_type     gradient_report_type;
   typedef report_type :: local_run_info_type           local_run_info_type;
+  typedef report_type :: dry_run_info_type             dry_run_info_type;
+  typedef report_type :: harvest_run_info_type         harvest_run_info_type;
+  typedef report_type :: pbs_run_info_type             pbs_run_info_type;
+  typedef report_type :: sbatch_run_info_type          sbatch_run_info_type;
   typedef base_config_type :: solution_tag_type        solution_tag_type;
   typedef base_config_type :: correlation_tag_type     correlation_tag_type;
 
@@ -86,6 +90,7 @@ public:
 
 public:
   virtual atom_list_type read_atom_list( filepath_type output_path ) = 0;
+  virtual atom_list_type read_atom_list_from_input( filepath_type input_path ) = 0;
   virtual charge_value_type read_nuclear_charge( filepath_type output_path ) = 0;
   virtual std :: tuple< number_value_type, number_value_type > read_na_nb( filepath_type output_path ) = 0;
   virtual number_value_type read_nelec( filepath_type output_path ) = 0;
@@ -93,10 +98,20 @@ public:
   virtual energy_value_type read_energy( correlation_tag_type correlation_tag, filepath_type output_path ) = 0;
 
 public:
-  virtual local_run_info_type run_external_program( filepath_type input_path, 
-                                                    directory_type scratch_dir, 
+  virtual local_run_info_type run_external_program( filepath_type input_path,
+                                                    directory_type scratch_dir,
                                                     directory_type output_dir ) = 0;
+  virtual dry_run_info_type write_dry_run_script( filepath_type input_path ) = 0;
+  virtual pbs_run_info_type write_pbs_run_script( filepath_type input_path ) = 0;
+  virtual sbatch_run_info_type write_sbatch_run_script( filepath_type input_path ) = 0;
+
   virtual energy_report_type collect_energy_data_from_output( correlation_tag_type correlation_tag, filepath_type output_path ) = 0;
+  virtual energy_report_type return_energy_null_info() = 0;
+
+  virtual std :: tuple < filepath_type, bool > locate_energy_input( base_config_ptr base_config_pointer ) = 0;
+  virtual std :: tuple < filepath_type, bool > locate_energy_output( base_config_ptr base_config_pointer ) = 0;
+  virtual harvest_run_info_type return_previous_run_status( std :: tuple < filepath_type, bool > input_status, std :: tuple< filepath_type, bool > output_status ) = 0;
+
   virtual base_config_ptr_list generate_config_list_from_request( request_type request ) = 0;
 
 public:
@@ -124,6 +139,7 @@ public:
     }
   } // end of function write_energy_input()
 
+public:
   tuple< energy_report_type, local_run_info_type > run_energy_calculation( base_config_ptr base_config_pointer ) {
    /**
     *  We write it in this way, to assure the chain of responsibility. If a directory/filename is invalid (checked by the 
@@ -134,18 +150,76 @@ public:
                                                                      this->make_directory( base_config_pointer->output_dir() ) );
     energy_report_type energy_report 
       = collect_energy_data_from_output( base_config_pointer->correlation_tag(), local_run_info.output_path() ); // call derived class
-    using std::make_tuple;
-    return make_tuple( energy_report, local_run_info );
+    return std :: make_tuple( energy_report, local_run_info );
   } // end of function run_energy_calculation()
+
+  tuple< gradient_report_type, local_run_info_type > run_gradient_calculation( base_config_ptr base_config_pointer ) {
+    // do not use this function yet!
+  } // end of function run_gradient_calculation()
+
+  tuple< energy_report_type, dry_run_info_type > write_local_energy_input( base_config_ptr base_config_pointer ) {
+    dry_run_info_type dry_run_info = this->write_dry_run_script( this->write_energy_input( base_config_pointer ) );
+    energy_report_type energy_report = this->return_energy_null_info();
+    return std :: make_tuple( energy_report, dry_run_info );
+  } // end of write_local_energy_input()
+
+  tuple< gradient_report_type, dry_run_info_type > write_local_gradient_input( base_config_ptr base_config_pointer ) {
+
+  } // end of write_local_gradient_input()
+
+  tuple< energy_report_type, pbs_run_info_type > write_pbs_energy_input( base_config_ptr base_config_pointer ) {
+    pbs_run_info_type pbs_run_info = this->write_pbs_run_script( this->write_energy_input( base_config_pointer ) );
+    energy_report_type energy_report = this->return_energy_null_info();
+    return std :: make_tuple( energy_report, pbs_run_info );
+  } // end of write_pbs_energy_input()
+
+  tuple< gradient_report_type, pbs_run_info_type > write_pbs_gradient_input( base_config_ptr base_config_pointer ) {
+    // do not use this function yet!
+  } // end of write_pbs_gradient_input()
+
+  tuple< energy_report_type, sbatch_run_info_type > write_sbatch_energy_input( base_config_ptr base_config_pointer ) {
+    sbatch_run_info_type sbatch_run_info = this->write_sbatch_run_script( this->write_energy_input( base_config_pointer ) ); 
+    energy_report_type energy_report       = this->return_energy_null_info();
+    return std :: make_tuple( energy_report, sbatch_run_info );
+  } // end of write_pbs_energy_input()
+
+  tuple< gradient_report_type, sbatch_run_info_type > write_sbatch_gradient_input( base_config_ptr base_config_pointer ) {
+    // do not use this function yet!
+  } // end of write_sbatch_energy_input()
+
+  tuple< energy_report_type, harvest_run_info_type > collect_local_energy_output( base_config_ptr base_config_pointer ) {
+    harvest_run_info_type harvest_run_info = this->return_previous_run_status( this->locate_energy_input( base_config_pointer ), 
+                                                                                 this->locate_energy_output( base_config_pointer ) );
+    energy_report_type energy_report;
+    if( harvest_run_info.input_matches_output() == true ) {
+      energy_report = this->collect_energy_data_from_output( base_config_pointer->correlation_tag(), harvest_run_info.output_path() );
+    }
+    else {
+      std :: cout << "error: detected mismatching between input [ " << harvest_run_info.input_path_name();
+      std :: cout <<                                " ] and output [ " << harvest_run_info.output_path_name();
+      std :: cout <<                                " ] " << std :: endl;
+      if( harvest_run_info.input_is_found() == false ) {
+        std :: cout << "info: input [ " << harvest_run_info.input_path_name() << " ] not found " << std :: endl;
+      }
+      if( harvest_run_info.output_is_found() == false ) {
+        std :: cout << "info: output [ " << harvest_run_info.output_path_name() << " ] not found " << std :: endl;
+      }
+      abort();
+    }
+
+    return std :: make_tuple( energy_report, harvest_run_info );
+  } // end of write_pbs_energy_input()
+
+  tuple< gradient_report_type, harvest_run_info_type > collect_local_gradient_output( base_config_ptr base_config_pointer ) {
+    // do not use this function yet!
+  } // end of write_sbatch_energy_input()
+
 
   file_name_type write_run_script( base_config_ptr base_config_pointer )
     { return string("");  } // end of function write_run_script()
 
   file_name_type collect_result( file_name_type output_filename )
     {   } // end of function collect_result()
-
-  tuple< gradient_report_type, local_run_info_type > run_gradient_calculation( base_config_ptr base_config_pointer )
-    {   } // end of function run_gradient_calculation()
 
 public:
   /**
@@ -161,20 +235,23 @@ public:
     try {
       report_type report;
       report.initialize();
+      report.set_run_mode() = iquads :: sequence :: mode :: LOCAL_RUN;
       base_config_ptr_list base_config_pointer_list = generate_config_list_from_request( request );
       for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ) {
          solution_tag_type solution_tag = base_config_pointer_list[istep]->solution_tag();
          switch( solution_tag ) {
            case( ENERGY ):
+             report.set_solution_tag() = iquads :: electron_correlation :: quantity :: ENERGY;
              report.accept_new_step_data( run_energy_calculation( base_config_pointer_list[istep] ) );
              break;
            case( GRADIENT ):
+             report.set_solution_tag() = iquads :: electron_correlation :: quantity :: GRADIENT;
              report.accept_new_step_data( run_gradient_calculation( base_config_pointer_list[istep] ) );
              break;
            default:
              throw solution_tag;
              break;
-        } // end of switch case
+         } // end of switch case
       } // end of for loop
 
       // prevent memory leak
@@ -191,17 +268,150 @@ public:
     }
   } // end of function sequence_local_run()
 
-  report_type sequence_write_local_input( request_type request ) 
-    {   } // end of function sequence_write_local_input()
+  report_type sequence_write_local_input( request_type request ) {
+    try {
+      report_type report;
+      report.initialize();
+      report.set_run_mode() = iquads :: sequence :: mode :: WRITE_LOCAL_INPUT;
+      base_config_ptr_list base_config_pointer_list = generate_config_list_from_request( request );
+      for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ) {
+         solution_tag_type solution_tag = base_config_pointer_list[istep]->solution_tag();
+         switch( solution_tag ) {
+           case( ENERGY ):
+             report.set_solution_tag() = iquads :: electron_correlation :: quantity :: ENERGY;
+             report.accept_new_step_data( write_local_energy_input( base_config_pointer_list[istep] ) );
+             break;
+           case( GRADIENT ):
+             report.set_solution_tag() = iquads :: electron_correlation :: quantity :: GRADIENT;
+             report.accept_new_step_data( write_local_gradient_input( base_config_pointer_list[istep] ) );
+             break;
+           default:
+             throw solution_tag;
+             break;
+         }
+      }
 
-  report_type sequence_write_pbs_input( request_type request )
-    {   } // end of function sequence_write_pbs_input()
+      for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ){
+        delete base_config_pointer_list[istep];
+      }
 
-  report_type sequence_write_sbatch_input( request_type request )
-    {   } // end of function sequence_write_sbatch_input()
+      return report;
+    } catch ( solution_tag_type unknown_solution_type ) {
+      using std::cout;
+      using std::endl;
+      cout << "unknown solution type" << unknown_solution_type << endl;
+      abort();
+    }
+ } // end of function sequence_write_local_input()
 
-  report_type sequence_collect_local_output( request_type request )
-    {   } // end of function sequence_collect_local_output()
+  report_type sequence_write_pbs_input( request_type request ) {
+    try {
+      report_type report;
+      report.initialize();
+      report.set_run_mode() = iquads :: sequence :: mode :: WRITE_PBS_INPUT;
+      base_config_ptr_list base_config_pointer_list = generate_config_list_from_request( request );
+      for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ) {
+         solution_tag_type solution_tag = base_config_pointer_list[istep]->solution_tag();
+         switch( solution_tag ) {
+           case( ENERGY ):
+             report.set_solution_tag() = iquads :: electron_correlation :: quantity :: ENERGY;
+             report.accept_new_step_data( write_pbs_energy_input( base_config_pointer_list[istep] ) );
+             break;
+           case( GRADIENT ):
+             report.set_solution_tag() = iquads :: electron_correlation :: quantity :: GRADIENT;
+             report.accept_new_step_data( write_pbs_gradient_input( base_config_pointer_list[istep] ) );
+             break;
+           default:
+             throw solution_tag;
+             break;
+         }
+      }
+
+      for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ){
+        delete base_config_pointer_list[istep];
+      }
+
+      return report;
+    } catch ( solution_tag_type unknown_solution_type ) {
+      using std::cout;
+      using std::endl;
+      cout << "unknown solution type" << unknown_solution_type << endl;
+      abort();
+    }
+  } // end of function sequence_write_pbs_input()
+
+  report_type sequence_write_sbatch_input( request_type request ) {
+    try {
+      report_type report;
+      report.initialize();
+      report.set_run_mode() = iquads :: sequence :: mode :: WRITE_SBATCH_INPUT;
+      base_config_ptr_list base_config_pointer_list = generate_config_list_from_request( request );
+      for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ) {
+         solution_tag_type solution_tag = base_config_pointer_list[istep]->solution_tag();
+         switch( solution_tag ) {
+           case( ENERGY ):
+             report.set_solution_tag() = iquads :: electron_correlation :: quantity :: ENERGY;
+             report.accept_new_step_data( write_sbatch_energy_input( base_config_pointer_list[istep] ) );
+             break;
+           case( GRADIENT ):
+             report.set_solution_tag() = iquads :: electron_correlation :: quantity :: GRADIENT;
+             report.accept_new_step_data( write_sbatch_gradient_input( base_config_pointer_list[istep] ) );
+             break;
+           default:
+             throw solution_tag;
+             break;
+         }
+      }
+
+      for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ){
+        delete base_config_pointer_list[istep];
+      }
+
+      return report;
+    } catch ( solution_tag_type unknown_solution_type ) {
+      using std::cout;
+      using std::endl;
+      cout << "unknown solution type" << unknown_solution_type << endl;
+      abort();
+    }
+  } // end of function sequence_write_sbatch_input()
+
+  report_type sequence_collect_local_output( request_type request ) {
+    try {
+      report_type report;
+      report.initialize();
+      report.set_run_mode() = iquads :: sequence :: mode :: COLLECT_LOCAL_OUTPUT;
+      base_config_ptr_list base_config_pointer_list = generate_config_list_from_request( request );
+      for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ) {
+         solution_tag_type solution_tag = base_config_pointer_list[istep]->solution_tag();
+         switch( solution_tag ) {
+           case( ENERGY ):
+             report.set_solution_tag() = iquads :: electron_correlation :: quantity :: ENERGY;
+             report.accept_new_step_data( collect_local_energy_output( base_config_pointer_list[istep] ) );
+             break;
+           case( GRADIENT ):
+             report.set_solution_tag() = iquads :: electron_correlation :: quantity :: GRADIENT;
+             report.accept_new_step_data( collect_local_gradient_output( base_config_pointer_list[istep] ) );
+             break;
+           default:
+             throw solution_tag;
+             break;
+         }
+      }
+
+      for( size_t istep = 0; istep < base_config_pointer_list.size(); istep++ ){
+        delete base_config_pointer_list[istep];
+      }
+
+      return report;
+    } catch ( solution_tag_type unknown_solution_type ) {
+      using std::cout;
+      using std::endl;
+      cout << "unknown solution type" << unknown_solution_type << endl;
+      abort();
+    }
+
+  } // end of function sequence_collect_local_output()
 
 public:
   report_type accept_request_and_process( request_type request ) {

@@ -33,6 +33,7 @@
 #include <utility/convert_string_to.hpp>
 #include <file_system/file_functions.hpp>
 #include <chemistry/periodic_table.hpp>
+#include <electron_correlation/correlation_level.hpp>
 #include <interface_to_third_party/molpro_config.hpp>
 #include <interface_to_third_party/molpro_agent.hpp>
 
@@ -189,6 +190,214 @@ agent_type :: run_external_program( filepath_type input_path, directory_type scr
   }
 } // end of function run_external_program()
 
+agent_type :: dry_run_info_type 
+agent_type :: write_dry_run_script( filepath_type input_path ) {
+
+  try {
+    filepath_type :: directory_type input_absolute_dir( input_path.directory().absolute() );
+    if( input_absolute_dir.exists() == false ) { input_absolute_dir.create(); }
+    {
+      filepath_type :: filename_type dry_run_single_script_filename( input_path.filename().name(),  std :: string( ".sh" ) );
+      filepath_type dry_run_single_script_filepath( input_absolute_dir, dry_run_single_script_filename );
+
+      std :: ofstream ofs_single( dry_run_single_script_filepath.absolute().c_str(), std :: ios :: out );
+      if( ofs_single.good() == false ) { throw dry_run_single_script_filepath.absolute(); }
+      ofs_single << this->program_path_ + "/" + this->program_name_ + " " + input_path.absolute();
+      ofs_single.close();
+
+      filepath_type :: filename_type dry_run_group_submission_filename( std :: string( "group_submission" ), std :: string( ".sh" ) );
+      filepath_type dry_run_group_submission_script_filepath( input_absolute_dir, dry_run_group_submission_filename );
+
+      std :: ofstream ofs_group( dry_run_group_submission_script_filepath.absolute().c_str(), std :: ios_base :: app | std :: ios_base :: out );
+      if( ofs_group.good() == false ) { throw dry_run_group_submission_script_filepath.absolute(); }
+      ofs_group << this->program_path_ + "/" + this->program_name_ + " " + input_path.absolute() << std :: endl;
+      ofs_group.close();
+
+      dry_run_info_type dry_run_info( this->program_name_,
+                                      input_path.directory().absolute(),
+                                      input_path.filename().value(),
+                                      std :: string( "not set" ),
+                                      std :: string( "not set" ),
+                                      std :: string( "not set" ),
+                                      dry_run_single_script_filepath.absolute(),
+                                      dry_run_group_submission_script_filepath.absolute() );
+      return dry_run_info;
+    }
+  } catch ( filepath_type :: filename_type :: value_type script_file_name ) {
+    std :: cout << "error in opening [ " << script_file_name << " ]" << std :: endl;
+    abort();
+  }
+
+} // end of function write_dry_run_script()
+
+agent_type :: pbs_run_info_type 
+agent_type :: write_pbs_run_script( filepath_type input_path ) {
+
+  try {
+    filepath_type :: directory_type input_absolute_dir( input_path.directory().absolute() );
+    if( input_absolute_dir.exists() == false ) { input_absolute_dir.create(); }
+    {
+      filepath_type :: filename_type pbs_run_single_script_filename( input_path.filename().name(),  std :: string( ".sh" ) );
+      filepath_type pbs_run_single_script_filepath( input_absolute_dir, pbs_run_single_script_filename );
+
+      std :: ofstream ofs_single( pbs_run_single_script_filepath.absolute().c_str(), std :: ios :: out );
+      if( ofs_single.good() == false ) { throw pbs_run_single_script_filepath.absolute(); }
+      ofs_single << this->program_path_ + "/" + this->program_name_ + " " + input_path.absolute();
+      ofs_single.close();
+
+      filepath_type :: filename_type pbs_run_group_submission_filename( std :: string( "group_submission" ), std :: string( ".sh" ) );
+      filepath_type pbs_run_group_submission_script_filepath( input_absolute_dir, pbs_run_group_submission_filename );
+
+      std :: ofstream ofs_group( pbs_run_group_submission_script_filepath.absolute().c_str(), std :: ios_base :: app | std :: ios_base :: out );
+      if( ofs_group.good() == false ) { throw pbs_run_group_submission_script_filepath.absolute(); }
+      ofs_group << this->program_path_ + "/" + this->program_name_ + " " + input_path.absolute() << std :: endl;
+      ofs_group.close();
+
+      pbs_run_info_type pbs_run_info( this->program_name_,
+                                      input_path.directory().absolute(),
+                                      input_path.filename().value(),
+                                      std :: string( "not set" ),
+                                      std :: string( "not set" ),
+                                      std :: string( "not set" ),
+                                      pbs_run_single_script_filepath.absolute(),
+                                      pbs_run_group_submission_script_filepath.absolute() );
+      return pbs_run_info;
+    }
+  } catch ( filepath_type :: filename_type :: value_type script_file_name ) {
+    std :: cout << "error in opening [ " << script_file_name << " ]" << std :: endl;
+    abort();
+  }
+
+} // end of function write_pbs_run_script()
+
+agent_type :: sbatch_run_info_type 
+agent_type :: write_sbatch_run_script( filepath_type input_path ) {
+
+  try {
+    filepath_type :: directory_type input_absolute_dir( input_path.directory().absolute() );
+    if( input_absolute_dir.exists() == false ) { input_absolute_dir.create(); }
+    {
+      filepath_type :: filename_type sbatch_run_single_script_filename( input_path.filename().name(),  std :: string( ".sh" ) );
+      filepath_type sbatch_run_single_script_filepath( input_absolute_dir, sbatch_run_single_script_filename );
+
+      std :: ofstream ofs_single( sbatch_run_single_script_filepath.absolute().c_str(), std :: ios :: out );
+      if( ofs_single.good() == false ) { throw sbatch_run_single_script_filepath.absolute(); }
+      ofs_single << this->program_path_ + "/" + this->program_name_ + " " + input_path.absolute();
+      ofs_single.close();
+
+      filepath_type :: filename_type sbatch_run_group_submission_filename( std :: string( "group_submission" ), std :: string( ".sh" ) );
+      filepath_type sbatch_run_group_submission_script_filepath( input_absolute_dir, sbatch_run_group_submission_filename );
+
+      std :: ofstream ofs_group( sbatch_run_group_submission_script_filepath.absolute().c_str(), std :: ios_base :: app | std :: ios_base :: out );
+      if( ofs_group.good() == false ) { throw sbatch_run_group_submission_script_filepath.absolute(); }
+      ofs_group << "srun " + this->program_path_ + "/" + this->program_name_ + " " + input_path.absolute() << std :: endl;
+      ofs_group.close();
+
+      sbatch_run_info_type sbatch_run_info( this->program_name_,
+                                      input_path.directory().absolute(),
+                                      input_path.filename().value(),
+                                      std :: string( "not set" ),
+                                      std :: string( "not set" ),
+                                      std :: string( "not set" ),
+                                      sbatch_run_single_script_filepath.absolute(),
+                                      sbatch_run_group_submission_script_filepath.absolute() );
+      return sbatch_run_info;
+    }
+  } catch ( filepath_type :: filename_type :: value_type script_file_name ) {
+    std :: cout << "error in opening [ " << script_file_name << " ]" << std :: endl;
+    abort();
+  }
+
+} // end of function write_sbatch_run_script
+
+agent_type :: energy_report_type 
+agent_type :: return_energy_null_info() {
+
+  return energy_report_type( std :: make_tuple( std :: string( "" ), iquads :: structure :: Molecule() ), 0.0e0, iquads :: electron_correlation :: UNKNOWN );
+
+} // end of function return_energy_basic_info
+
+std :: tuple< agent_type :: filepath_type, bool > 
+agent_type :: locate_energy_input( base_config_ptr base_config_pointer ) {
+
+  directory_type input_dir( base_config_pointer->input_dir() );
+  filepath_type :: filename_type input_name( base_config_pointer->molecule_name(), base_config_pointer->file_extension() );
+  filepath_type input_filepath( input_dir, input_name );
+
+  return std :: make_tuple( input_filepath, input_filepath.exists() );
+
+} // end of function locate_energy_input()
+
+std :: tuple < agent_type :: filepath_type, bool >
+agent_type :: locate_energy_output( base_config_ptr base_config_pointer ) {
+
+  directory_type output_dir( base_config_pointer->output_dir() );
+  filepath_type :: filename_type output_name( base_config_pointer->molecule_name(), std :: string( ".out" ) );
+  filepath_type output_filepath( output_dir, output_name );
+
+  return std :: make_tuple( output_filepath, output_filepath.exists() );
+
+} // end of function locate_energy_output()
+
+agent_type :: harvest_run_info_type 
+agent_type :: return_previous_run_status( std :: tuple< filepath_type, bool > input_status, std :: tuple< filepath_type, bool > output_status ) {
+
+  const bool input_is_found = std :: get<1> ( input_status );
+  const bool output_is_found = std :: get<1> ( output_status );
+
+  bool input_matches_output = false;
+  if( input_is_found && output_is_found ) {
+    atom_list_type atom_list_input  = this->read_atom_list_from_input( std :: get<0>( input_status ) );
+    atom_list_type atom_list_output = this->read_atom_list( std :: get<0> ( output_status ) );
+    if( atom_list_input.size() != atom_list_output.size() ) { input_matches_output = false; }
+    for( size_t i = 0; i < atom_list_input.size(); i++ ) {
+      if( atom_list_input[i] == atom_list_output[i] ) {
+        input_matches_output = true;
+      } else {
+        input_matches_output = false;
+        break;
+      }
+    }
+  }
+
+  return harvest_run_info_type( this->program_name_,
+                                std :: get<0> ( input_status ).directory().absolute(),
+                                std :: get<0> ( input_status ).filename().value(),
+                                std :: string( "not set" ),
+                                std :: get<0> ( output_status ).directory().absolute(),
+                                std :: get<0> ( output_status ).filename().value(),
+                                input_matches_output,
+                                input_is_found,
+                                output_is_found );
+
+} // end of function return_previous_run_status()
+
+agent_type :: atom_list_type 
+agent_type :: read_atom_list_from_input( filepath_type input_path ) {
+
+  iquads :: structure :: AtomList retval;
+  retval.resize(0);
+
+  std :: string lineA( "geometry={" );
+  std :: string lineB( "}" );
+  std :: vector< std :: string > coordinate_block = iquads :: file_system :: read_block_between_lineA_and_lineB( lineA, lineB, input_path.absolute() );
+
+  for( size_t i = 0; i < coordinate_block.size(); i++ ) {
+    std :: string line = coordinate_block[i];
+    std :: vector< std :: string > vector_of_string;
+    boost :: trim( line );
+    boost :: split( vector_of_string, line, boost :: is_any_of( " " ), boost :: token_compress_on );
+    retval.push_back ( iquads :: structure :: Atom( vector_of_string.at(0), 
+                                                    iquads :: utility :: string_tool :: convert_string_to<double> ( vector_of_string.at(1) ), 
+                                                    iquads :: utility :: string_tool :: convert_string_to<double> ( vector_of_string.at(2) ), 
+                                                    iquads :: utility :: string_tool :: convert_string_to<double> ( vector_of_string.at(3) ), 
+                                                    std :: string( "bohr" ) ) );
+  }
+
+  return retval;
+
+} // end of function read_atom_list()
+
 agent_type :: atom_list_type 
 agent_type :: read_atom_list( filepath_type output_path ) {
 
@@ -285,17 +494,17 @@ agent_type :: collect_energy_data_from_output( correlation_tag_type correlation_
 
   // get the energy value to a correlation
   double energy_data = this->read_energy( correlation_tag, output_path );
-
+  std :: string molecule_name = output_path.filename().name();
   //std :: cout << "\t" << std :: setw(16) << std :: setprecision(12) << energy_data;
 
   // also get the atom list and molecule name
   // molecule name is the filename, but without extension
-  std :: string molecule_name = output_path.filename().name();
 
   // find out the molecule atom list
   agent_type :: atom_list_type atom_list = this->read_atom_list( output_path );
-  int charge = this->read_nuclear_charge( output_path ) - this->read_nelec( output_path );
   // find out the molecule charge
+  int charge = this->read_nuclear_charge( output_path ) - this->read_nelec( output_path );
+
   return ExternalProgramReport :: EnergyReport( std :: make_tuple( molecule_name, iquads :: structure :: Molecule( atom_list, charge ) ), energy_data, correlation_tag );
 
 }; // end of function collect_energy_data_from_output()

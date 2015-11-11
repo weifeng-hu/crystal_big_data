@@ -61,7 +61,7 @@ int main( int argc, char* argv[] ) {
 
   iquads :: structure :: UnitCell< iquads :: structure :: Molecule > unit_cell( node_list, lattice_parameter );
 
-  iquads :: structure :: Lattice< iquads :: structure :: UnitCell< iquads :: structure :: Molecule > > lattice( unit_cell, 4, 4, 4 );
+  iquads :: structure :: Lattice< iquads :: structure :: UnitCell< iquads :: structure :: Molecule > > lattice( unit_cell, 1, 1, 1 );
 
   iquads :: structure :: Bulk< iquads :: structure :: Molecule > bulk;
   //std :: cout << lattice.is_filled() << std :: endl;
@@ -72,11 +72,11 @@ int main( int argc, char* argv[] ) {
   iquads :: manybody_expansion :: Report report = agent.accept_request_and_process
       ( iquads :: manybody_expansion :: Request ( std :: make_tuple ( "lattic_x", lattice ), 
                                                   std :: make_tuple ( "unknown_bulk", bulk ),
-                                                  2, "hf", "molpro", "sto-3g",
-                                                  "local",
+                                                  4, "hf", "molpro", "sto-3g",
+                                                  "harvest",
                                                   "try",
                                                   "unknown", "/scratch/wh288/lattice_x/", "unknown",
-                                                  4.0e0, iquads :: manybody_expansion :: PRODUCTION ) );
+                                                  9.0e0, iquads :: manybody_expansion :: PRODUCTION ) );
 //  std :: cout << std :: setprecision(12) << std :: setw(16) << "monomer energy per unit cell: "  << report.return_one_body_energy_per_unit_cell() << std :: endl;
 //  std :: cout << std :: setprecision(12) << std :: setw(16) << "dimer interaction energy per unit cell: " << report.return_two_body_interaction_energy_per_unit_cell() << std :: endl;
 //  std :: cout << std :: setprecision(12) << std :: setw(16) << "trimer interaction energy per unit cell: " << report.return_three_body_interaction_energy_per_unit_cell() << std :: endl;

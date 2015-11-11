@@ -164,10 +164,11 @@ namespace manybody_expansion {
                       std :: array< lattice_index_type, 2 > index = { std :: make_tuple( std :: make_tuple( 0, 0, 0 ), i_R0 ), 
                                                                       std :: make_tuple( std :: make_tuple( R_a, R_b, R_c ), i_R ) };
                       energy_data_type dimer_interaction_energy = compute_interaction_energy_with_fragment_identification<2> ( index, std :: string( dimer_name ), database, dimer_report );
+                      //std :: cout << dimer_interaction_energy << std :: endl;
                       /*
                       report.attach_new_dimer_report( dimer_report );
                       */
-                      retval += dimer_interaction_energy;
+                      retval_local += dimer_interaction_energy;
                     }
                   }
                 }

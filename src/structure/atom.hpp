@@ -220,6 +220,12 @@ public:
     return lhs;
   }
 
+  inline bool operator==( const this_type& rhs ) {
+    return ( this->element_name_ == rhs.element_name() );
+  }
+
+  inline bool operator!=( const this_type& rhs )
+    { return !( *this == rhs ); }
   /**
    *  I/O member functions
    */

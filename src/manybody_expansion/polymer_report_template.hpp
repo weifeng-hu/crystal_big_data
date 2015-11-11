@@ -86,7 +86,7 @@ public:
   PolymerReport() {
     this->fragment_name_ = "unknown";
     this->atom_list_.resize(0);
-    this->geometry_unit_ = UNKNOWN;
+    this->geometry_unit_ = iquads :: structure :: geometry_unit :: UNKNOWN;
     this->composition_list_.fill(0);
     this->fragment_energy_ = 0.0e0;
     this->interaction_energy_ = 0.0e0;

@@ -43,7 +43,7 @@ int main( int argc, char* argv[] ) {
   std :: cout << "geometry: " << endl << std :: get<1>( molecule_info ) << endl;
 
   // let's create an electron correlation setting
-  iquads :: electron_correlation :: Setting  calculation_setting( iquads :: sequence :: mode :: LOCAL_RUN,
+  iquads :: electron_correlation :: Setting  calculation_setting( iquads :: sequence :: mode :: COLLECT_LOCAL_OUTPUT,
                                                                   "sto-3g",
                                                                   0,
                                                                   0,
@@ -62,5 +62,28 @@ int main( int argc, char* argv[] ) {
   std :: cout << x << std :: endl;
   std :: cout << client.report().molecule_name() << std :: endl;
   std :: cout << client.report().energy() << std :: endl;
+
+
+/*
+  iquads :: electron_correlation :: Setting  calculation_setting_collect( iquads :: sequence :: mode :: COLLECT_LOCAL_OUTPUT,
+                                                                  "sto-3g",
+                                                                  0,
+                                                                  0,
+                                                                  iquads :: electron_correlation :: single_reference :: mean_field :: RHF,
+                                                                  iquads :: interface_to_third_party :: program :: MOLPRO,
+                                                                  "./input/",
+                                                                  "./scratch/",
+                                                                  "./output/" );
+  std :: cout << calculation_setting_collect << std :: endl;
+
+  // let's create a client
+  iquads :: electron_correlation :: Client client_collect;
+  // and run application
+  client_collect.driver( molecule_info, calculation_setting_collect );
+  iquads :: structure :: Molecule x_collect = client_collect.report().molecule_obj();
+  std :: cout << x_collect << std :: endl;
+  std :: cout << client_collect.report().molecule_name() << std :: endl;
+  std :: cout << client_collect.report().energy() << std :: endl;
+*/
 
 }  // end of main()

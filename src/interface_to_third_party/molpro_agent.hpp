@@ -70,12 +70,22 @@ public:
 public:
   base_config_ptr_list generate_config_list_from_request( request_type request );
   local_run_info_type run_external_program( filepath_type input_path, directory_type scratch_dir, directory_type output_dir );
+  dry_run_info_type write_dry_run_script( filepath_type input_path );
+  pbs_run_info_type write_pbs_run_script( filepath_type input_path );
+  sbatch_run_info_type write_sbatch_run_script( filepath_type input_path );
+
+  energy_report_type return_energy_null_info();
+  std :: tuple < filepath_type, bool > locate_energy_input( base_config_ptr base_config_pointer );
+  std :: tuple < filepath_type, bool > locate_energy_output( base_config_ptr base_config_pointer );
+  harvest_run_info_type return_previous_run_status( std :: tuple < filepath_type, bool > input_status, std :: tuple< filepath_type, bool > output_status );
+
   filepath_type write_input_hf_energy( base_config_ptr base_config_pointer );
   filepath_type write_input_mp2_energy( base_config_ptr base_config_pointer );
   filepath_type write_input_casscf_energy( base_config_ptr base_config_pointer );
   energy_report_type collect_energy_data_from_output( correlation_tag_type correlation_tag, filepath_type output_path );
 
   atom_list_type read_atom_list( filepath_type output_path );
+  atom_list_type read_atom_list_from_input( filepath_type input_path );
   charge_value_type read_nuclear_charge( filepath_type output_path );
   std :: tuple< number_value_type, number_value_type > read_na_nb( filepath_type output_path );
   number_value_type read_nelec( filepath_type output_path );

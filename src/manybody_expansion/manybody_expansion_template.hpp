@@ -27,6 +27,7 @@
 #ifndef MANYBODY_EXPANSION_TEMPLATE_HPP
 #define MANYBODY_EXPANSION_TEMPLATE_HPP
 
+#include <iquads/sequence.hpp>
 #include <manybody_expansion/config.hpp>
 #include <electron_correlation/setting.hpp>
 #include <manybody_expansion/fragment_signature_database.hpp>
@@ -126,7 +127,10 @@ public:
     electron_calc_setting_type setting;
     setting.generate_from( config );
     this->fragment_signature_database_.build( config.expansion_order(), config.lattice_info(), config.radius(), setting );
-    return this->expansion_formula_with_fragment_identification_.compute( config, this->fragment_signature_database_, report );
+    if( config.run_mode() == iquads :: sequence :: mode :: LOCAL_RUN ||
+        config.run_mode() == iquads :: sequence :: mode :: COLLECT_LOCAL_OUTPUT ) {
+      return this->expansion_formula_with_fragment_identification_.compute( config, this->fragment_signature_database_, report );
+    }
   }
 
 public:

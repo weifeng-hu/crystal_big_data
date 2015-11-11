@@ -25,6 +25,7 @@
  */
 
 #include <tuple>
+#include <iquads/sequence.hpp>
 #include <electron_correlation/report.hpp>
 
 namespace iquads {
@@ -35,13 +36,40 @@ typedef Report  report_type;
 
 void report_type :: collect_data_from_external_report( external_report_type external_report ) {
 
-  this->external_report_ = external_report;
-  for( size_t i = 0; i < this->external_report_.energy_local_run_report_list().size(); i++ ) {
-    this->correlated_energy_report_.set_correlated_energy_of( std :: get<0>( this->external_report_.energy_local_run_report_list()[i] ).energy_solution_tag() )
-      = std :: get<0>( this->external_report_.energy_local_run_report_list()[i] ).energy();
+  switch( external_report.run_mode() ) {
+    case( iquads :: sequence :: mode :: LOCAL_RUN ): {
+      this->external_report_ = external_report;
+      for( size_t i = 0; i < this->external_report_.energy_local_run_report_list().size(); i++ ) {
+        this->correlated_energy_report_.set_correlated_energy_of( std :: get<0>( this->external_report_.energy_local_run_report_list()[i] ).energy_solution_tag() )
+          = std :: get<0>( this->external_report_.energy_local_run_report_list()[i] ).energy();
+      }
+      this->molecule_info_ = std :: make_tuple( std :: get<0> ( this->external_report_.energy_local_run_report_list()[0] ).molecule_name(),
+                                                std :: get<0> ( this->external_report_.energy_local_run_report_list()[0] ).molecule_obj()   );
+    }
+    break;
+    case( iquads :: sequence :: mode :: WRITE_LOCAL_INPUT ): {
+      this->external_report_ = external_report;
+    }
+    break;
+    case( iquads :: sequence :: mode :: WRITE_PBS_INPUT ): {
+      this->external_report_ = external_report;
+    }
+    break;
+    case( iquads :: sequence :: mode :: WRITE_SBATCH_INPUT ): {
+      this->external_report_ = external_report;
+    }
+    break;
+    case( iquads :: sequence :: mode :: COLLECT_LOCAL_OUTPUT ): {
+      this->external_report_ = external_report;
+      for( size_t i = 0; i < this->external_report_.energy_harvest_run_report_list().size(); i++ ) {
+        this->correlated_energy_report_.set_correlated_energy_of( std :: get<0>( this->external_report_.energy_harvest_run_report_list()[i] ).energy_solution_tag() )
+          = std :: get<0>( this->external_report_.energy_harvest_run_report_list()[i] ).energy();
+      }
+      this->molecule_info_ = std :: make_tuple( std :: get<0> ( this->external_report_.energy_harvest_run_report_list()[0] ).molecule_name(),
+                                                std :: get<0> ( this->external_report_.energy_harvest_run_report_list()[0] ).molecule_obj()   );
+    }
+    break;
   }
-  this->molecule_info_ = std :: make_tuple( std :: get<0> ( this->external_report_.energy_local_run_report_list()[0] ).molecule_name(),
-                                            std :: get<0> ( this->external_report_.energy_local_run_report_list()[0] ).molecule_obj()   );
 
 }; // end of function collect_data_from_external_report()
 
