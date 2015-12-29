@@ -29,24 +29,52 @@ def import_unit_cell( fg_config ):
 
   natom = fg_config.natom;
 
-  xyz_file_name   = config.xyz_name;
-  from geometry_file import read_xyz;
-  coordinates = [];
-  coordinates = read_xyz( xyz_file_nam );
+  ''' Create a unit_cell obj '''
+  import unit_cell_config;
+  new_unit_cell = unit_cell_config.UnitCellConfig();
 
-  natom_imported = len( coordinates );
+  ''' Read molecules in a unit cell '''
+  xyz_file_name = fg_config.xyz_file_name;
+  from read import read_xyz;
+  new_unit_cell.nodes = read_xyz( xyz_file_name );
+  import copy;
+  natom_imported = copy.deepcopy( new_unit_cell.natom() );
 
   if natom_imported != natom:
-    print "warning: import number of atom ", natom_import, " not equal to preset natom", natom;
+    print "warning: import number of atom ", natom_imported, " not equal to pre-set natom", natom;
 
-  const_file_name = config.const_name;
-  from geometry_file import read_const;
-  constants = [];
-  constants = config.read_const( const_file_name );
+  ''' Read lattice constants ''' 
+  lattice_constant_file_name = fg_config.lattice_constant_file_name;
+  from read import read_lattice_constant;
+  new_unit_cell.lattice_constant = read_lattice_constant( lattice_constant_file_name );
+ 
+  return new_unit_cell;
 
+
+def driver( fg_config_input ):
+
+  ''' Initialize the fragment generator config '''
+  import fragment_generator_config;
+  fg_config = fragment_generator_config.FragmentGeneratorConfig();
+
+  ''' fg_config_input is something user-defined, unless the coordinates '''
   import copy;
-  fg_config.coordinates = copy.deepcopy( coordinates );
-  fg_config.constants   = copy.deepcopy( constants   );
+  fg_config = copy.deepcopy( fg_config_input );
+
+  ''' Impport a unit_cell obj '''
+  new_unit_cell = import_unit_cell( fg_config );
+
+  ''' Set the main config, the unit_cell info '''
+  fg_config.unit_cell_info = copy.deepcopy( new_unit_cell );
+
+  import main_cpp;
+  main_cpp.write( fg_config );
+
+  import makefile;
+  makefile.write( fg_config );
+
+  print "Compiling...\n";
+  import subprocess;
+  subprocess.call( "make" ); 
 
   return 0;
-

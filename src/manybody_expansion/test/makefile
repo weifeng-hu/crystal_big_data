@@ -16,7 +16,7 @@ LIBS            = $(iquads_src)/manybody_expansion/libiquads_manybody_expansion.
 		  $(iquads_src)/blas/libiquads_blas_interface.a\
 		  -L/usr/lib64 -lboost_filesystem -lboost_date_time -lboost_system\
 		  -L/home/intel/mkl/compiler_and_libraries/linux/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core \
-	-lgfortran
+	 	  -lgfortran
 		  #-L/home/intel/compilers_and_libraries/linux/lib/intel64 -liomp5 -lifcore -lifport -limf -lirc -lintlc
 executable      = $(iquads_src)/manybody_expansion/test/test
 

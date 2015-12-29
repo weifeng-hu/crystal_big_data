@@ -4,7 +4,7 @@ iquads_bin	= $(iquads_root)/bin/
 
 cc_blas		= gcc
 cpp_blas	= g++
-fc_blas		= gfortran -m64
+fc_blas		= gfortran 
 ar_blas		= ar -r 
 
 cflags_blas	= -I$(iquads_src) -I/usr/include

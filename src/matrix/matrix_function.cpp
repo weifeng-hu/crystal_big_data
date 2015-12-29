@@ -24,7 +24,7 @@
  *
  */
 
-#include <emmintrin.h>
+//#include <emmintrin.h>
 #include <omp.h>
 #include <stdlib.h>
 #include <math.h>
