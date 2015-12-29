@@ -11,10 +11,12 @@ new_fg.driver_name = "./main.cpp";
 new_fg.input_name = "unknown";
 new_fg.scratch_name = "/scratch/wh288/";
 new_fg.output_name = "unknown";
-new_fg.a = 1;
-new_fg.b = 1;
-new_fg.c = 1;
+new_fg.a = 3;
+new_fg.b = 3;
+new_fg.c = 3;
 new_fg.basis_set = "6-31g";
+new_fg.radius = 9.0;
+new_fg.order = 2;
 
 from manybody_expansion.api import fragment_generator;
 
