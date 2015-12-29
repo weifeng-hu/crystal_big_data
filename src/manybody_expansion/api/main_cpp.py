@@ -67,7 +67,7 @@ def write_nodes( fg_config, f_main_cpp ):
       y       = coordinate_of_node[iatom][2];
       z       = coordinate_of_node[iatom][3];
       unit    = coordinate_of_node[iatom][4];
-      f_main_cpp.write( "              iquads :: structure :: Atom( std :: string(" + quotation_mark + str(element) + quotation_mark + "), " + str(x) + ", " + str(y) + ", " + str(z) + ", " + "std :: string( " + quotation_mark + unit + quotation_mark + " ) )," + "\n");
+      f_main_cpp.write( "              iquads :: structure :: Atom( std :: string(" + quotation_mark + str(element) + quotation_mark + "), " + str(x) + ", " + str(y) + ", " + str(z) + ", " + "std :: string( " + quotation_mark + unit + quotation_mark +" ) )," + "\n");
     f_main_cpp.write( "          };\n" );
     f_main_cpp.write( "  iquads :: structure :: Molecule " + "molecule_" + str(inode) + "( atom_list_" + str(inode) + ", 0" + "); \n" );
     f_main_cpp.write( "  node_list.push_back( molecule_" + str( inode ) + " );\n");
