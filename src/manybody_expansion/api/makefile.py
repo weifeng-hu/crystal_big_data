@@ -54,7 +54,7 @@ def write( fg_config ):
   f_makefile.write( "$(executable): $(CPPOBJS)\n" );
   f_makefile.write( "\t$(CPP) -o $(executable) $(CPPFLAGS) $(CPPOPT) $(CPPOBJS) $(LIBS)\n" );
   f_makefile.write( "\n" );
-  f_makefile.write( current_directory + "/main.o:\n" );
+  f_makefile.write( current_directory + "/main.o:  " + current_directory + "/main.cpp\n" );
   f_makefile.write( "\t$(CPP) -o " + current_directory + "/main.o " + " -c $(CPPFLAGS) $(CPPOPT) " + fg_config.cppsrcs + "\n" );
   f_makefile.write( "\n" );
   f_makefile.write( "clean:\n" );
