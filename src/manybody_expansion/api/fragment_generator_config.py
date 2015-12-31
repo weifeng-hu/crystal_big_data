@@ -69,7 +69,13 @@ class FragmentGeneratorConfig:
     current_directory = os.getcwd();
     self.cppsrcs = current_directory + "/main.cpp";
     self.cppobjs = "$(CPPSRCS:.cpp=.o)";
-    self.libs = "$(iquads_src)/manybody_expansion/libiquads_manybody_expansion.a $(iquads_src)/electron_correlation/libiquads_electron_correlation.a $(iquads_src)/interface_to_third_party/libiquads_third_party.a $(iquads_src)/matrix/libiquads_matrix.a $(iquads_src)/blas/libiquads_blas_interface.a -lboost_filesystem -lboost_date_time -lboost_system -llapack -lblas -lrt -lpthread -lgfortran";
+    self.libs = "";
+    import platform
+    arch = platform.machine();
+    if arch == "x86" or arch == "x86_64":
+      self.libs = "$(iquads_src)/manybody_expansion/libiquads_manybody_expansion.a $(iquads_src)/electron_correlation/libiquads_electron_correlation.a $(iquads_src)/interface_to_third_party/libiquads_third_party.a $(iquads_src)/matrix/libiquads_matrix.a $(iquads_src)/blas/libiquads_blas_interface.a -lboost_filesystem -lboost_date_time -lboost_system -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lrt -lpthread -lgfortran";
+    else:
+      self.libs = "$(iquads_src)/manybody_expansion/libiquads_manybody_expansion.a $(iquads_src)/electron_correlation/libiquads_electron_correlation.a $(iquads_src)/interface_to_third_party/libiquads_third_party.a $(iquads_src)/matrix/libiquads_matrix.a $(iquads_src)/blas/libiquads_blas_interface.a -lboost_filesystem -lboost_date_time -lboost_system -llapack -lblas -lrt -lpthread -lgfortran";
     self.executable = current_directory + "/fg_driver";
 
 

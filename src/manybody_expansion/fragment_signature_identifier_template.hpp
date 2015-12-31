@@ -285,16 +285,20 @@ private:
         omp_set_dynamic(0);
         const size_t num_thread = omp_get_num_procs();
         omp_set_num_threads( num_thread );
-        std :: string display_message = std :: string( "Filling fragment group info [ openmp, automatic, num_thread = " ) + 
-                                        std :: to_string( num_thread ) + 
-                                        std :: string( " ]  for " ) + 
+//        std :: string display_message = std :: string( "Filling fragment group info [ openmp, automatic, num_thread = " ) + 
+//                                        std :: to_string( num_thread ) + 
+//                                        std :: string( " ]  for " ) + 
+//                                        std :: to_string( n_group ) + 
+//                                        std :: string( " prototype fragments ... " );
+        std :: string display_message = std :: string( "Filling fragment group info " ) +
+                                        std :: string( "for " ) + 
                                         std :: to_string( n_group ) + 
                                         std :: string( " prototype fragments ... " );
         progress_display_type progress_display( display_message, n_group/num_thread );
-        #pragma omp parallel 
+        //#pragma omp parallel 
         {
           const int thread_id = omp_get_thread_num();
-          #pragma omp for
+          //#pragma omp for
           for( size_t igroup = 0; igroup < n_group; igroup++ ) {
             std :: vector<int> polymer_indices_i = group_indices.at(igroup);
             fragment_info_type fragment_info_obj( this->get_signature_of_group_lattice( polymer_indices_i, setting ),
@@ -302,7 +306,7 @@ private:
             fragment_info_list_obj[igroup] = fragment_info_obj;
             if( thread_id == 0 ) progress_display++;
           }
-          #pragma omp barrier
+          //#pragma omp barrier
         }
         break;
       }

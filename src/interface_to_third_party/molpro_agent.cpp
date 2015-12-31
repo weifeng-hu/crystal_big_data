@@ -306,7 +306,7 @@ agent_type :: write_sbatch_run_script( filepath_type input_path ) {
       ofs_single << "mkdir -p ../output/" << std :: endl;
       // On servers, program_name_ is assumed to be in $PATH, so we omit the program_path_ here;
       // Also, molpro doesn't need output name, also we don't use absolute path of input file, just assuming that we are in the current dir
-      ofs_single << this->program_name_ + " ./" + input_path.filename().value();
+      ofs_single << this->program_name_ + " ./" + input_path.filename().value()        << std :: endl;
       ofs_single << "cp ./" << input_path.filename().name() << ".out" << " ../output/" << std :: endl;
       ofs_single << "cp ./" << input_path.filename().name() << ".xml" << " ../output/" << std :: endl;
       ofs_single.close();
@@ -321,13 +321,13 @@ agent_type :: write_sbatch_run_script( filepath_type input_path ) {
       // write a sbatch dependency list
       if( group_submission_script_already_created == false ) {
         // if the first time, then no dependency
-        ofs_group << "new_jobid=`sbatch ./" << sbatch_run_single_script_filename << " | awk { print $NF }` " << std :: endl;
+        ofs_group << "new_jobid=`sbatch ./" << sbatch_run_single_script_filename.value() << " | awk '{ print $NF }'` " << std :: endl;
         ofs_group << "echo $new_jobid not dependent" << std :: endl;
         ofs_group << "old_jobid=$new_jobid" << std :: endl;
         ofs_group << std :: endl;
       }
       else {
-        ofs_group << "new_jobid=`sbatch --dependency=afterany:$old_jobid ./" << sbatch_run_single_script_filename << " | awk { print $NF }` " 
+        ofs_group << "new_jobid=`sbatch --dependency=afterany:$old_jobid ./" << sbatch_run_single_script_filename.value() << " | awk '{ print $NF }'` " 
                   << std :: endl;
         ofs_group << "echo $new_jobid is dependent on $old_jobid" << std :: endl;
         ofs_group << "old_jobid=$new_jobid" << std :: endl;
