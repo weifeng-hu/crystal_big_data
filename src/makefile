@@ -25,31 +25,48 @@ fopt_iquads	=
 uname_m_iquads	= $(shell uname -m)
 machine_iquads	= $(uname_m_iquads)
 
-ifneq ( , $(findstring arm, $(machine_iquads) ) )
+ifeq ($(findstring arm, $(machine_iquads) ),arm)
+$(info arm detected ... set opt as -O0)
 copt_iquads	+= -O0
 cppopt_iquads	+= -O0
 fopt_iquads	+= -O0
 # this covers x86 and x86_64
-else ifneq ( , $(findstring x86, $(machine_iquads) ) )
+endif
+
+ifeq ($(findstring x86, $(machine_iquads) ),x86)
+$(info x86/x86_64 detected ... set opt as -O3)
 copt_iquads	+= -O3
 cppopt_iquads	+= -O3
 fopt_iquads	+= -O3
+endif
 
 # Also specifically add machine mode for armv7, ONLY applies to GNU compilers!!!
-else ifneq ( ,$(findstring arm, $(machine_iquads) ) )
+ifeq ($(findstring armv7, $(machine_iquads) ),armv7)
+$(info armv7 detected ... append opt as -mcpu=cortex-a15)
 copt_iquads	+= -mcpu=cortex-a15 
 cppopt_iquads	+= -mcpu=cortex-a15 
-fopt_iquads	+= -mcpu=cortex-a15 
+fopt_iquads	+= -mcpu=cortex-a15
 endif
+ 
+ifeq ($(findstring x86, $(machine_iquads) ),x86)
+$(info x86/x86_64 detected ... opt unchanged)
+copt_iquads	+= 
+cppopt_iquads	+= 
+fopt_iquads	+= 
+endif
+
 
 lib_iquads	= -lboost_filesystem -lboost_date_time -lboost_system
 
 # blas and lapack libraries
 # arm doesn't have mkl, so other blas and lapack are used
-ifneq ( ,$(findstring arm, $(machine_iquads) ) )
+ifeq ($(findstring arm, $(machine_iquads) ),arm)
+$(info arm detected, append open-source math libs)
 lib_iquads	+= -llapack -lblas
-else ifneq ( ,$(findstring x86, $(machine_iquads) ) )
-$(info x)
+endif
+
+ifeq ($(findstring x86, $(machine_iquads) ),x86)
+$(info x86/x86_64 detected ... append intel math libs)
 lib_iquads	+= -lmkl_intel_lp64 -lmkl_sequential -lmkl_core
 endif
 
@@ -73,7 +90,7 @@ debug:
 	make debug_manybody_expansion
 
 release: 
-	@echo make release_blas;\
+	make release_blas;\
 	make release_matrix;\
 	make release_third_party;\
 	make release_electron_correlation;\
