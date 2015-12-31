@@ -273,6 +273,13 @@ agent_type :: write_pbs_run_script( filepath_type input_path ) {
 agent_type :: sbatch_run_info_type 
 agent_type :: write_sbatch_run_script( filepath_type input_path ) {
 
+  // Instead of implementing a script structure like local run: individual scripts + a group submission as a piling up of individual 
+  // scripts,
+  // the sbatch script features individual scripts which are standalone sbatch scripts, including a completed setup of sbatch environment 
+  // settings, and a group submission script, which is not a piling up of individual scripts(run commands) but a dependency list submission.
+  // Nowadays job scheduling systems usually have short job time allowance, e.g., 24hr, so requesting a long time for a group of jobs is 
+  // less favorable.
+
   try {
     filepath_type :: directory_type input_absolute_dir( input_path.directory().absolute() );
     if( input_absolute_dir.exists() == false ) { input_absolute_dir.create(); }
@@ -282,15 +289,50 @@ agent_type :: write_sbatch_run_script( filepath_type input_path ) {
 
       std :: ofstream ofs_single( sbatch_run_single_script_filepath.absolute().c_str(), std :: ios :: out );
       if( ofs_single.good() == false ) { throw sbatch_run_single_script_filepath.absolute(); }
-      ofs_single << this->program_path_ + "/" + this->program_name_ + " " + input_path.absolute();
+
+      int num_node = 1;
+      int num_procs_per_node = 1;
+      int memory = 8000 * num_procs_per_node;
+      std :: string runtime = "12:00:00";
+
+      ofs_single << "#!/bin/sh"                                        << std :: endl;
+      // for molpro we should request 1 machine and 1 core
+      ofs_single << "#SBATCH -N " << num_node                          << std :: endl;
+      ofs_single << "#SBATCH --ntasks-per-node=" << num_procs_per_node << std :: endl;
+      ofs_single << "#SBATCH --mem=" << memory                         << std :: endl;
+      ofs_single << "#SBATCH -t " << runtime                           << std :: endl;
+      ofs_single << std :: endl;
+
+      ofs_single << "mkdir -p ../output/" << std :: endl;
+      // On servers, program_name_ is assumed to be in $PATH, so we omit the program_path_ here;
+      // Also, molpro doesn't need output name, also we don't use absolute path of input file, just assuming that we are in the current dir
+      ofs_single << this->program_name_ + " ./" + input_path.filename().value();
+      ofs_single << "cp ./" << input_path.filename().name() << ".out" << " ../output/" << std :: endl;
+      ofs_single << "cp ./" << input_path.filename().name() << ".xml" << " ../output/" << std :: endl;
       ofs_single.close();
 
       filepath_type :: filename_type sbatch_run_group_submission_filename( std :: string( "group_submission" ), std :: string( ".sh" ) );
       filepath_type sbatch_run_group_submission_script_filepath( input_absolute_dir, sbatch_run_group_submission_filename );
 
+      const bool group_submission_script_already_created = sbatch_run_group_submission_script_filepath.exists();
+
       std :: ofstream ofs_group( sbatch_run_group_submission_script_filepath.absolute().c_str(), std :: ios_base :: app | std :: ios_base :: out );
       if( ofs_group.good() == false ) { throw sbatch_run_group_submission_script_filepath.absolute(); }
-      ofs_group << "srun " + this->program_path_ + "/" + this->program_name_ + " " + input_path.absolute() << std :: endl;
+      // write a sbatch dependency list
+      if( group_submission_script_already_created == false ) {
+        // if the first time, then no dependency
+        ofs_group << "new_jobid=`sbatch ./" << sbatch_run_single_script_filename << " | awk { print $NF }` " << std :: endl;
+        ofs_group << "echo $new_jobid not dependent" << std :: endl;
+        ofs_group << "old_jobid=$new_jobid" << std :: endl;
+        ofs_group << std :: endl;
+      }
+      else {
+        ofs_group << "new_jobid=`sbatch --dependency=afterany:$old_jobid ./" << sbatch_run_single_script_filename << " | awk { print $NF }` " 
+                  << std :: endl;
+        ofs_group << "echo $new_jobid is dependent on $old_jobid" << std :: endl;
+        ofs_group << "old_jobid=$new_jobid" << std :: endl;
+        ofs_group << std :: endl; 
+      }
       ofs_group.close();
 
       sbatch_run_info_type sbatch_run_info( this->program_name_,
@@ -300,7 +342,8 @@ agent_type :: write_sbatch_run_script( filepath_type input_path ) {
                                       std :: string( "not set" ),
                                       std :: string( "not set" ),
                                       sbatch_run_single_script_filepath.absolute(),
-                                      sbatch_run_group_submission_script_filepath.absolute() );
+                                      sbatch_run_group_submission_script_filepath.absolute(),
+                                      num_node, num_procs_per_node, memory, runtime );
       return sbatch_run_info;
     }
   } catch ( filepath_type :: filename_type :: value_type script_file_name ) {

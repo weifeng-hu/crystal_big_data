@@ -16,7 +16,7 @@ new_fg.b = 3;
 new_fg.c = 3;
 new_fg.basis_set = "6-31g";
 new_fg.radius = 9.0;
-new_fg.order = 2;
+new_fg.order = 1;
 
 from manybody_expansion.api import fragment_generator;
 

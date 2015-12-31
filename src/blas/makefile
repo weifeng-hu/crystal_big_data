@@ -1,16 +1,19 @@
-iquads_root	= $(DEV_ROOT)/iquads/
-iquads_src	= $(iquads_root)/src/
-iquads_bin	= $(iquads_root)/bin/
+iquads_root	= $(DEV_ROOT)/iquads
+iquads_src	= $(iquads_root)/src
 
-cc_blas		= gcc
-cpp_blas	= g++
-fc_blas		= gfortran 
-ar_blas		= ar -r 
+cc_blas		= $(cc_iquads)
+cpp_blas	= $(cpp_iquads)
+fc_blas		= $(fc_iquads)
+ar_blas		= $(ar_iquads)
+install_blas	= $(install_iquads)
 
-cflags_blas	= -I$(iquads_src) -I/usr/include
-cppflags_blas	= -std=c++11 -I$(iquads_src) -I/usr/include
-cppopt_blas	= 
-fopt_blas	=
+cflags_blas	= $(cflags_iquads)
+cppflags_blas	= $(cppflags_iquads)
+fflags_blas	= $(fflags_iquads)
+
+copt_blas	= $(copt_iquads)
+cppopt_blas	= $(cppopt_iquads)
+fopt_blas	= $(fopt_iquads)
 
 cppheads_blas	= $(iquads_src)/blas/blas_interface.h
 
@@ -24,10 +27,11 @@ cppobjs_blas	= $(cppsrcs_blas:.cpp=.o)
 fobjs_blas	= $(fsrcs_blas:.f=.o)
 
 target_blas	= $(iquads_src)/blas/libiquads_blas_interface.a
+target_shared_blas	= $(iquads_src)/blas/libiquads_blas_interface.so
 
-#all_blas: release_blas
+all_blas: release_blas
 
-debug_blas:   cppopt_blas += -g -O0\
+debug_blas:   cppopt_blas += -g\
 	  -Wextra -Wcast-align \
 	  -Wdisabled-optimization \
 	  -Wfloat-equal -Wformat=2 \
@@ -45,31 +49,38 @@ debug_blas:   cppopt_blas += -g -O0\
 	  -Wunreachable-code \
 	  -Wvariadic-macros \
 	  -Wwrite-strings
-debug_blas: fc_blas += -g -O0
-debug_blas: target_blas
+debug_blas: fopt_blas += -g
+debug_blas: copt_blas += -g
+debug_blas: target_blas target_shared_blas
 
 clean_blas:
-	rm $(iquads_src)/blas/*.o; rm $(target_blas)
+	rm $(iquads_src)/blas/*.o; rm $(target_blas) $(target_shared_blas)
 
-release_blas: cppopt_blas +=  -O3 
-release_blas: fopt_blas   +=  -O3
-release_blas: target_blas
+release_blas: ccopt_blas +=
+release_blas: cppopt_blas +=
+release_blas: fopt_blas   +=
+release_blas: target_blas target_shared_blas
 
+standalone_blas: ccopt_blas += -static 
 standalone_blas: cppopt_blas += -static 
-#standalone: we don't have static libary of boost ...
-standalone_blas: target
+standalone_blas: fopt_blas += -static 
+#standalone, currently deprecated, we don't have static libary of boost ...
+standalone_blas: 
 
 target_blas:	$(cppobjs_blas) $(fobjs_blas)
-	$(ar_blas) $(target_blas) $(cppobjs_blas) $(fobjs_blas)
+	$(ar_blas) $(target_blas) $(cppobjs_blas) $(fobjs_blas); $(install_blas) $(target_blas) $(iquads_lib)
+
+target_shared_blas:	$(cppobjs_blas) $(fobjs_blas)
+	$(cc_blas) -shared -o $(target_shared_blas) $(cppobjs_blas) $(fobjs_blas); $(install_blas) $(target_shared_blas) $(iquads_lib)
 
 $(iquads_src)/blas/blas_interface.o: $(iquads_src)/blas/blas_interface.cpp
 	$(cpp_blas) -o $(iquads_src)/blas/blas_interface.o -c $(cppopt_blas) $(cppflags_blas) $(iquads_src)/blas/blas_interface.cpp
 
 $(iquads_src)/blas/ax_b.o: $(iquads_src)/blas/ax_b.f
-	$(fc_blas) -o $(iquads_src)/blas/ax_b.o -c $(fopt_blas) $(iquads_src)/blas/ax_b.f
+	$(fc_blas) -o $(iquads_src)/blas/ax_b.o -c $(fflags_blas) $(fopt_blas) $(iquads_src)/blas/ax_b.f
 
 $(iquads_src)/blas/mat_x_mat.o: $(iquads_src)/blas/mat_x_mat.f
-	$(fc_blas) -o $(iquads_src)/blas/mat_x_mat.o -c $(fopt_blas) $(iquads_src)/blas/mat_x_mat.f
+	$(fc_blas) -o $(iquads_src)/blas/mat_x_mat.o -c $(fflags_blas) $(fopt_blas) $(iquads_src)/blas/mat_x_mat.f
 
 $(iquads_src)/blas/symdiag.o: $(iquads_src)/blas/symdiag.f
-	$(fc_blas) -o $(iquads_src)/blas/symdiag.o -c $(fopt_blas) $(iquads_src)/blas/symdiag.f
+	$(fc_blas) -o $(iquads_src)/blas/symdiag.o -c $(fflags_blas) $(fopt_blas) $(iquads_src)/blas/symdiag.f

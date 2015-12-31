@@ -284,20 +284,36 @@ public:
                 dir_name_type output_directory, 
                 dir_name_type output_filename,
                 file_name_type sbatch_run_script_name,
-                file_name_type sbatch_run_group_submission_script_name ) :
+                file_name_type sbatch_run_group_submission_script_name,
+                int num_node,
+                int num_procs_per_node,
+                int memory,
+                std :: string runtime ) :
       RuntimeInfo_Base ( program_name, input_directory, input_filename,
                          scratch_directory, output_directory, output_filename ),
       sbatch_run_script_name_( sbatch_run_script_name ),
-      sbatch_run_group_submission_script_name_( sbatch_run_group_submission_script_name )
+      sbatch_run_group_submission_script_name_( sbatch_run_group_submission_script_name ),
+      num_node_( num_node ),
+      num_procs_per_node_( num_procs_per_node ),
+      memory_( memory ),
+      runtime_( runtime ) 
       { }
     public:
       file_name_type sbatch_run_script_name()                      const { return this->sbatch_run_script_name_; }
       file_name_type sbatch_run_group_submission_script_name()     const { return this->sbatch_run_group_submission_script_name_; }
       file_path_type sbatch_run_script_path()                  const { return file_path_type( this->input_dir_, this->sbatch_run_script_name_ ); }
       file_path_type sbatch_run_group_submission_script_path() const { return file_path_type( this->input_dir_, this->sbatch_run_group_submission_script_name_ ); }
+      int num_node() const { return this->num_node_; }
+      int num_procs_per_node() const { return this->num_procs_per_node_; }
+      int memory() const { return this->memory_; }
+      std :: string runtime() const { return this->runtime_; }
     private:
       file_name_type sbatch_run_script_name_;
       file_name_type sbatch_run_group_submission_script_name_;
+      int num_node_;
+      int num_procs_per_node_;
+      int memory_;
+      std :: string runtime_;
   }; // end of SBATCHRunInfo
 
   typedef LocalRunInfo local_run_info_type;
