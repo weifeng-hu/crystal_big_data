@@ -1,14 +1,17 @@
-iquads_root	= $(DEV_ROOT)/iquads/
-iquads_src	= $(iquads_root)/src/
-iquads_bin	= $(iquads_root)/bin/
 
-cc_third_party		= gcc
-cpp_third_party		= g++
-ar_third_party		= ar -r 
+cc_third_party		= $(cc_iquads)
+cpp_third_party		= $(cpp_iquads)
+fc_third_party		= $(fc_iquads)
+ar_third_party		= $(ar_iquads)
+install_third_party	= $(install_iquads)
 
-cflags_third_party	= -I$(iquads_src) -I/usr/include
-cppflags_third_party	= -std=c++11 -I$(iquads_src) -I/usr/include
-cppopt_third_party	= 
+cflags_third_party	= $(cflags_iquads)
+cppflags_third_party	= $(cppflags_iquads)
+fflags_third_party	= $(fflags_iquads)
+
+copt_third_party	= $(copt_iquads)
+cppopt_third_party	= $(cppopt_iquads)
+fopt_third_party	= $(fopt_iquads)
 
 cppheads_third_party	= $(iquads_src)/interface_to_third_party/program_mask.hpp\
 			  $(iquads_src)/interface_to_third_party/quantity_identifier.h\
@@ -24,6 +27,7 @@ cppsrcs_third_party		= \
 cppobjs_third_party		= $(cppsrcs_third_party:.cpp=.o)\
 
 target_third_party		= $(iquads_src)/interface_to_third_party/libiquads_third_party.a
+target_shared_third_party	= $(iquads_src)/interface_to_third_party/libiquads_third_party.so
 
 all_third_party: release_third_party
 
@@ -45,21 +49,27 @@ debug_third_party: 	cppopt_third_party += -g\
 		  -Wunreachable-code \
 		  -Wvariadic-macros \
 		  -Wwrite-strings
-debug_third_party: cppopt_third_party += -O0
-debug_third_party: target_third_party
+debug_third_party: copt_third_party += -g
+debug_third_party: fopt_third_party += -g
+debug_third_party: target_third_party target_shared_third_party
 
-release_third_party: cppopt_third_party +=  -O3
-release_third_party: target_third_party
+release_third_party: cppopt_third_party +=
+release_third_party: copt_third_party +=
+release_third_party: fopt_third_party +=
+release_third_party: target_third_party target_shared_third_party
 
 standalone_third_party: cppopt_third_party += -static
 #standalone_third_party: we don't have static libary of boost ...
 standalone_third_party: target_third_party
 
 clean_third_party:
-	rm $(iquads_src)/interface_to_third_party/*.o; rm $(target_third_party)
+	rm $(cppobjs_third_party); rm $(target_third_party) $(target_shared_third_party)
 
 target_third_party:	$(cppobjs_third_party)
-	$(ar_third_party) $(target_third_party) $(cppobjs_third_party)
+	$(ar_third_party) $(target_third_party) $(cppobjs_third_party); $(install_third_party) $(target_third_party) $(iquads_lib)
+
+target_shared_third_party:	$(cppobjs_third_party)
+	g++ -shared -o $(target_shared_third_party) $(cppobjs_third_party); $(install_third_party) $(target_shared_third_party) $(iquads_lib)
 
 $(iquads_src)/interface_to_third_party/molpro_agent.o: $(iquads_src)/iquads/sequence.hpp\
 		$(iquads_src)/structure/coordinate_representation.hpp\

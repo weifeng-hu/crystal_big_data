@@ -1,14 +1,17 @@
-iquads_root	= $(DEV_ROOT)/iquads/
-iquads_src	= $(iquads_root)/src/
-iquads_bin	= $(iquads_root)/bin/
 
-cc_manybody_expansion		= gcc
-cpp_manybody_expansion		= g++
-ar_manybody_expansion		= ar -r
+cc_manybody_expansion	= $(cc_iquads)
+cpp_manybody_expansion	= $(cpp_iquads)
+fc_manybody_expansion		= $(fc_iquads)
+ar_manybody_expansion		= $(ar_iquads)
+install_manybody_expansion	= $(install_iquads)
 
-cflags_manybody_expansion	= -I$(iquads_src) -I/usr/include
-cppflags_manybody_expansion	= -std=c++11 -I$(iquads_src) -I/usr/include
-cppopt_manybody_expansion	= 
+cflags_manybody_expansion	= $(cflags_iquads)
+cppflags_manybody_expansion	= $(cppflags_iquads)
+fflags_manybody_expansion	= $(fflags_iquads)
+
+copt_manybody_expansion	= $(copt_iquads)
+cppopt_manybody_expansion	= $(cppopt_iquads)
+fopt_manybody_expansion	= $(fopt_iquads)
 
 cppheads_manybody_expansion	= $(iquads_src)/manybody_expansion/client.hpp\
 				  $(iquads_src)/manybody_expansion/agent.hpp\
@@ -37,28 +40,17 @@ cppsrcs_manybody_expansion	= \
 				  $(iquads_src)/manybody_expansion/agent.cpp
 
 cppobjs_manybody_expansion	= $(cppsrcs_manybody_expansion:.cpp=.o)
-libs_manybody_expansion		= $(iquads_src)/electron_correlation/libiquads_electron_correlation.a\
-		  		  $(iquads_src)/interface_to_third_party/libiquads_third_party.a\
-		  		  $(iquads_src)/matrix/libiquads_matrix.a\
-		  		  $(iquads_src)/blas/libiquads_blas_interface.a\
-		  		  -L/usr/lib64 -lboost_filesystem -lboost_date_time -lboost_system\
-		  		  -L/home/intel/compiler_and_libraries/linux/mkl/lib/intel64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lm\
-			          -lgfortran 
-	#  -L/home/intel/compilers_and_libraries/linux/lib/intel64 -liomp5 -lifcore -lifport -limf -lirc -lintlc
+
+lib_manybody_expansion		= -L$(iquads_lib) -liquads_manybody_expansion -liquads_electron_correlation -liquads_third_party -liquads_matrix -liquads_blas_interface $(lib_iquads)
+#  -L/home/intel/compilers_and_libraries/linux/lib/intel64 -liomp5 -lifcore -lifport -limf -lirc -lintlc
 
 executable_manybody_expansion	= $(iquads_src)/manybody_expansion/iquads_manybody_expansion
 library_manybody_expansion	= $(iquads_src)/manybody_expansion/libiquads_manybody_expansion.a
-
-default: all
+shared_library_manybody_expansion	= $(iquads_src)/manybody_expansion/libiquads_manybody_expansion.so
 
 all: release_manybody_expansion
 
-include $(iquads_src)/blas/makefile
-include $(iquads_src)/matrix/makefile
-include $(iquads_src)/interface_to_third_party/makefile
-include $(iquads_src)/electron_correlation/makefile
-
-debug_manybody_expansion: 	cppopt_manybody_expansion += -g -O0\
+debug_manybody_expansion: 	cppopt_manybody_expansion += -g \
 				  -Wextra -Wcast-align \
 				  -Wdisabled-optimization \
 				  -Wfloat-equal -Wformat=2 \
@@ -76,41 +68,34 @@ debug_manybody_expansion: 	cppopt_manybody_expansion += -g -O0\
 				  -Wunreachable-code \
 				  -Wvariadic-macros \
 				  -Wwrite-strings
-debug_manybody_expansion: library_manybody_expansion
+debug_manybody_expansion: library_manybody_expansion shared_library_manybody_expansion
 debug_manybody_expansion: executable_manybody_expansion
 
-release_manybody_expansion: cppopt_manybody_expansion +=  -O3 -fopenmp
 release_manybody_expansion: cppopt_manybody_expansion += 
-release_manybody_expansion: library_manybody_expansion
+release_manybody_expansion: copt_manybody_expansion += 
+release_manybody_expansion: fopt_manybody_expansion += 
+release_manybody_expansion: library_manybody_expansion shared_library_manybody_expansion
 release_manybody_expansion: executable_manybody_expansion
 
 standalone: cppopt_manybody_expansion += -static
-#standalone: we don't have static libary of boost ...
+#standalone: deprecated we don't have static libary of boost ...
 standalone: executable_manybody_expansion
 standalone: library_manybody_expansion
 
 clean_manybody_expansion:
-	rm *.o; rm $(executable_manybody_expansion) $(library_manybody_expansion);
-
-distclean:
-	make clean_blas; make clean_matrix; make clean_third_party; make clean_electron_correlation; make clean_manybody_expansion
+	rm $(cppobjs_manybody_expansion); rm $(executable_manybody_expansion) $(library_manybody_expansion) $(shared_library_manybody_expansion);
 
 executable_manybody_expansion:	\
-		$(iquads_src)/blas/libiquads_blas_interface.a\
-		$(iquads_src)/matrix/libiquads_matrix.a\
-		$(iquads_src)/interface_to_third_party/libiquads_third_party.a\
-		$(iquads_src)/electron_correlation/libiquads_electron_correlation.a\
 		$(iquads_src)/manybody_expansion/main.o $(cppobjs_manybody_expansion)
-	$(cpp_manybody_expansion) -o $(executable_manybody_expansion) $(cppflags_manybody_expansion) $(cppopt_manybody_expansion) $(iquads_src)/manybody_expansion/main.o $(cppobjs_manybody_expansion) $(libs_manybody_expansion)
-	cp $(executable_manybody_expansion) $(iquads_bin)
+	$(cpp_manybody_expansion) -o $(executable_manybody_expansion) $(cppflags_manybody_expansion) $(cppopt_manybody_expansion) $(iquads_src)/manybody_expansion/main.o $(cppobjs_manybody_expansion) $(lib_manybody_expansion)
+	$(install_manybody_expansion) $(executable_manybody_expansion) $(iquads_bin)
 
 library_manybody_expansion:	\
-		$(iquads_src)/blas/libiquads_blas_interface.a\
-		$(iquads_src)/matrix/libiquads_matrix.a\
-		$(iquads_src)/interface_to_third_party/libiquads_third_party.a\
-		$(iquads_src)/electron_correlation/libiquads_electron_correlation.a\
 		$(cppobjs_manybody_expansion)
-	$(ar_manybody_expansion) $(library_manybody_expansion)  $(cppobjs_manybody_expansion)
+	$(ar_manybody_expansion) $(library_manybody_expansion)  $(cppobjs_manybody_expansion); $(install_manybody_expansion) $(library_manybody_expansion) $(iquads_lib)
+
+shared_library_manybody_expansion:
+	g++ -shared -o $(shared_library_manybody_expansion) $(cppobjs_manybody_expansion); $(install_manybody_expansion) $(shared_library_manybody_expansion) $(iquads_lib)
 
 $(iquads_src)/blas/libiquads_blas_interface.a:
 	cd $(iquads_src)/blas/; make release_blas # make debug_manybody_expansion_blas

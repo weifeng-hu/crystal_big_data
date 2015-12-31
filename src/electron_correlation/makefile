@@ -1,14 +1,17 @@
-iquads_root	= $(DEV_ROOT)/iquads/
-iquads_src	= $(iquads_root)/src/
-iquads_bin	= $(iquads_root)/bin/
 
-cc_electron_correlation		= gcc
-cpp_electron_correlation		= g++
-ar_electron_correlation		= ar -r 
+cc_electron_correlation		= $(cc_iquads)
+cpp_electron_correlation	= $(cpp_iquads)
+fc_electron_correlation		= $(fc_iquads)
+ar_electron_correlation		= $(ar_iquads)
+install_electron_correlation	= $(install_iquads)
 
-cflags_electron_correlation		= -I$(iquads_src) -I/usr/include
-cppflags_electron_correlation	= -std=c++11 -I$(iquads_src) -I/usr/include
-cppopt_electron_correlation		= 
+cflags_electron_correlation	= $(cflags_iquads)
+cppflags_electron_correlation	= $(cppflags_iquads)
+fflags_electron_correlation	= $(fopt_iquads)
+
+copt_electron_correlation	= $(copt_iquads)
+cppopt_electron_correlation	= $(cppopt_iquads)
+fopt_electron_correlation	= $(fopt_iquads)
 
 cppheads_electron_correlation	= $(iquads_src)/electron_correlation/client.hpp\
 		  		  $(iquads_src)/electron_correlation/report.hpp\
@@ -24,10 +27,11 @@ cppsrcs_electron_correlation	= $(iquads_src)/electron_correlation/client.cpp\
 cppobjs_electron_correlation		= $(cppsrcs_electron_correlation:.cpp=.o)\
 
 target_electron_correlation		= $(iquads_src)/electron_correlation/libiquads_electron_correlation.a
+target_shared_electron_correlation	= $(iquads_src)/electron_correlation/libiquads_electron_correlation.so
 
 all_electron_correlation: release_electron_correlation
 
-debug_electron_correlation: 	cppopt_electron_correlation += -g -O0\
+debug_electron_correlation: 	cppopt_electron_correlation += -g\
 		  -Wextra -Wcast-align \
 		  -Wdisabled-optimization \
 		  -Wfloat-equal -Wformat=2 \
@@ -45,20 +49,27 @@ debug_electron_correlation: 	cppopt_electron_correlation += -g -O0\
 		  -Wunreachable-code \
 		  -Wvariadic-macros \
 		  -Wwrite-strings
-debug_electron_correlation: target_electron_correlation
+debug_electron_correlation:	copt_electron_correlation += -g
+debug_electron_correlation:	fopt_electron_correlation += -g
+debug_electron_correlation: target_electron_correlation target_shared_electron_correlation
 
-release_electron_correlation: cppopt_electron_correlation +=  -O3
-release_electron_correlation: target_electron_correlation
+release_electron_correlation: cppopt_electron_correlation += 
+release_electron_correlation: copt_electron_correlation += 
+release_electron_correlation: fopt_electron_correlation += 
+release_electron_correlation: target_electron_correlation target_shared_electron_correlation
 
 standalone_electron_correlation: cppopt_electron_correlation += -static
 #standalone_electron_correlation: we don't have static libary of boost ...
 standalone_electron_correlation: target_electron_correlation
 
 clean_electron_correlation:
-	rm $(iquads_src)/electron_correlation/*.o; rm $(target_electron_correlation)
+	rm $(cppobjs_electron_correlation); rm $(target_electron_correlation) $(target_shared_electron_correlation)
 
 target_electron_correlation:	$(cppobjs_electron_correlation)
-	$(ar_electron_correlation) $(target_electron_correlation) $(cppobjs_electron_correlation)
+	$(ar_electron_correlation) $(target_electron_correlation) $(cppobjs_electron_correlation); $(install_electron_correlation) $(target_electron_correlation) $(iquads_lib)
+
+target_shared_electron_correlation:	$(cppobjs_electron_correlation)
+	g++ -shared -o $(target_shared_electron_correlation) $(cppobjs_electron_correlation); $(install_electron_correlation) $(target_shared_electron_correlation) $(iquads_lib)
 
 $(iquads_src)/electron_correlation/setting.o: $(iquads_src)/iquads/sequence.hpp\
 	   $(iquads_src)/structure/molecule.hpp\
