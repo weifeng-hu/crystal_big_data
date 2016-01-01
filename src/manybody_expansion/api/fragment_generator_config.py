@@ -57,12 +57,15 @@ class FragmentGeneratorConfig:
     self.iquads_root = "$(DEV_ROOT)/iquads/";
     self.iquads_src  = "$(iquads_root)/src/";
     self.iquads_bin  = "$(iquads_root)/bin/";
+    self.boost_root  = "$(BOOST_ROOT)"
+    self.boost_lib   = "$(BOOST_ROOT)/stage/lib/";
+    self.boost_include = "$(BOOST_ROOT)";
     self.pwd = "";
     self.cc  = "gcc";
     self.copt = "-O3 "
     self.cpp = "g++";
     self.cppopt = "-O3 -std=c++11 -fopenmp"
-    self.cppflags = "-I/usr/include -I$(iquads_src)"
+    self.cppflags = "-I/usr/include -I$(iquads_src) -I$(boost_include)"
     self.fc  = "gfortran";
     self.cheads = "";
     self.cppsrcs = "";
@@ -71,9 +74,9 @@ class FragmentGeneratorConfig:
     import platform
     arch = platform.machine();
     if arch == "x86" or arch == "x86_64":
-      self.libs = "$(iquads_src)/manybody_expansion/libiquads_manybody_expansion.a $(iquads_src)/electron_correlation/libiquads_electron_correlation.a $(iquads_src)/interface_to_third_party/libiquads_third_party.a $(iquads_src)/matrix/libiquads_matrix.a $(iquads_src)/blas/libiquads_blas_interface.a -lboost_filesystem -lboost_date_time -lboost_system -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lrt -lpthread -lgfortran";
+      self.libs = "$(iquads_src)/manybody_expansion/libiquads_manybody_expansion.a $(iquads_src)/electron_correlation/libiquads_electron_correlation.a $(iquads_src)/interface_to_third_party/libiquads_third_party.a $(iquads_src)/matrix/libiquads_matrix.a $(iquads_src)/blas/libiquads_blas_interface.a -L/$(boost_lib) -lboost_filesystem -lboost_date_time -lboost_system -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lrt -lpthread -lgfortran";
     else:
-      self.libs = "$(iquads_src)/manybody_expansion/libiquads_manybody_expansion.a $(iquads_src)/electron_correlation/libiquads_electron_correlation.a $(iquads_src)/interface_to_third_party/libiquads_third_party.a $(iquads_src)/matrix/libiquads_matrix.a $(iquads_src)/blas/libiquads_blas_interface.a -lboost_filesystem -lboost_date_time -lboost_system -llapack -lblas -lrt -lpthread -lgfortran";
+      self.libs = "$(iquads_src)/manybody_expansion/libiquads_manybody_expansion.a $(iquads_src)/electron_correlation/libiquads_electron_correlation.a $(iquads_src)/interface_to_third_party/libiquads_third_party.a $(iquads_src)/matrix/libiquads_matrix.a $(iquads_src)/blas/libiquads_blas_interface.a -L/$(boost_lib) -lboost_filesystem -lboost_date_time -lboost_system -llapack -lblas -lrt -lpthread -lgfortran";
     self.executable = "";
 
 
