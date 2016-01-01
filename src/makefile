@@ -1,7 +1,9 @@
-iquads_root	= $(DEV_ROOT)/iquads/
+iquads_root	= $(IQUADS_ROOT)
 iquads_src	= $(iquads_root)/src/
 iquads_bin	= $(iquads_root)/bin/
 iquads_lib	= $(iquads_root)/lib/
+boost_lib	= $(BOOST_ROOT)/stage/lib
+boost_include	= $(BOOST_ROOT)/
 
 cc_iquads	= gcc
 cpp_iquads	= g++
@@ -10,8 +12,8 @@ ar_iquads	= ar -r
 install_iquads	= install
 
 # use -fPIC since shared libraries will be created
-cflags_iquads	= -I$(iquads_src) -I/usr/include -I/usr/local/include -fPIC -fopenmp
-cppflags_iquads	= -I$(iquads_src) -I/usr/include -I/usr/local/include -fPIC -fopenmp -std=c++11
+cflags_iquads	= -I$(iquads_src) -I$(boost_include) -I/usr/include -I/usr/local/include -fPIC -fopenmp
+cppflags_iquads	= -I$(iquads_src) -I$(boost_include) -I/usr/include -I/usr/local/include -fPIC -fopenmp -std=c++11
 fflags_iquads	= -fPIC
 
 # iquads relies on openmp.
@@ -56,7 +58,11 @@ fopt_iquads	+=
 endif
 
 
+<<<<<<< HEAD
 lib_iquads	= -L/home/weifeng/boost_1_55_0/stage/lib -lboost_filesystem -lboost_date_time -lboost_system
+=======
+lib_iquads	= -L$(BOOST_LIB) -lboost_filesystem -lboost_date_time -lboost_system
+>>>>>>> f1a793cba4056087dd41bcd6d599ce4e642f35c2
 
 # blas and lapack libraries
 # arm doesn't have mkl, so other blas and lapack are used

@@ -54,9 +54,10 @@ class FragmentGeneratorConfig:
     self.c = 0;
     self.natom = 0;
 
-    self.iquads_root = "$(DEV_ROOT)/iquads/";
+    self.iquads_root = "$(IQUADS_ROOT)";
     self.iquads_src  = "$(iquads_root)/src/";
     self.iquads_bin  = "$(iquads_root)/bin/";
+    self.iquads_include = "$(iquads_root)/src/";
     self.boost_root  = "$(BOOST_ROOT)"
     self.boost_lib   = "$(BOOST_ROOT)/stage/lib/";
     self.boost_include = "$(BOOST_ROOT)";
@@ -65,7 +66,7 @@ class FragmentGeneratorConfig:
     self.copt = "-O3 "
     self.cpp = "g++";
     self.cppopt = "-O3 -std=c++11 -fopenmp"
-    self.cppflags = "-I/usr/include -I$(iquads_src) -I$(boost_include)"
+    self.cppflags = "-I$(iquads_include) -I/usr/include -I$(boost_include)"
     self.fc  = "gfortran";
     self.cheads = "";
     self.cppsrcs = "";
