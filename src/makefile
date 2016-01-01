@@ -56,7 +56,7 @@ fopt_iquads	+=
 endif
 
 
-lib_iquads	= -lboost_filesystem -lboost_date_time -lboost_system
+lib_iquads	= -L/home/weifeng/boost_1_55_0/stage/lib -lboost_filesystem -lboost_date_time -lboost_system
 
 # blas and lapack libraries
 # arm doesn't have mkl, so other blas and lapack are used
