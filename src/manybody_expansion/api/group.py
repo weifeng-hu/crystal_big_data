@@ -79,7 +79,7 @@ def fg_binary_generation( calc_config ):
   call(  echo_string , shell=True );
 
   from subprocess import call;
-  sbatch_submission_string = "echo 'cd " + new_fg.project_name + "; cd input/; sbatch group_submission.sh; cd ../../;'" + " >> group_sbatch.sh";
+  sbatch_submission_string = "echo 'cd " + new_fg.project_name + "; cd input/; sh group_submission.sh; cd ../../;'" + " >> group_sbatch.sh";
   call( sbatch_submission_string, shell=True );
 
   return 0;
