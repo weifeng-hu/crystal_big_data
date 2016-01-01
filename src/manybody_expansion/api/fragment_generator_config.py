@@ -40,7 +40,7 @@ class FragmentGeneratorConfig:
     self.correlation = "hf";
     self.program = "molpro";
     self.basis_set = "unknown_basis";
-    self.lattice_name = "unknown_lattice";
+    self.lattice_name = "";
     self.mode = "dryrun";
     self.project_name = "try";
     self.radius = 1.0;
@@ -65,9 +65,7 @@ class FragmentGeneratorConfig:
     self.cppflags = "-I/usr/include -I$(iquads_src)"
     self.fc  = "gfortran";
     self.cheads = "";
-    import os;
-    current_directory = os.getcwd();
-    self.cppsrcs = current_directory + "/main.cpp";
+    self.cppsrcs = "";
     self.cppobjs = "$(CPPSRCS:.cpp=.o)";
     self.libs = "";
     import platform
@@ -76,7 +74,7 @@ class FragmentGeneratorConfig:
       self.libs = "$(iquads_src)/manybody_expansion/libiquads_manybody_expansion.a $(iquads_src)/electron_correlation/libiquads_electron_correlation.a $(iquads_src)/interface_to_third_party/libiquads_third_party.a $(iquads_src)/matrix/libiquads_matrix.a $(iquads_src)/blas/libiquads_blas_interface.a -lboost_filesystem -lboost_date_time -lboost_system -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lrt -lpthread -lgfortran";
     else:
       self.libs = "$(iquads_src)/manybody_expansion/libiquads_manybody_expansion.a $(iquads_src)/electron_correlation/libiquads_electron_correlation.a $(iquads_src)/interface_to_third_party/libiquads_third_party.a $(iquads_src)/matrix/libiquads_matrix.a $(iquads_src)/blas/libiquads_blas_interface.a -lboost_filesystem -lboost_date_time -lboost_system -llapack -lblas -lrt -lpthread -lgfortran";
-    self.executable = current_directory + "/fg_driver";
+    self.executable = "";
 
 
 
@@ -96,6 +94,21 @@ class FragmentGeneratorConfig:
 
   def natom_per_node( self ):
     return self.unit_cell_info.nodes().natom_per_node;
+
+  def order_string( self ):
+    if self.order == 0:
+      return "null";
+    elif self.order == 1:
+      return "m";
+    elif self.order == 2:
+      return "md";
+    elif self.order == 3:
+      return "mdt";
+    elif self.order == 4:
+      return "mdttr";
+    else:
+      print "unable to process order ", self.order;
+      quit();
 
   def print_data( self ):
 

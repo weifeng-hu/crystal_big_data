@@ -27,6 +27,8 @@
 
 def read_xyz( xyz_file_name ):
 
+  from decimal import Decimal;
+
   import nodes_config;
   new_nodes_info = nodes_config.NodesConfig();
   
@@ -59,9 +61,9 @@ def read_xyz( xyz_file_name ):
       line = f_xyz.readline();
       words = line.split();
       element = words[0];
-      x = float( words[1] );
-      y = float( words[2] );
-      z = float( words[3] );
+      x = Decimal( words[1] );
+      y = Decimal( words[2] );
+      z = Decimal( words[3] );
       new_coordinate = [ element, x, y, z, new_molecule.unit ];
       new_coordinates.append( new_coordinate );
 
@@ -79,6 +81,7 @@ def read_xyz( xyz_file_name ):
 def read_lattice_constant( lattice_constant_file_name ):
 
   import lattice_constant;
+  from decimal import Decimal;
 
   new_constants = lattice_constant.LatticeConstant();
   word_a = "";
@@ -115,12 +118,12 @@ def read_lattice_constant( lattice_constant_file_name ):
 
   f_lattice_constant.close();
 
-  a = float( word_a );
-  b = float( word_b );
-  c = float( word_c );
-  alpha = float( word_alpha );
-  beta  = float( word_beta  );
-  gamma = float( word_gamma );
+  a = Decimal( word_a );
+  b = Decimal( word_b );
+  c = Decimal( word_c );
+  alpha = Decimal( word_alpha );
+  beta  = Decimal( word_beta  );
+  gamma = Decimal( word_gamma );
 
   new_constants.a = a;
   new_constants.b = b;

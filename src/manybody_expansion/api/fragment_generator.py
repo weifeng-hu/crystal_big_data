@@ -51,7 +51,7 @@ def import_unit_cell( fg_config ):
   return new_unit_cell;
 
 
-def driver( fg_config_input ):
+def generate_binary( fg_config_input ):
 
   ''' Initialize the fragment generator config '''
   import fragment_generator_config;
@@ -73,8 +73,9 @@ def driver( fg_config_input ):
   import makefile;
   makefile.write( fg_config );
 
-  print "Compiling...\n";
+  print "Compiling...", fg_config.makefile_name;
   import subprocess;
-  subprocess.call( "make" ); 
+  make_string = "make -s -f " + fg_config.makefile_name;
+  subprocess.call( make_string, shell=True ); 
 
   return 0;
