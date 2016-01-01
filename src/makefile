@@ -83,6 +83,7 @@ include electron_correlation/makefile
 include manybody_expansion/makefile
 
 debug:
+	mkdir -p $(iquads_lib);\
 	make debug_blas;\
 	make debug_matrix;\
 	make debug_third_party;\
@@ -90,6 +91,7 @@ debug:
 	make debug_manybody_expansion
 
 release: 
+	mkdir -p $(iquads_lib);\
 	make release_blas;\
 	make release_matrix;\
 	make release_third_party;\
@@ -101,5 +103,6 @@ clean:
 	make clean_matrix;\
 	make clean_third_party;\
 	make clean_electron_correlation;\
-	make clean_manybody_expansion
+	make clean_manybody_expansion;\
+	rm -rf $(iquads_lib)/*
 
