@@ -1,5 +1,3 @@
-iquads_root	= $(DEV_ROOT)/iquads
-iquads_src	= $(iquads_root)/src
 
 cc_blas		= $(cc_iquads)
 cpp_blas	= $(cpp_iquads)

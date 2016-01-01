@@ -37,6 +37,7 @@ def write( fg_config ):
   f_makefile.write( "iquads_root\t= " + fg_config.iquads_root + "\n");
   f_makefile.write( "iquads_src\t= " + fg_config.iquads_src + "\n" );
   f_makefile.write( "iquads_bin\t= " + fg_config.iquads_bin + "\n" );
+  f_makefile.write( "iquads_include\t= " + fg_config.iquads_include + "\n" );
   f_makefile.write( "boost_include\t= " + fg_config.boost_include + "\n" );
   f_makefile.write( "boost_lib\t= " + fg_config.boost_lib + "\n" );
   f_makefile.write( "CC\t = " + fg_config.cc + "\n" );
