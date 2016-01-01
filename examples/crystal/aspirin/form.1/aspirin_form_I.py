@@ -1,38 +1,34 @@
 
 
-from manybody_expansion import api
-from manybody_expansion.api import fragment_generator_config
-from os import getcwd;
+def new_calc_config( lattice_name, xyz_file_name, lattice_constant_file_name, natom, a, b, c, order, basis_set, radius ):
+  from manybody_expansion.api.calculation_config import CalculationConfig;
+  new_cg = CalculationConfig();
 
-current_directory = getcwd();
-new_fg = fragment_generator_config.FragmentGeneratorConfig();
+  new_cg.lattice_name = lattice_name;
+  new_cg.xyz_file_name = xyz_file_name;
+  new_cg.lattice_constant_file_name = lattice_constant_file_name;
+  new_cg.natom = natom;
+  new_cg.a = a;
+  new_cg.b = b;
+  new_cg.c = c;
+  new_cg.order = order;
+  new_cg.basis_set = basis_set;
+  new_cg.radius = radius;
+  return new_cg; 
 
-new_fg.lattice_name = "aspirin_form_I";
-new_fg.natom = 84;
-new_fg.xyz_file_name = "./aspirin_form_I.coord";
-new_fg.lattice_constant_file_name = "./aspirin_form_I.const";
-new_fg.input_name = "unknown";
-new_fg.scratch_name = "unknown";
-new_fg.output_name = "unknown";
-new_fg.a = 3;
-new_fg.b = 3;
-new_fg.c = 3;
-new_fg.basis_set = "6-31g";
-new_fg.radius = 15.0;
-new_fg.order = 2;
-new_fg.mode = "sbatch";
 
-new_fg.project_name = new_fg.lattice_name + '_' +  new_fg.correlation  + "_" + new_fg.basis_set    + "_" + new_fg.order_string()  + "_";
-new_fg.project_name += str(new_fg.radius)  + "_" + str(new_fg.a) + "_" + str(new_fg.b) + "_" + str(new_fg.c) + "_" + new_fg.mode;
+group_config = [];
+lattice_name = "aspirin_form_I";
+xyz_file_name = "./aspirin_form_I.coord";
+lattice_constant_file_name = "./aspirin_form_I.const";
+natom = 84;
+basis_set = "6-31g";
 
-new_fg.cppsrcs = current_directory + "/" + new_fg.project_name + ".cpp";
-new_fg.cppobjs = current_directory + "/" + new_fg.project_name + ".o";
-new_fg.makefile_name = current_directory + "/" + "makefile_" + new_fg.project_name;
+from copy import deepcopy;
 
-from copy import deepcopy
+#new_calc_config( lattice_name, xyz_file_name, lattice_constant_file_name, natom, a, b, c, order, basis_set, radius );
+group_config.append(deepcopy(new_calc_config(lattice_name, xyz_file_name, lattice_constant_file_name, natom, 2, 2, 2, 2, basis_set, 7.0)));
+group_config.append(deepcopy(new_calc_config(lattice_name, xyz_file_name, lattice_constant_file_name, natom, 2, 2, 2, 2, basis_set, 8.0)));
 
-new_fg.driver_name = deepcopy(new_fg.cppsrcs);
-new_fg.executable = current_directory + "/" + "fg_driver." + new_fg.project_name;
-
-from manybody_expansion.api import fragment_generator;
-fragment_generator.generate_binary( new_fg );
+from manybody_expansion.api.group import main_driver;
+main_driver( group_config ); 
