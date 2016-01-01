@@ -37,5 +37,6 @@ class CalculationConfig:
     self.c = 0;
     self.basis_set = "unknown";
     self.radius = 0.0;
+    self.correlation = "unknown";
     self.order = 0;
 

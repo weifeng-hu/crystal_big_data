@@ -45,6 +45,7 @@ def fg_binary_generation( calc_config ):
   new_fg.basis_set = calc_config.basis_set;
   new_fg.radius = calc_config.radius;
   new_fg.order  = calc_config.order;
+  new_fg.correlation = calc_config.correlation;
   new_fg.mode   = "sbatch";
   #new_fg.lattice_name = "aspirin_form_I";
   #new_fg.natom = 84;
@@ -102,6 +103,7 @@ def fg_data_collection( calc_config ):
   new_fg.c = calc_config.c;
   new_fg.basis_set = calc_config.basis_set;
   new_fg.radius = calc_config.radius;
+  new_fg.correlation = calc_config.correlation;
   new_fg.order  = calc_config.order;
   new_fg.mode   = "harvest";
 
