@@ -28,7 +28,8 @@ class RemoteConfig:
 
   def __init__( self ):
 
-    self.local   = "";
+    from socket import gethostname;
+    self.local   = gethostname();
     self.remote  = "";
     self.user    = "";
     self.dir_name = "";

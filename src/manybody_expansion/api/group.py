@@ -60,7 +60,7 @@ def single_fg_binary_generation( calc_config ):
   #new_fg.order = 2;
   #new_fg.mode = "sbatch";
   
-  new_fg.project_name = new_fg.lattice_name + '_' +  new_fg.correlation  + "_" + new_fg.basis_set    + "_" + new_fg.order_string()  + "_";
+  new_fg.project_name = new_fg.lattice_name + '_' +  new_fg.correlation  + "_" + new_fg.basis_set + "_" + new_fg.order_string()  + "_";
   new_fg.project_name += str(new_fg.radius)  + "_" + str(new_fg.a) + "_" + str(new_fg.b) + "_" + str(new_fg.c) + "_" + new_fg.mode;
   new_fg.cppsrcs = new_fg.working_directory + "/" + new_fg.project_name + ".cpp";
   new_fg.cppobjs = new_fg.working_directory + "/" + new_fg.project_name + ".o";
@@ -76,14 +76,21 @@ def single_fg_binary_generation( calc_config ):
   outfile_name = new_fg.working_directory + "/" + new_fg.project_name + ".out";
   group_sh_name = new_fg.working_directory + "/" + "fg_group_run.sh";
   echo_string = "echo '" + new_fg.executable + " > " + outfile_name + "' >> " + group_sh_name ;
-  call(  echo_string , shell=True );
+  call(  echo_string , shell = True );
   print_string = "echo '" + "echo ... done with " + new_fg.executable + "' >> " + group_sh_name ;
-  call(  print_string , shell=True );
+  call(  print_string , shell = True );
 
   from subprocess import call;
   group_sbatch_sh_name = new_fg.working_directory + "/group_sbatch.sh";
   sbatch_submission_string = "echo 'cd " + new_fg.project_name + "; cd input/; sh group_submission.sh; cd ../../;'" + " >> " + group_sbatch_sh_name;
-  call( sbatch_submission_string, shell=True );
+  call( sbatch_submission_string, shell = True );
+
+  # Write sbatch for this fragment generator  
+  sbatch_filename = "sbatch_" + new_fg.project_name + ".sh";
+  f_sbatch = open( sbatch_filename, "wt" );
+  f_sbatch.write( "#!/bin/sh" );
+  f_sbatch.write( "#SBATCH " );
+  f_sbatch.close();
 
   return 0;
 
@@ -112,7 +119,7 @@ def single_fc_binary_generation( calc_config ):
   new_fg.scratch_name = "unknown";
   new_fg.output_name = "unknown";
   
-  new_fg.project_name = new_fg.lattice_name + '_' +  new_fg.correlation  + "_" + new_fg.basis_set    + "_" + new_fg.order_string()  + "_";
+  new_fg.project_name = new_fg.lattice_name + '_' +  new_fg.correlation  + "_" + new_fg.basis_set + "_" + new_fg.order_string()  + "_";
   new_fg.project_name += str(new_fg.radius)  + "_" + str(new_fg.a) + "_" + str(new_fg.b) + "_" + str(new_fg.c) + "_" + new_fg.mode;
   new_fg.cppsrcs = new_fg.working_directory + "/" + new_fg.project_name + ".cpp";
   new_fg.cppobjs = new_fg.working_directory + "/" + new_fg.project_name + ".o";
@@ -128,9 +135,9 @@ def single_fc_binary_generation( calc_config ):
   outfile_name = new_fg.working_directory + "/" + new_fg.project_name + ".out";
   group_sh_name = new_fg.working_directory + "/" + "fc_group_run.sh";
   echo_string = "echo '" + new_fg.executable + " > " + outfile_name + "' >> " + group_sh_name ;
-  call( echo_string, shell=True );
+  call( echo_string, shell = True );
   print_string = "echo '" + "echo ... done with " + new_fg.executable + "' >> " + group_sh_name ;
-  call( print_string , shell=True );
+  call( print_string , shell = True );
 
   return 0;
 
@@ -224,7 +231,7 @@ def push_to_remote( rc ):
     from subprocess import call;
     call( push_string, shell = True );
   else:
-    echo_string = "echo '" + push_string + "' > " + current_directory + "./push_to_remote_" + dir_name + ".sh";
+    echo_string = "echo '" + push_string + "' > " + current_directory + "/" + "push_to_remote_" + dir_name + ".sh";
     from subprocess import call;
     call( echo_string, shell = True );
 
@@ -237,8 +244,6 @@ def pull_from_remote( rc ):
   from manybody_expansion.api.remote_config import RemoteConfig;
   new_remote_config = deepcopy( rc );
 
-  from
-
   from os import getcwd;
   current_directory = getcwd();
   dir_name  = new_remote_config.dir_name;
@@ -246,12 +251,12 @@ def pull_from_remote( rc ):
   from socket import gethostname;
   new_remote_config.local = gethostname();
 
-  pull_string = "scp -r " + new_remote_config.user + "@" + new_remote_config.remote + ":" + new_remote_config.remote_directory + "/" + dir_name + " ./";
+  pull_string = "scp -r " + new_remote_config.user + "@" + new_remote_config.remote + ":" + new_remote_config.remote_directory + "/" + dir_name + "/" + " ./";
   if new_remote_config.pull_from_remote == True:
     from subprocess import call;
     call( pull_string, shell = True );
   else:
-    echo_string = "echo '" + pull_string + "' > " + current_directory + "./pull_from_remote_" + dir_name + ".sh";
+    echo_string = "echo '" + pull_string + "' > " + current_directory + "/" + "pull_from_remote_" + dir_name + ".sh";
     from subprocess import call;
     call( echo_string, shell = True );
 
