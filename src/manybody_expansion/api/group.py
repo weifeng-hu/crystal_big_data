@@ -86,13 +86,25 @@ def single_fg_binary_generation( calc_config ):
   call( sbatch_submission_string, shell = True );
 
   # Write sbatch for this fragment generator  
-  sbatch_filename = "sbatch_" + new_fg.project_name + ".sh";
+  sbatch_filename = new_fg.working_directory + "/" + "sbatch_" + new_fg.project_name + ".sh";
   f_sbatch = open( sbatch_filename, "wt" );
   f_sbatch.write( "#!/bin/sh" );
-  f_sbatch.write( "#SBATCH " );
+  f_sbatch.write( "#SBATCH -ntasks=120\n" );
+  f_sbatch.write( "#SBATCH -ntasks-per-socket=6\n");
+  f_sbatch.write( "#SBATCH -t=48:00:00\n");
+  f_sbatch.write( "\n");
+  f_sbatch.write( "export OMP_NUM_THREADS=120\n");
+  f_sbatch.write( "./" + new_fg.executable + " > " + new_fg.project_name + ".fg.out" );
   f_sbatch.close();
 
+
+  from subprocess import call;
+  group_sbatch_name = new_fg.working_directory + "/" + "fg_group_sbatch.sh";
+  sbatch_echo_string = "echo 'sbatch " + sbatch_filename + "' >> " + group_sbatch_name;
+  call( group_sbatch_name, shell = True  );
+
   return 0;
+
 
 # fc stands for fragment collection, means data collection after calculations
 def single_fc_binary_generation( calc_config ):
@@ -138,6 +150,23 @@ def single_fc_binary_generation( calc_config ):
   call( echo_string, shell = True );
   print_string = "echo '" + "echo ... done with " + new_fg.executable + "' >> " + group_sh_name ;
   call( print_string , shell = True );
+
+  # Write sbatch for this fragment collector
+  sbatch_filename = new_fg.working_directory + "/" + "sbatch_" + new_fg.project_name + ".sh";
+  f_sbatch = open( sbatch_filename, "wt" );
+  f_sbatch.write( "#!/bin/sh" );
+  f_sbatch.write( "#SBATCH -ntasks=120\n" );
+  f_sbatch.write( "#SBATCH -ntasks-per-socket=6\n");
+  f_sbatch.write( "#SBATCH -t=48:00:00\n");
+  f_sbatch.write( "\n");
+  f_sbatch.write( "export OMP_NUM_THREADS=120\n");
+  f_sbatch.write( "./" + new_fg.executable + " > " + new_fg.project_name + ".fc.out" );
+  f_sbatch.close();
+
+  from subprocess import call;
+  group_sbatch_name = new_fg.working_directory + "/" + "fc_group_sbatch.sh";
+  sbatch_echo_string = "echo 'sbatch " + sbatch_filename + "' >> " + group_sbatch_name;
+  call( group_sbatch_name, shell = True  );
 
   return 0;
 
