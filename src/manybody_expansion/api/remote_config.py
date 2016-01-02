@@ -28,5 +28,11 @@ class RemoteConfig:
 
   def __init__( self ):
 
-    self.machine = "";
+    self.local   = "";
+    self.remote  = "";
     self.user    = "";
+    self.dir_name = "";
+    self.remote_directory = "";
+    self.push_to_remote = False;
+    self.pull_from_remote = False;
+

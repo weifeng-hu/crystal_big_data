@@ -135,7 +135,7 @@ def single_fc_binary_generation( calc_config ):
   return 0;
 
 
-def main_driver( gc ):
+def group_generator( gc ):
 
   from copy import deepcopy
   group_config = deepcopy(gc);
@@ -197,4 +197,64 @@ def main_driver( gc ):
 
   print "Done";
 
+  print "In order to complete the whole calculation, please:";
+  print " 1. run fg_group_run.sh in the generated dir, and this will generate all the calculation inputs"; 
+  print " 2. copy the generated directory to the remote sbatch system, and use group_sbatch.sh to submit all jobs";
+  print " 3. when all jobs are done, copy the whole directory back from the remote sbatch system";
+  print " 4. run fc_group_run.sh in the generated dir, and this will compute all lattice energies";
+
+  return dir_name;
+
+
+def push_to_remote( rc ):
+
+  from copy import deepcopy;
+  from manybody_expansion.api.remote_config import RemoteConfig;
+  new_remote_config = deepcopy( rc );
+
+  from os import getcwd;
+  current_directory = getcwd();
+  dir_name  = new_remote_config.dir_name;
+
+  from socket import gethostname;
+  new_remote_config.local = gethostname();
+
+  push_string = "scp -r ./" + dir_name + "/ " + new_remote_config.user + "@" + new_remote_config.remote + ":" + new_remote_config.remote_directory + "/";
+  if new_remote_config.push_to_remote == True:
+    from subprocess import call;
+    call( push_string, shell = True );
+  else:
+    echo_string = "echo '" + push_string + "' > " + current_directory + "./push_to_remote_" + dir_name + ".sh";
+    from subprocess import call;
+    call( echo_string, shell = True );
+
   return 0;
+
+
+def pull_from_remote( rc ):
+
+  from copy import deepcopy;
+  from manybody_expansion.api.remote_config import RemoteConfig;
+  new_remote_config = deepcopy( rc );
+
+  from
+
+  from os import getcwd;
+  current_directory = getcwd();
+  dir_name  = new_remote_config.dir_name;
+
+  from socket import gethostname;
+  new_remote_config.local = gethostname();
+
+  pull_string = "scp -r " + new_remote_config.user + "@" + new_remote_config.remote + ":" + new_remote_config.remote_directory + "/" + dir_name + " ./";
+  if new_remote_config.pull_from_remote == True:
+    from subprocess import call;
+    call( pull_string, shell = True );
+  else:
+    echo_string = "echo '" + pull_string + "' > " + current_directory + "./pull_from_remote_" + dir_name + ".sh";
+    from subprocess import call;
+    call( echo_string, shell = True );
+
+  return 0;
+
+
