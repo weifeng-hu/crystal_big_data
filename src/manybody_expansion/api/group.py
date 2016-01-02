@@ -148,12 +148,21 @@ def main_driver( gc ):
   second = tuple_date_time[5];
 
   dir_name = year + "-" + month + "-" + day + "-" + hour + "-" + minute + "-" + second;
-  new_working_dir += "/";
-  new_working_dir += dir_name;
-  mkdir_string = "mkdir -p " + new_working_dir;
-  print "Creating working directory ", new_working_dir, " ... (anything generated will be placed in this directory)";
+  new_working_directory += "/";
+  new_working_directory += dir_name;
+  mkdir_string = "mkdir -p " + new_working_directory;
+  print "Creating working directory ", new_working_directory, " ... (anything generated will be placed in this directory)";
   from subprocess import call;
   call( mkdir_string, shell = True );
+
+  # write a task group metadata in the directory
+  print "Writing metadata file ... ";
+  meta_filename = new_working_directory + "/" + "METADATA";
+  f_meta = fopen( meta_filename, "wt" );
+  f_meta.write( "METADATA\n" );
+  f_meta.write( "datetime:   " + dir_name + "\n" );
+  f_meta.write( "targets:\n" );
+  f_meta.write( "lattice size\torder\tcutoff radius for max(order)\t\t\tcorrelation\t\tbasis set\t\tmode\t\tnotes\t\t\t\n" )
 
   # fg_code_generation
   print "Generating fragment generators ..."; 
@@ -162,6 +171,8 @@ def main_driver( gc ):
     current_config = deepcopy( group_config[iconfig] );
     current_config.working_directory = new_working_directory;
     single_fg_binary_generation( current_config );
+    lattice_size = str( current_config.a ) + "x" + str( current_config.b ) + "x" + str( current_config.c );
+    f_meta.write( lattice_size + "\t" + str( current_config.order ) + "\t" + str( current_config.radius ) + "\t\t\t" + current_config.correlation + "\t\t" + current_config.basis_set + "\t\t" + current_config.mode + "\t\t" + current_config.notes + "\t\t\t\n"  );
 
   # fc_code_generation
   print "Generating fragment data collectors ..."; 
@@ -170,6 +181,10 @@ def main_driver( gc ):
     current_config = deepcopy( group_config[iconfig] );
     current_config.working_directory = new_working_directory;
     single_fc_binary_generation( current_config );
+    lattice_size = str( current_config.a ) + "x" + str( current_config.b ) + "x" + str( current_config.c );
+    f_meta.write( lattice_size + "\t" + str( current_config.order ) + "\t" + str( current_config.radius ) + "\t\t\t" + current_config.correlation + "\t\t" + current_config.basis_set + "\t\t" + current_config.mode + "\t\t" + current_config.notes + "\t\t\t\n"  );
+
+  f_meta.close();
 
   print "Done";
 

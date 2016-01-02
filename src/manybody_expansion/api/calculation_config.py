@@ -40,4 +40,5 @@ class CalculationConfig:
     self.correlation = "unknown";
     self.order = 0;
     self.working_directory = "";
+    self.notes = "";
 
