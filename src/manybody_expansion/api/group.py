@@ -91,7 +91,7 @@ def single_fg_binary_generation( calc_config ):
   f_sbatch.write( "#!/bin/sh\n" );
   f_sbatch.write( "#SBATCH --ntasks=120\n" );
   f_sbatch.write( "#SBATCH --ntasks-per-socket=6\n");
-  f_sbatch.write( "#SBATCH -t=48:00:00\n");
+  f_sbatch.write( "#SBATCH -t 48:00:00\n");
   f_sbatch.write( "\n");
   f_sbatch.write( "export OMP_NUM_THREADS=120\n");
   f_sbatch.write( "./fg_driver." + new_fg.project_name + " > " + new_fg.project_name + ".out" );
@@ -157,7 +157,7 @@ def single_fc_binary_generation( calc_config ):
   f_sbatch.write( "#!/bin/sh\n" );
   f_sbatch.write( "#SBATCH --ntasks=120\n" );
   f_sbatch.write( "#SBATCH --ntasks-per-socket=6\n");
-  f_sbatch.write( "#SBATCH -t=48:00:00\n");
+  f_sbatch.write( "#SBATCH -t 48:00:00\n");
   f_sbatch.write( "\n");
   f_sbatch.write( "export OMP_NUM_THREADS=120\n");
   f_sbatch.write( "./fg_driver." + new_fg.project_name + " > " + new_fg.project_name + ".out" );
