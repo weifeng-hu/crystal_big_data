@@ -73,11 +73,16 @@ def single_fg_binary_generation( calc_config ):
   fragment_generator.generate_binary( new_fg );
 
   from subprocess import call;
-  echo_string = "echo '" + new_fg.executable + " > " + new_fg.project_name + ".out' >> fg_group_run.sh";
+  outfile_name = new_fg.working_directory + "/" + new_fg.project_name + ".out";
+  group_sh_name = new_fg.working_directory + "/" + "fg_group_run.sh";
+  echo_string = "echo '" + new_fg.executable + " > " + outfile_name + "' >> " + group_sh_name ;
   call(  echo_string , shell=True );
+  print_string = "echo '" + "echo ... done with " + new_fg.executable + "' >> " + group_sh_name ;
+  call(  print_string , shell=True );
 
   from subprocess import call;
-  sbatch_submission_string = "echo 'cd " + new_fg.project_name + "; cd input/; sh group_submission.sh; cd ../../;'" + " >> group_sbatch.sh";
+  group_sbatch_sh_name = new_fg.working_directory + "/group_sbatch.sh";
+  sbatch_submission_string = "echo 'cd " + new_fg.project_name + "; cd input/; sh group_submission.sh; cd ../../;'" + " >> " + group_sbatch_sh_name;
   call( sbatch_submission_string, shell=True );
 
   return 0;
@@ -120,8 +125,12 @@ def single_fc_binary_generation( calc_config ):
   fragment_generator.generate_binary( new_fg );
 
   from subprocess import call;
-  echo_string = "echo '" + new_fg.executable + " > " + new_fg.project_name + ".out' >> fc_group_run.sh" ;
+  outfile_name = new_fg.working_directory + "/" + new_fg.project_name + ".out";
+  group_sh_name = new_fg.working_directory + "/" + "fc_group_run.sh";
+  echo_string = "echo '" + new_fg.executable + " > " + outfile_name + "' >> " + group_sh_name ;
   call( echo_string, shell=True );
+  print_string = "echo '" + "echo ... done with " + new_fg.executable + "' >> " + group_sh_name ;
+  call( print_string , shell=True );
 
   return 0;
 
@@ -134,7 +143,7 @@ def main_driver( gc ):
   # create the working directory, by date, time
   from os import getcwd;
   current_directory = getcwd();
-  new_working_dir = current_directory;
+  new_working_directory = current_directory;
 
   # add date and time to dir name
   import datetime
@@ -147,7 +156,7 @@ def main_driver( gc ):
   minute = tuple_date_time[4];
   second = tuple_date_time[5];
 
-  dir_name = year + "-" + month + "-" + day + "-" + hour + "-" + minute + "-" + second;
+  dir_name = str(year) + "-" + str(month) + "-" + str(day) + "-" + str(hour) + "-" + str(minute) + "-" + str(second);
   new_working_directory += "/";
   new_working_directory += dir_name;
   mkdir_string = "mkdir -p " + new_working_directory;
@@ -158,11 +167,11 @@ def main_driver( gc ):
   # write a task group metadata in the directory
   print "Writing metadata file ... ";
   meta_filename = new_working_directory + "/" + "METADATA";
-  f_meta = fopen( meta_filename, "wt" );
+  f_meta = open( meta_filename, "wt" );
   f_meta.write( "METADATA\n" );
   f_meta.write( "datetime:   " + dir_name + "\n" );
   f_meta.write( "targets:\n" );
-  f_meta.write( "lattice size\torder\tcutoff radius for max(order)\t\t\tcorrelation\t\tbasis set\t\tmode\t\tnotes\t\t\t\n" )
+  f_meta.write( "lattice size\torder\tcutoff radius\tcorrelation\tbasis set\tmode\tnotes\n" )
 
   # fg_code_generation
   print "Generating fragment generators ..."; 
@@ -172,7 +181,7 @@ def main_driver( gc ):
     current_config.working_directory = new_working_directory;
     single_fg_binary_generation( current_config );
     lattice_size = str( current_config.a ) + "x" + str( current_config.b ) + "x" + str( current_config.c );
-    f_meta.write( lattice_size + "\t" + str( current_config.order ) + "\t" + str( current_config.radius ) + "\t\t\t" + current_config.correlation + "\t\t" + current_config.basis_set + "\t\t" + current_config.mode + "\t\t" + current_config.notes + "\t\t\t\n"  );
+    f_meta.write( lattice_size + "\t\t" + str( current_config.order ) + "\t" + str( current_config.radius ) + "\t\t" + current_config.correlation + "\t\t" + current_config.basis_set + "\t\t" + "sbatch" + "\t" + current_config.notes + "\n"  );
 
   # fc_code_generation
   print "Generating fragment data collectors ..."; 
@@ -182,7 +191,7 @@ def main_driver( gc ):
     current_config.working_directory = new_working_directory;
     single_fc_binary_generation( current_config );
     lattice_size = str( current_config.a ) + "x" + str( current_config.b ) + "x" + str( current_config.c );
-    f_meta.write( lattice_size + "\t" + str( current_config.order ) + "\t" + str( current_config.radius ) + "\t\t\t" + current_config.correlation + "\t\t" + current_config.basis_set + "\t\t" + current_config.mode + "\t\t" + current_config.notes + "\t\t\t\n"  );
+    f_meta.write( lattice_size + "\t\t" + str( current_config.order ) + "\t" + str( current_config.radius ) + "\t\t" + current_config.correlation + "\t\t" + current_config.basis_set + "\t\t" + "harvest" + "\t" + current_config.notes + "\n"  );
 
   f_meta.close();
 
