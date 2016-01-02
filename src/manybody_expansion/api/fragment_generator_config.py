@@ -54,6 +54,8 @@ class FragmentGeneratorConfig:
     self.c = 0;
     self.natom = 0;
 
+    self.working_directory = "";
+
     self.iquads_root = "$(IQUADS_ROOT)";
     self.iquads_src  = "$(iquads_root)/src/";
     self.iquads_bin  = "$(iquads_root)/bin/";

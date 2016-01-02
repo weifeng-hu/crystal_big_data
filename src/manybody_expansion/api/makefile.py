@@ -30,9 +30,6 @@ def write( fg_config ):
 
   makefile_name = fg_config.makefile_name;
 
-  import os;
-  current_directory = os.getcwd();
-
   f_makefile = open( makefile_name, "wt" );
   f_makefile.write( "iquads_root\t= " + fg_config.iquads_root + "\n");
   f_makefile.write( "iquads_src\t= " + fg_config.iquads_src + "\n" );

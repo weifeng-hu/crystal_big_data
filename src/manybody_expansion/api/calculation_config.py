@@ -39,4 +39,5 @@ class CalculationConfig:
     self.radius = 0.0;
     self.correlation = "unknown";
     self.order = 0;
+    self.working_directory = "";
 

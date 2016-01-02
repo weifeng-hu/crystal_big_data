@@ -26,15 +26,13 @@
 
 # A lousy group submission controller
 
-def fg_binary_generation( calc_config ):
+def single_fg_binary_generation( calc_config ):
 
   from manybody_expansion import api
   from manybody_expansion.api import fragment_generator_config
   new_fg = fragment_generator_config.FragmentGeneratorConfig();
 
-  from os import getcwd;
-  current_directory = getcwd();
-
+  new_fg.working_directory = calc_config.working_directory;
   new_fg.lattice_name = calc_config.lattice_name;
   new_fg.natom = calc_config.natom;
   new_fg.xyz_file_name = calc_config.xyz_file_name;
@@ -64,10 +62,10 @@ def fg_binary_generation( calc_config ):
   
   new_fg.project_name = new_fg.lattice_name + '_' +  new_fg.correlation  + "_" + new_fg.basis_set    + "_" + new_fg.order_string()  + "_";
   new_fg.project_name += str(new_fg.radius)  + "_" + str(new_fg.a) + "_" + str(new_fg.b) + "_" + str(new_fg.c) + "_" + new_fg.mode;
-  new_fg.cppsrcs = current_directory + "/" + new_fg.project_name + ".cpp";
-  new_fg.cppobjs = current_directory + "/" + new_fg.project_name + ".o";
-  new_fg.makefile_name = current_directory + "/" + "makefile_" + new_fg.project_name;
-  new_fg.executable = current_directory + "/" + "fg_driver." + new_fg.project_name;
+  new_fg.cppsrcs = new_fg.working_directory + "/" + new_fg.project_name + ".cpp";
+  new_fg.cppobjs = new_fg.working_directory + "/" + new_fg.project_name + ".o";
+  new_fg.makefile_name = new_fg.working_directory + "/" + "makefile_" + new_fg.project_name;
+  new_fg.executable = new_fg.working_directory + "/" + "fg_driver." + new_fg.project_name;
   from copy import deepcopy
   new_fg.driver_name = deepcopy(new_fg.cppsrcs);
   
@@ -84,16 +82,14 @@ def fg_binary_generation( calc_config ):
 
   return 0;
 
-
-def fg_data_collection( calc_config ):
+# fc stands for fragment collection, means data collection after calculations
+def single_fc_binary_generation( calc_config ):
 
   from manybody_expansion import api
   from manybody_expansion.api import fragment_generator_config
   new_fg = fragment_generator_config.FragmentGeneratorConfig();
 
-  from os import getcwd;
-  current_directory = getcwd();
-
+  new_fg.working_directory = calc_config.working_directory;
   new_fg.lattice_name = calc_config.lattice_name;
   new_fg.natom = calc_config.natom;
   new_fg.xyz_file_name = calc_config.xyz_file_name;
@@ -113,11 +109,11 @@ def fg_data_collection( calc_config ):
   
   new_fg.project_name = new_fg.lattice_name + '_' +  new_fg.correlation  + "_" + new_fg.basis_set    + "_" + new_fg.order_string()  + "_";
   new_fg.project_name += str(new_fg.radius)  + "_" + str(new_fg.a) + "_" + str(new_fg.b) + "_" + str(new_fg.c) + "_" + new_fg.mode;
-  new_fg.cppsrcs = current_directory + "/" + new_fg.project_name + ".cpp";
-  new_fg.cppobjs = current_directory + "/" + new_fg.project_name + ".o";
-  new_fg.makefile_name = current_directory + "/" + "makefile_" + new_fg.project_name;
-  new_fg.executable = current_directory + "/" + "fg_driver." + new_fg.project_name;
-  from copy import deepcopy
+  new_fg.cppsrcs = new_fg.working_directory + "/" + new_fg.project_name + ".cpp";
+  new_fg.cppobjs = new_fg.working_directory + "/" + new_fg.project_name + ".o";
+  new_fg.makefile_name = new_fg.working_directory + "/" + "makefile_" + new_fg.project_name;
+  new_fg.executable = new_fg.working_directory + "/" + "fg_driver." + new_fg.project_name;
+  from copy import deepcopy;
   new_fg.driver_name = deepcopy(new_fg.cppsrcs);
 
   from manybody_expansion.api import fragment_generator;
@@ -135,16 +131,46 @@ def main_driver( gc ):
   from copy import deepcopy
   group_config = deepcopy(gc);
 
+  # create the working directory, by date, time
+  from os import getcwd;
+  current_directory = getcwd();
+  new_working_dir = current_directory;
+
+  # add date and time to dir name
+  import datetime
+  current_date_time = datetime.datetime.now();
+  tuple_date_time   = current_date_time.timetuple();
+  year  = tuple_date_time[0];
+  month = tuple_date_time[1];
+  day   = tuple_date_time[2];
+  hour  = tuple_date_time[3];
+  minute = tuple_date_time[4];
+  second = tuple_date_time[5];
+
+  dir_name = year + "-" + month + "-" + day + "-" + hour + "-" + minute + "-" + second;
+  new_working_dir += "/";
+  new_working_dir += dir_name;
+  mkdir_string = "mkdir -p " + new_working_dir;
+  print "Creating working directory ", new_working_dir, " ... (anything generated will be placed in this directory)";
+  from subprocess import call;
+  call( mkdir_string, shell = True );
+
   # fg_code_generation
+  print "Generating fragment generators ..."; 
   for iconfig in range( 0, len(group_config) ):
     from copy import deepcopy;
     current_config = deepcopy( group_config[iconfig] );
-    fg_binary_generation( current_config );
+    current_config.working_directory = new_working_directory;
+    single_fg_binary_generation( current_config );
 
   # fc_code_generation
+  print "Generating fragment data collectors ..."; 
   for iconfig in range( 0, len(group_config) ):
     from copy import deepcopy;
     current_config = deepcopy( group_config[iconfig] );
-    fg_data_collection( current_config );
+    current_config.working_directory = new_working_directory;
+    single_fc_binary_generation( current_config );
+
+  print "Done";
 
   return 0;
