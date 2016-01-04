@@ -61,11 +61,11 @@ def single_fg_binary_generation( calc_config ):
   #new_fg.mode = "sbatch";
   
   new_fg.project_name = new_fg.lattice_name + '_' +  new_fg.correlation  + "_" + new_fg.basis_set + "_" + new_fg.order_string()  + "_";
-  new_fg.project_name += str(new_fg.radius)  + "_" + str(new_fg.a) + "_" + str(new_fg.b) + "_" + str(new_fg.c) + "_" + new_fg.mode;
-  new_fg.cppsrcs = new_fg.working_directory + "/" + new_fg.project_name + ".cpp";
-  new_fg.cppobjs = new_fg.working_directory + "/" + new_fg.project_name + ".o";
-  new_fg.makefile_name = new_fg.working_directory + "/" + "makefile_" + new_fg.project_name;
-  new_fg.executable = new_fg.working_directory + "/" + "fg_driver." + new_fg.project_name;
+  new_fg.project_name += str(new_fg.radius)  + "_" + str(new_fg.a) + "_" + str(new_fg.b) + "_" + str(new_fg.c);
+  new_fg.cppsrcs = new_fg.working_directory + "/" + new_fg.project_name + "_" + new_fg.mode + ".cpp";
+  new_fg.cppobjs = new_fg.working_directory + "/" + new_fg.project_name + "_" + new_fg.mode + ".o";
+  new_fg.makefile_name = new_fg.working_directory + "/" + "makefile_" + new_fg.project_name + "_" + new_fg.mode;
+  new_fg.executable = new_fg.working_directory + "/" + "fg_driver." + new_fg.project_name + "_" + new_fg.mode;
   from copy import deepcopy
   new_fg.driver_name = deepcopy(new_fg.cppsrcs);
   
@@ -73,7 +73,7 @@ def single_fg_binary_generation( calc_config ):
   fragment_generator.generate_binary( new_fg );
 
   from subprocess import call;
-  outfile_name = new_fg.working_directory + "/" + new_fg.project_name + ".out";
+  outfile_name = new_fg.working_directory + "/" + new_fg.project_name + "_" + new_fg.mode + ".out";
   group_sh_name = new_fg.working_directory + "/" + "fg_group_run.sh";
   echo_string = "echo '" + new_fg.executable + " > " + outfile_name + "' >> " + group_sh_name ;
   call(  echo_string , shell = True );
@@ -86,7 +86,7 @@ def single_fg_binary_generation( calc_config ):
   call( sbatch_submission_string, shell = True );
 
   # Write sbatch for this fragment generator  
-  sbatch_filename = new_fg.working_directory + "/" + "sbatch_" + new_fg.project_name + ".sh";
+  sbatch_filename = new_fg.working_directory + "/" + "sbatch_" + new_fg.project_name + "_" + new_fg.mode + ".sh";
   f_sbatch = open( sbatch_filename, "wt" );
   f_sbatch.write( "#!/bin/sh\n" );
   f_sbatch.write( "#SBATCH --ntasks=120\n" );
@@ -94,13 +94,13 @@ def single_fg_binary_generation( calc_config ):
   f_sbatch.write( "#SBATCH -t 48:00:00\n");
   f_sbatch.write( "\n");
   f_sbatch.write( "export OMP_NUM_THREADS=120\n");
-  f_sbatch.write( "./fg_driver." + new_fg.project_name + " > " + new_fg.project_name + ".out" );
+  f_sbatch.write( "./fg_driver." + new_fg.project_name + "_" + new_fg.mode + " > " + new_fg.project_name + "_" + new_fg.mode + ".out" );
   f_sbatch.close();
 
 
   from subprocess import call;
   group_sbatch_name = new_fg.working_directory + "/" + "fg_group_sbatch.sh";
-  sbatch_echo_string = "echo 'sbatch " + "sbatch_" + new_fg.project_name + ".sh" + "' >> " + group_sbatch_name;
+  sbatch_echo_string = "echo 'sbatch " + "sbatch_" + new_fg.project_name + "_" + new_fg.mode + ".sh" + "' >> " + group_sbatch_name;
   call( sbatch_echo_string, shell = True  );
 
   return 0;
@@ -130,13 +130,13 @@ def single_fc_binary_generation( calc_config ):
   new_fg.input_name = "unknown";
   new_fg.scratch_name = "unknown";
   new_fg.output_name = "unknown";
-  
+ 
   new_fg.project_name = new_fg.lattice_name + '_' +  new_fg.correlation  + "_" + new_fg.basis_set + "_" + new_fg.order_string()  + "_";
-  new_fg.project_name += str(new_fg.radius)  + "_" + str(new_fg.a) + "_" + str(new_fg.b) + "_" + str(new_fg.c) + "_" + new_fg.mode;
-  new_fg.cppsrcs = new_fg.working_directory + "/" + new_fg.project_name + ".cpp";
-  new_fg.cppobjs = new_fg.working_directory + "/" + new_fg.project_name + ".o";
-  new_fg.makefile_name = new_fg.working_directory + "/" + "makefile_" + new_fg.project_name;
-  new_fg.executable = new_fg.working_directory + "/" + "fg_driver." + new_fg.project_name;
+  new_fg.project_name += str(new_fg.radius)  + "_" + str(new_fg.a) + "_" + str(new_fg.b) + "_" + str(new_fg.c);
+  new_fg.cppsrcs = new_fg.working_directory + "/" + new_fg.project_name + "_" + new_fg.mode + ".cpp";
+  new_fg.cppobjs = new_fg.working_directory + "/" + new_fg.project_name + "_" + new_fg.mode + ".o";
+  new_fg.makefile_name = new_fg.working_directory + "/" + "makefile_" + new_fg.project_name + "_" + new_fg.mode;
+  new_fg.executable = new_fg.working_directory + "/" + "fg_driver." + new_fg.project_name + "_" + new_fg.mode;
   from copy import deepcopy;
   new_fg.driver_name = deepcopy(new_fg.cppsrcs);
 
@@ -144,7 +144,7 @@ def single_fc_binary_generation( calc_config ):
   fragment_generator.generate_binary( new_fg );
 
   from subprocess import call;
-  outfile_name = new_fg.working_directory + "/" + new_fg.project_name + ".out";
+  outfile_name = new_fg.working_directory + "/" + new_fg.project_name + "_" + new_fg.mode + ".out";
   group_sh_name = new_fg.working_directory + "/" + "fc_group_run.sh";
   echo_string = "echo '" + new_fg.executable + " > " + outfile_name + "' >> " + group_sh_name ;
   call( echo_string, shell = True );
@@ -152,7 +152,7 @@ def single_fc_binary_generation( calc_config ):
   call( print_string , shell = True );
 
   # Write sbatch for this fragment collector
-  sbatch_filename = new_fg.working_directory + "/" + "sbatch_" + new_fg.project_name + ".sh";
+  sbatch_filename = new_fg.working_directory + "/" + "sbatch_" + new_fg.project_name + "_" + new_fg.mode + ".sh";
   f_sbatch = open( sbatch_filename, "wt" );
   f_sbatch.write( "#!/bin/sh\n" );
   f_sbatch.write( "#SBATCH --ntasks=120\n" );
@@ -160,12 +160,12 @@ def single_fc_binary_generation( calc_config ):
   f_sbatch.write( "#SBATCH -t 48:00:00\n");
   f_sbatch.write( "\n");
   f_sbatch.write( "export OMP_NUM_THREADS=120\n");
-  f_sbatch.write( "./fg_driver." + new_fg.project_name + " > " + new_fg.project_name + ".out" );
+  f_sbatch.write( "./fg_driver." + new_fg.project_name + "_" + new_fg.mode + " > " + new_fg.project_name + "_" + new_fg.mode + ".out" );
   f_sbatch.close();
 
   from subprocess import call;
   group_sbatch_name = new_fg.working_directory + "/" + "fc_group_sbatch.sh";
-  sbatch_echo_string = "echo 'sbatch " + "sbatch_" + new_fg.project_name + ".sh" + "' >> " + group_sbatch_name;
+  sbatch_echo_string = "echo 'sbatch " + "sbatch_" + new_fg.project_name + "_" + new_fg.mode + ".sh" + "' >> " + group_sbatch_name;
   call( sbatch_echo_string, shell = True  );
 
   return 0;
