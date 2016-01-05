@@ -1,23 +1,4 @@
 
-
-def new_calc_config( lattice_name, xyz_file_name, lattice_constant_file_name, natom, a, b, c, order, basis_set, correlation, radius ):
-  from manybody_expansion.api.calculation_config import CalculationConfig;
-  new_cg = CalculationConfig();
-
-  new_cg.lattice_name = lattice_name;
-  new_cg.xyz_file_name = xyz_file_name;
-  new_cg.lattice_constant_file_name = lattice_constant_file_name;
-  new_cg.natom = natom;
-  new_cg.a = a;
-  new_cg.b = b;
-  new_cg.c = c;
-  new_cg.order = order;
-  new_cg.basis_set = basis_set;
-  new_cg.radius = radius;
-  new_cg.correlation = correlation;
-  return new_cg; 
-
-
 group_config = [];
 lattice_name = "aspirin_form_I";
 xyz_file_name = "./aspirin_form_I.coord";
@@ -42,5 +23,5 @@ group_config.append(deepcopy(new_calc_config(lattice_name,xyz_file_name,lattice_
 group_config.append(deepcopy(new_calc_config(lattice_name,xyz_file_name,lattice_constant_file_name,natom,5, 5, 5, 2, basis_set,correlation,15.0)));
 group_config.append(deepcopy(new_calc_config(lattice_name,xyz_file_name,lattice_constant_file_name,natom,5, 5, 5, 4, basis_set,correlation,18.0)));
 
-from manybody_expansion.api.group import main_driver;
-main_driver( group_config ); 
+from manybody_expansion.api.group import group_generator;
+dir_name = group_generator( group_config ); 
