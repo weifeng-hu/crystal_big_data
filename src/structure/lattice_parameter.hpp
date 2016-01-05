@@ -180,6 +180,11 @@ private:
    *   - a_vec()
    *   - b_vec()
    *   - c_vec()
+   *   - alpha is angle between a and c
+   *   - beta is angle between b and c
+   *   - gamma is angle between a and b
+   *   some other literatures reverses the alpha and beta
+   *   This is translation from lattice constant to cartesian translational vectors, also called fractional coordinate translations.
    */
   threed_vector_type a_vec() const {
     threed_vector_type retval = { this->a(), 0.0e0, 0.0e0 };
@@ -193,7 +198,7 @@ private:
 
   threed_vector_type c_vec() const {
     threed_vector_type retval;
-    retval.at(0) = this->a() * cos( this->alpha() );
+    retval.at(0) = this->c() * cos( this->alpha() );
     {
      retval.at(1) = 1.0e0/ ( this->b() * sin( this->gamma() ) ) *
       ( this->c() * this->b() * cos( this->beta() ) - 
