@@ -78,6 +78,8 @@ public:
       ostream& operator<< ( ostream& os, const this_type& object_ref ) {
         using std::endl;
         os << "memory," << object_ref.memory_amount() << "," << object_ref.memory_unit() << endl;
+        // we always use direct integral evaluation to aviod heavy disk usage
+        os << "gdirect" << endl;
         return os; 
       }
    /* Note:

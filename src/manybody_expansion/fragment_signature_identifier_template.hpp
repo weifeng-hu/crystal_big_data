@@ -113,6 +113,8 @@ public:
     polymer_bulk_index_list_type polymer_combination_list_orig
       = iquads :: math :: get_combination<NUM>( lattice_obj.size() * lattice_obj.unit_cell().size() );
 
+    std :: cout << "Combination done. Found " << polymer_combination_list_orig.size()  << " unique polymers of " << NUM << " in the molecular lattice " << std :: endl << std :: flush;
+
     omp_set_dynamic(0);
     const size_t num_thread = omp_get_num_procs();
     omp_set_num_threads( num_thread );
@@ -122,7 +124,6 @@ public:
     std :: vector< polymer_lattice_index_list_type* > sub_polymer_lattice_index_list_addresses;
     sub_polymer_lattice_index_list_addresses.resize( num_thread );
 
-    // cout << "Found " << n_comb << " unique polymers of " << NUM << " in the molecule bulk " << endl;
     // std :: cout << polymer_combination_list_orig.size() << std :: endl;
     std :: string initialize_message = std :: string( "Initializing the identifier [ openmp, automatic, num_thread = " ) +
                                                                                std :: to_string( num_thread ) +

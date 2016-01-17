@@ -58,7 +58,8 @@ agent_type :: generate_config_list_from_request( request_type request ) {
     config_pointer_list[0] -> set_input_dir() = request.input_dir();
     config_pointer_list[0] -> set_scratch_dir() = request.scratch_dir();
     config_pointer_list[0] -> set_output_dir()  = request.output_dir();
-    config_pointer_list[0] -> set_memory_config() = this_config_type :: MemoryConfig( 400, "m" );
+//    config_pointer_list[0] -> set_memory_config() = this_config_type :: MemoryConfig( 400, "m" );
+    config_pointer_list[0] -> set_memory_config() = this_config_type :: MemoryConfig( 1000, "m" );
     config_pointer_list[0] -> set_basis_set_config() = this_config_type :: BasisSetConfig( request.basis_set_name() );
     config_pointer_list[0] -> set_geometry_config() = this_config_type :: GeometryConfig( request.molecule_obj().coordinate_list(), coordinate_representation :: CARTESIAN, request.molecule_obj().geometry_unit() );
     size_t nelec = request.molecule_obj().neutral_nelec() - request.molecule_obj().charge();
