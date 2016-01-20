@@ -103,6 +103,12 @@ def write_unit_cell( fg_config, f_main_cpp ):
   f_main_cpp.write( "  iquads :: structure :: UnitCell< iquads :: structure :: Molecule > unit_cell( node_list, lattice_parameter );\n" );
   f_main_cpp.write( "  iquads :: structure :: Lattice < iquads :: structure :: UnitCell< iquads :: structure :: Molecule > > lattice( unit_cell, " + str(a) + ", " + str(b) + ", " + str(c) + " );\n" );
 
+  f_main_cpp.write( "  using std :: get;\n" );
+  
+  f_main_cpp.write( '  std :: cout << "edges of the lattice:" << std :: endl\n' );
+  f_main_cpp.write( '  std :: cout << " [ " << get<0> ( get<0> ( lattice.edges() ) ) << ", " << get<1> ( get<0> ( lattice.edges() ) ) << " ] " << std :: endl;\n' );
+  f_main_cpp.write( '  std :: cout << " [ " << get<0> ( get<1> ( lattice.edges() ) ) << ", " << get<1> ( get<1> ( lattice.edges() ) ) << " ] " << std :: endl;\n' );
+  f_main_cpp.write( '  std :: cout << " [ " << get<0> ( get<2> ( lattice.edges() ) ) << ", " << get<1> ( get<2> ( lattice.edges() ) ) << " ] " << std :: endl;\n' );
   f_main_cpp.write( "  iquads :: structure :: Bulk< iquads :: structure :: Molecule > bulk;\n" );
   f_main_cpp.write( "\n" );
 
