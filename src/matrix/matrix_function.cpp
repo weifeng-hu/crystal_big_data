@@ -442,14 +442,10 @@ IMatrixHeap compute_boolean_mat( std :: vector<DMatrixHeap>& eigvals ) {
 
 std :: vector< std :: map< int, int > > compute_boolean_map( std :: vector<DMatrixHeap>& eigvals ) {
 
-  omp_set_dynamic(0);
-  const size_t num_thread = omp_get_num_procs();
-  omp_set_num_threads( num_thread );
-
   size_t n_matrix = eigvals.size();
   size_t n_element_per_vector = eigvals[0].size();
   size_t n_element_total = n_matrix * n_element_per_vector;
-  size_t n_element_cache_size = STACK_DOUBLE_LIMIT/num_thread;
+  size_t n_element_cache_size = STACK_DOUBLE_LIMIT;
   size_t n_vector_every_time = n_element_cache_size / n_element_per_vector;
   size_t n_normal      = n_matrix / n_vector_every_time;
   size_t n_vector_tail = n_matrix % n_vector_every_time;
@@ -474,9 +470,9 @@ std :: vector< std :: map< int, int > > compute_boolean_map( std :: vector<DMatr
     it_big += n_element_per_vector;
   }
 
-//  omp_set_dynamic(0);
-//  const size_t num_thread = omp_get_num_procs();
-//  omp_set_num_threads( num_thread );
+  omp_set_dynamic(0);
+  const size_t num_thread = omp_get_num_procs();
+  omp_set_num_threads( num_thread );
 
   std :: string display_message = std :: string( "Comparing eivenvalue to get a boolean matrix [ cache hierached, compressed, openmp, automatic, num_thread = " ) +
                                   std :: to_string( num_thread ) + 

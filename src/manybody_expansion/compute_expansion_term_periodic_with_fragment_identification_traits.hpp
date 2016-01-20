@@ -207,6 +207,7 @@ namespace manybody_expansion {
   template <> inline energy_data_type compute_expansion_term_periodic_with_fragment_identification<3>( config_type config, const database_type& database, report_ref report ) {
 
     energy_data_type retval = 0.0e0;
+    size_t number_of_effective_terms = 0;
     unit_cell_type cell_R0 = config.lattice().at(0, 0, 0);
 
     const size_t unit_size = cell_R0.size();
@@ -229,11 +230,14 @@ namespace manybody_expansion {
 
     std :: vector< energy_data_type > retval_set;
     retval_set.resize( num_thread );
+    std :: vector< size_t > number_of_effective_terms_set;
+    number_of_effective_terms_set.resize( num_thread );
 
     #pragma omp parallel
     {
       const int thread_id = omp_get_thread_num();
       energy_data_type retval_local = 0.0e0;
+      size_t number_of_effective_terms_local = 0;
 
       #pragma omp for
       for( size_t i = 0; i < loop_size; i++ ) {
@@ -289,6 +293,7 @@ namespace manybody_expansion {
                               report.attach_new_trimer_report( trimer_report );
                               */
                               // retval += trimer_interaction_energy;
+                              number_of_effective_terms_local += 1;
                               retval_local += trimer_interaction_energy;
                             }
                           }
@@ -301,16 +306,19 @@ namespace manybody_expansion {
       }
 
       retval_set[ thread_id ] = retval_local;
+      number_of_effective_terms_set[ thread_id ] = number_of_effective_terms_local;
       #pragma omp barrier
 
       #pragma omp single
       for( size_t j = 0; j < retval_set.size(); j++ ) {
         retval+= retval_set[j];
+        number_of_effective_terms += number_of_effective_terms_set[j];
       }
 
     }
 
     std :: cout << "Third order interaction energy: " << std :: setprecision(12) << std :: setw(16) << retval/6.0e0 << std :: endl;
+    std :: cout << "Number of effective terms: " << number_of_effective_terms << std :: endl;
 
     return 1.0e0/6.0e0 * retval;
  
@@ -322,6 +330,7 @@ namespace manybody_expansion {
   template <> inline energy_data_type compute_expansion_term_periodic_with_fragment_identification<4> ( config_type config, const database_type& database, report_ref report ) { 
 
     energy_data_type retval = 0.0e0;
+    size_t number_of_effective_terms = 0;
     unit_cell_type cell_R0 = config.lattice().at(0, 0, 0);
 
     const size_t unit_size = cell_R0.size();
@@ -346,11 +355,14 @@ namespace manybody_expansion {
 
     std :: vector< energy_data_type > retval_set;
     retval_set.resize( num_thread );
+    std :: vector< size_t > number_of_effective_terms_set;
+    number_of_effective_terms_set.resize( num_thread );
 
     #pragma omp parallel
     {
       const int thread_id = omp_get_thread_num();
       energy_data_type retval_local = 0.0e0;
+      size_t number_of_effective_terms_local = 0;
 
       #pragma omp for
       for( size_t i = 0; i < loop_size; i++ ) {
@@ -420,6 +432,7 @@ namespace manybody_expansion {
                                       //  report.attach_new_tetramer_report( tetramer_report );
                                       //
                                       // retval += tetramer_interaction_energy;
+                                       number_of_effective_terms_local += 1;
                                        retval_local += tetramer_interaction_energy;
                                     }
                                   }
@@ -435,16 +448,19 @@ namespace manybody_expansion {
       }
 
       retval_set[ thread_id ] = retval_local;
+      number_of_effective_terms_set[ thread_id ] = number_of_effective_terms_local;
       #pragma omp barrier
 
       #pragma omp single
       for( size_t j = 0; j < retval_set.size(); j++ ) {
         retval+= retval_set[j];
+        number_of_effective_terms += number_of_effective_terms_set[j];
       }
 
     }
 
     std :: cout << "Fourth order interaction energy: " << std :: setprecision(12) << std :: setw(16) << retval/24.0e0 << std :: endl;
+    std :: cout << "Number of effective terms: " << number_of_effective_terms << std :: endl;
 
     return 1.0e0/24.0e0 * retval;
  
