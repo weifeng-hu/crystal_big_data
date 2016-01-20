@@ -105,7 +105,7 @@ def write_unit_cell( fg_config, f_main_cpp ):
 
   f_main_cpp.write( "  using std :: get;\n" );
   
-  f_main_cpp.write( '  std :: cout << "edges of the lattice:" << std :: endl\n' );
+  f_main_cpp.write( '  std :: cout << "edges of the lattice:" << std :: endl;\n' );
   f_main_cpp.write( '  std :: cout << " [ " << get<0> ( get<0> ( lattice.edges() ) ) << ", " << get<1> ( get<0> ( lattice.edges() ) ) << " ] " << std :: endl;\n' );
   f_main_cpp.write( '  std :: cout << " [ " << get<0> ( get<1> ( lattice.edges() ) ) << ", " << get<1> ( get<1> ( lattice.edges() ) ) << " ] " << std :: endl;\n' );
   f_main_cpp.write( '  std :: cout << " [ " << get<0> ( get<2> ( lattice.edges() ) ) << ", " << get<1> ( get<2> ( lattice.edges() ) ) << " ] " << std :: endl;\n' );
