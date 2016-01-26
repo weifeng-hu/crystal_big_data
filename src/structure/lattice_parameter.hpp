@@ -217,7 +217,7 @@ public:
    *     Invokes the ax_b() function to actually solve the coefficients.
    */
   coefficient_vector_type 
-  compute_translational_coeffcient_for_point( coordinate_type coordinate ) const {
+  compute_translational_coefficient_for_point( coordinate_type coordinate ) const {
     threed_vector_type coordinate_copy;
     coordinate_copy[0] = get<0>( coordinate );
     coordinate_copy[1] = get<1>( coordinate );
@@ -293,8 +293,8 @@ public:
       = this->primitive_translation_vectors();
     translation_basis_matrix_type basis_matrix = 
       { translation_vectors[0][0], translation_vectors[0][1], translation_vectors[0][2],
-        translation_vectors[0][0], translation_vectors[0][1], translation_vectors[0][2],
-        translation_vectors[0][0], translation_vectors[0][1], translation_vectors[0][2] };
+        translation_vectors[1][0], translation_vectors[1][1], translation_vectors[1][2],
+        translation_vectors[2][0], translation_vectors[2][1], translation_vectors[2][2] };
     return basis_matrix;
   }
 
