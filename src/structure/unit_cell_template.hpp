@@ -34,6 +34,7 @@
 #include <geometrical_space/coordinate.hpp>
 #include <geometrical_space/threed_space.hpp>
 #include <geometrical_space/threed_space_function.hpp>
+#include <structure/atom.hpp>
 #include <structure/atom_list.hpp>
 #include <structure/lattice_parameter.hpp>
 
@@ -285,6 +286,32 @@ public:
     }
   }
 
+  /**
+   *  + print_fractional_coordinates()
+   *    print the fractional coordinates of all atoms in the unit cell
+   *    We don't implement overloaded function in the sub structure classes,
+   *    e.g., atoms, molecules, because fractional coordinates is only 
+   *    meaningful if there is a unit cell.
+   */
+  void print_fractional_coordinates() {
+    printf( "Fractional coordinates:\n" );
+    for( size_t inode = 0; inode < this->node_list_.size(); inode++ ) {
+      NodeType node = this->node_list_[inode];
+      iquads :: structure :: Atom :: atom_coordinate_list_type coordinate_list = node.coordinate_list();
+      for( size_t icoord = 0; icoord < coordinate_list.size(); icoord++ ) {
+        std :: string element_name = std :: get<0> ( coordinate_list[icoord] );
+        printf( "%s        ", element_name.c_str() );
+        coordinate_type coordinate = std :: get<1> ( coordinate_list[icoord] );
+        threed_vector_type fractional_coordinate = 
+          this->lattice_parameter_.compute_translational_coefficient_for_point( coordinate );
+          printf( "%16.8lf        %16.8lf        %16.8lf\n", fractional_coordinate[0],
+                                                             fractional_coordinate[1],
+                                                             fractional_coordinate[2] );
+      }
+    }
+    printf( "end\n" );
+  }
+
 public:
   /**
    *  Container-related overloaded functions
@@ -348,6 +375,7 @@ public:
     { return this->cell_id_; }
   array<double, 3> translation_vec() const
    { return this->translation_vec_; }
+
 
   /**
    *  Mutators
