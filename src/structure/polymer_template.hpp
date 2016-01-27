@@ -118,7 +118,7 @@ public:
    *    is within a distance threshold
    */
   condition_type within_mean_distance_by_center_of_mass( double distance ) {
-    return ( this->mean_distance_by_center_of_mass() <= distance ? true : false );
+    return ( ( this->mean_distance_by_center_of_mass() - distance ) <= 0.0e0 ? true : false );
   }
 
   /**
@@ -127,7 +127,7 @@ public:
    *    is within a distance threshold
    */
   condition_type within_mean_distance_by_center( double distance ) {
-    return ( this->mean_distance_by_center() <= distance ? true : false );
+    return ( ( this->mean_distance_by_center() - distance ) <= 0.0e0 ? true : false );
   }
 
 public:

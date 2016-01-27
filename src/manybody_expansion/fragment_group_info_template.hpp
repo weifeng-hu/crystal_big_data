@@ -65,6 +65,7 @@ public:
 
 public:
   void build( const lattice_info_type& lattice_info, distance_data_type radius, electron_calc_setting_type setting ) {
+    this->copy_of_lattice = std :: get<1> ( lattice_info );
     iquads :: manybody_expansion :: FragmentSignatureIdentifier< NUM > identifier;
     identifier.initialize( std :: get<1>( lattice_info ), radius );
     identifier.evaluate_subgroups( this->fragment_info_list_, setting );
@@ -85,6 +86,31 @@ public:
       }
     }
     std :: cout << " polymer not found " << std :: endl;
+    std :: cout << " polymer info: " << std :: endl;
+    std :: cout << " polymer " << NUM << std :: endl;
+    for( size_t iind = 0; iind < NUM; iind++ ) {
+      std :: cout << " index [ " << iind << " ] " << std :: endl;
+      std :: cout << std :: get<0> ( std :: get<0> ( lattice_indices[iind] ) ) << " ";
+      std :: cout << std :: get<1> ( std :: get<0> ( lattice_indices[iind] ) ) << " ";
+      std :: cout << std :: get<2> ( std :: get<0> ( lattice_indices[iind] ) ) << " ";
+      std :: cout << std :: get<1> ( ( lattice_indices[iind] ) ) << " ";
+      std :: cout << std :: endl;
+    }
+    std :: array< iquads :: structure :: Molecule, NUM > molecule_list;
+    lattice_type copy_of_lattice_again = this->copy_of_lattice;
+    for( size_t i = 0; i < NUM; i++ ) {
+      std :: tuple< std :: tuple<int, int, int>, int > ix = lattice_indices[i];
+      int a = std :: get <0> ( std :: get<0> ( ix ) );
+      int b = std :: get <1> ( std :: get<0> ( ix ) );
+      int c = std :: get <2> ( std :: get<0> ( ix ) );
+      lattice_type :: unit_cell_type unit_cell = copy_of_lattice_again.at( a, b, c );
+      int j = std :: get <1> ( ix );
+      iquads :: structure :: Molecule molecule = unit_cell.at(j);
+      molecule_list[i] = molecule;
+    }
+    iquads :: structure :: Polymer<NUM> polymer( molecule_list );
+    double dist = polymer.mean_distance_by_center_of_mass();
+    std :: cout << " distance center of mass: " << std :: setw(16) << std :: setprecision(11) << dist << std :: endl;
     abort();
   }
 
@@ -186,6 +212,7 @@ public:
 
 private:
   fragment_info_list_type fragment_info_list_;
+  lattice_type copy_of_lattice;
 
 }; // end of template struct FragmentGroupInfo
 

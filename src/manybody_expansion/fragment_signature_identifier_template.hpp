@@ -108,6 +108,8 @@ public:
 
 public:
   void initialize( const lattice_type& lattice_obj, distance_data_type radius ) {
+
+
     // cout << "Initializing polymer group from bulk... " << endl;
     // get a list of combination
     polymer_bulk_index_list_type polymer_combination_list_orig
@@ -175,7 +177,7 @@ public:
     //     << this->group_storage.size() 
     //     << " unique polymers of " << NUM 
     //     << " within the averaged intermolecular distance of " << Radius << " Angstrom " << endl;
-    std :: cout << "Total # of unsorted fragments = " << this->polymer_lattice_index_list_.size() << " with mean distance " << radius << std :: endl;
+    std :: cout << "Total # of unsorted fragments = " << this->polymer_lattice_index_list_.size() << " with mean distance " << std :: setw(16) << std :: setprecision(11) << radius << std :: endl;
     this->is_initialized_ = true;
     this->system_type_ = LATTICE;
     this->lattice_ptr_ = &lattice_obj;
