@@ -109,6 +109,8 @@ public:
 public:
   void initialize( const lattice_type& lattice_obj, distance_data_type radius ) {
 
+    radius += 1.0e-8;
+    std :: cout << "The radius added by 1.e-8, to avoid some double precision problem, this is a tentative procedure" << std :: endl;
 
     // cout << "Initializing polymer group from bulk... " << endl;
     // get a list of combination
