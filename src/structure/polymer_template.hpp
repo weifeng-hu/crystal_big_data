@@ -147,6 +147,21 @@ public:
     return os;
   }
 
+
+  /**
+   *  + operator >>
+   *    Invokes the operator >> of molecule objects
+   */
+  friend
+  istream& operator>> ( istream& is, this_type& polymer_obj ) {
+    for( size_t imolecule = 0; imolecule < NUM; imolecule++ ) {
+      molecule_type new_molecule;
+      is >> new_molecule;
+      polymer_obj[imolecule] = new_molecule;
+    }
+    return is;
+  }
+
 public:
   /**
    *  Container related member functions

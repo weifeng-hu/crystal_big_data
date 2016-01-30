@@ -46,6 +46,7 @@ namespace manybody_expansion {
 
 template < size_t NUM > struct FragmentGroupInfo {
 public:
+  typedef FragmentGroupInfo<NUM> this_type;
   typedef double distance_data_type;
   typedef std :: tuple< std :: tuple< int, int, int >, int >  lattice_index_type;
   typedef std :: string lattice_name_type;

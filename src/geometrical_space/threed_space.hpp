@@ -44,16 +44,20 @@ namespace threed_space {
 
   using std::make_tuple;
   // the x unit vector
-  const tuple< double, double, double > e_x 
-   = make_tuple( 1.0e0, 0.0e0, 0.0e0 );
-  const tuple< double, double, double > e_y 
-   = make_tuple( 0.0e0, 1.0e0, 0.0e0 );
-  const tuple< double, double, double > e_z 
-   = make_tuple( 0.0e0, 0.0e0, 1.0e0 );
+  constexpr std :: array< double, 3 > e_x = { 1.0e0, 0.0e0, 0.0e0 };
+  constexpr std :: array< double, 3 > e_y = { 0.0e0, 1.0e0, 0.0e0 };
+  constexpr std :: array< double, 3 > e_z = { 0.0e0, 0.0e0, 1.0e0 };
+//  const tuple< double, double, double > e_x 
+//   = make_tuple( 1.0e0, 0.0e0, 0.0e0 );
+//  const tuple< double, double, double > e_y 
+//   = make_tuple( 0.0e0, 1.0e0, 0.0e0 );
+//  const tuple< double, double, double > e_z 
+//   = make_tuple( 0.0e0, 0.0e0, 1.0e0 );
 
   // a tuple of all the unit vectors
-  const array< tuple<double, double, double>,3 > e_3d
-   = { e_x, e_y, e_z };
+  constexpr std :: array< std :: array< double, 3 >, 3 > e_3d = { e_x, e_y, e_z };
+//  const array< tuple<double, double, double>,3 > e_3d
+//   = { e_x, e_y, e_z };
 
   inline
   array< double, 3 > operator* ( array< double, 3 > vec, double a ) {

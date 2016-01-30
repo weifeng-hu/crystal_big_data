@@ -218,12 +218,20 @@ public:
 
       std :: vector< std :: vector< int > > group_indices;
       group_indices.resize(0);
+      if( setting.mode() != iquads :: sequence :: mode :: COLLECT_LOCAL_OUTPUT ) 
       {
         std :: vector< matrix_type > eigval_vectors = this->compute_dist_eigval();                     // compute euclidean distance matrix eigenvalues
         // iquads :: matrix :: IMatrixHeap eigpair_boolean_mat = iquads :: matrix :: compute_boolean_mat( eigval_vectors );   // get the ''eigenvalue boolean matrix''
         // group_indices = iquads :: matrix :: get_groups( eigpair_boolean_mat );                         // get the degeneracy structure of the boolean matrix
         std :: vector< std :: map<int, int> > bond_map = iquads :: matrix :: compute_boolean_map( eigval_vectors );
         group_indices = iquads :: matrix :: get_groups( bond_map );
+        
+        size_t order = NUM;
+        this->save_group_indices( group_indices, order );
+      }
+      else {
+        size_t order = NUM;
+        this->reload_group_indices( group_indices, order );
       }
       this->fill_fragment_group( group_indices, fragment_info_list_ref, setting );
     } catch( int signal ) {
@@ -231,6 +239,81 @@ public:
       abort();
     }
   }
+
+private:
+  void save_group_indices( const std :: vector< std :: vector<int> >& group_indices, const size_t order ) {
+
+    std :: string work_dir = std :: string( "./" ) + std :: string( "group_indices" );
+    iquads :: file_system :: Directory work_dir_obj( work_dir );
+    work_dir_obj.create();
+
+    std :: string group_indices_filename = std :: string( "group_indices_order_" ) + std :: to_string( order );
+    iquads :: file_system :: Filepath save_filepath( work_dir, group_indices_filename );
+
+    std :: string display_message = std :: string( "Saving group indices of polymer - " ) +
+                                    std :: to_string( order ) +
+                                    std :: string( " to " ) +
+                                    std :: string( save_filepath.absolute() );
+
+    progress_display_type progress_display( display_message, group_indices.size() );
+
+    std :: ofstream ofs( save_filepath.absolute().c_str(), std :: ios :: out );
+    ofs << group_indices.size() << std :: endl; // the number of groups
+    for( size_t igroup = 0; igroup < group_indices.size(); igroup++ ) {
+      std :: vector< int > igroup_indices = group_indices[igroup];
+      ofs << igroup_indices.size() << std :: endl; // the number of polymers in this group
+      for( size_t ind = 0; ind < igroup_indices.size(); ind++ ) {
+        ofs << igroup_indices[ind] << " ";
+      } // end of loop ind of igroup
+      ofs << std :: endl;
+      progress_display++;
+    } // end of loop igroup
+    ofs.close();
+
+  } // end of save_group_indices()
+
+  void reload_group_indices( std :: vector< std :: vector<int> >& group_indices_obj, const size_t order ) {
+
+    group_indices_obj.resize(0);
+
+    std :: string work_dir = std :: string( "./" ) + std :: string( "group_indices" );
+    iquads :: file_system :: Directory work_dir_obj( work_dir );
+    std :: string group_indices_filename = "group_indices_order_" + std :: to_string( order );
+    iquads :: file_system :: Filepath load_filepath( work_dir, group_indices_filename );
+
+    if( load_filepath.exists() == false ) {
+      std :: cout << "cannot find group indices file " << load_filepath.absolute() << std :: endl;
+      abort();
+    }
+
+    std :: string display_message = std :: string( "Loading group indices of polymer - " ) +
+                                    std :: to_string( order ) +
+                                    std :: string( " to " ) +
+                                    std :: string( load_filepath.absolute() );
+    {
+      std :: ifstream ifs( load_filepath.absolute().c_str(), std :: ios :: in );
+      size_t number_of_groups;
+      ifs >> number_of_groups;
+      progress_display_type progress_display( display_message, number_of_groups );
+
+      for( size_t igroup = 0; igroup < number_of_groups; igroup++ ) {
+        std :: vector< int > group;
+        group.resize(0);
+        size_t number_of_indices;
+        ifs >> number_of_indices;
+        group.resize( number_of_indices );
+        for( size_t ind = 0; ind < number_of_indices; ind++ ) {
+          int number;
+          ifs >> number;
+          group[ind] = number;
+        } // end of loop ind
+        group_indices_obj.push_back( group );
+        progress_display++;
+      } // end of loop igroup
+      ifs.close();
+    }
+
+  } // end of reload_group_indices()
 
 private:
   std :: vector< matrix_type > compute_dist_eigval() {

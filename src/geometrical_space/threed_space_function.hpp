@@ -30,6 +30,7 @@
 #include <array>
 #include <tuple>
 #include <math.h>
+#include <geometrical_space/threed_space.hpp>
 #include <geometrical_space/coordinate.hpp>
 
 namespace iquads {
@@ -119,7 +120,26 @@ namespace iquads {
         array<double, 3 > retval = { -(x_plus+x_minus)/2, -(y_plus+y_minus)/2, -(z_plus+z_minus)/2 };
         return retval;
       } // end of function compute_recenter_vec()
-    
+
+      inline
+      double compute_angle_between_two_vectors( const array< double, 3 >& ra, const array< double, 3 >& rb ) {
+        double inner_prod =  ra[0] * rb[0];
+               inner_prod += ra[1] * rb[1];
+               inner_prod += ra[2] * rb[2];
+        double inner_a =  ra[0] * ra[0];
+               inner_a += ra[1] * ra[1];
+               inner_a += ra[2] * ra[2];
+        double norm_a = sqrt( inner_a );
+
+        double inner_b =  rb[0] * rb[0];
+               inner_b += rb[1] * rb[1];
+               inner_b += rb[2] * rb[2];
+        double norm_b = sqrt( inner_b );
+        double cos_theta = inner_prod / ( norm_a * norm_b );
+        double theta = acos( cos_theta );
+        return theta / pi * 180.0e0;
+      }
+
     } // end of namespace threed_space
     
   } // end of namespace geometrical_space

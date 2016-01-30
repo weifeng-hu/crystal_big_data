@@ -191,7 +191,7 @@ public:
 public:
   /**
    *  Stream operators
-   *  We don't provide insert operator since a lattice objcect is created not from reading files
+   *  We don't provide insert operator since a lattice object is created not from reading files
    */
   /**
    *  + operator<< 

@@ -126,7 +126,9 @@ public:
   compute_lattice_energy_per_unit_cell_with_fragment_identification( config_type config, report_ref report ) {
     electron_calc_setting_type setting;
     setting.generate_from( config );
+
     this->fragment_signature_database_.build( config.expansion_order(), config.lattice_info(), config.radius(), setting );
+
     if( config.run_mode() == iquads :: sequence :: mode :: LOCAL_RUN ||
         config.run_mode() == iquads :: sequence :: mode :: COLLECT_LOCAL_OUTPUT ) {
       return this->expansion_formula_with_fragment_identification_.compute( config, this->fragment_signature_database_, report );

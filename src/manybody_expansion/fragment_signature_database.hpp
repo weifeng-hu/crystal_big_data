@@ -72,11 +72,13 @@ public:
     if( order_value == order :: FOURTH_ORDER ) {
       std :: get<3> ( this->database_set_ ).build( lattice_info, radius, setting );
 
-      double largest_trimer_radius = ( std :: get<3> ( this->database_set_ ) ).largest_trimer_intermolecular_distance();
+      double largest_trimer_radius 
+               = ( std :: get<3> ( this->database_set_ ) ).largest_trimer_intermolecular_distance();
       std :: get<2> ( this->database_set_ ).build( lattice_info, std :: max ( radius , largest_trimer_radius ), setting );
-
-      double largest_dimer_radius_from_tetramer = std :: max( ( std :: get<3> ( this->database_set_ ) ).largest_dimer_intermolecular_distance(), radius );
-      double largest_dimer_radius_from_trimer =   std :: max( ( std :: get<2> ( this->database_set_ ) ).largest_dimer_intermolecular_distance(), radius );
+      double largest_dimer_radius_from_tetramer 
+               = std :: max( ( std :: get<3> ( this->database_set_ ) ).largest_dimer_intermolecular_distance(), radius );
+      double largest_dimer_radius_from_trimer 
+               = std :: max( ( std :: get<2> ( this->database_set_ ) ).largest_dimer_intermolecular_distance(), radius );
       std :: get<1> ( this->database_set_ ).build( lattice_info, std :: max( largest_dimer_radius_from_tetramer, largest_dimer_radius_from_trimer ), setting );
 
       std :: get<0> ( this->database_set_ ).build( lattice_info, radius, setting );
@@ -85,9 +87,10 @@ public:
 
       std :: get<2> ( this->database_set_ ).build( lattice_info, radius, setting );
     
-      double largest_dimer_radius = std :: max( radius, ( std :: get<2> ( this->database_set_ ) ).largest_dimer_intermolecular_distance() );
+      double largest_dimer_radius 
+               = std :: max( radius, ( std :: get<2> ( this->database_set_ ) ).largest_dimer_intermolecular_distance() );
       std :: get<1> ( this->database_set_ ).build( lattice_info, largest_dimer_radius, setting );
-    
+
       std :: get<0> ( this->database_set_ ).build( lattice_info, radius, setting );
     }
     else if( order_value == order :: SECOND_ORDER ) {
@@ -98,6 +101,7 @@ public:
       std :: get<0> ( this->database_set_ ).build( lattice_info, radius, setting );
     }
   }
+
   template < size_t NUM > PolymerReport<NUM> get_report_by_lattice_index( std :: array< lattice_index_type, NUM > lattice_index ) const {
 
     //Interface< FragmentSignatureDataBase, FragmentGroupInfo<NUM>, NUM > interface_class(this);

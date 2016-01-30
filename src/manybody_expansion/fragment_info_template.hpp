@@ -41,6 +41,7 @@ namespace manybody_expansion {
 
 template < size_t NUM > struct FragmentInfo {
 public:
+  typedef FragmentInfo< NUM > this_type;
   typedef iquads :: matrix :: DMatrixHeap  eigenvalue_container_type;
   typedef iquads :: structure :: Polymer<NUM>   polymer_type;
   typedef double distance_data_type;
@@ -275,14 +276,75 @@ public:
     { return std :: get<2>( this->signature_ ); }
   polymer_report_type polymer_report() const
     { return std :: get<3>( this->signature_ ); }
+
   bulk_fragment_composition_type prototype_bulk_fragment_composition() const 
     { return this->bulk_identical_fragment_list_.begin(); }
   bulk_identical_fragment_list_type bulk_identical_fragment_list()
     { return this->bulk_identical_fragment_list_; }
+
   lattice_fragment_composition_type prototype_lattice_fragment_composition() const
     { return this->lattice_identical_fragment_list_.begin(); }
   lattice_identical_fragment_list_type lattice_identical_fragment_list()
     { return this->lattice_identical_fragment_list_; }
+
+  signature_data_type& set_signature()
+    { return this->signature_; }
+
+  void push_back( const lattice_fragment_composition_type& new_composition ) 
+    { this->lattice_identical_fragment_list_.push_back( new_composition ); } 
+
+/*
+public:
+  friend 
+  std :: istream& operator>> ( std :: istream& is, this_type& obj ) {
+
+    polymer_type new_polymer;
+    is >> new_polymer;
+
+    eigenvalue_container_type new_eigenvalue_container;
+    is >> new_eigenvalue_container;
+
+    distance_data_type new_distance;
+    is >> new_distance;
+
+    polymer_report_type new_polymer_report;
+    is >> new_polymer_report;
+
+    obj.set_signature = std :: make_tuple( new_polymer, new_eigenvalue_container, new_distance, new_polymer_report );
+
+    // ============================
+    std :: string system_type;
+    is >> system_type;
+    if( system_type == "LATTICE" ) {
+      size_t number_of_identical_fragment;
+      is >> number_of_identical_fragment;
+      for( size_t ifrag = 0; ifrag < number_of_identical_fragment; ifrag++ ) {
+        lattice_fragment_composition_type new_composition;
+        for( size_t imember = 0; imember < NUM; imember++ ) {
+          int Ri, Rj, Rk, inode;
+          is >> Ri >> Rj >> Rk >> inode;
+          unit_cell_index_type new_unit_cell_ind = std :: make_tuple( Ri, Rj, Rk );
+          lattice_node_index_type new_lattice_node_index = std :: make_tuple( new_unit_cell_ind, inode );
+          new_composition[imember] = new_lattice_node_index;
+        }
+        is >> seperation_line;
+        if( seperation_line != "----------------" ) {
+          std :: cout << "error: seperation line is in the wrong place! " << std :: endl;
+          abort();
+        }
+        obj.push_back( new_composition );
+      }
+    }
+    else if( system_type == "BULK" ) {
+      // not implemented yet...
+    }
+    else{
+      std :: cout << "unknown system type" << std :: endl;
+      abort();
+    }
+
+  }
+*/
 
 private:
   // stores a primitive fragment signature ( consisting of multiple molecules )
