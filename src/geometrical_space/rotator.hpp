@@ -24,6 +24,7 @@
  *
  */
 
+#include <iostream>
 #include <array>
 #include <geometrical_space/coordinate.hpp>
 #include <geometrical_space/threed_space_function.hpp>
@@ -85,7 +86,6 @@ public:
               ( r_from_proj_in_xy, iquads :: geometrical_space :: threed_space :: e_x );
     if( r_from[1] >= 0.0e0 ) { this->angle_1_ *= -1.0e0; } else {  }
     this->R_1_ = rotation_matrix_z_type( this->angle_1_ );
-    std :: cout << this->angle_1_ << std :: endl;
 
     // compute the rotation matrix from e_x to r_to_in_xy
     threed_vector_type r_to_proj_in_xy;
@@ -96,7 +96,6 @@ public:
      = iquads :: geometrical_space :: threed_space :: compute_angle_between_two_vectors
               ( r_to_proj_in_xy, iquads :: geometrical_space :: threed_space :: e_x );
     if( r_to[1] >= 0.0e0 ) { } else { this->angle_3_ *= -1.0e0; }
-    std :: cout <<  this->angle_3_ << std :: endl;
     this->R_3_ = rotation_matrix_z_type( this->angle_3_ );
 
     // compute the angle in the xz plane
@@ -122,7 +121,6 @@ public:
       = iquads :: geometrical_space :: threed_space :: compute_angle_between_two_vectors
                ( r_to_to_xz, iquads :: geometrical_space :: threed_space :: e_z );
     this->angle_2_ = angle_minus_z_to_r_to - angle_minus_z_to_r_from;
-    std :: cout << this->angle_2_ << std :: endl;
     this->R_2_ = rotation_matrix_y_type( this->angle_2_ );
   } 
 

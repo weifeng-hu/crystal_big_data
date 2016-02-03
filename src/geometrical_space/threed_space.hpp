@@ -75,6 +75,14 @@ namespace threed_space {
     return retval;
   }
 
+  inline
+  double norm( array<double, 3> vec ) {
+    double retval = vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2];
+    retval = sqrt( retval );
+    return retval;
+  }
+
+
 } // end of namespace threed_space
 
 } // end of namespace geometrical_space

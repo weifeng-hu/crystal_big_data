@@ -205,6 +205,22 @@ public:
     return copy;
   } 
 
+  coordinate_type center() const {
+    coordinate_value_type x_average = 0.0e0;
+    coordinate_value_type y_average = 0.0e0;
+    coordinate_value_type z_average = 0.0e0;
+    for( size_t inode = 0; inode < this->node_list_.size(); inode++ ) {
+      x_average += std :: get<0> ( this->node_list_[inode].center() );
+      y_average += std :: get<1> ( this->node_list_[inode].center() );
+      z_average += std :: get<2> ( this->node_list_[inode].center() );
+    }
+    x_average = x_average/double(this->node_list_.size());
+    y_average = y_average/double(this->node_list_.size());
+    z_average = z_average/double(this->node_list_.size());
+    return make_tuple( x_average, y_average, z_average );
+ 
+  }
+
   /**
    *   + operator+= ()
    *     Overloaded arithmetic operator +=

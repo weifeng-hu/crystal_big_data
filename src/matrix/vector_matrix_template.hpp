@@ -81,7 +81,7 @@ public:
     return this->at( i, j );
   }
   friend 
-  std :: ostream& operator<< ( std :: ostream& os, const VectorMatrix<T>& matrix_obj ){
+  std :: ostream& operator<< ( std :: ostream& os, VectorMatrix<T>& matrix_obj ){
     for( size_t irow = 0; irow < matrix_obj.nrow(); irow++ ) {
       for( size_t icol = 0; icol < matrix_obj.ncol(); icol++ ) {
         const T element = matrix_obj( irow, icol );
