@@ -221,10 +221,10 @@ private:
       edm_eigvals_of_unknown.push_back( edm_plus.eigval() );
     }
 
-    std :: vector< std :: map< double, int > > edm_mat_distance_map;
+    std :: vector< std :: multimap< double, int > > edm_mat_distance_map;
     edm_mat_distance_map.resize(0);
     for( size_t iref = 0; iref < this->edm_eigvals_reference_.size(); iref++ ) {
-      std :: map< double, int > map_local;
+      std :: multimap< double, int > map_local;
       for( size_t iunknown = 0; iunknown < edm_eigvals_of_unknown.size(); iunknown++ ) {
         map_local.insert( std :: pair< double, int > ( iquads :: matrix :: distance_of_two_matrices( this->edm_eigvals_reference_[iref],
                                                                                                      edm_eigvals_of_unknown[iunknown] ),
@@ -237,7 +237,7 @@ private:
     std :: vector< int > result;
     result.resize(0);
     for( size_t iref = 0; iref < this->edm_eigvals_reference_.size(); iref++ ) {
-      std :: map < double, int > map_local = edm_mat_distance_map[iref];
+      std :: multimap < double, int > map_local = edm_mat_distance_map[iref];
       for( std :: map< double, int > :: iterator it = map_local.begin(); it != map_local.end(); ++it ) {
         int ind = it->second;
         if( std :: find( result.begin(), result.end(), ind ) == result.end() ) {

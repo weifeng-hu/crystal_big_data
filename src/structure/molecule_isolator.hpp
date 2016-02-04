@@ -60,6 +60,7 @@ public:
    const size_t natom = atom_list_obj.size();
    iquads :: matrix :: IMatrixHeap adjacency_matrix( natom, natom );
 
+
    // produce an initial adjaceny matrix
    for( size_t iatom = 0; iatom < natom; iatom++ ) {
      atom_type atom_i = atom_list_obj[iatom];
@@ -125,7 +126,7 @@ public:
    for( size_t imolecule = 0; imolecule < molecule_list.size(); imolecule++ ) {
      molecule_type molecule_i = molecule_list[imolecule];
      coordinate_type center_of_mass = molecule_i.center_of_mass();
-     std :: map < double, iquads :: structure :: Atom > dist_map;
+     std :: multimap < double, iquads :: structure :: Atom > dist_map;
      for( size_t iatom = 0; iatom < molecule_i.size(); iatom++ ) {
        atom_type atom_i = molecule_i[iatom];
        double distance_to_com 
@@ -135,12 +136,11 @@ public:
 
      atom_list_type new_atom_list_i;
      new_atom_list_i.resize(0);
-     typedef std :: map < double, iquads :: structure :: Atom > :: iterator dist_map_iterator;
+     typedef std :: multimap < double, iquads :: structure :: Atom > :: iterator dist_map_iterator;
      for( dist_map_iterator it = dist_map.begin(); it != dist_map.end(); ++it ) {
        atom_type atom_it = it->second;
        new_atom_list_i.push_back(atom_it);
      }
-
      molecule_list[imolecule] = iquads :: structure :: Molecule( new_atom_list_i, 0 );
 
    }
