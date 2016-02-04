@@ -31,9 +31,9 @@ class FragmentGeneratorConfig:
 
     self.name = "fragment generator config";
 
-    from unit_cell_config import UnitCellConfig;
-
+    from structure.api.unit_cell_config import UnitCellConfig;
     self.unit_cell_info = UnitCellConfig();
+
     self.xyz_file_name = "";
     self.lattice_constants_file_name = "";
     self.order = 0;

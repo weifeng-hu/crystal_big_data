@@ -24,12 +24,53 @@
 #  
 ## 
 
+def read_unknown( input_file_name ):
+
+  from decimal import Decimal;
+  import unknown_unit_cell_config;
+
+  new_unknown_unit_cell = unknown_unit_cell_config.UnknownUnitCellConfig();
+
+  f_input = open( input_file_name, "rt" );
+  natom_str = f_input.readline();
+  natom = int( natom_str );
+
+  new_lattice_vectors = [];
+  for ivec in range( 0, 3 ):
+    line = f_input.readline();
+    words = line.split();
+    x = Decimal( words[0] );
+    y = Decimal( words[1] );
+    z = Decimal( words[2] );
+    vector = [ x, y, z ];
+    new_lattice_vectors.append( vector );
+
+  new_coordinates = [];
+  for iatom in range( 0, natom ):
+    line = f_input.readline();
+    words = line.split();
+    element = words[0];
+    x = Decimal( words[1] );
+    y = Decimal( words[2] );
+    z = Decimal( words[3] );
+    new_coordinate = [ element, x, y, z ];
+    new_coordinates.append( new_coordinate );
+
+  import copy;
+  new_unknown_unit_cell.natom = copy.deepcopy( natom );
+  new_unknown_unit_cell.lattice_vectors = copy.deepcopy( new_lattice_vectors );
+  new_unknown_unit_cell.coordinates = copy.deepcopy( new_coordinates );
+
+  f_input.close();
+
+  return new_unknown_unit_cell;
+
 
 def read_xyz( xyz_file_name ):
 
   from decimal import Decimal;
 
-  import nodes_config;
+  from structure.api import nodes_config;
   new_nodes_info = nodes_config.NodesConfig();
   
   f_xyz = open( xyz_file_name , "rt" );
@@ -47,7 +88,7 @@ def read_xyz( xyz_file_name ):
   new_nodes_info.natom_per_node = copy.deepcopy( natom_per_node );
 
   for inode in range( 0, nnode ):
-    import molecule_config;
+    from structure.api import molecule_config;
     new_molecule = molecule_config.MoleculeConfig();
 
     import copy;
@@ -80,7 +121,7 @@ def read_xyz( xyz_file_name ):
 
 def read_lattice_constant( lattice_constant_file_name ):
 
-  import lattice_constant;
+  from structure.api import lattice_constant;
   from decimal import Decimal;
 
   new_constants = lattice_constant.LatticeConstant();

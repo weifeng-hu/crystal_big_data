@@ -37,6 +37,7 @@
 #include <structure/molecule.hpp>
 #include <structure/unit_cell_instant.hpp>
 #include <structure/euclidean_distance_matrix.hpp>
+#include <structure/molecule_isolator.hpp>
 
 namespace iquads {
 
@@ -301,7 +302,7 @@ public:
     }
 
     // get the node list of unit cell from this atom list
-    molecule_list_type node_list_of_cell = this->determine_node_list( atom_list, lattice_vectors );
+    molecule_list_type node_list_of_cell = this->determine_node_list( new_atom_list, new_lattice_vectors );
 
     return unit_cell_type( node_list_of_cell, lattice_parameter );
   }

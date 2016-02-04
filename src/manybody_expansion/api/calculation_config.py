@@ -42,7 +42,9 @@ class CalculationConfig:
     self.working_directory = "";
     self.notes = "";
 
+
 def new_calc_config( lattice_name, xyz_file_name, lattice_constant_file_name, natom, a, b, c, order, basis_set, correlation, radius ):
+
   from manybody_expansion.api.calculation_config import CalculationConfig;
   new_cg = CalculationConfig();
 
@@ -57,4 +59,5 @@ def new_calc_config( lattice_name, xyz_file_name, lattice_constant_file_name, na
   new_cg.basis_set = basis_set;
   new_cg.radius = radius;
   new_cg.correlation = correlation;
+
   return new_cg;

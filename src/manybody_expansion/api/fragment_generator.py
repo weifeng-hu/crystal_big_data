@@ -30,12 +30,13 @@ def import_unit_cell( fg_config ):
   natom = fg_config.natom;
 
   ''' Create a unit_cell obj '''
-  import unit_cell_config;
+  from structure.api import unit_cell_config;
   new_unit_cell = unit_cell_config.UnitCellConfig();
 
   ''' Read molecules in a unit cell '''
   xyz_file_name = fg_config.xyz_file_name;
-  from read import read_xyz;
+  from structure.api import read;
+  from structure.api.read import read_xyz;
   new_unit_cell.nodes = read_xyz( xyz_file_name );
   import copy;
   natom_imported = copy.deepcopy( new_unit_cell.natom() );
@@ -45,7 +46,8 @@ def import_unit_cell( fg_config ):
 
   ''' Read lattice constants ''' 
   lattice_constant_file_name = fg_config.lattice_constant_file_name;
-  from read import read_lattice_constant;
+  from structure.api import read;
+  from structure.api.read import read_lattice_constant;
   new_unit_cell.lattice_constant = read_lattice_constant( lattice_constant_file_name );
  
   return new_unit_cell;
