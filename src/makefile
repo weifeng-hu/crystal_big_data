@@ -57,7 +57,7 @@ cppopt_iquads	+=
 fopt_iquads	+= 
 endif
 
-lib_iquads	= -L$(BOOST_LIB) -lboost_filesystem -lboost_date_time -lboost_system
+lib_iquads	= -L$(boost_lib) -lboost_filesystem -lboost_date_time -lboost_system
 
 # blas and lapack libraries
 # arm doesn't have mkl, so other blas and lapack are used
