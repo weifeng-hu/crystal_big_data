@@ -30,6 +30,9 @@
 #include <array>
 #include <vector>
 #include <map>
+#include <omp.h>
+#include <timer/progress_display.hpp>
+#include <math/combination_computation.hpp>
 #include <matrix/matrix_typedef.hpp>
 #include <matrix/matrix_function.hpp>
 #include <geometrical_space/coordinate.hpp>
@@ -59,8 +62,8 @@ public:
 
 public:
   UnitCellCanonicalizer() {
-    this->edm_eigvals_reference_.resize(0);
-    this->distance_to_center_list_.resize(0);
+    //this->edm_eigvals_reference_.resize(0);
+    //this->distance_to_center_list_.resize(0);
     this->bond_length_limit_ = 0.0e0;
     this->natom_per_molecule_ = 0;
   }
@@ -70,9 +73,10 @@ public:
     this->reference_unit_cell_ = ref_unit_cell;
     this->bond_length_limit_ = bond_length_limit;
     this->natom_per_molecule_ = this->reference_unit_cell_[0].size();
-    this->edm_eigvals_reference_.resize(0);
-    this->distance_to_center_list_.resize(0);
+   // this->edm_eigvals_reference_.resize(0);
+   // this->distance_to_center_list_.resize(0);
 
+   /*
     {
       molecule_list_type molecule_list = this->reference_unit_cell_.node_list();
       coordinate_type center_of_cell = this->reference_unit_cell_.center();
@@ -91,6 +95,18 @@ public:
         this->edm_eigvals_reference_.push_back( edm_plus.eigval() );
       }
     } // end of the block of determining edm and distance
+   */
+    molecule_list_type molecule_list_of_unit_cell = ref_unit_cell.node_list();
+    atom_list_type atom_list_of_unit_cell;
+    atom_list_of_unit_cell.resize(0);
+    for( size_t imole = 0; imole < molecule_list_of_unit_cell.size(); imole++ ) {
+      atom_list_type atom_list_i = molecule_list_of_unit_cell[imole].atom_list();
+      atom_list_of_unit_cell.insert( atom_list_of_unit_cell.end(), atom_list_i.begin(), atom_list_i.end() );
+    }
+    iquads :: structure :: EuclideanDistanceMatrix edm( atom_list_of_unit_cell.size() );
+    edm.compose_from_atomlist( atom_list_of_unit_cell );
+    edm.diagonalise();
+    this->edm_eigval_ = edm.eigval();
 
   } // end of user-defined constructor
 
@@ -176,15 +192,15 @@ private:
   }
 
   molecule_list_type determine_node_list( const atom_list_type& atom_list, const std :: array< threed_vector_type, 3 >& lattice_vectors ) {
- 
-    std :: array< std :: tuple< int, int >, 3 > ranges = { std :: make_tuple( 0, 1 ), std :: make_tuple( 0, 1 ), std :: make_tuple( 0, 1 ) };
+   
+    std :: array< std :: tuple< int, int >, 3 > ranges = { std :: make_tuple( -1, 1 ), std :: make_tuple( -1, 1 ), std :: make_tuple( -1, 1 ) };
     atom_list_type new_atom_list = this->atom_list_duplicate( atom_list,
                                                               lattice_vectors,
                                                               ranges );
 
     // recenter the atom list
-    this->atom_list_reorigin( new_atom_list );
-    coordinate_type center_of_list = this->center_of_atom_list( new_atom_list );
+   // this->atom_list_reorigin( new_atom_list );
+   // coordinate_type center_of_list = this->center_of_atom_list( new_atom_list );
 
     // split the atom list to molecules
     iquads :: structure :: MoleculeIsolator molecule_isolator( this->bond_length_limit_ );
@@ -197,6 +213,87 @@ private:
 
     std :: cout << "number of complete molecules: " << molecule_list_of_unknown.size() << std :: endl;
 
+    molecule_list_type new_node_list;
+    new_node_list.resize(0);
+
+    {
+      std :: vector< std :: pair< double, int> > distance_list;
+      distance_list.resize(0);
+
+      std :: vector< std :: vector<int> > possible_molecule_combinations = 
+         iquads :: math :: get_combination( molecule_list_of_unknown.size(), this->reference_unit_cell_.node_list().size() );
+
+      omp_set_dynamic(0);
+      const size_t num_thread = omp_get_num_procs();
+      omp_set_num_threads( num_thread );
+      const size_t total_num = possible_molecule_combinations.size();
+
+      std :: vector< std :: vector< std :: pair< double, int > >* > sub_distance_list_addresses;
+      sub_distance_list_addresses.resize( num_thread );
+
+      std :: string display_message = std :: string( "Building the distance map for total " ) + 
+                                      std :: to_string( total_num ) + 
+                                      std :: string( " possibilities [ openmp, automatic, num_thread = " ) + 
+                                      std :: to_string( num_thread ) + 
+                                      std :: string( " ]" );
+      iquads :: timer :: ProgressDisplay display( display_message, total_num/num_thread );
+
+      #pragma omp parallel
+      {
+        const int thread_id = omp_get_thread_num();
+        std :: vector< std :: pair< double, int> > sub_distance_list;
+                                                   sub_distance_list.resize(0);
+        # pragma omp for
+        for( size_t icomb = 0; icomb < possible_molecule_combinations.size(); icomb++ ) {
+          atom_list_type atom_list_of_comb;
+          atom_list_of_comb.resize(0);
+          std :: vector<int> combination = possible_molecule_combinations[icomb];
+          for( size_t imole = 0; imole < combination.size(); imole++ ) {
+            int molecule_id = combination[imole];
+            atom_list_type atom_list_i = molecule_list_of_unknown[molecule_id].atom_list();
+            atom_list_of_comb.insert( atom_list_of_comb.end(), atom_list_i.begin(), atom_list_i.end() );
+          }
+          iquads :: structure :: EuclideanDistanceMatrix edm( atom_list_of_comb.size() );
+          edm.compose_from_atomlist( atom_list_of_comb );
+          edm.diagonalise();
+          double distance_of_edm_eig = iquads :: matrix :: distance_of_two_matrices( this->edm_eigval_, edm.eigval() );
+          sub_distance_list.push_back( std :: pair< double, int >( distance_of_edm_eig, icomb ) );
+          if( thread_id == 0 ) { display++; }
+        }
+
+        sub_distance_list_addresses[thread_id] = &( sub_distance_list );
+        #pragma omp barrier
+
+        #pragma omp single
+        for( size_t i = 0; i < num_thread; i++ ) {
+          distance_list.insert( distance_list.end(), sub_distance_list_addresses[i]->begin(), sub_distance_list_addresses[i]->end() );
+          sub_distance_list_addresses[i]->clear();
+          sub_distance_list_addresses[i]->shrink_to_fit();
+        }
+
+      }
+
+      std :: multimap< double, int > distance_map;
+      for( size_t i = 0; i < distance_list.size(); i++ ) {
+        distance_map.insert( distance_list[i] );
+      }
+      distance_list.clear();
+      distance_list.shrink_to_fit();
+
+      int target_comb_id = distance_map.begin()->second;
+
+      std :: cout << "Identified the closed unit cell set has the distance of EDM " << distance_map.begin()->first << std :: endl;
+
+      std :: vector<int> target_comb = possible_molecule_combinations[target_comb_id];
+
+      for( size_t i = 0; i < target_comb.size(); i++ ) {
+        new_node_list.push_back( molecule_list_of_unknown[target_comb[i]] );
+      }
+
+    }
+
+    // THE BELOW ALGORITHM DOES NOT WORK FOR MOST OF THE CRYSTAL
+    /*
     // compute distance from center of mass to center of list
     std :: vector< distance_type > distance_to_center_of_unknown;
     distance_to_center_of_unknown.resize(0);
@@ -250,14 +347,13 @@ private:
     // check the distance to center
     for( size_t ind = 0; ind < result.size(); ind++ ) {
       if( fabs( this->distance_to_center_list_[ind] - distance_to_center_of_unknown[ result[ind] ] > 0.5e0  ) ) {
-        std :: cout << "distance diff too big " << ind << ": " 
+        std :: cout << "warning: distance to geometrical center diff too big " << ind << ": " 
                     << this->distance_to_center_list_[ind] << " ----- " << result[ind] << ": " 
                     << distance_to_center_of_unknown[ result[ind] ] << std :: endl;
-        abort();
+        //abort();
       }
     }
 
-    molecule_list_type new_node_list;
     new_node_list.resize(0);
     for( size_t ind = 0; ind < result.size(); ind++ ) {
       molecule_type molecule_i = molecule_list_of_unknown[ result[ind] ];
@@ -265,6 +361,7 @@ private:
     }
 
     std :: cout << "number of identified unit cell nodes: " << result.size() << std :: endl;
+   */
 
     return new_node_list;
 
@@ -309,8 +406,9 @@ public:
 
 private:
   unit_cell_type reference_unit_cell_;
-  std :: vector< matrix_type > edm_eigvals_reference_;
-  std :: vector< double > distance_to_center_list_;
+  matrix_type edm_eigval_;
+  //std :: vector< matrix_type > edm_eigvals_reference_;
+  //std :: vector< double > distance_to_center_list_;
   bond_length_type bond_length_limit_;
   size_t natom_per_molecule_;
 

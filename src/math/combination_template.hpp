@@ -37,6 +37,41 @@ namespace math {
 using std::array;
 using std::vector;
 
+struct Combinations_general {
+public:
+  Combinations_general() {
+    this->all_combinations.resize(0);
+    this->current.resize(0);
+    this->r_ = 0;
+  }
+  Combinations_general( size_t r ) {
+    this->all_combinations.resize(0);
+    this->current.resize(r);
+    this->r_ = r;
+  }
+
+public:
+  void combination_util( vector<int> input_array, size_t start, size_t end, size_t index ) {
+    size_t r = this->r_;
+    if( index == r ) {
+      this->all_combinations.push_back( this->current );
+      return;
+    }
+    for( size_t i = start; ( i <= end && (end - i + 1) >= (r - index) ) ; i++ ) {
+      this->current[index] = input_array[i];
+      this->combination_util( input_array, i + 1, end, index + 1 );
+    }
+  }
+
+  vector< vector<int> > get_all_comb() { return this->all_combinations; }
+
+private:
+  vector< vector<int> > all_combinations;
+  vector<int> current;
+  size_t r_;
+
+};
+
 template< size_t r > struct Combinations {
 public:
   Combinations() {

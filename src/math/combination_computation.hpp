@@ -40,6 +40,19 @@ namespace math {
 using std :: vector;
 using std :: array;
 
+vector< vector< int > > get_combination( size_t total_n, size_t r ) {
+
+  vector<int> input_array;
+  input_array.resize(0);
+  for( size_t i = 0; i < total_n; i++ ) { input_array.push_back(i); }
+
+  iquads :: math :: Combinations_general comb(r);
+  comb.combination_util( input_array, 0, total_n - 1, 0 );
+
+  return comb.get_all_comb();
+
+}
+
 template < size_t k > inline vector< array< int, k > > get_combination( size_t total_n ) {
 
   vector<int> input_array;

@@ -5,7 +5,7 @@ cxxopt	= -O0
 cxxinc	= -I${HOME}/iquads/src/
 cxxsrcs	= main.cpp
 cxxobjs	= $(cxxsrcs:.cpp=.o)
-target	= test
+target	= duplication_remover
 lib	= $(HOME)/iquads/lib/libiquads_matrix.a $(HOME)/iquads/lib/libiquads_blas_interface.a -llapack -lblas -lgfortran
 
 ${target}:	$(cxxobjs)
