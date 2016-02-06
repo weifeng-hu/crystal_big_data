@@ -191,9 +191,10 @@ private:
     for( size_t iatom = 0; iatom < atom_list.size(); iatom++ ) { atom_list[iatom] += recenter_vec; }
   }
 
-  molecule_list_type determine_node_list( const atom_list_type& atom_list, const std :: array< threed_vector_type, 3 >& lattice_vectors ) {
+  molecule_list_type determine_node_list( const atom_list_type& atom_list,
+                                          const std :: array< threed_vector_type, 3 >& lattice_vectors,
+                                          const std :: array< std :: tuple< int, int>, 3 >& ranges ) {
    
-    std :: array< std :: tuple< int, int >, 3 > ranges = { std :: make_tuple( -1, 1 ), std :: make_tuple( -1, 1 ), std :: make_tuple( -1, 1 ) };
     atom_list_type new_atom_list = this->atom_list_duplicate( atom_list,
                                                               lattice_vectors,
                                                               ranges );
@@ -212,6 +213,10 @@ private:
     }
 
     std :: cout << "number of complete molecules: " << molecule_list_of_unknown.size() << std :: endl;
+
+//    for( size_t i = 0 ; i < molecule_list_of_unknown.size(); i++ ){
+//      std :: cout << molecule_list_of_unknown[i];
+//    }
 
     molecule_list_type new_node_list;
     new_node_list.resize(0);
@@ -257,7 +262,7 @@ private:
           edm.compose_from_atomlist( atom_list_of_comb );
           edm.diagonalise();
           double distance_of_edm_eig = iquads :: matrix :: distance_of_two_matrices( this->edm_eigval_, edm.eigval() );
-          sub_distance_list.push_back( std :: pair< double, int >( distance_of_edm_eig, icomb ) );
+          sub_distance_list.push_back( std :: pair< double, int > ( distance_of_edm_eig, icomb ) );
           if( thread_id == 0 ) { display++; }
         }
 
@@ -274,11 +279,16 @@ private:
       }
 
       std :: multimap< double, int > distance_map;
+      std :: cout << distance_map.size() << std :: endl;
       for( size_t i = 0; i < distance_list.size(); i++ ) {
         distance_map.insert( distance_list[i] );
       }
       distance_list.clear();
       distance_list.shrink_to_fit();
+
+      for( std :: multimap< double, int > :: iterator it = distance_map.begin(); it != distance_map.end(); ++it ){
+        std :: cout << it->first << std :: endl;
+      }
 
       int target_comb_id = distance_map.begin()->second;
 
@@ -369,7 +379,9 @@ private:
 
 
 public:
-  unit_cell_type canonicalize( const atom_list_type& atom_list, const std :: array< threed_vector_type, 3 >& lattice_vectors ) {
+  unit_cell_type canonicalize( const atom_list_type& atom_list,
+                               const std :: array< threed_vector_type, 3 >& lattice_vectors,
+                               const std :: array< std :: tuple<int, int>, 3 >& ranges ) {
 
     // get the rotator first
     threed_vector_type vec_1 = lattice_vectors[0];
@@ -399,7 +411,7 @@ public:
     }
 
     // get the node list of unit cell from this atom list
-    molecule_list_type node_list_of_cell = this->determine_node_list( new_atom_list, new_lattice_vectors );
+    molecule_list_type node_list_of_cell = this->determine_node_list( new_atom_list, new_lattice_vectors, ranges );
 
     return unit_cell_type( node_list_of_cell, lattice_parameter );
   }

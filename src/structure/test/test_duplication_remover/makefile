@@ -2,11 +2,11 @@ shell	= /bin/sh
 cxx	= g++
 cxxflag	= -fopenmp -g -std=c++11
 cxxopt	= -O0
-cxxinc	= -I${HOME}/iquads/src/
+cxxinc	= -I${IQUADS_ROOT}/src/
 cxxsrcs	= main.cpp
 cxxobjs	= $(cxxsrcs:.cpp=.o)
 target	= duplication_remover
-lib	= $(HOME)/iquads/lib/libiquads_matrix.a $(HOME)/iquads/lib/libiquads_blas_interface.a -llapack -lblas -lgfortran
+lib	= ${IQUADS_ROOT}/lib/libiquads_matrix.a ${IQUADS_ROOT}/lib/libiquads_blas_interface.a -llapack -lblas -lgfortran
 
 ${target}:	$(cxxobjs)
 	${cxx} -fopenmp -o ${target} ${cxxobjs} ${lib}

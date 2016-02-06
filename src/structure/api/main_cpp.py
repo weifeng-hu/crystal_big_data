@@ -135,6 +135,12 @@ def write_unknown_unit_cell( uc_config, f_main_cpp ):
 
   f_main_cpp.write( "  std :: array< threed_vector_type, 3 > lattice_vectors = { a_vec, b_vec, c_vec };\n" );
 
+  if uc_config.reference_unit_cell.nodes.nnode_per_unit_cell <= 4 :
+    f_main_cpp.write( "  std :: array< std :: tuple< int, int >, 3 > ranges = { std :: make_tuple( -1, 1 ), std :: make_tuple( -1, 1 ), std :: make_tuple( -1, 1 ) );\n" );
+  else :
+    f_main_cpp.write( "  std :: array< std :: tuple< int, int >, 3 > ranges = { std :: make_tuple( -1, 1 ), std :: make_tuple( -1, 1 ), std :: make_tuple( -1, 1 ) );\n" );
+
+
   return 0;
 
 
