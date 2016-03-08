@@ -270,6 +270,7 @@ public:
       }
       lattice_parameter_type new_lattice_parameter;
       is >> new_lattice_parameter;
+      std :: cout << new_lattice_parameter << std :: endl;
       unit_cell_obj.set_lattice_parameter() = new_lattice_parameter;
       return is;
     }
@@ -357,7 +358,7 @@ public:
       this->node_list_.push_back( node_obj );
       using structure :: align_geometry_unit;
       align_geometry_unit( this->node_list_.begin()->set_atom_list(), 
-                           this->node_list_.end()->set_atom_list() );
+                           this->node_list_.rbegin()->set_atom_list() );
     }
  
   /**

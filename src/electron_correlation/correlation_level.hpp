@@ -42,10 +42,14 @@ namespace iquads {
    *      + mean field
    *        + HF
    *        + DFT
+   *        + DF-HF
    *      + mollet plesset
    *        + mp2
    *        + mp3
    *        + mp4
+   *        + lmp2
+   *        + df-mp2
+   *        + df-lmp2
    *      + ci
    *        + cis
    *        + cisd
@@ -55,6 +59,9 @@ namespace iquads {
    *        + ccsdt
    *        + ccsdt(q)
    *        + ccsdtq
+   *        + lccsd
+   *        + lccsd(t)
+   *        + lccsdt
    *
    *    + multi reference
    *      + ci
@@ -96,6 +103,7 @@ namespace iquads {
         constexpr level_mask_type RHF = SINGLE_REFERENCE | MEAN_FIELD | ( 0x01 << 12 );
         constexpr level_mask_type UHF = SINGLE_REFERENCE | MEAN_FIELD | ( 0x01 << 13 );
         constexpr level_mask_type DFT = SINGLE_REFERENCE | MEAN_FIELD | ( 0x01 << 14 );
+        constexpr level_mask_type DF_RHF = SINGLE_REFERENCE | MEAN_FIELD | ( 0x01 << 15 );
       } // end of namespace single_reference :: mean_field 
 
       namespace mollet_plesset {
@@ -104,6 +112,8 @@ namespace iquads {
         constexpr level_mask_type MP2 = SINGLE_REFERENCE | MOLLET_PLESSET | ( 0x01 << 12 );
         constexpr level_mask_type MP3 = SINGLE_REFERENCE | MOLLET_PLESSET | ( 0x01 << 13 );
         constexpr level_mask_type MP4 = SINGLE_REFERENCE | MOLLET_PLESSET | ( 0x01 << 14 );
+        constexpr level_mask_type DF_MP2  = SINGLE_REFERENCE | MOLLET_PLESSET | ( 0x01 << 15 );
+        constexpr level_mask_type DF_LMP2 = SINGLE_REFERENCE | MOLLET_PLESSET | ( 0x01 << 16 );
       } // end of namespace single_reference :: mollet_plesset
   
       namespace ci {
@@ -123,6 +133,9 @@ namespace iquads {
         constexpr level_mask_type CCSDT   = SINGLE_REFERENCE | CC | ( 0x01 << 14 );
         constexpr level_mask_type CCSDT_Q = SINGLE_REFERENCE | CC | ( 0x01 << 15 );
         constexpr level_mask_type CCSDTQ  = SINGLE_REFERENCE | CC | ( 0x01 << 16 );
+        constexpr level_mask_type LCCSD   = SINGLE_REFERENCE | CC | ( 0x01 << 17 );
+        constexpr level_mask_type LCCSD_T = SINGLE_REFERENCE | CC | ( 0x01 << 18 );
+        constexpr level_mask_type LCCSDT  = SINGLE_REFERENCE | CC | ( 0x01 << 19 );
       } // end of namespace single_reference :: coupled_cluster
   
     }
@@ -171,10 +184,13 @@ namespace iquads {
       if( correlation_name == "hf" || correlation_name == "rhf" ) return single_reference :: mean_field :: RHF;
       if( correlation_name == "uhf" ) return single_reference :: mean_field :: UHF;
       if( correlation_name == "dft" ) return single_reference :: mean_field :: DFT;
+      if( correlation_name == "df-hf" || correlation_name == "df-rhf" ) return single_reference :: mean_field :: DF_RHF;
 
       if( correlation_name == "mp2" ) return single_reference :: mollet_plesset :: MP2;
       if( correlation_name == "mp3" ) return single_reference :: mollet_plesset :: MP3;
       if( correlation_name == "mp4" ) return single_reference :: mollet_plesset :: MP4;
+      if( correlation_name == "df-mp2"  ) return single_reference :: mollet_plesset :: DF_MP2;
+      if( correlation_name == "df-lmp2" ) return single_reference :: mollet_plesset :: DF_LMP2;
 
       if( correlation_name == "cis"    ) return single_reference :: ci :: CIS;
       if( correlation_name == "cisd"   ) return single_reference :: ci :: CISD;
@@ -182,10 +198,13 @@ namespace iquads {
       if( correlation_name == "cisdtq" ) return single_reference :: ci :: CISDTQ;
 
       if( correlation_name == "ccsd"     ) return single_reference :: coupled_cluster :: CCSD;
-      if( correlation_name == "ccsd(t)"  ) return single_reference :: coupled_cluster :: CCSD_T;
+      if( correlation_name == "ccsd_t"  ) return single_reference :: coupled_cluster :: CCSD_T;
       if( correlation_name == "ccsdt"    ) return single_reference :: coupled_cluster :: CCSDT;
-      if( correlation_name == "ccsdt(q)" ) return single_reference :: coupled_cluster :: CCSDT_Q;
+      if( correlation_name == "ccsdt_q" ) return single_reference :: coupled_cluster :: CCSDT_Q;
       if( correlation_name == "ccsdtq"   ) return single_reference :: coupled_cluster :: CCSDTQ;
+      if( correlation_name == "lccsd"    ) return single_reference :: coupled_cluster :: LCCSD;
+      if( correlation_name == "lccsd_t" ) return single_reference :: coupled_cluster :: LCCSD_T;
+      if( correlation_name == "lccsdt"   ) return single_reference :: coupled_cluster :: LCCSDT;
 
       if( correlation_name == "casci"   ) return multi_reference :: ci :: CASCI;
       if( correlation_name == "mrci"    ) return multi_reference :: ci :: MRCI;
@@ -217,6 +236,10 @@ namespace iquads {
         retval.push_back( correlation_name_type( "KS-DFT" ) );
         retval.push_back( correlation_name_type( "dft" ) );
       }
+      else if( level_mask == single_reference :: mean_field :: DF_RHF ) {
+        retval.push_back( correlation_name_type( "RHF" ) );
+        retval.push_back( correlation_name_type( "rhf" ) );
+      }
       else if( level_mask == single_reference :: mollet_plesset :: MP2 ) {
         retval.push_back( correlation_name_type( "MP2" ) );
         retval.push_back( correlation_name_type( "mp2" ) );
@@ -228,6 +251,14 @@ namespace iquads {
       else if( level_mask == single_reference :: mollet_plesset :: MP4 ) {
         retval.push_back( correlation_name_type( "MP4" ) );
         retval.push_back( correlation_name_type( "mp4" ) );
+      }
+      else if( level_mask == single_reference :: mollet_plesset :: DF_MP2 ) {
+        retval.push_back( correlation_name_type( "MP2" ) );
+        retval.push_back( correlation_name_type( "mp2" ) );
+      }
+      else if( level_mask == single_reference :: mollet_plesset :: DF_LMP2 ) {
+        retval.push_back( correlation_name_type( "LMP2" ) );
+        retval.push_back( correlation_name_type( "lmp2" ) );
       }
       else if( level_mask == single_reference :: ci :: CIS ) {
         retval.push_back( correlation_name_type( "CIS" ) );
@@ -264,6 +295,18 @@ namespace iquads {
       else if( level_mask == single_reference :: coupled_cluster :: CCSDTQ ) {
         retval.push_back( correlation_name_type( "CCSDTQ" ) );
         retval.push_back( correlation_name_type( "ccsdtq" ) );
+      }
+      else if( level_mask == single_reference :: coupled_cluster :: LCCSD ) {
+        retval.push_back( correlation_name_type( "LCCSD" ) );
+        retval.push_back( correlation_name_type( "lccsd" ) );
+      }
+      else if( level_mask == single_reference :: coupled_cluster :: LCCSD_T ) {
+        retval.push_back( correlation_name_type( "LCCSD(T0)" ) );
+        retval.push_back( correlation_name_type( "lccsd(t)" ) );
+      }
+      else if( level_mask == single_reference :: coupled_cluster :: LCCSDT ) {
+        retval.push_back( correlation_name_type( "LCCSDT" ) );
+        retval.push_back( correlation_name_type( "lccsdt" ) );
       }
       else if( level_mask == multi_reference :: ci :: CASCI ) {
         retval.push_back( correlation_name_type( "CASCI" ) );

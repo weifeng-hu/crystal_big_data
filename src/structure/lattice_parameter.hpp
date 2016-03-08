@@ -126,7 +126,7 @@ public:
     angle_data_type alpha, beta, gamma;
     is >> a >> b >> c >> alpha >> beta >> gamma;
     lattice_parameter_obj = LatticeParameter( make_tuple( a, b, c ), 
-                                              make_tuple( alpha, beta, gamma ) );
+                                              make_tuple( alpha*pi/180.0e0, beta*pi/180.0e0, gamma*pi/180.0e0 ) );
     return is;
   }
 

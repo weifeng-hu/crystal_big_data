@@ -524,9 +524,17 @@ agent_type :: read_energy( correlation_tag_type correlation_tag, filepath_type o
   // I have to confess that this part is not that black box, because developer needs to know that molpro uses upper case
   // keywords to label correlation method, with "!". And the developers also need to know that the first element of the AKA list
   // is for molpro use.
+  // For RHF, we need !RHF and Energy
+  // For MP2, CCSD etc, we need e.g., !MP2 total energy
   std :: vector< std :: string > keywords;
-  keywords.push_back( correlation_name_aka_list[0] );
-  keywords.push_back( std :: string( "Energy" ) );
+  if( correlation_name_aka_list[0] == "!RHF" ) {
+    keywords.push_back( correlation_name_aka_list[0] );
+    keywords.push_back( std :: string( "Energy" ) );
+  } else {
+    keywords.push_back( correlation_name_aka_list[0] );
+    keywords.push_back( std :: string( "total" ) );
+    keywords.push_back( std :: string( "energy" ) );
+  }
   energy_data_type energy_data 
     = iquads :: utility :: string_tool :: return_last_value_of_strings< energy_data_type > ( iquads :: file_system :: return_split_strings_if_line_contains_all_keywords( keywords, output_path.absolute() ) );
 

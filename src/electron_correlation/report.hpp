@@ -122,10 +122,16 @@ public:
         this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( RHF, 0.0e0 ) );
         this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( UHF, 0.0e0 ) );
         this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( DFT, 0.0e0 ) );
+        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( DF_RHF, 0.0e0 ) );
         this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( MP2, 0.0e0 ) );
+        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( DF_MP2, 0.0e0 ) );
+        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( DF_LMP2, 0.0e0 ) );
         this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( CCSD_T, 0.0e0 ) );
         this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( CCSDT, 0.0e0 ) );
         this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( CCSDT_Q, 0.0e0 ) );
+        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( LCCSD, 0.0e0 ) );
+        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( LCCSD_T, 0.0e0 ) );
+        this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( LCCSDT, 0.0e0 ) );
         this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( CASCI, 0.0e0 ) );
         this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( CASSCF, 0.0e0 ) );
         this->correlated_energy_list_.insert( pair< correlation_level_type, energy_data_type > ( DMRG, 0.0e0 ) );
