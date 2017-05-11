@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Use this bash script to do crystal fragment calculations, which 
+# will be run via shell command
+# This is a pipeline to include split, distribute, run, and output retrieving steps.
+
+print_help () {
+
+  printf "Use this bash script to do crystal fragment calculations, which\n" 
+  printf "will be run via shell command\n"
+  printf "This is a pipeline to include split, distribute, run, and output retrieving steps.\n"
+
+  printf "Usage:\n"
+  printf "\t bash mbe.crystal_fragment.shell_run.pipeline <hosts, separated by ','>\n"
+
+  exit 0;
+
+}
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "" ]; then
+  print_help
+fi
+
+hosts_literal=$1
+hosts=(`sed "s/,/ /g" <<< ${hosts_literal}`)
+number_of_hosts=${#hosts[@]}
+
+cd input;
+bash mbe.crystal_fragment.shell_run.split_and_run ${number_of_hosts} N
+cd ../
+bash mbe.crystal_fragment.shell_run.distribute_and_run ${hosts_literal} Y
+bash mbe.crystal_fragment.shell_run.collect ${hosts_literal} 

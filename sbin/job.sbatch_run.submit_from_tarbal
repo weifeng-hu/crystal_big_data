@@ -1,0 +1,142 @@
+#!/bin/bash
+
+# Use this bash script to submit a sbatch job, which has already been 
+# placed in a tarbal
+# The tarbal should contain job scripts, also a sbatch script, named as "job.sh"
+# The script will untar the tarbal, and change sbatch environment parameters
+# requested by a user
+
+scratch_gpfs_root=/scratch/gpfs/weifeng/
+
+np=1
+walltime="00:00:00"
+memory=4000
+tarbalname="unset"
+cmdfile="unset"
+run_command="";
+
+print_help() {
+
+  printf "Use this bash script to submit a sbatch job, which has already been\n" 
+  printf "placed in a tarbal\n"
+  printf "The tarbal should contain job scripts, also a sbatch script, named as job.sh\n"
+  printf "The script will untar the tarbal, and change sbatch environment parameters\n"
+  printf "requested by a user\n"
+
+  echo "Usage (with full option list)"
+  echo "sbatch_single --nproc=<np> , integer"
+  echo "              --nnode=<nn> , integer"
+  echo "              --walltime=<walltime> in the format of 00:40:00"
+  echo "              --memory=<memory> , from 0 to 96000/128000"
+  echo "              --tarbalname=<tarbalname>, will be appended with .tar by this code"
+  echo "              --cmdfile=<cmdfile>"
+  echo "              --info=<info>, job description"
+
+  exit 0;
+
+}
+
+if [ "$1" == "-h"] || [ "$1" == "--help" ] || [ "$1" == "" ]; then
+  print_help;
+fi
+
+for key in "$@"
+do
+case $key in
+  --nproc=*)
+  np="${key#*=}"
+  shift
+  ;;
+  --nnode=*)
+  nn="${key#*=}"
+  shift
+  ;;
+  --walltime=*)
+  walltime="${key#*=}"
+  shift
+  ;;
+  --memory=*)
+  memory="${key#*=}"
+  shift
+  ;;
+  --tarbalname=*)
+  tarbalname="${key#*=}"
+  shift
+  ;;
+  --cmdfile=*)
+  cmdfile="${key#*=}"
+  shift
+  ;;
+  --info=*)
+  info="${key#*=}"
+  shift
+  ;;
+  *)
+  echo unknown option ${key}
+  exit
+  ;;
+esac
+done
+
+target_folder="${tarbalname}"
+tarbal="${tarbalname}.tar"
+scratch_gpfs_dir="${scratch_gpfs_root}/${target_folder}/"
+
+sbatch_file_name="job.sh"
+sbatch_file_path="${scratch_gpfs_dir}/${sbatch_file_name}"
+
+metadata_path="${scratch_gpfs_dir}/METADATA"
+
+cmdfile_path="${scratch_gpfs_dir}/${cmdfile}"
+run_command="sh ${cmdfile_path}"
+
+if test ${cmdfile} == "unset"; then
+  echo command file name not defined
+  exit 1
+fi
+
+if test ${tarbalname} == "unset"; then
+  echo tarbal name not defined
+  exit 1
+fi
+
+if [ ! -f ${tarbal} ]; then
+  echo cannot find tarbal ${tarbal}
+  exit 1
+fi
+
+cp ${tarbal} ${scratch_gpfs_root}
+( cd ${scratch_gpfs_root} ; tar -xf ${tarbal} ; exit 0 )
+
+if [ ! -f ${cmdfile_path} ]; then
+  echo cannot find command file ${cmdfile_path}
+  exit 1
+fi
+
+echo "" >> ${metadata_path}
+echo work dir: ${scratch_gpfs_dir} >> ${metadata_path}
+echo scratch dir: ${scratch_dir} >> ${metadata_path}
+echo "" >> ${metadata_path}
+echo sbatch script path: ${sbatch_file_name} >> ${metadata_path}
+echo "" >> ${metadata_path}
+echo one node is used
+echo number of procss per node: ${np} >> ${metadata_path}
+echo memory: ${memory} MB >> ${metadata_path}
+echo command: ${run_command} >> ${metadata_path}
+echo job description: ${info} >> ${metadata_path}
+
+
+echo "#!/bin/sh"                       >> ${sbatch_file_path}
+echo "#SBATCH -N 1"                    >> ${sbatch_file_path}
+echo "#SBATCH --ntasks-per-node=${np}" >> ${sbatch_file_path}
+echo "#SBATCH -t ${walltime}"          >> ${sbatch_file_path}
+echo "#SBATCH --mem=${memory}"         >> ${sbatch_file_path}
+echo ""                                >> ${sbatch_file_path}
+echo ${run_command}                    >> ${sbatch_file_path}
+
+( cd ${scratch_gpfs_dir}; sbatch ${sbatch_file_name}; exit 0 )
+
+echo new job:  >> ${HOME}/JOB_RECORDS
+echo ${info}   >> ${HOME}/JOB_RECORDS
+echo in ${scratch_gpfs_dir} >> ${HOME}/JOB_RECORDS
+echo "" >> ${HOME}/JOB_RECORDS

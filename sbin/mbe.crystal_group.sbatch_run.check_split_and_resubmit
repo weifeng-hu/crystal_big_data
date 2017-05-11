@@ -1,0 +1,139 @@
+#!/bin/bash
+
+# Use this bash script to check whether fragment calculations are done
+# for a crystal set.
+# Used for sbatch. If there are any incomplete jobs, this script will 
+# generate a restart list which contains these incomplete jobs. 
+# Jobs will be splitted again, and submitted under a quota.
+
+print_help() {
+
+  printf "Use this bash script to check whether fragment calculations are done for a crystal set.\n"
+  printf "Used for sbatch. If there are any incomplete jobs, this script will \n"
+  printf "generate a restart list which contains these incomplete jobs. \n"
+  printf "Jobs will be splitted again, and submitted under a quota.\n"
+
+  echo "Usage:"
+  echo "\t bash mbe.crystal_group.sbatch_run.check_split_and_resubmit --directory=<> --thread=<> --walltime=<> --limit=<>"
+
+  exit 0;
+
+}
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "" ]; then
+  print_help
+fi
+
+directory=""
+num_thread=0
+new_walltime="00:00:00"
+new_limit=0
+
+for key in "$@"; do
+
+  case $key in
+    --directory=*)
+    directory="${key#*=}"
+    shift
+    ;;
+    --thread=*)
+    num_thread="${key#*=}"
+    shift
+    ;;
+    --walltime=*)
+    new_walltime="${key#*=}"
+    shift
+    ;;
+    --limit=*)
+    new_limit="${key#*=}"
+    shift
+    ;;
+    *)
+    echo unknown keyword ${key}
+    print_help
+    exit 1
+  esac
+
+done
+
+if [ ! -d ${directory} ]; then
+  printf "directory ${directory} not exist\n"
+  print_help 
+  exit 1
+fi
+
+cd ${directory}
+
+crystal_csd_dir="`find ./ -mindepth 1 -maxdepth 1 -type d -print0`"
+crystal_csd_list=(`sed 's:./: :g' <<<${crystal_csd_dir}`)
+
+for subdir in ${crystal_csd_list[@]}; do
+
+  cd ${subdir}
+  
+  target_dir=(`find ./ -mindepth 1 -maxdepth 1 -type d`)
+  cd ${target_dir}
+  
+  compute_dir=(`find ./ -mindepth 1 -maxdepth 2 -type d -name input`)
+  
+  cd ${compute_dir}
+
+  pwd
+
+  number_of_total_calcs=`ls -l *.com |wc -l`
+  number_of_performed_calcs=`ls -l *.xml |wc -l`
+  number_of_successful_calcs=`grep "Variable memory released" *.out| wc -l`
+
+  printf "in directory ${compute_dir}\n"
+  printf "number of total calculation: ${number_of_total_calcs}\n"
+  printf "number of successful calculation: ${number_of_successful_calcs}\n"
+
+  number_of_initial_run=`ls -l ./original | wc -l`
+  if [ "${number_of_initial_run}" -eq "0" ]; then
+    printf "directory [${subdir}] has no initial run; aborting...\n"
+    exit 1
+  fi
+  number_of_previous_restarts=`find ./ -type f -name "restart_list*" | wc -l`
+
+  printf "number of previous restarts: ${number_of_previous_restarts}\n"
+
+  restart_index=${number_of_previous_restarts}
+
+  restart_list="./restart_list_${restart_index}"
+
+  if [ ${number_of_successful_calcs} -lt ${number_of_total_calcs} ];
+  then
+    printf "in [ ${subdir} ] calculations not fully completed\n"
+    printf "generating incompleted job list\n"
+    all_input_files=(`find ./ -type f -name "fragment*com"`)
+    for input_file in ${all_input_files[@]}; do
+      job_head=(`sed  -e 's:./: :' -e 's:.com::' <<<${input_file}`)
+      output_file="./${job_head}.out"
+      sbatch_file="./${job_head}.sh"
+      if [ -f ${output_file} ]; then
+        grep_return_value=`grep -c "Variable memory released" ${output_file}`
+        if [ "${grep_return_value}" -eq "0" ]; then
+          printf "job not done for [ ${job_head} ]\n"
+          echo "${sbatch_file}" >> ${restart_list}
+        fi
+      else
+        printf "job not started for [ ${job_head} ]\n"
+        echo "${sbatch_file}" >> ${restart_list}
+      fi
+    done
+
+   ( bash mbe.crystal_fragment.sbatch_run.selection_split_and_submit 50000 ${num_thread} N ${restart_list} ${new_walltime};
+     bash mbe.crystal_fragment.sbatch_run.submit_under_quota ${new_limit} 0 300;
+     exit 0 )
+
+    printf "done\n"
+  fi
+  
+  cd ../../
+  
+  cd ../
+  
+  cd ../
+
+done
+

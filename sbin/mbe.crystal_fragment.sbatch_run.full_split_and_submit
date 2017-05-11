@@ -1,0 +1,114 @@
+#!/bin/bash
+
+# Use this bash script to split fragment calculations in MBE into 
+# sbatch groups with dependency list.
+# The script will consider all the fragment calculation input files 
+# in the directory, split them, and submit sbatch groups if requested by 
+# the user.
+# It will stop if there are too many sbatch jobs to run, i.e., > queue_limit.
+
+print_help () {
+
+  printf "Use this bash script to split fragment calculations in MBE into\n" 
+  printf "sbatch groups with dependency list.\n"
+  printf "The script will consider all the fragment calculation input files \n"
+  printf "in the directory, split them, and submit sbatch groups if requested by \n"
+  printf "the user. \n"
+  printf "It will stop if there are too many sbatch jobs to run, i.e., > queue_limit.\n"
+
+  printf "Usage:\n"
+  printf "\t bash mbe.crystal_fragment_sbatch_run.full_split_and_submit <length_of_queue> <number_of_split> <submit or not(Y/N)> <new sbatch walltime>\n"
+
+  exit 0;
+
+}
+
+queue_limit=$1
+number_of_split=$2
+wtime=$4
+submit=$3
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "" ]; then
+  print_help
+fi
+
+#replace the wtime
+find ./*.sh -print0 | xargs -0 sed -i "s/#SBATCH -t .*/#SBATCH -t $wtime/"
+
+ls -l fragment*.sh | awk '{ print $NF }' > original
+
+number_of_files=`ls -l fragment*.sh | wc -l`
+
+echo queue limit $queue_limit
+echo number of split $number_of_split
+echo number of sbatch files $number_of_files
+
+if test $number_of_files -gt $queue_limit  ; then 
+  echo too many sbatch files;
+  exit 1;
+fi
+
+echo splitting...
+
+number_per_split=$(($number_of_files / $number_of_split))
+number_mod_split=$(($number_of_files % $number_of_split))
+
+echo number per split $number_per_split;
+echo numder mod split $number_mod_split;
+
+count=0
+line_start=0
+line_end=0
+while [ $count -lt $number_of_split ]; do
+  let line_start=count*number_per_split+1 
+  let line_end=line_start+number_per_split-1
+  echo treating $line_start to $line_end
+  sed -n "$line_start,$line_end p" original > group$count
+  let count=count+1
+done
+
+let line_start=line_end+1
+line_end=$number_of_files
+echo treating $line_start to $line_end
+sed -n "$line_start,$line_end p" original > group$count
+
+count=0
+number_read=$(($number_of_split+1))
+while [ $count -lt $number_read ]; do
+
+  rm -rf starter_$count.sh
+  rm -rf group_submission_$count.sh
+
+  # write a dummy job
+  echo "#!/bin/sh" > starter_$count.sh
+  echo "#SBATCH -N 1" >> starter_$count.sh
+  echo "#SBATCH -t 00:01:00" >> starter_$count.sh
+  echo >> starter_$count.sh
+  echo "echo group $count started" >> starter_$count.sh
+
+  startline="new_jobid=\`sbatch starter_$count.sh | awk '{ print \$NF }'\`; echo \$new_jobid not dependent; old_jobid=\$new_jobid"
+  echo $startline > group_submission_$count.sh
+
+  while read line; do
+    newline="new_jobid=sbatch --dependency=afterany:old_jobid $line | awk '{ print NF }'; echo new_jobid is dependent on old_jobid; old_jobid=new_jobid"
+    echo $newline >> group_submission_$count.sh
+  done <group$count
+
+  sed -i -e '2,$s/sbatch/\`sbatch/' -e '2,$s/:old_jobid/:$old_jobid/' -e '2,$s/NF/\$NF/' -e "2,$ s/}'/}'\`/" -e '2,$s/new_jobid is dependent on old_jobid/$new_jobid is dependent on $old_jobid/' -e '2,$s/old_jobid=new_jobid/old_jobid=$new_jobid/' group_submission_$count.sh
+
+  let count=count+1
+done
+
+if [ $submit == 'Y' ]; then
+  
+  echo "Just do it!"
+  count=0
+  while [ $count -le $number_of_split ]; do
+    echo "submitting group_submission_$count.sh"
+    sh group_submission_$count.sh
+    let count=count+1
+  done
+
+fi
+
+

@@ -1,0 +1,177 @@
+#!/bin/bash
+
+# Use this bash script to submit a sbatch job, with a given program name 
+# and an already written program input file.
+# Also it can change sbatch environment parameters
+
+scratch_root=/scratch/weifeng/
+scratch_gpfs_root=/scratch/gpfs/weifeng/
+
+scratch=""
+np=1
+nn=1
+walltime="00:00:00"
+memory=4000
+program="unset"
+input="unset"
+mode="single"
+run_command="";
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "" ]; then
+  printf "Use this bash script to submit a sbatch job, with a given program name\n"
+  printf "and an already written program input file.\n"
+  printf "Also it can change sbatch environment parameters\n"
+
+  echo "Usage (with full option list)"
+  echo "sbatch_single --nproc=<np> , integer"
+  echo "              --nnode=<nn> , integer"
+  echo "              --walltime=<walltime> in the format of 00:40:00"
+  echo "              --memory=<memory> , from 0 to 96000/128000"
+  echo "              --program=<program>"
+  echo "              --input=<input>"
+  echo "              --mode=<mode>, mpi, or omp"
+  echo "              --info=<info>, job description"
+
+  exit 0;
+
+fi
+
+for key in "$@"
+do
+case $key in
+  --nproc=*)
+  np="${key#*=}"
+  shift
+  ;;
+  --nnode=*)
+  nn="${key#*=}"
+  shift
+  ;;
+  --walltime=*)
+  walltime="${key#*=}"
+  shift
+  ;;
+  --memory=*)
+  memory="${key#*=}"
+  shift
+  ;;
+  --program*)
+  program="${key#*=}"
+  shift
+  ;;
+  --input=*)
+  input="${key#*=}"
+  shift
+  ;;
+  --mode=*)
+  mode="${key#*=}"
+  shift
+  ;;
+  --info=*)
+  info="${key#*=}"
+  shift
+  ;;
+  *)
+  echo unknown option ${key}
+  exit
+  ;;
+esac
+done
+
+date=`date +%Y-%m-%d-%H-%M-%S`
+scratch_gpfs_dir="${scratch_gpfs_root}/${date}/"
+scratch_dir="${scratch_root}/${date}/"
+
+sbatch_file_name="job-${date}.sh"
+sbatch_file_path="${scratch_gpfs_dir}/${sbatch_file_name}"
+metadata_path="${scratch_gpfs_dir}/METADATA"
+input_path="${scratch_dir}/${input}"
+
+if [ "${program}" == "Pcrystal" ]; then
+  input_path="<${scratch_dir}/${input}"
+fi
+
+input_gpfs_path="${scratch_gpfs_dir}/${input}"
+output_path="${scratch_gpfs_dir}/${input}.out"
+
+if test ${mode} == "omp"; then
+  #echo "openmp mode with nprocs = ${np}"
+  run_command="${program} ${input_path} > ${output_path}";
+  let nn=1;
+elif test ${mode} == "mpi"; then
+  #echo "mpi mode with nprocs = ${np}"
+  run_command="mpirun -np ${np} ${program} ${input_path} > ${output_path}"
+elif test ${mode} == "single"; then
+  #echo "single mode"
+  run_command="${program} ${input_path} > ${output_path}"
+fi
+
+if test ${input} == "unset"; then
+  exit 1
+fi
+
+if [ ! -f ${input} ]; then
+  echo cannot find input file ${input}
+  exit 1
+fi
+
+if [ "`command -v ${program}`" == "" ]; then
+  echo ${program} cannot be found
+  exit 1
+fi
+
+mkdir -p ${scratch_gpfs_dir}
+
+echo METADATA >> ${metadata_path}
+echo "" >> ${metadata_path}
+echo work dir: ${scratch_gpfs_dir} >> ${metadata_path}
+echo scratch dir: ${scratch_dir} >> ${metadata_path}
+echo "" >> ${metadata_path}
+echo sbatch script path: ${sbatch_file_name} >> ${metadata_path}
+echo input path: ${input_path} >> ${metadata_path}
+echo input original path: ${input_gpfs_path} >> ${metadata_path}
+echo output path: ${output_path} >> ${metadata_path}
+echo "" >> ${metadata_path}
+echo program: ${program} >> ${metadata_path}
+echo mode: ${mode} >> ${metadata_path}	
+echo number of procss per node: ${np} >> ${metadata_path}
+echo number of nodes: ${nn} >> ${metadata_path}
+echo memory per node: ${memory} MB >> ${metadata_path}
+echo command: ${run_command} >> ${metadata_path}
+echo job description: ${info} >> ${metadata_path}
+
+cp ${input} ${scratch_gpfs_dir}
+
+if [ "${program}" == "block.spin_adapted" ]; then
+  sed -i "/prefix/ c prefix ${scratch_dir}" ${input_gpfs_path}
+  sed -i "/scratch/ c prefix ${scratch_dir}" ${input_gpfs_path}
+fi
+
+if [ "${program}" == "nwchem" ]; then
+  sed -i "/scratch_dir/ c scratch_dir ${scratch_dir}" ${input_gpfs_path}
+fi
+
+echo "#!/bin/sh"                       >> ${sbatch_file_path}
+echo "#SBATCH -N ${nn}"                >> ${sbatch_file_path}
+echo "#SBATCH --ntasks-per-node=${np}" >> ${sbatch_file_path}
+echo "#SBATCH -t ${walltime}"          >> ${sbatch_file_path}
+echo "#SBATCH --mem=${memory}"         >> ${sbatch_file_path}
+echo "echo $HOSTNAME"                  >> ${sbatch_file_path}
+if test ${mode} == "omp"; then
+  echo "export OMP_NUM_THREADS=${np}"  >> ${sbatch_file_path}
+fi
+
+echo "export TMPDIR=${scratch_dir}"    >> ${sbatch_file_path}
+echo ""                                >> ${sbatch_file_path}
+echo "mkdir -p ${scratch_dir}"         >> ${sbatch_file_path}
+echo "cp ${input_gpfs_path} ${scratch_dir}" >> ${sbatch_file_path}
+echo ""                                >> ${sbatch_file_path}
+echo "cd ${scratch_dir}"               >> ${sbatch_file_path}
+echo ${run_command}                    >> ${sbatch_file_path}
+
+( cd ${scratch_gpfs_dir}; sbatch ${sbatch_file_name}; exit 0 )
+
+echo new job:  >> ${HOME}/JOB_RECORDS
+echo ${info}   >> ${HOME}/JOB_RECORDS
+echo in ${scratch_gpfs_dir} >> ${HOME}/JOB_RECORDS
+echo "" >> ${HOME}/JOB_RECORDS

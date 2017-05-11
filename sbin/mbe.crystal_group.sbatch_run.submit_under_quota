@@ -1,0 +1,75 @@
+#!/bin/bash
+
+print_help() {
+
+  printf "group_recursive_sbatch\n";
+  printf "--options\n"
+  printf "         --directory=<directory>\n"
+  printf "         --limit=<job limit, curicial>\n"
+  printf "         --thread=<#jobs to run at the same time>\n"
+  printf "         --walltime=<walltime for each job>\n"
+
+}
+
+# end of function
+
+directory=""
+limit=2000;
+thread=50
+walltime=06:00:00
+
+for key in "$@"; do
+
+  case $key in
+    --directory=*)
+    directory="${key#*=}"
+    shift
+    ;;
+    --limit=*)
+    limit="${key#*=}"
+    shift
+    ;;
+    --thread=*)
+    thread="${key#*=}"
+    shift
+    ;;
+    --walltime=*)
+    walltime="${key#*=}"
+    shift
+    ;;
+    *)
+    echo unknown keyword ${key}
+    print_help
+    exit 1
+  esac
+
+done
+
+
+if [ "${directory}" == "" ]; then
+  printf "working directory not set\n"
+  print_help
+  exit 1
+fi
+
+if [ ! -d ${directory} ]; then
+  printf "cannot find target directory ${directory}\n"
+  exit 1
+fi
+
+printf "work directory: ${directory}\n"
+printf "limit: ${limit}\n"
+printf "thread: ${thread}\n"
+printf "walltime: ${walltime}\n"
+
+target_subdirs=(`find ./${directory}/*/*/*/input -type d` )
+
+for subdir in ${target_subdirs[@]}; do
+   printf "performing sbatch submission in ${subdir} ..."
+   ( cd ${subdir};\
+     bash sbatch_split 50000 ${thread} N ${walltime};\
+     bash sbatch_auto_submission ${limit} 0 300;\
+     exit 0 )
+   printf "done\n"
+done
+

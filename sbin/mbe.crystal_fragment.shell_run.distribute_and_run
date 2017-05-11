@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# Use this bash script to distribute splitted fragment calculations
+# to different hosts, then launch jobs simply via shell commands.
+# A splitting must be run before this step. This is done by running 
+#  bash mbe.crystal_fragment.shell_run.split_and_run 
+# User can choose to run job scripts right after job distribution.
+# The script will probe whether all hosts are linkable. If any of 
+# them cannot be connected, the script will quit.
+
+print_help () {
+
+  printf "Use this bash script to distribute splitted fragment calculations\n"
+  printf "to different hosts, then launch jobs simply via shell commands.\n"
+  printf "This script will probe the given hosts. If any host is not linkable, the  \n"
+  printf "script will quit.\n"
+  printf "A splitting must be run before this step. This is done by running \n"
+  printf "  bash mbe.crystal_fragment.shell_run.split_and_run \n"
+  printf "User can choose to run job scripts right after job distributiion \n"
+  printf "The script will probe whether all hosts are linkable. If any of\n" 
+  printf "them cannot be connected, the script will quit.\n"
+
+  printf "Usage:\n"
+  printf "\t bash mbe.crystal_fragment.shell_run.distribute_and_run <hosts, splitted by ','> <whether to launch shell commands (Y/N)> \n" 
+
+  exit 0;
+
+}
+
+#for key in "$@"
+#do
+#case $key in
+#  --node=*)
+#  nodes="${key#*=}"
+#  shift
+#  ;;
+#esac
+#done
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "" ]; then
+  print_help
+fi
+
+hosts_literal=$1
+hosts=(`sed "s/,/ /g" <<< ${hosts_literal}`)
+run=$2
+
+# check connections to hosts
+printf "Checking connections ...\n"
+for host in ${hosts[@]}; do
+  ping -q -c 1 ${host};
+  ping_return_code=$?
+  if [ ${ping_return_code} -ne 0 ]; then
+    printf "${host} is unavailable \n"
+    exit 1;
+  fi
+done
+
+printf "... all good!\n";
+
+# set splitting variables
+current_dir=(`pwd`)
+current_dir_spaced=(`sed "s:/: :g" <<< ${current_dir}`)
+num_fields=${#current_dir_spaced}
+current_dir_end=${current_dir_spaced[${num_fields}-1]}
+work_dir="/scratch/wh288/${current_dir_end}"
+
+for host in ${hosts[@]}; do
+  (
+    ssh wh288@${host} "mkdir -p ${work_dir}";
+    scp -q -r input/ wh288@${host}:${work_dir};
+  )
+done
+
+# run the script if requested
+if [ ${run} == 'Y' ]; then
+  printf "requested to run jobs\n";
+  count=0
+  for host in ${hosts[@]}; do
+    ( ssh wh288@${host} "sh -c 'cd ${work_dir}/input; nohup ./group_run_$count.sh > /dev/null 2>&1 &' " )
+    let count=count+1
+  done
+fi
+

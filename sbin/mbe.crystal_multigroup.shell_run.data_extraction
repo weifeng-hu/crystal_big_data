@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Use bash script to do multi crystal group data extraction
+# in a parent directory
+
+print_help() {
+
+  printf "Use bash script to do multi crystal group data extraction\n"
+  printf "in a parent directory\n"
+
+  printf "Usage:\n"
+  printf "\t bash mbe.crystal_multigroup.shell_run.data_extraction <target directory>\n"
+
+  exit 0;
+
+}
+
+directory=""
+
+for key in "$@"; do
+
+  case $key in
+    --directory=*)
+    directory="${key#*=}"
+    shift
+    ;;
+    *)
+    echo unknown keyword ${key}
+    exit 1
+  esac
+
+done
+
+cd ${directory}
+
+subdirs=`find ./ -mindepth 1 -maxdepth 1 -type d`
+subdir_list=`sed 's:./: :g' <<< ${subdirs}`
+
+for subdir in ${subdir_list[@]}; do
+
+  mbe.crystal_group.shell_run.data_extraction --directory=${subdir}
+
+done

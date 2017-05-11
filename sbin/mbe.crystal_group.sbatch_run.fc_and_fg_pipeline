@@ -1,0 +1,595 @@
+#!/bin/bash
+
+# Use this script to do
+#  1.   fragment generation --> packaging --> transferring to remote server
+#  1.5. user to splitting, sbatch/shell run, to perform fragment calculations at the remote server
+#  2.   connect to remote hosts --> remote packing --> transfer to local host --> perform fragment harvest
+
+# BEGIN OF FUNCTIONS
+# functions used by this bash
+
+print_help() {
+
+  printf "Use this script to do\n"
+  printf " 1.   fragment generation --> packaging --> transferring to remote server\n"
+  printf " 1.5. user to splitting, sbatch/shell run, to perform fragment calculations at the remote server\n"
+  printf " 2.   connect to remote hosts --> remote packing --> transfer to local host --> perform fragment harvest\n"
+
+  printf "group_mbe_processor\n"
+  printf "Options:\n"
+  printf "         --mode=launch/collect \n"
+  printf "         --list=<list> \n"
+  printf "         --name=<project name> \n"
+  printf "         --size=<lattice size>, 1 1 1 means 3x3x3 \n"
+  printf "         --cutoff=<cutoff>, is a list \n"
+  printf "         --poly=<polymer size> \n"
+  printf "         --directory=<directory> \n"
+  printf "         --info=<info> \n"
+  printf "         --server=<server hostname/ip> \n"
+  printf "         --user=<server username> \n"
+  printf "         --remotedir=<remote working root dir> \n"
+  printf "         --dryrun=<yes/no> \n"
+  printf "         --auto=<yes/no> \n"
+
+  exit 0;
+
+}
+
+get_date_string() {
+  local this_date=`date +%Y-%m-%d-%H-%M-%S`
+  echo ${this_date}
+}
+
+get_value_by_key_in_file() {
+
+  local value="not found"
+  local key=${1}
+  local file=${2}
+
+  while read line; do
+   if [ "${line#${key}}" != "${line}" ]; then
+     value=${line#${key}}
+     echo ${value}
+     break
+   fi 
+  done < ${file}
+
+}
+
+write_fg_python_script () {
+
+  local lattice=${1}
+  local size_set=${2}
+  local cutoff_set=${3}
+  local poly_n=${4}
+
+  local -a cutoff_array=(`sed 's/,/ /g' <<< "${cutoff_set}"`)
+  local python_script="${lattice}.py"
+
+  local nnode=$(sed -n 1p "${lattice}.coord" )
+  local natom_per_node=$(sed -n 2p  "${lattice}.coord" )
+  local natom=0
+  let natom=nnode*natom_per_node
+
+  printf "\n" >> ${python_script}
+  printf "group_config = []; \n" >> ${python_script}
+  printf "lattice_name = \"${lattice}\"; \n" >> ${python_script}
+  printf "xyz_file_name = \"./${lattice}.coord\"; \n" >> ${python_script}
+  printf "lattice_constant_file_name = \"./${lattice}.const\"; \n" >> ${python_script}
+  printf "natom = ${natom}; \n" >> ${python_script}
+  printf "correlation = \"hf\"; \n" >> ${python_script}
+  printf "basis_set = \"aug-cc-pvdz\"; \n " >> ${python_script}
+  printf "\n" >> ${python_script}
+  printf "from manybody_expansion.api.calculation_config import new_calc_config;\n" >> ${python_script}
+  printf "from copy import deepcopy;\n" >> ${python_script}
+  for x in ${cutoff_array[@]}; do
+    printf "group_config.append(deepcopy(new_calc_config(lattice_name,xyz_file_name,lattice_constant_file_name,natom,${size_set},${poly_n},basis_set,correlation,${x})));\n" >> ${python_script}
+  done
+  printf "\n">> ${python_script}
+  printf "from manybody_expansion.api.group import group_generator;\n" >> ${python_script}
+  printf "dir_name = group_generator( group_config );\n" >> ${python_script}
+  printf "\n" >> ${python_script}
+
+  echo ${python_script}
+
+}
+
+deploy_remote_package () {
+
+  local remote_work_rootdir=${1}
+  local tarbal_name=${2}
+  local host=${3}
+  local user=${4}
+  local remotedir=${5}
+
+  printf "deploying ... "
+  ( ssh ${user}@${host} "cd ${remotedir}; mkdir -p ${remote_work_rootdir}" ; exit 0 )
+  ( scp ${tarbal_name} ${user}@${host}:${remotedir}/${remote_work_rootdir} ; exit 0 )
+  ( ssh ${user}@${host} "cd ${remotedir}; cd ${remote_work_rootdir}; tar -xf ${tarbal_name}"; exit 0 )
+  printf "done\n"
+
+}
+
+deploy_remote_package_by_ssh_port_forwarding () {
+
+  local remote_work_rootdir=${1}
+  local tarbal_name=${2}
+  local user=${3}
+  local remotedir=${4}
+  local port=${5}
+
+  printf "deploying through port ${port} ... \n"
+  ( ssh -p ${port} ${user}@localhost "cd ${remotedir}; mkdir -p ${remote_work_rootdir}" ; exit 0 )
+  ( scp -P ${port} ${tarbal_name} ${user}@localhost:${remotedir}/${remote_work_rootdir} ; exit 0 )
+  ( ssh -p ${port} ${user}@localhost "cd ${remotedir}; cd ${remote_work_rootdir} ; tar -xf ${tarbal_name}"; exit 0 )
+  printf "done\n"
+
+}
+
+fetch_remote_package() {
+
+  local remote_work_rootdir=${1}
+  local tarbal_name=${2}
+  local target_dir=${3}
+  local host=${4}
+  local user=${5}
+  local remotedir=${6}
+
+  printf "fetching ... "
+  ( ssh ${user}@${host} "cd ${remotedir}; cd ${remote_work_rootdir}; rm ${tarbal_name}; tar -cf ${tarbal_name} ${target_dir}"; exit 0 )
+  ( scp ${user}@${host}:${remotedir}/${remote_work_rootdir}/${tarbal_name} ./; exit 0 )
+  printf "done\n"
+
+}
+
+fetch_remote_package_by_ssh_port_forwarding() {
+
+  local remote_work_rootdir=${1}
+  local tarbal_name=${2}
+  local target_dir=${3}
+  local user=${4}
+  local remotedir=${5}
+  local port=${6}
+
+  printf "fetching through port ${port} ... \n"
+  ( ssh -p ${port} ${user}@localhost "cd ${remotedir}; cd ${remote_work_rootdir}; rm ${tarbal_name}; tar -cf ${tarbal_name} ${target_dir}"; exit 0 )
+  ( scp -P ${port} ${user}@localhost:${remotedir}/${remote_work_rootdir}/${tarbal_name} ./; exit 0 )
+  printf "done\n"
+
+}
+
+perform_group_launch() {
+
+  local current_dir=${1}
+
+  local meta_path="METADATA"
+  echo METADATA >> ${meta_path}
+
+  local -a crystal_csd_list;
+  crystal_csd_list=(`sed 's:,: :g' <<< "${2}"`)
+  for i in ${crystal_csd_list[@]}; do
+    echo included crystal ${i} in the list
+  done
+  echo csd list: ${crystal_csd_list[*]} >> ${meta_path}
+
+  local project_name=${3}
+  echo project name: ${project_name} >> ${meta_path}
+
+  local lattice_size=${4}
+  echo lattice size: ${lattice_size} >> ${meta_path}
+
+  local cutoff_radius=${5}
+  echo cutoff radius: ${cutoff_radius} >> ${meta_path}
+
+  local max_polymer=${6}
+  echo polymer size: ${max_polymer} >> ${meta_path}
+
+  local job_info=${7}
+  echo job info: ${job_info} >> ${meta_path} 
+
+  local remote_hostname=${8}
+  echo remote hostname: ${remote_hostname} >> ${meta_path}
+
+  local remote_username=${9}
+  echo remote username: ${remote_username} >> ${meta_path}
+
+  local remotedir=${10}
+  echo remote directory: ${remotedir} >> ${meta_path}
+
+  local dryrun=${11}
+  echo dryrun: ${dryrun} >> ${meta_path}
+
+  local auto=${12}
+  echo auto: ${auto} >> ${meta_path}
+
+  # create launch directory
+  printf "creating directory for exporting inputs ... " 
+  local launch_dir="launch"
+  if [ "${dryrun}" == "no" ]; then
+    ( mkdir -p ${launch_dir}; exit 0 )
+  fi
+  printf "${launch_dir} \n"
+  echo launch directory: ${launch_dir} >> ${meta_path}
+
+  # perform the group preparation
+  #   loop over each crystal
+  for csd in ${crystal_csd_list[@]}; do
+ 
+    # need to find all the .coord and .const
+    local crystal_coord_file="${csd}_canonicalized.coord"
+    local crystal_const_file="${csd}_canonicalized.const"
+  
+    printf "locating file ${csd}_canonicalized.coord ... "
+    local crystal_origin_coord_path=`find ../*/*/${crystal_coord_file}`
+    printf "${crystal_origin_coord_path} \n"
+  
+    printf "locating file ${csd}_canonicalized.const ... "
+    local crystal_origin_const_path=`find ../*/*/${crystal_const_file}`
+    printf "${crystal_origin_const_path} \n"
+
+    if [ ! -f ${crystal_origin_coord_path} ]; then
+      printf "cannot find coord file for ${csd} \n"
+      continue
+    fi
+
+    if [ ! -f ${crystal_origin_const_path} ]; then
+      printf "cannot find const file for ${csd} \n"
+      continue
+    fi
+
+    # create a mbe main directory
+    local crystal_mbe_dir="${csd}_mbe";
+    if [ "${dryrun}" == "no" ]; then
+      ( mkdir -p ${crystal_mbe_dir}; exit 0 )
+    fi
+  
+    # copy .const and .coord to the mbe directory
+    printf "copying ${csd} coord and const file to ${crystal_mbe_dir} ... "
+    if [ "${dryrun}" == "no" ]; then
+      ( cp ${crystal_origin_const_path} -t ${crystal_mbe_dir}; exit 0 )
+      ( cp ${crystal_origin_coord_path} -t ${crystal_mbe_dir}; exit 0 )
+    fi
+    printf "done\n"
+  
+    # rename the .const and .coord in the mbe directory, to be really unique for this calculation
+    local lattice_name="${csd}_${project_name}"
+    if [ "${dryrun}" == "no" ]; then
+      ( cd ${crystal_mbe_dir}; mv ${crystal_coord_file} "${lattice_name}.coord"; exit 0 )
+      ( cd ${crystal_mbe_dir}; mv ${crystal_const_file} "${lattice_name}.const"; exit 0 )
+    fi
+  
+    # generate binaries for fg and fc in the mbe directory
+    printf "writing python script for ${csd} ... "
+    local python_script_name="${lattice_name}.py"
+    if [ "${dryrun}" == "no" ]; then
+      (cd ${crystal_mbe_dir};\
+       script=`write_fg_python_script ${lattice_name} ${lattice_size} ${cutoff_radius} ${max_polymer}`;\
+       echo "${script}";\
+       exit 0 )
+    fi
+    printf "${python_script_name} ... done\n"
+    # run the script
+    if [ "${dryrun}" == "no" ]; then
+      ( cd ${crystal_mbe_dir}; python ${python_script_name}; exit 0 )
+    fi
+
+    # perform the fragment generation
+    printf "generating fragment data base for ${csd} ... "
+    if [ "${dryrun}" == "no" ]; then
+      if [ "${auto}" == "yes" ]; then
+        ( cd ${crystal_mbe_dir};\
+          local generated_directory=`find ./ -mindepth 1 -type d`;\
+          cd ${generated_directory}; sh fg_group_run.sh\
+          exit 0 )
+      fi
+    fi
+    printf "done\n"
+
+    # compress the tarbal of generated mbe_main_dir
+    local mbe_tarbal_name="${crystal_mbe_dir}.tar"
+    printf "compressing ... "
+    if [ "${dryrun}" == "no" ]; then
+      ( tar -cf ${mbe_tarbal_name} ${crystal_mbe_dir}; exit 0 )
+    fi
+    printf "done\n"
+  
+    # move, not copy, the tarbal to exporting dir
+    printf "moving to ${launch_dir} ... "
+    if [ "${dryrun}" == "no" ]; then
+      ( mv ${mbe_tarbal_name} ${launch_dir}; exit 0 )
+    fi
+    printf "done\n"
+
+    # send to the server
+    # check whether remote machine is alive
+    printf "connecting to ${remote_hostname} ... "
+    local ping_code=$( ping -c 1 ${remote_hostname}; echo $? )
+    if [ ${ping_code} == 0 ]; then
+      if [ "${dryrun}" == "no" ]; then
+        ( cd ${launch_dir};\
+          deploy_remote_package ${current_dir} ${mbe_tarbal_name} ${remote_hostname} ${remote_username} ${remotedir};\
+          exit 0 )
+      fi
+    else
+      printf "cannot connect to remote host ${remote_hostname}\n"
+      printf "trying to use ssh port forwarding ... \n"
+      if [ "${dryrun}" == "no" ]; then
+        ( cd ${launch_dir};\
+          ssh -M -S my_socket_${csd}_deploy -fN -L 9001:${remote_hostname}:22 wh288@128.112.122.173;\
+          deploy_remote_package_by_ssh_port_forwarding ${current_dir} ${mbe_tarbal_name} ${remote_username} ${remotedir} 9001;\
+          ssh -S my_socket_${csd}_deploy -O exit wh288@128.112.122.173;\
+          exit 0 )
+      fi
+    fi
+  done
+
+}
+
+perform_group_collect() {
+
+  local current_dir=${1}
+  local dryrun=${2}
+  local auot=${3}
+
+  local meta_path="METADATA"
+  # find if any METADATA is in the directory
+  if [ ! -f ${meta_path} ]; then
+    echo "cannot find METADATA ${meta_path}"
+    exit 1
+  fi
+
+  local crystal_csd_list_string=`get_value_by_key_in_file "csd list:" ${meta_path}`
+  local -a crystal_csd_list=`sed 's/,/ /g' <<< ${crystal_csd_list_string}`
+  local remote_hostname=`get_value_by_key_in_file "remote hostname:" ${meta_path}`
+  local remote_username=`get_value_by_key_in_file "remote username:" ${meta_path}`
+  local remotedir=`get_value_by_key_in_file "remote directory:" ${meta_path}`
+
+  printf "crystal csd list to collect: ${crystal_csd_list[*]} \n";
+  printf "remote hostname: ${remote_hostname} \n";
+  printf "remote username: ${remote_username} \n";
+  printf "remote directory: ${remotedir} \n";
+
+  printf "creating directory for importing outputs ... "
+  local collect_dir="collect"
+  if [ "${dryrun}" == "no" ]; then
+    ( mkdir -p ${collect_dir}; exit 0 )
+  fi
+  printf "${collect_dir} \n"
+
+  if [ "${dryrun}" == "no" ]; then
+    echo collect directory: ${collect_dir} >> ${meta_path}
+  fi
+
+  # perform the group collection
+  #   loop over each crystal
+  for csd in ${crystal_csd_list[@]}; do
+
+    local crystal_mbe_dir="${csd}_mbe"
+
+    if [ ! -d ${crystal_mbe_dir} ]; then
+      printf "cannot find crystal mbe dir ${crystal_mbe_dir} ... abort task for ${csd} \n"
+      continue
+    fi
+
+    local mbe_tarbal_name="${crystal_mbe_dir}.tar"
+
+    printf "connecting to ${remote_hostname} ... "
+    local ping_code=$( ping -c 1 ${remote_hostname}; echo $? )
+    if [ ${ping_code} == 0 ]; then
+      if [ "${dryrun}" == "no" ]; then
+        ( cd ${collect_dir};\
+          fetch_remote_package ${current_dir} ${mbe_tarbal_name} ${crystal_mbe_dir} ${remote_server_hostname} ${remote_server_username} ${remote_server_dir};\
+          exit 0 )
+        ( cd ${collect_dir}; cp ${mbe_tarbal_name} ../; exit 0 )
+        ( tar -xf ${mbe_tarbal_name}; rm ${mbe_tarbal_name}; exit 0 )
+      fi
+    else
+      printf "cannot connect to remote host ${remote_hostname}\n"
+      printf "trying to use ssh port forwarding ... \n"
+      if [ "${dryrun}" == "no" ]; then
+#        ( cd ${collect_dir};\
+#        ssh -M -S my_socket_${csd}_collect -fN -L 9002:${remote_hostname}:22 wh288@128.112.122.173;\
+#        fetch_remote_package_by_ssh_port_forwarding ${current_dir} ${mbe_tarbal_name} ${crystal_mbe_dir} ${remote_username} ${remotedir} 9002;\
+#        ssh -S my_socket_${csd}_collect -O exit wh288@128.112.122.173;\
+#        cp ${mbe_tarbal_name} ../; cd ../; tar -xf ${mbe_tarbal_name}; rm ${mbe_tarbal_name};\
+#        exit 0 )
+
+        if [ "${auto}" == "yes" ]; then
+          ( cd ${crystal_mbe_dir}; 
+           local generated_directory=`find ./ -mindepth 1 -type d`;
+           cd ${generated_directory}; sh fc_group_run.sh; exit 0 ) 
+        fi
+ 
+      fi
+    fi
+  done
+
+}
+
+# END OF FUNCTIONS
+
+dryrun="yes"
+mode=""
+list=""
+name=""
+size="0 0 0"
+cutoff="0.0"
+poly=0
+directory=""
+info="none"
+server=""
+user=""
+remotedir=""
+auto="no"
+
+if [ "$1" == "--help" ] || [ "$1" == "-h" ] || [ "$1" == "" ]; then
+  print_help
+fi
+
+for key in "$@"; do
+ 
+  case $key in 
+    --dryrun=*)
+    dryrun="${key#*=}"
+    shift
+    ;;
+    --auto=*)
+    auto="${key#*=}"
+    shift
+    ;;
+    --mode=*)
+    mode="${key#*=}"
+    shift
+    ;;
+    --list=*)
+    list="${key#*=}"
+    shift
+    ;;
+    --name=*)
+    name="${key#*=}"
+    shift
+    ;;
+    --size=*)
+    size="${key#*=}"
+    shift
+    ;;
+    --cutoff=*)
+    cutoff="${key#*=}"
+    shift
+    ;;
+    --poly=*)
+    poly="${key#*=}"
+    shift
+    ;;
+    --directory=*)
+    directory="${key#*=}"
+    shift
+    ;;
+    --info=*)
+    info="${key#*=}"
+    shift
+    ;;
+    --server=*)
+    server="${key#*=}"
+    shift
+    ;;
+    --user=*)
+    user="${key#*=}"
+    shift
+    ;;
+    --remotedir=*)
+    remotedir="${key#*=}"
+    shift
+    ;;
+    *)
+    echo unknown option ${key}
+    print_help
+    exit 1
+    ;;
+  esac
+done
+
+printf "MBE calculation group processor\n"
+
+# do some check on the arguments
+if [ "${mode}" == "launch" ]; then
+
+  if [ "${list}" == "" ]; then
+    printf "crystal list not set\n"
+    exit 1
+  fi
+
+  if [ "${name}" == "" ]; then
+    printf "project name not set\n"
+    exit 1
+  fi
+
+  if [ "${size}" == "0 0 0" ]; then
+    printf "lattice size not set\n"
+    exit 1
+  fi
+
+  if [ "${cutoff}" == "0.0" ]; then
+    printf "cutoff rasius not set\n"
+    exit 1
+  fi 
+
+  if [ "${poly}" == 0 ]; then
+    printf "polymer size not set\n"
+    exit 1
+  fi
+
+  if [ "${server}" == "" ]; then
+    printf "remote server name not set\n"
+    exit 1
+  fi
+
+  if [ "${user}" == "" ]; then
+    printf "remote server user not set\n"
+    exit 1
+  fi
+
+  if [ "${remotedir}" == "" ]; then
+    printf "remote directory not set\n"
+    exit 1
+  fi
+
+elif [ "${mode}" == "collect" ]; then
+
+  if [ "${directory}" == "" ]; then
+    printf "directory not set\n"
+    exit 1
+  fi
+
+else
+  echo unknown run mode ${mode}
+  print_help
+  exit 1;
+fi
+
+printf "mode: ${mode} \n"
+
+if [ "${mode}" == "launch" ]; then
+
+  printf "parameters:\n"
+  printf "crystal list: ${list} \n"
+  printf "project name: ${name} \n"
+  printf "lattice size: ${size} \n"
+  printf "cutoff radius: ${cutoff} \n"
+  printf "polymer size: ${poly} \n"
+  printf "project info: ${info} \n"
+  printf "server name: ${server}\n"
+  printf "user name: ${user}\n"
+  printf "remote directory: ${remotedir}\n"
+
+  date=$(get_date_string)
+
+  working_dir="${date}_${name}"
+  if [ "${dryrun}" == "no" ]; then
+    ( mkdir -p ${working_dir}; exit 0 )
+  fi
+
+  printf "working directory is set to ... ${working_dir}\n"
+
+  if [ "${dryrun}" == "no" ]; then
+    ( cd ${working_dir};\
+      perform_group_launch ${working_dir} ${list} ${name} ${size} ${cutoff} ${poly} ${info} ${server} ${user} ${remotedir} ${dryrun} ${auto};\
+      exit 0 )
+  fi
+
+else
+
+  printf "parameters:\n"
+  printf "working directory: ${directory} \n"
+
+  working_dir=${directory}
+  if [ ! -d ${working_dir} ]; then
+    printf "cannot find working dir ${working_dir}\n";
+    exit 1;
+  fi
+
+  ( cd ${working_dir};\
+    perform_group_collect ${working_dir} ${dryrun} ${auto};\
+    exit 0 )
+
+fi

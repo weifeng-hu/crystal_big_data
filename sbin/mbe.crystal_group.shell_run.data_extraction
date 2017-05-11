@@ -1,0 +1,97 @@
+#!/bin/bash
+
+# Use this bash script to extract data from finished 
+# fragment harvest calculations, of a crystal group
+
+print_help() {
+
+  printf "Use this bash script to extract data from finished\n" 
+  printf "fragment harvest calculations, of a crystal group\n"
+
+  printf "Usage:\n"
+  printf "\t bash mbe.crystal_group.shell_run.data_extraction <directory>\n"
+
+  exit 0;
+
+}
+
+directory=""
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "" ]; then
+  print_help;
+fi
+
+for key in "$@"; do
+
+  case $key in
+    --directory=*)
+    directory="${key#*=}"
+    shift
+    ;;
+    *)
+    echo unknown keyword ${key}
+    exit 1
+  esac
+
+done
+
+if [ ! -d ${directory} ]; then
+  printf "directory ${directory} not found\n"
+fi
+
+cd ${directory}
+
+job_dir_list=`find ./ -mindepth 1 -maxdepth 1 -type d`
+job_dirs=(`sed 's:./: :g' <<< ${job_dir_list}`)
+
+for job_dir in ${job_dir_list[@]}; do
+
+  cd ${job_dir}
+
+  #echo "======================================================="
+  #printf "collecting energies in ${directory}/${job_dir}..\n"
+  harvest_output=`find ./ -type f -name "*harvest.out"`
+
+  if [ "${harvest_output}" == "" ]; then
+    #printf "***harvest output file not exist - skip***\n";
+    printf ""
+  else
+    csd_id=${directory}
+    method_fields=(`sed 's:_: :g' <<<${job_dir}`)
+    method=""
+    count=0
+    for field in ${method_fields[@]}; do 
+      if [ "${field}" == "collect" ]; then
+        break
+      fi
+      let count=count+1
+    done
+    let count=count+1
+    length=${#method_fields[@]}
+    let length=length-1
+
+    printf "${csd_id},"
+    for num in `seq $count $length`; do
+      printf "${method_fields[$num]}_"
+    done
+
+    printf ","
+
+    #cat ./METADATA
+    first_order=`grep "First order energy" ${harvest_output} | awk '{print $NF}'`
+    second_order=`grep "Second order interaction energy" ${harvest_output} | awk '{print $NF}'`
+    third_order=`grep "Third order interaction energy" ${harvest_output}  | awk '{print $NF}'`
+    fourth_order=`grep "Fourth order interaction energy" ${harvest_output} | awk '{print $NF}'`
+    #grep "number of effective terms" ${harvest_output} | awk '{print $NF}'
+
+    echo "${first_order},${second_order},${third_order},${fourth_order}"
+
+  fi
+
+  #echo "======================================================="
+  cd ../
+
+done
+
+cd ../
+

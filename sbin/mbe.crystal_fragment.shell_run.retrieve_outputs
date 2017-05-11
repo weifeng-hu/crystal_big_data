@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Use the bash script to retrieve fragment calculation
+# output files from hosts. Calculations were run via 
+# shell command.
+# The script will probe whether all hosts are linkable. If any of 
+# them cannot be connected, the script will quit.
+
+print_help () {
+
+  printf "Use the bash script to retrieve fragment calculation\n"
+  printf "output files from hosts. Calculations were run via \n"
+  printf "shell command. \n"
+  printf "The script will probe whether all hosts are linkable. If any of\n" 
+  printf "them cannot be connected, the script will quit.\n"
+
+  printf "Usage:\n"
+  printf "\t bash mbe.crystal_fragment.shell_run.retrieve_outputs <hosts, seperated by ','>\n"
+
+  exit 0;
+
+}
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "" ]; then
+  print_help
+fi
+
+hosts_literal=$1
+hosts=(`sed "s/,/ /g" <<< ${hosts_literal}`)
+
+# check connections to hosts
+printf "Checking connections ...\n"
+for host in ${hosts[@]}; do
+  ping -q -c 1 ${host};
+  ping_return_code=$?
+  if [ ${ping_return_code} -ne 0 ]; then
+    printf "${host} is unavailable \n"
+    exit 1;
+  fi
+done
+
+printf "... all good!\n";
+
+# set splitting variables
+current_dir=(`pwd`)
+current_dir_spaced=(`sed "s:/: :g" <<< ${current_dir}`)
+num_fields=${#current_dir_spaced}
+current_dir_end=${current_dir_spaced[${num_fields}-1]}
+work_dir="/scratch/wh288/${current_dir_end}"
+
+for host in ${hosts[@]}; do
+  (
+    ssh wh288@${host} "mkdir -p ${work_dir}";
+    scp -q -r wh288@${host}:${work_dir}/input/*.out* ./input;
+    scp -q -r wh288@${host}:${work_dir}/input/*.xml* ./input;
+  )
+done
+
+mkdir -p output;
+cp input/*.out* output/
+cp input/*.xml* output/
+
+printf "... done\n"

@@ -1,0 +1,332 @@
+#!/bin/bash
+
+# Use this bash script to replace electron correlation method keywords
+# for molpro input files, in a crystal group calculation.
+# This bash work for density fitting methods.
+
+# functions
+
+print_help () {
+
+  printf "Use this bash script to replace electron correlation method keywords\n"
+  printf "for molpro input files, in a crystal group calculation.\n"
+  printf "This bash work for density fitting methods.\n"
+
+  printf "Options:    --directory=<target directory to find files>\n"
+  printf "            --keywords=<keyword to work on, in the format, e.g., basis:6-31g,method:ccsd(t)>\n"
+  printf "            --sbatch_keywords=<sbatch variables to work on, e.g., scratch:/scratch/weifeng/,nproc:8>\n"
+  printf "            --program=<quantum chemistry program, this will indicate the file extenion type>\n"
+  printf "            --df_basis=<fitting basis>"
+
+  exit 0;
+
+}
+
+get_value_by_key_in_file() {
+
+  local value="not found"
+  local key=${1}
+  local file=${2}
+
+  while read line; do
+   if [ "${line#${key}}" != "${line}" ]; then
+     value=${line#${key}}
+     echo ${value}
+     break
+   fi 
+  done < ${file}
+
+}
+
+adjust_sbatch_scratch() {
+
+  local targets=`< sbatch_target_files`
+  local value=${1}
+
+  sed -i "/SBATCH -t/ a export TMPDIR=${value} \n\
+mkdir -p ${value}" ${targets}
+
+}
+
+adjust_sbatch_np() {
+
+  local targets=`< sbatch_target_files`
+  local value=${1}
+
+  sed -i -e "/SBATCH -t/ a export OMP_NUM_THREADS=${value}" -e "/SBATCH -t/ a export MKL_NUM_THREADS=${value}" -e "/SBATCH -t/ a export MKL_DYNAMIC=false" ${targets}
+
+  sed -i -e "/ntasks-per-node/ c \#SBATCH --ntasks-per-node=${value}" -e "/OMP_NUM_THREADS/ c export OMP_NUM_THREADS=${value}" -e "/MKL_NUM_THREADS/ c export MKL_NUM_THREADS=${value}" -e "/MKL_DYNAMIC/ c export MKL_DYNAMIC=false" ${targets}
+
+}
+
+adjust_sbatch_memory() {
+
+  local targets=`< sbatch_target_files`
+  local value=${1}
+
+  sed -i "/--mem=/ c \#SBATCH --mem=${value}" ${targets}
+
+}
+
+adjust_basis() {
+
+  local targets=`< target_files`
+  local program=${1}
+  local value=${2}
+
+  if [ "${program}" == "molpro" ]; then
+    sed -i "/basis/ c basis=${value}" ${targets}
+  elif [ "${program}" == "nwchem" ]; then
+    printf "replacing basis set has not been implemented for ${program}\n"
+    exit 1
+  fi
+
+}
+
+adjust_memory() {
+
+  local targets=`< target_files` 
+  local program=${1}
+  local value=${2}
+
+  if [ "${program}" == "molpro" ]; then
+    sed -i "/memory/ c memory,${value},m" ${targets}
+  elif [ "${program}" == "nwchem" ]; then
+    printf "replacing memory has not been implemented for ${program}\n"
+    exit 1
+  fi
+
+}
+
+adjust_method() {
+
+  local targets=`< target_files`
+  local program=${1}
+  local value=${2}
+  local df_basis=${3}
+
+
+  if [ "${program}" == "molpro" ]; then
+    if [ "${value}" == "mp2" ]; then
+      sed -i '/gdirect/ d' ${targets}
+      sed -i "/hf/ c {df-hf,df_basis=${df_basis};" ${targets}
+      sed -i "$ a {df-mp2,df_basis=${df_basis};\
+}" ${targets}
+
+    elif [ "${value}" == "lccsd" ]; then
+      sed -i '/gdirect/ d' ${targets}
+      sed -i "/hf/ c {df-hf,df_basis=${df_basis};" ${targets}
+      sed -i "$ a {df-mp2,df_basis=${df_basis};\
+}\
+\
+{df-lccsd,df_basis_ccsd=${df_basis};\
+}" ${targets}
+
+
+    elif [ "${value}" == "lccsd(t)" ]; then
+      sed -i '/gdirect/ d' ${targets}
+      sed -i "/hf/ c {df-hf,df_basis=${df_basis};" ${targets}
+      sed -i "$ a {df-mp2,df_basis=${df_basis};\
+}\
+\
+{df-lccsd(t),df_basis_ccsd=${df_basis};\
+}" ${targets}
+    fi
+
+
+  elif [ "${program}" == "nwchem" ]; then
+    printf "replacing method has not been implemented for ${program}\n"
+    exit 1
+  fi
+
+
+}
+# end of functions
+
+directory=""
+keywords=""
+sbatch_keywords=""
+program=""
+df_basis=""
+
+for key in "$@"; do
+
+  case $key in
+    --directory=*)
+    directory="${key#*=}"
+    shift
+    ;;
+    --program=*)
+    program="${key#*=}"
+    shift
+    ;;
+    --keywords=*)
+    keywords="${key#*=}"
+    shift
+    ;;
+    --df_basis=*)
+    df_basis="${key#*=}"
+    shift
+    ;;
+    --sbatch_keywords=*)
+    sbatch_keywords="${key#*=}"
+    shift
+    ;;
+    *)
+    echo unknown keyword ${key}
+    print_help
+    exit 1
+  esac
+
+done
+
+if [ "${directory}" == "" ]; then
+  printf "working directory not set\n"
+  exit 1
+fi
+
+if [ "${keywords}" == "" ]; then
+  printf "keywords not set\n"
+fi
+
+if [ "${program}" == "" ]; then
+  printf "program not set\n"
+fi
+
+printf "work directory: ${directory}\n"
+printf "program type: ${program}\n"
+printf "keywords: ${keywords}\n"
+printf "sbatch keywords: ${sbatch_keywords}\n"
+
+if [ ! -d ${directory} ]; then
+  printf "cannot find target directory ${directory}\n"
+  exit 1
+fi
+
+# split the sbatch keywords
+declare -a sbatch_keywords_pair_list=( `sed 's<,< <g' <<< ${sbatch_keywords}` )
+declare -a sbatch_keyword_list
+declare -a sbatch_value_list
+
+sb_count=0
+for spair in ${sbatch_keywords_pair_list[@]}; do
+  declare -a spair_splitted=(`sed 's<:< <' <<< ${spair}`)
+  sbatch_keyword_list[${sb_count}]=${spair_splitted[0]}
+  sbatch_value_list[${sb_count}]=${spair_splitted[1]}
+  let sb_count=sb_count+1
+done
+
+sbatch_file_extension="sh"
+
+# split the keywords
+declare -a keywords_pair_list=( `sed 's/,/ /g' <<< ${keywords}` )
+declare -a keyword_list
+declare -a value_list
+
+count=0
+for pair in ${keywords_pair_list[@]}; do
+  declare -a pair_splitted=(`sed 's/:/ /' <<< ${pair}`)
+  keyword_list[${count}]=${pair_splitted[0]}
+  value_list[$count]=${pair_splitted[1]}
+  let count=count+1
+done
+
+file_extension=""
+if [ "${program}" == "molpro" ]; then
+  file_extension="com"
+elif [ "${program}" == "nwchem" ]; then
+  file_extension="nw"
+else
+  printf "unknown program type ${program}\n"
+  exit 1
+fi
+
+name_tail=""
+for value in ${value_list[@]}; do
+  name_tail="${name_tail}_${value}"
+done
+name_tail="${name_tail}_df_${df_basis}"
+
+new_directory="${directory}_${name_tail}"
+# copy everything in the current dir to a new directory
+
+if [ ! -d ${new_directory} ]; then
+  printf "creating new directory ${new_directory} ... "
+  cp -r ${directory} ${new_directory}
+  printf "done\n"
+fi
+
+# find the files with the file extension
+cd ${new_directory}
+
+printf "removing unecessary files ... "
+rm *.tar
+find ./*/*/*/*/*.out | xargs rm
+find ./*/*/*/*/*.xml | xargs rm
+find ./*/*/*/*/group* | xargs rm
+find ./*/*/*/*/starter* | xargs rm
+find ./*/*/*/*/original | xargs rm
+printf "done\n"
+
+declare -a crystal_csd_list=(`get_value_by_key_in_file "csd list:" METADATA`)
+
+for csd in ${crystal_csd_list[@]}; do
+
+subdir="${csd}_mbe"
+
+cd ${subdir}
+
+target_files=`find ./*/*/input/*.${file_extension} -type f`
+echo ${target_files} > target_files
+
+  printf "performing replacement in ${subdir} ..."
+  let maxid=count-1
+  for i in $(seq 0 1 ${maxid}); do
+  
+    keyword=${keyword_list[$i]}
+    value=${value_list[$i]}
+
+    echo $keyword $value
+
+    if [ "${keyword}" == "basis" ]; then
+      adjust_basis  ${program} ${value}
+    elif [ "${keyword}" == "memory" ]; then
+      adjust_memory ${program} ${value}
+    elif [ "${keyword}" == "method" ]; then
+      adjust_method ${program} ${value} ${df_basis}
+    else
+      printf "unknown keyword ${keyword}\n"
+      exit 1
+    fi
+  
+  done
+  printf " done\n";
+
+sbatch_target_files=`find ./*/*/input/*.sh -type f`
+echo ${sbatch_target_files} > sbatch_target_files
+
+  printf "performing sbatch replacement in ${subdir} ..."
+  let max_sbid=sb_count-1
+  for i in $(seq 0 1 ${max_sbid}); do
+
+    sbatch_keyword=${sbatch_keyword_list[$i]}
+    sbatch_value=${sbatch_value_list[$i]}
+
+    echo $sbatch_keyword $sbatch_value
+
+    if [ "${sbatch_keyword}" == "scratch" ]; then
+      adjust_sbatch_scratch ${sbatch_value}
+    elif [ "${sbatch_keyword}" == "nproc" ]; then
+      adjust_sbatch_np ${sbatch_value}
+    elif [ "${sbatch_keyword}" == "memory" ]; then
+      adjust_sbatch_memory ${sbatch_value}
+    else
+      printf "unknown keyword ${sbatch_keyword}\n"
+      exit 1
+    fi
+  done
+  printf " done\n";
+
+cd ../;
+
+done

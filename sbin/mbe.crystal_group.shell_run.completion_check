@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# Use this bash script to check whether a group of crystal 
+# fragment calculations is accomplished.
+
+print_help() {
+
+  printf "Use this bash script to check whether a group of crystal\n" 
+  printf "fragment calculations is accomplished.\n"
+
+  printf "Usage:\n"
+  printf "\t bash mbe.crystal_group.shell_run.completion_check <crystal group directory>\n"
+
+  exit 0;
+
+}
+
+directory=""
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "" ]; then
+  print_help;
+fi
+
+for key in "$@"; do
+
+  case $key in
+    --directory=*)
+    directory="${key#*=}"
+    shift
+    ;;
+    *)
+    echo unknown keyword ${key}
+    exit 1
+  esac
+
+done
+
+cd ${directory}
+
+crystal_csd_dir="`find ./ -mindepth 1 -maxdepth 1 -type d -print0`"
+crystal_csd_list=(`sed 's:./: :g' <<<${crystal_csd_dir}`)
+
+for subdir in ${crystal_csd_list[@]}; do
+
+cd ${subdir}
+
+target_dir=(`find ./ -mindepth 1 -maxdepth 1 -type d`)
+cd ${target_dir}
+
+compute_dir=(`find ./ -mindepth 1 -maxdepth 2 -type d -name input`)
+
+cd ${compute_dir}
+
+number_of_total_calcs=`ls -l *.com |wc -l`
+number_of_performed_calcs=`ls -l *.xml |wc -l`
+number_of_successful_calcs=`grep "Variable memory released" *.out| wc -l`
+launched_rate=$((${number_of_performed_calcs}*100/${number_of_total_calcs}))
+successful_rate=$((${number_of_successful_calcs}*100/${number_of_performed_calcs}))
+completion_rate=$((${number_of_successful_calcs}*100/${number_of_total_calcs}))
+
+printf "crystal ${subdir} \n"
+printf "number of calculations: ${number_of_total_calcs}\n"
+printf "number of performed calculations: ${number_of_performed_calcs}\n"
+printf "number of successful calculations: ${number_of_successful_calcs}\n"
+printf "launched rate: ${launched_rate} percent \n"
+printf "successful rate: ${successful_rate} percent \n"
+printf "completed rate: ${completion_rate} percent \n"
+
+printf "\n"
+
+cd ../../
+
+cd ../
+
+cd ../
+
+done

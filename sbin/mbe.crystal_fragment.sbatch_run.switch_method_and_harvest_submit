@@ -1,0 +1,200 @@
+#!/bin/bash
+
+# Use this bash script to rebuild crystal fragment data harvest executive binarys, 
+# for a (set) of different electron correlation methods beyond Hartree-Fock.
+# Pre-requestites:
+#   1. Fragments have Hartree-Fock level harvest .cpp file.
+#   2. Fragments have post-HF calculations done. This can be done by 
+#      running post-HF level fragment generation, to get post-HF level 
+#      fragment calculation input files, and run. Or, users can simply 
+#      use mbe.crystal_group.shell_run.replace_keywords_for_density_fitting 
+#      or  mbe.crystal_group.shell_run.replace_keywords_for_non_density_fitting 
+#      to directly get fragment calculation inputs.
+# This script will replace the 'hf' keyword in the HF harvest .cpp file of the crystal
+# with designated methods, and recompile harvest binaries. Currently, it will submit 
+# the new harvest jobs once compilations are done.
+
+print_help () {
+
+  printf "Use this bash script to rebuild crystal fragment data harvest executive binarys, \n"
+  printf "for a (set) of different electron correlation methods beyond Hartree-Fock.\n"
+  printf "Pre-requestites:\n"
+  printf "  1. Fragments have Hartree-Fock level harvest .cpp file.\n"
+  printf "  2. Fragments have post-HF calculations done. This can be done by \n"
+  printf "     running post-HF level fragment generation, to get post-HF level \n"
+  printf "     fragment calculation input files, and run. Or, users can simply \n"
+  printf "     use mbe.crystal_group.shell_run.replace_keywords_for_density_fitting \n"
+  printf "     or  mbe.crystal_group.shell_run.replace_keywords_for_non_density_fitting \n"
+  printf "     to directly get fragment calculation inputs.\n"
+  printf "This script will replace the 'hf' keyword in the HF harvest .cpp file of the crystal\n"
+  printf "with designated methods, and recompile harvest binaries. Currently, it will submit \n"
+  printf "the new harvest jobs once compilations are done.\n"
+
+  printf "Usage:\n"
+  printf "Options:\t--directory=<the target directory>\n"
+  printf "\t\t--methods=<a list of electron correlated methods, which should be done already in the calculation, use : to split>\n"
+  printf "\t\t--walltime=<the walltime needed to carry out the harvest job>\n"
+  printf "\t\t--limit=<the external job queue limit size for my account, for SLURM>\n"
+
+  exit 0;
+
+}
+
+rewrite_makefile() {
+
+  driver_source=${1}
+  driver_makefile=${2}
+  driver_exe=${3}
+
+  driver_obj=`sed 's:.cpp:.o:' <<<${driver_source}`
+
+  printf "iquads_root = \$(IQUADS_ROOT)\n" > ${driver_makefile}
+  printf "iquads_src  = \$(iquads_root)\/src\/\n" >> ${driver_makefile}
+  printf "iquads_bin  = \$(iquads_root)\/bin\/\n" >> ${driver_makefile}
+  printf "iquads_include = \$(iquads_root)\/src\/\n" >> ${driver_makefile}
+  printf "boost_include = \$(BOOST_ROOT)\n" >> ${driver_makefile}
+  printf "boost_lib = \$(BOOST_ROOT)\/stage\/lib\/\n" >> ${driver_makefile}
+  printf "CC = gcc\n" >> ${driver_makefile}
+  printf "COPT = -O3\n" >> ${driver_makefile}
+  printf "CPP = g++\n" >> ${driver_makefile}
+  printf "CPPOPT = -O3 -std=c++11 -fopenmp\n" >> ${driver_makefile}
+  printf "CPPFLAGS = -I\$(iquads_include) -I\/usr\/include -I\$(boost_include)\n" >> ${driver_makefile}
+  printf "FC = gfortran\n" >> ${driver_makefile}
+  printf "CHEADS = \n" >> ${driver_makefile}
+  printf "CPPSRCS = ${driver_source}\n" >> ${driver_makefile}
+  printf "CPPOBJS = ${driver_obj}\n" >> ${driver_makefile}
+  printf "LIBS = \$(iquads_src)\/manybody_expansion\/libiquads_manybody_expansion.a \$(iquads_src)\/electron_correlation\/libiquads_electron_correlation.a \$(iquads_src)\/interface_to_third_party\/libiquads_third_party.a \$(iquads_src)\/matrix\/libiquads_matrix.a \$(iquads_src)\/blas\/libiquads_blas_interface.a -L\/\$(boost_lib) -lboost_filesystem -lboost_date_time -lboost_system -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lrt -lpthread -lgfortran\n" >> ${driver_makefile}
+  printf "executable = ${driver_exe}\n" >> ${driver_makefile}
+  printf "\n" >> ${driver_makefile}
+  printf "all: \$(executable)\n"  >> ${driver_makefile}
+  printf "\$(executable): \$(CPPOBJS)\n" >> ${driver_makefile}
+  printf "\t\$(CPP) -o \$(executable) \$(CPPFLAGS) \$(CPPOPT) \$(CPPOBJS) \$(LIBS)\n" >> ${driver_makefile}
+  printf "${driver_obj}:\t ${driver_source}\n" >> ${driver_makefile}
+  printf "\t \$(CPP) -o ${driver_obj} -c \$(CPPFLAGS) \$(CPPOPT) ${driver_source}\n" >> ${driver_makefile}
+  printf "\n" >> ${driver_makefile}
+  printf "clean:\n" >> ${driver_makefile}
+  printf "\t rm ${driver_exe} ./*.o" >> ${driver_makefile}
+  
+
+}
+
+replace_method_in_cpp() {
+
+  file=${1}
+  method=${2}
+
+  old_method_string="\"hf\""
+  new_method_string="\"${method}\""
+
+  echo ${old_method_string}
+  echo ${new_method_string}
+
+  sed -i "s:${old_method_string}:${new_method_string}:" ${file}
+
+}
+
+amend_sbatch() {
+
+  target_file=${1}
+  walltime=${2}
+
+  sed -i '/SBATCH --ntasks=/ c #SBATCH -N 1' ${target_file};
+  sed -i '/SBATCH --ntasks-per-socket/ c #SBATCH --ntasks-per-node=20' ${target_file};
+  sed -i '/SBATCH --ntasks-per-node/ a #SBATCH --mem=128000' ${target_file}
+  sed -i "/SBATCH -t/ c \#SBATCH -t ${walltime}" ${target_file}
+  sed -i 's:OMP_NUM_THREADS=120:OMP_NUM_THREADS=20:' ${target_file}
+
+}
+
+#end of functions
+
+directory=""
+methods=""
+walltime="00:00:00"
+limit=0
+
+for key in "$@"; do
+
+  case $key in
+    --directory=*)
+    directory="${key#*=}"
+    shift
+    ;;
+    --methods=*)
+    methods="${key#*=}"
+    shift
+    ;;
+    --walltime=*)
+    walltime="${key#*=}"
+    shift
+    ;;
+    --limit=*)
+    limit="${key#*=}"
+    shift
+    ;;
+    *)
+    echo unknown keyword ${key}
+    exit 1
+  esac
+
+done
+
+if [ "$1" == "-h"] || [ "$1" == "--help" ] || [ "$1" == "" ]; then
+  print_help;
+fi
+
+if [ "${directory}" == "" ]; then
+  printf "directory not set!\n"
+  exit 1
+fi
+
+if [ ! -d ${directory} ]; then
+  printf "directory ${directory} not exists! aborting ... \n"
+  exit 1
+fi
+
+cd ${directory}
+
+original_working_dir=`find ./ -mindepth 1 -maxdepth 1 -type d`;
+printf "protecting the original data dir ${original_working_dir}...\n"
+chmod 555 ${original_working_dir}
+
+methods_list=(`sed "s/:/ /g" <<< ${methods}`)
+
+for method in ${methods_list[@]}; do
+
+  printf "setting up stuff for ${method}\n"
+
+  new_dir="${original_working_dir}_collect_${method}"
+  printf "copying data to a new directory ${new_dir}...\n"
+  ( cp -r ${original_working_dir} ${new_dir}; chmod 755 ${new_dir}; exit 0 )
+
+  cd ${new_dir}
+
+    harvest_driver_source=`find ./ -name "*harvest.cpp"`
+    harvest_driver_sbatch=`find ./ -name "sbatch*harvest.sh"`
+    harvest_driver_makefile=`find ./ -name "makefile_*_harvest"`
+    harvest_driver_exe=`find ./ -name "fg_driver*_harvest"`
+
+    printf "replacing the correlation method to ${method}\n"
+    replace_method_in_cpp ${harvest_driver_source} ${method}
+
+    rewrite_makefile ${harvest_driver_source} ${harvest_driver_makefile} ${harvest_driver_exe}
+
+    printf "recompiling harvest source code...\n"
+    ( make -f ${harvest_driver_makefile}; exit 0 );
+
+    printf "amending sbatch script...\n"
+    amend_sbatch ${harvest_driver_sbatch} ${walltime}
+
+    printf "submitting harvest job for ${new_dir}...\n"
+    while [ `squeue -u weifeng| wc -l` -gt ${limit} ]; do
+      printf "exceeds job number limit ${limit}; wait...\n"
+      sleep 300;
+    done
+    ( sbatch ${harvest_driver_sbatch}; exit 0 )
+
+  cd ../
+
+done
+

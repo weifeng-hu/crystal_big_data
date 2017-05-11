@@ -1,0 +1,78 @@
+#!/bin/bash
+
+# Use this bash script to submit sbatch jobs to harvest crystal 
+# fragment calculation data, for a crystal group, which has been 
+# placed in a directory.
+# The script can harvest data from multiple electronic correlated 
+# methods. 
+
+print_help () {
+
+  printf "Use this bash script to submit sbatch jobs to harvest crystal \n"
+  printf "fragment calculation data, for a crystal group, which has been \n"
+  printf "placed in a directory. \n"
+  printf "The script can harvest data from multiple electronic correlated \n"
+  printf "methods. \n"
+
+  printf "Usage: \n"
+  printf "Options:    --directory=<the target directory>\n"
+  printf "            --methods=<a list of electron correlated methods, which should be done already in the calculation, use : to split>\n"
+  printf "            --walltime=<the walltime needed to carry out the harvest job>\n"
+  printf "            --limit=<the external job queue limit size for my account, for SLURM>\n"
+
+  exit 0;
+
+}
+
+if [ "$1" == "-h" ] || [ "$1" == "--help" ] || [ "$1" == "" ]; then
+  print_help
+fi
+
+directory=""
+method_list=""
+walltime="00:00:00"
+limit=0
+
+for key in "$@"; do
+
+  case $key in
+    --directory=*)
+    directory="${key#*=}"
+    shift
+    ;;
+    --methods=*)
+    method_list="${key#*=}"
+    shift
+    ;;
+    --walltime=*)
+    walltime="${key#*=}"
+    shift
+    ;;
+    --limit=*)
+    limit="${key#*=}"
+    shift
+    ;;
+    *)
+    echo unknown keyword ${key}
+    print_help
+    exit 1
+  esac
+
+done
+
+if [ ! -d ${directory} ]; then
+  printf "directory ${directory} not exists! aborting ... \n"
+  exit 1
+fi
+
+cd ${directory}
+
+subdirs=`find ./ -mindepth 1 -maxdepth 1 -type d`
+subdirs_list=(`sed 's:./: :g' <<< ${subdirs}`)
+
+echo ${subdirs_list[@]}
+
+for subdir in ${subdirs_list[@]}; do
+  bash mbe.crystal_fragment.sbatch_run.switch_method_and_harvest_submit --directory=${subdir} --methods=${method_list} --walltime=${walltime} --limit=${limit}
+done
+
