@@ -1,9 +1,24 @@
 #!/bin/bash
 
+# Use this bash script to submit fragment calculations for a 
+# crystal group.
+# This script relies on a previous split operation, done by 
+# mbe.crystal_group.sbatch_run.check_split_and_resubmit (without submission)
+# Particularly, this script submits sbatch groups under a given sbatch limit
+# or cap. It will detect the number of currently submitted sbatch jobs, compare against the sbatch quota, and wait until new sbatch slots are available.
+# Very good to use if the computing system strongly limits users' sbatch quota.
+
 print_help() {
 
-  printf "group_recursive_sbatch\n";
-  printf "--options\n"
+  printf "Use this bash script to submit fragment calculations for a \n"
+  printf "crystal group.\n"
+  printf "This script relies on a previous split operation, done by \n"
+  printf "mbe.crystal_group.sbatch_run.check_split_and_resubmit (without submission)\n"
+  printf "Particularly, this script submits sbatch groups under a given sbatch limit\n"
+  printf "or cap. It will detect the number of currently submitted sbatch jobs, compare against the sbatch quota, and wait until new sbatch slots are available.\n"
+  printf "Very good to use if the computing system strongly limits users' sbatch quota.\n"
+
+  printf "Options\n"
   printf "         --directory=<directory>\n"
   printf "         --limit=<job limit, curicial>\n"
   printf "         --thread=<#jobs to run at the same time>\n"
