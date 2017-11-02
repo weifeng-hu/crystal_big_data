@@ -46,9 +46,9 @@ int transform_info::read()
    this->c_filename = prefix + basename + ".orca.mo";
    if( solve_u == 1 ) this->cl_filename = prefix + basename + ".orca.loc.mo";
    if( solve_u == 0 ) this->u_filename = prefix + basename + ".orca.u";
-   this->p1_filename = prefix + basename + ".trans_onepdm";
-   this->p2_filename = prefix + basename + ".trans_twopdm";
-   this->act_filename = prefix + basename + ".orca.act_orbs";
+   //this->p1_filename = prefix + basename + ".trans_onepdm";
+   //this->p2_filename = prefix + basename + ".trans_twopdm";
+   //this->act_filename = prefix + basename + ".orca.act_orbs";
 
    cout << " basename = " << basename << endl;
    cout << " prefix = " << prefix << endl;
@@ -73,20 +73,20 @@ int transform_info::read()
    cout << " trans_twopdm_element  = " << trans_twopdm_element << endl;
   }
 
-  {
-    this->s_ov.set_nao() = this->norb;
-    this->s_ov.set_nmo() = this->norb;
-    FILE* f_ov = fopen( s_filename.c_str(), "rt" );
-    for( int i = 0; i < norb; i++ ){
-     for( int j = 0; j < norb; j++ ){
-      double value;
-      int ind_i, ind_j;
-      fscanf( f_ov, "%d %d %lf", &ind_i, &ind_j, &value );
-      s_ov( ind_j-1, ind_i-1 ) = value;
-     }
-    }
-    fclose(f_ov);
-  }
+//  {
+//    this->s_ov.set_nao() = this->norb;
+//    this->s_ov.set_nmo() = this->norb;
+//    FILE* f_ov = fopen( s_filename.c_str(), "rt" );
+//    for( int i = 0; i < norb; i++ ){
+//     for( int j = 0; j < norb; j++ ){
+//      double value;
+//      int ind_i, ind_j;
+//      fscanf( f_ov, "%d %d %lf", &ind_i, &ind_j, &value );
+//      s_ov( ind_j-1, ind_i-1 ) = value;
+//     }
+//    }
+//    fclose(f_ov);
+//  }
 
   {
     this->s_full.set_nao() = this->norb;
@@ -120,15 +120,15 @@ int transform_info::read()
     fclose(f_cmo);
   }
 
-  {
-    FILE* fact = fopen( act_filename.c_str(), "rt" );
-    for( int i = 0; i < nact; i++ ){
-     int value;
-     fscanf( fact, "%d", &value );
-     active_space.at(i) = value;
-    }
-    fclose(fact);
-  }
+//  {
+//    FILE* fact = fopen( act_filename.c_str(), "rt" );
+//    for( int i = 0; i < nact; i++ ){
+//     int value;
+//     fscanf( fact, "%d", &value );
+//     active_space.at(i) = value;
+//    }
+//    fclose(fact);
+//  }
 
   if( cl_filename != "not set" && u_filename == "not set" )
   {
@@ -162,35 +162,38 @@ int transform_info::read()
     fclose(f_utr);
   }
 
-  {
-    FILE* f_act = fopen( act_filename.c_str(), "rt");
-    for( int i = 0; i < nact; i++ ){
-     int value;
-     fscanf( f_act, "%d", &value );
-     active_space.at(i) = value;
-    }
-    fclose( f_act );
-  }
+//  {
+//    FILE* f_act = fopen( act_filename.c_str(), "rt");
+//    for( int i = 0; i < nact; i++ ){
+//     int value;
+//     fscanf( f_act, "%d", &value );
+//     active_space.at(i) = value;
+//    }
+//    fclose( f_act );
+//  }
 
   // temperarily set gamma1
   // only one element
   this->gamma1.set_norb() = this->nact;
   this->gamma1.set_n_element() = nact * nact;
   this->gamma1.set_store().fill(0.0e0);
-
+cout << trans_onepdm << endl;
   if( trans_onepdm == 1 )
   {
     ifstream if1pdm;
     if1pdm.open( p1_filename.c_str() );
+    if1pdm >> this->gamma1.set_norb();
     while( if1pdm.good() ){
       double value;
       int ind_i, ind_j;
       if1pdm >> ind_i >> ind_j >> value;
-      if( fabs(value) >= t1_thresh_in ){ gamma1(ind_i, ind_j) = value; }
+      //if( fabs(value) >= t1_thresh_in ){ gamma1(ind_i, ind_j) = value; }
+      gamma1( ind_i, ind_j ) = value;
+//cout << ind_i << " " << ind_j << " " << value << endl;
     }
     if1pdm.close();
   }
-
+/*
   this->gamma2.set_norb() = this->nact;
   this->gamma2.set_n_element() = nact * nact * nact * nact;
   this->gamma2.set_store().fill(0.0e0);
@@ -206,7 +209,7 @@ int transform_info::read()
     }
     if2pdm.close();
   }
-
+*/
   return 0;
 
 }
@@ -241,7 +244,6 @@ transform_info::transform_info( std::string inputfile )
   this->trans_twopdm_element = -1;
 
   this->configfile = inputfile;
-  
   this->read();
 
 }

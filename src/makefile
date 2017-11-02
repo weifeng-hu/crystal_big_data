@@ -38,8 +38,8 @@ endif
 ifeq ($(findstring x86, $(machine_iquads) ),x86)
 $(info x86/x86_64 detected ... set opt as -O3)
 copt_iquads	+= -O3
-cppopt_iquads	+= -O3
-fopt_iquads	+= -O3
+cppopt_iquads	+= -O0
+fopt_iquads	+= -O0
 endif
 
 # Also specifically add machine mode for armv7, ONLY applies to GNU compilers!!!

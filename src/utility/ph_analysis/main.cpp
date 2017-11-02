@@ -30,7 +30,7 @@ int main( int argc, char* argv[] )
    exit(1); 
   }
 
-  string input_file = argv[1];
+  string input_file( argv[1] );
   ph_analysis::transform_info trans_info( input_file );
 
   ph_analysis::transform_main( trans_info );

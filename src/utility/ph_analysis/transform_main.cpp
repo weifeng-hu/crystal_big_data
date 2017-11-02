@@ -10,7 +10,7 @@
 #include "mo_coefficients.h"
 #include "transform_info.h"
 #include "ph_analysis.h"
-#include "fc_fortran.h"
+#include "matrix/fc_fortran.h"
 
 using namespace std;
 
@@ -36,8 +36,16 @@ int transform_ph_main( onepdm& pdm_mo, mo_coefficients &c_mo )
   int norb = pdm_mo.get_norb();
   onepdm pdm_ao( norb );
   pdm_ao = transform_1( c_mo, pdm_mo );
-  print_projected_element_1( pdm_ao, 0.0e0, 0, 0 );
-//  iqs::matrix::oei_transform_( &norb, &norb, c_mo.set_store().data(), pdm_mo.set_store().data(), pdm_ao.set_store().data() );
+  ofstream ofs( "./spatial_onepdm.0.0" );
+  ofs << norb << endl;
+  for( int i = 0; i < norb; i++ ) {
+    for( int j = 0; j < norb; j++ ) {
+      ofs << i << " " << j << " " << pdm_ao(i,j) << endl;
+    }
+  }
+  ofs.close();
+  //print_projected_element_1( pdm_ao, 0.0e0, 0, 0 );
+//  iquads::matrix::oei_transform_( &norb, &norb, c_mo.set_store().data(), pdm_mo.set_store().data(), pdm_ao.set_store().data() );
 //  print_projected_element_1( pdm_ao, 0.0e0, 0, 0 );
   return 0;
 }
@@ -49,7 +57,7 @@ int transform_pphh_main( twopdm& pdm_mo, mo_coefficients &c_mo )
 
 // Debug
    twopdm pdm_ao( norb );
-   iqs::matrix::tei_transform_( &norb, &norb, c_mo.set_store().data(), pdm_mo.set_store().data(), pdm_ao.set_store().data() );
+//   iquads::matrix::tei_transform_( &norb, &norb, c_mo.set_store().data(), pdm_mo.set_store().data(), pdm_ao.set_store().data() );
 
    print_projected_element_double_spin_excitation( pdm_ao, c_mo);
 }
@@ -189,31 +197,32 @@ int transform_main( const transform_info& trans_info )
    u_mat.set_n_element() = u_mat.get_nmo() * u_mat.get_nao();
    u_mat.set_transposed() = false;
    u_mat.set_inverse_computed() = false;
+   u_mat = u_mat_tmp;
 
    // read the pz indices
-   vector<int> pz_ind;
-   {
-     ifstream ifs;
-     string filename = trans_info.get_prefix() + trans_info.get_basename() + ".orca.2pz_orbs";
-     ifs.open( filename.c_str() );
-     int count = 0;
-     while( count <= trans_info.get_nact() ){
-      int entry;
-      ifs >> entry;
-      pz_ind.push_back( entry );
-      count = count + 1;
-     }
-     ifs.close();
-   }
-
-   for( int i = 0; i < u_mat.get_nmo(); i++ ){
-    for( int j = 0; j < u_mat.get_nao(); j++ ){
-     const int ind_old_i = pz_ind.at(i);
-     const int ind_old_j = active_space.at(j);
-     const double value = u_mat_tmp( ind_old_j, ind_old_i );
-     u_mat( j , i ) = value;  // mo, pz
-    }
-   }
+//   vector<int> pz_ind;
+//   {
+//     ifstream ifs;
+//     string filename = trans_info.get_prefix() + trans_info.get_basename() + ".orca.2pz_orbs";
+//     ifs.open( filename.c_str() );
+//     int count = 0;
+//     while( count <= trans_info.get_nact() ){
+//      int entry;
+//      ifs >> entry;
+//      pz_ind.push_back( entry );
+//      count = count + 1;
+//     }
+//     ifs.close();
+//   }
+//
+//   for( int i = 0; i < u_mat.get_nmo(); i++ ){
+//    for( int j = 0; j < u_mat.get_nao(); j++ ){
+//     const int ind_old_i = pz_ind.at(i);
+//     const int ind_old_j = active_space.at(j);
+//     const double value = u_mat_tmp( ind_old_j, ind_old_i );
+//     u_mat( j , i ) = value;  // mo, pz
+//    }
+//   }
   }
 
   if( trans_info.get_trans_onepdm() == 1 )
@@ -229,41 +238,41 @@ int transform_main( const transform_info& trans_info )
    }
   }
 
-  if( trans_info.get_trans_twopdm() == 1 )
-  {
-    if( trans_info.get_trans_twopdm_element() == -1 ){
-     twopdm pdm_mo = trans_info.get_gamma2();
-     transform_pphh_main( pdm_mo, u_mat );
-    }
-    else if( trans_info.get_trans_twopdm_element() == 1 ){
-     const double thresh = trans_info.get_t2_thresh();
-     twopdm pdm_mo = trans_info.get_gamma2();
-     multimap<double, pair<int, int> > pphh_pair = get_pphh_pairs( pdm_mo, thresh );
-     transform_pphh_main( pphh_pair, u_mat );
-    }
-  }
+//  if( trans_info.get_trans_twopdm() == 1 )
+//  {
+//    if( trans_info.get_trans_twopdm_element() == -1 ){
+//     twopdm pdm_mo = trans_info.get_gamma2();
+//     transform_pphh_main( pdm_mo, u_mat );
+//    }
+//    else if( trans_info.get_trans_twopdm_element() == 1 ){
+//     const double thresh = trans_info.get_t2_thresh();
+//     twopdm pdm_mo = trans_info.get_gamma2();
+//     multimap<double, pair<int, int> > pphh_pair = get_pphh_pairs( pdm_mo, thresh );
+//     transform_pphh_main( pphh_pair, u_mat );
+//    }
+//  }
+//
+//
+//  {
+//   const double thresh = trans_info.get_t2_thresh();
+//   multimap< double, array<int, 4 > > pphh_list = get_pphh_list( trans_info.get_gamma2(), thresh );
+//   multimap< double, array<int, 4 > > :: reverse_iterator it_list = pphh_list.rbegin();
+//cout << pphh_list.size() << endl;
+//   twopdm total( trans_info.get_gamma2().get_norb() );
+//   for( ; it_list != pphh_list.rend(); it_list++ ){
+//    const double value = it_list->first;
+//    const int i = (it_list->second).at(0);
+//    const int j = (it_list->second).at(1);
+//    const int k = (it_list->second).at(2);
+//    const int l = (it_list->second).at(3);
+//    cout << i << " " << j << " " << k << " " << l << " " << value << endl;
+//    twopdm mat = transform_element_2( u_mat, value, i, j, k, l );
+//    total = total + mat;
+////    break;
+//   }
+//   print_projected_element_double_spin_excitation( total, u_mat );
+//  }
 
-/*
-  {
-   const double thresh = trans_info.get_t2_thresh();
-   multimap< double, array<int, 4 > > pphh_list = get_pphh_list( trans_info.get_gamma2(), thresh );
-   multimap< double, array<int, 4 > > :: reverse_iterator it_list = pphh_list.rbegin();
-cout << pphh_list.size() << endl;
-   twopdm total( trans_info.get_gamma2().get_norb() );
-   for( ; it_list != pphh_list.rend(); it_list++ ){
-    const double value = it_list->first;
-    const int i = (it_list->second).at(0);
-    const int j = (it_list->second).at(1);
-    const int k = (it_list->second).at(2);
-    const int l = (it_list->second).at(3);
-    cout << i << " " << j << " " << k << " " << l << " " << value << endl;
-    twopdm mat = transform_element_2( u_mat, value, i, j, k, l );
-    total = total + mat;
-//    break;
-   }
-   print_projected_element_double_spin_excitation( total, u_mat );
-  }
-*/
 
   return 0;
 

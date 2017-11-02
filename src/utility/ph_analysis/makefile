@@ -1,6 +1,8 @@
+
+
 SHELL	= /bin/sh
 CXX	= g++
-CXXFLAGS= -std=c++11 -g 
+CXXFLAGS= -std=c++11 -g -fopenmp
 COPT	= -O0
 CSRCS	= transform_info.cpp\
           transform.cpp\
@@ -13,12 +15,12 @@ HEAD	= ph_analysis.h\
 	  pdm.h\
 	  mo_coefficients.h\
 	  transform_info.h
-INCLUDE = -I/home/wh288/iquads/blas/ -I/home/wh288/iquads/utilities/ph_analysis/ -I/home/wh288/iquads/matrix/
-LIBS	= /home/wh288/iquads/blas/lib_blas_interface.a /home/wh288/iquads/matrix/libmatrix.a -L/home/intel/mkl/lib/intel64/ -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lgfortran
+INCLUDE = -I/home/wh288/Development/6000.integrated_quantum_dynamics/src/ -I/home/wh288/Development/6000.integrated_quantum_dynamics/src//blas/ -I/home/wh288/Development/6000.integrated_quantum_dynamics/src//utilities/ph_analysis/ -I/home/wh288/Development/6000.integrated_quantum_dynamics/src//matrix/
+LIBS	= -L/home/wh288/Development/6000.integrated_quantum_dynamics/src//blas -liquads_blas_interface -L/home/wh288/Development/6000.integrated_quantum_dynamics/src//matrix/ -liquads_matrix -L/home/intel/mkl/lib/intel64/ -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread -lgfortran
 
 PGM	= ph_trans
 
-$(PGM):	$(COBJS) $(HEAD) /home/wh288/iquads/blas/lib_blas_interface.a
+$(PGM):	$(COBJS) $(HEAD) /home/wh288/Development/6000.integrated_quantum_dynamics/src//blas/libiquads_blas_interface.a
 	$(CXX) $(CXXFLAGS) -o $(PGM) $(COBJS) $(LIBS)
 
 .SUFFIXES: .cpp .o

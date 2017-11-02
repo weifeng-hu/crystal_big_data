@@ -1,7 +1,7 @@
 #ifndef FC_FORT_H
 #define FC_FORT_H
 
-namespace iqs { namespace matrix {
+namespace iquads { namespace matrix {
 
 extern "C"
 {
