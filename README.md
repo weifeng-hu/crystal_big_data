@@ -1,4 +1,9 @@
 # crystal big data
 
-A crystal pattern recognition library based on the Many-Body Expansion formula.
+A scalable crystal pattern recognition library
+
+Main features:
+
+* Based on the Many-Body Expansion(MBE) formula
+* 
 
