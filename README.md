@@ -10,6 +10,6 @@ Main features:
 
 Roadmaps:
 * A more complete NoSQL-type library for more recognition types
-* A complete gradient-decent code(APIs) for crystal pattern dynamics
+* A complete gradient-descent code(APIs) for crystal pattern dynamics
 * Interface to MongoDB
 
